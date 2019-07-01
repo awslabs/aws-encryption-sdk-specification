@@ -1,4 +1,4 @@
-*Updated June 7, 2019*
+*Updated July 1, 2019*
 
 #  Message Header
 
@@ -7,6 +7,7 @@
 - [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextHeaders.java)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/structures.py)
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/header.c)
+- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/types.ts)
 
 ## Overview
 
@@ -231,7 +232,7 @@ This value MUST be equal to the [IV length](#algorithm-suites.md#iv-length) valu
 
 #### Frame Length
 
-The length of each [regular frame](#message-body.md#regular-frame) of framed content.
+The length of the [encrypted content](#message-body.md#encrypted-content) within each [regular frame](#message-body.md#regular-frame) of framed content.
 When the [content type](#Content-Type) is non-framed the value of this field MUST be 0.
 
 ### Header Authentication
