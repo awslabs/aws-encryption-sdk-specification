@@ -1,34 +1,60 @@
 # Footer Structure
 
-## Overview 
+## Current Implementations
 
-When the [algorithms with signing](#TODO) are used, the [message format](#TODO) contains a footer.  
-The message footer contains a signature calculated over the message [header](#TODO) and [body](#TODO) and is used to authenticate the message.  
-The following table describes the fields that form the footer.  
-The bytes are appended in the order shown. 
+- [C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/session_encrypt.c) 
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextFooters.java)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/internal/structures.py)
+- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/24fbfa0f9ace67a0185f62cf9851371a992f407a/modules/serialize/src/signature_info.ts)
+
+## Overview
+
+The footer is a component of the [message](#message.md).  
+When [algorithms with signing](#algorithm-suites.md#ecdsa) is used, the [message](#message.md) MUST contain a footer.  
+
+## Definitions
+
+### Conventions used in this document
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
+in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
+
 
 ## Structure
 
-| Field                    | Length in bytes                                                                            |
-| ------------------------ | ------------------------------------------------------------------------------------------ |
-| Signature Length         | 2                                                                                          |
-| Signature                | Variable. Equal to the value specified in the previous 2 bytes (Signature Length).         |
+The following describes the fields that form the footer.  
+The bytes are appended in the order shown.  
+
+Field            | Length (bytes) | Interpreted as
+---------------- | -------------- | --------------
+Signature Length | 2              | Uint16
+Signature        | Variable.      | Bytes
+         
 
 ### Signature Length
 
 The length of the signature.  
-It is a 2-byte value interpreted as a 16-bit unsigned integer that specifies the number of bytes that contain the signature.
 
 ### Signature
 
-The signature. It is used to authenticate the header and body of the message.
+The [signature](#algorithm-suite.md#ecdsa) used to authenticate the message.  
+This signature MUST be calculated over both the [message header](#message-header.md) and the [message body](#message-body.md).
 
+## Example Usage
 
-## Example Usage 
+The following section contains examples of the footer.
 
-The example below shows the raw bytes of the footer, in hexadecimal notation, followed by a description of what those bytes represent. 
+### Example Pseudo-ASN.1 Structure
 
+``` DEFINITIONS ::= BEGIN 
+Footer SEQUENCE (SIZE(2)) { 
+    SignatureLength UINT16, 
+    Signature OCTET STRING (SIZE(SignatureLength)),
+}
 ```
+
+### Example Bytes 
+
 0067                                     Signature Length (103)
 30650230 7229DDF5 B86A5B64 54E4D627      Signature
 CBE194F1 1CC0F8CF D27B7F8B F50658C0
@@ -38,9 +64,3 @@ BE84B355 3CED1721 A0BE2A1B 8E3F449E
 331F3614 BC407CEE B86A66FA CBF74D9E
 34CB7E4B 363A38
 ```
-
-## Implementation Details 
-
-[C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/session_encrypt.c#L338)
-[Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextFooters.java)
-[Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/internal/structures.py)
