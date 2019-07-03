@@ -98,7 +98,7 @@ The purpose of the message ID is to:
 #### AAD
 
 The additional authenticated data (AAD) for the header.
-This AAD is an encoding of the [encryption context](#encryption-context.md).
+This AAD is an encoding of the [encryption context](#data-structures.md#encryption-context).
 
 The following table describes the fields that form the AAD.
 The bytes are appended in the order shown.
@@ -148,7 +148,7 @@ The bytes are appended in the order shown.
 
 #### Encrypted Data Keys
 
-The encoding of the encrypted data keys.
+The encoding of the [encrypted data keys](#data-structures.md#encrypted-data-key).
 
 The following table describes the fields that form the encrypted data keys.
 The bytes are appended in the order shown.
