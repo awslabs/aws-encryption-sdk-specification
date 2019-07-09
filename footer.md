@@ -5,12 +5,12 @@
 - [C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/session_encrypt.c) 
 - [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextFooters.java)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/internal/structures.py)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/24fbfa0f9ace67a0185f62cf9851371a992f407a/modules/serialize/src/signature_info.ts)
+- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/signature_info.ts)
 
 ## Overview
 
 The footer is a component of the [message](#message.md).  
-When [algorithms with signing](#algorithm-suites.md#ecdsa) is used, the [message](#message.md) MUST contain a footer.  
+If an [algorithm suite](#algorithm-suites.md) includes a [signature algorithm](#algorithm-suites.md#signature-algorithm) while generating a [message](#message.md), it MUST contain a footer.
 
 ## Definitions
 
@@ -18,7 +18,6 @@ When [algorithms with signing](#algorithm-suites.md#ecdsa) is used, the [message
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
 in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
-
 
 ## Structure
 
@@ -29,7 +28,6 @@ Field            | Length (bytes) | Interpreted as
 ---------------- | -------------- | --------------
 Signature Length | 2              | Uint16
 Signature        | Variable.      | Bytes
-         
 
 ### Signature Length
 
@@ -37,8 +35,11 @@ The length of the signature.
 
 ### Signature
 
-The [signature](#algorithm-suite.md#ecdsa) used to authenticate the message.  
-This signature MUST be calculated over both the [message header](#message-header.md) and the [message body](#message-body.md).
+The [signature](#algorithm-suites.md#signature-algorithm) used to authenticate the message.  
+This signature MUST be calculated over both the [message header](#message-header.md) and the [message body](#message-body.md).  
+The [algorithm suite](#algorithm-suites-id) specified by the [Algorithm Suite ID](#algorith-suite-id) field 
+[determines how the value of this field is calculated](#encrypt.md), 
+and uses this value to [authenticate the contents of the header and body during decryption](#decrypt.md).  
 
 ## Example Usage
 
