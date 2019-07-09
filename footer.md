@@ -10,7 +10,7 @@
 ## Overview
 
 The footer is a component of the [message](#message.md).  
-If an [algorithm suite](#algorithm-suites.md) includes a [signature algorithm](#algorithm-suites.md#signature-algorithm) while generating a [message](#message.md), it MUST contain a footer.
+When an [algorithm suite](#algorithm-suites.md) includes a [signature algorithm](#algorithm-suites.md#signature-algorithm) the [message](message.md) MUST contain a footer.
 
 ## Definitions
 
@@ -37,7 +37,7 @@ The length of the signature.
 
 The [signature](#algorithm-suites.md#signature-algorithm) used to authenticate the message.  
 This signature MUST be calculated over both the [message header](#message-header.md) and the [message body](#message-body.md).  
-The [algorithm suite](#algorithm-suites-id) specified by the [Algorithm Suite ID](#algorith-suite-id) field 
+The [algorithm suite](#algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suites.md#algorithm-suite-id) field
 [determines how the value of this field is calculated](#encrypt.md), 
 and uses this value to [authenticate the contents of the header and body during decryption](#decrypt.md).  
 
