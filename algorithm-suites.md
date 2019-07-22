@@ -78,8 +78,16 @@ If specified to use ECDSA, the AWS Encryption SDK MUST use ECDSA with the follow
   The specific curves are defined in
   [Digital Signature Standard (DSS) (FIPS PUB 186-4)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf).
 - The hash function is specified by the algorithm suite.
-- If serialized, the binary form of the public key is equal to
-  the elliptic curve point Q compressed according to [SEC 1 version 2.0](http://www.secg.org/sec1-v2.pdf).
+- When included in the [message](#message.md), the output signature value is encoded using the
+  ANS.1 structure `ECDSA-Sig-Value` defined in section C.5 of [Sec 1 version 2.0](http://www.secg.org/sec1-v2.pdf):
+```
+ECDSA-Sig-Value ::= SEQUENCE {
+    r INTEGER,
+    s INTEGER
+}
+```
+- If serialized, the binary form of the verification key is equal to the elliptic curve point Q compressed
+according to section 2.3.3 of [SEC 1 version 2.0](http://www.secg.org/sec1-v2.pdf).
 
 ## Supported Algorithm Suites
 
