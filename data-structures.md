@@ -38,9 +38,6 @@ An encrypted data key is comprised of the following fields:
 
 Note: "Encrypted" is a misnomer here, as the process by which a key provider may obtain the plaintext data key
 from the ciphertext and vice versa does not have to be an encryption and decryption cipher.
-This specification uses the terms "encrypt" and "decrypt" for simplicity,
-but the actual process by which a key provider obtains the plaintext data key from the ciphertext
-and vice versa MAY be any reversible operation, though we expect that most will use encryption.
 
 ##### Key Provider ID
 
@@ -66,13 +63,13 @@ that includes more information.
 
 ##### Ciphertext
 
-An opaque value from which an appropriate key provider can obtain the plaintext data key.
+An opaque form of a plaintext data key which can be used by an appropriate key provider to obtain the plaintext key.
 
 Some key provider MUST be capable of deterministically obtaining the plaintext key from the ciphertext.
 
 Most commonly this is an encrypted form of the plaintext data key.
-Alternatively it could be the public input to a KDF that derives the plaintext data key or
-an identifier into a key store that will return the plaintext data key.
+Alternatively it could be the public input to a KDF which derives the plaintext data key or
+an identifier into a key store which will return the plaintext data key.
 
 ### Encryption Context
 
@@ -85,7 +82,7 @@ an identifier into a key store that will return the plaintext data key.
 
 #### Structure
 
-The encryption context is a key-value mapping of arbitrary, non-secret, UTF-8 encoded strings.
+The encryption context is a key-value mapping of arbitrary, non-secret UTF-8 encoded strings.
 It is used during [encryption](#encrypt.md) and [decryption](#decrypt.md) to provide additional authenticated data (AAD).
 
 Users SHOULD use the encryption context to store:
@@ -97,7 +94,7 @@ Users MUST NOT use the encryption context to store secret data.
 
 The encryption context MUST reserve the following key fields for use by the AWS Encryption SDK:
 
-- `aws-crypto-public-key` (See [the Default CMM spec](#default-cmm.md) for its use)
+- `aws-crypto-public-key` (See [Encrypt](#encrypt.md) and [Decrypt](#decrypt.md) for it's use)
 
 The encryption context SHOULD reserve any key field with the prefix `aws` for use by AWS KMS and
 other AWS services.
@@ -142,8 +139,7 @@ The [encryption context](#encryption-context) associated with this [encryption](
 
 ##### Keyring Trace
 
-A [keyring trace](#keyring-trace) containing all of the actions that keyrings have taken on this set
-of encryption materials.
+A [keyring trace](#keyring-trace) containing all of the actions keyrings have taken on this set of encryption materials.
 
 ##### Plaintext Data Key
 
@@ -151,7 +147,7 @@ A data key to be used as input for [encryption](#encrypt.md).
 
 The plaintext data key MUST:
 
-- fit the specification for the [key derivation algorithm](#algorithm-suites.md#key-derivation-algorithm)
+- fit the specification for the [encryption algorithm](#algorithm-suites.md#encryption-algorithm)
   included in this decryption material's [algorithm suite](#algorithm-suite).
 - consist of cryptographically secure (pseudo-)random bits.
 - be kept secret.
@@ -232,7 +228,7 @@ included in this decryption material's [algorithm suite](#algorithm-suite).
 
 #### Structure
 
-A list of traces, representing actions that keyrings have taken on data keys.
+A list of traces, representing keyrings' actions on data keys.
 
 The list MUST be ordered sequentially according to the order the actions were taken,
 with the earliest action corresponding to the first trace in the list.
@@ -248,32 +244,35 @@ A field representing a set of one or more enums indicating what actions were tak
 
 This set MUST include at least one flag.
 
-The following list contains the supported flags:
+The following table lists the supported flags and their respective values.
 
-- [GENERATED DATA KEY](#generated-data-key)
-- [ENCRYPTED DATA KEY](#encrypted-data-key)
-- [DECRYPTED DATA KEY](#decrypted-data-key)
-- [SIGNED ENCRYPTION CONTEXT](#signed-encryption-context)
-- [VERIFIED ENCRYPTION CONTEXT](#verified-encryption-context)
+| Flag                                                        | Value |
+|-------------------------------------------------------------|-------|
+| [GENERATED DATA KEY](#generated-data-key)                   | 1     |
+| [ENCRYPTED DATA KEY](#encrypted-data-key)                   | 2     |
+| [DECRYPTED DATA KEY](#decrypted-data-key)                   | 4     |
+| [SIGNED ENCRYPTION CONTEXT](#signed-encryption-context)     | 8     |
+| [VERIFIED ENCRYPTION CONTEXT](#verified-encryption-context) | 16    |
 
-Note: the underlying value of each enum is implementation specific.
+Note that each value of a flag MUST be a power of two so that implementations can store the set of
+flags as an integer, where each bit in the integer represents whether the flag is included in the set.
 
 ###### GENERATED DATA KEY
 
 A flag to represent that a keyring has generated a plaintext data key.
-This flag MUST be included in a trace if the keyring has successfully performed the
+This flag MUST ONLY be included in a trace if the keyring has successfully performed the
 [generate data key](#keyring-interface.md#generate-data-key) behavior.
 
 ###### ENCRYPTED DATA KEY
 
 A flag to represent that a keyring has created an [encrypted data key](#encrypted-data-key).
-This flag MUST be included in a trace if and only if the keyring has successfully performed the
+This flag MUST ONLY be included in a trace if the keyring has successfully performed the
 [encrypt data key](#keyring-interface.md#encrypt-data-key) behavior.
 
 ###### DECRYPTED DATA KEY
 
 A flag to represent that a keyring has obtained the corresponding plaintext data key from an [encrypted data key](#encrypted-data-key).
-This flag MUST be included in a trace if and only if the keyring has successfully performed the
+This flag MUST ONLY be included in a trace if the keyring has successfully performed the
 [decrypt data key](#keyring-interface.md#decrypt-data-key) behavior.
 
 ###### SIGNED ENCRYPTION CONTEXT
@@ -281,7 +280,7 @@ This flag MUST be included in a trace if and only if the keyring has successfull
 A flag to represent that the keyring has cryptographically bound the [encryption context](#encryption-context)
 to a newly created [encrypted data key](#encrypted-data-key).
 
-This flag MUST be included in a trace if and only if the keyring has successfully performed the
+This flag MUST ONLY be included in a trace if the keyring has successfully performed the
 [encrypt data key](#keyring-interface.md#encrypt-data-key) behavior to create an [encrypted data-key](#encrypted-data-key)
 that has the following property:
 
@@ -294,7 +293,7 @@ that has the following property:
 A flag to represent that the keyring has verified that an [encrypted data key](#encrypted-data-key) was
 originally created with a particular [encryption context](#encryption-context).
 
-This flag MUST be included in a trace if and only if the keyring has successfully performed the
+This flag MUST ONLY be included in a trace if the keyring has successfully performed the
 [decrypt data key](#keyring-interface.md#decrypt-data-key) behavior to decrypt an [encrypted data key](#encrypted-data-key)
 that has the following property:
 

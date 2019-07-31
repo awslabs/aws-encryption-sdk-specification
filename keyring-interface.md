@@ -46,7 +46,7 @@ If the keyring did not attempt any of the above behaviors, it MUST output the [e
 
 If the [encryption materials](#data-structures.md#encryption-materials) do not contain a plaintext data key,
 OnEncrypt MAY generate a data key.
-If the encryption materials contain a plaintext data key, OnEncrypt MUST NOT generate a data key.
+Otherwise, OnEncrypt MUST NOT generate a data key.
 
 The keyring generates a plaintext data key, and sets the resulting plaintext data key on the
 [encryption materials](#data-structures.md#encryption-materials).
@@ -60,29 +60,25 @@ this keyring MUST append exactly one trace to the [keyring trace](#data-structur
 [GENERATED DATA KEY](#data-structures.md#generated-data-key) flag.
 Note that this trace MAY include more than one flag.
 
-Note: If the keyring successfully performs this behavior, this means that the keyring MAY then
-perform the [Encrypt Data Key](#encrypt-data-key) behavior.
-
 #### Encrypt Data Key
 
 If the [encryption materials](#data-structures.md#encryption-materials) contain a plaintext data key,
 OnEncrypt MAY encrypt a data key.
-If the encryption materials do not contain a plaintext data key, OnEncrypt MUST NOT encrypt a data key.
+Otherwise, OnEncrypt MUST NOT encrypt a data key.
 
 The keyring creates one or more [encrypted data keys](#data-structures.md#encrypted-data-key) using
 the plaintext data key from the [encryption materials](#data-structures.md#encryption-materials) as input,
-and appends the [encrypted data keys](#data-structures.md#encrypted-data-key) to the encrypted data key list
+and appends the [encrypted data keys](#data-structures.md#encrypted-data-key) to encrypted data key list
 in the [encryption materials](#data-structures.md#encryption-materials).
 
 The [encrypted data keys](#data-structures.md#encrypted-data-key) produced by this keyring MUST
-have [ciphertexts](#data-structures.md#ciphertext) that can be decrypted to the plaintext data key in the
-[encryption materials](#data-structures.md#encryption-materials).
+be an opaque form of the plaintext data key in the [encryption materials](#data-structures.md#encryption-materials).
 
 If OnEncrypt updates the [encryption materials](#data-structure.md#encryption-materials) with at least
 one new [encrypted data key](#data-structures.md#encrypted-data-key), this keyring MUST append at least
 one trace to the [keyring trace](#data-structures.md#keyring-trace) that includes the [ENCRYPTED DATA KEY](#data-structures.md#encrypted-data-key)
 flag.
-Note that this trace MAY include more than one flag, for example the [SIGNED ENCRYPTION CONTEXT flag](#data-structures.md#signed-encryption-context).
+Note that this trace MAY include more than one flag.
 
 ### OnDecrypt
 
@@ -98,30 +94,29 @@ If the keyring did not attempt the above behavior, the keyring MUST output the [
 
 #### Decrypt Data Key
 
-If the encryption materials do contain a plaintext data key, OnDecrypt MUST NOT decrypt a data key.
 If the [decryption materials](#data-structures.md#decryption-materials) do not include a plaintext data key,
 OnDecrypt MAY decrypt a data key.
+Otherwise, OnDecrypt MUST NOT decrypt a data key.
 
-To do this, the keyring attempts to retrieve a plaintext data key using the input list of [encrypted data keys](#data-structures.md#encrypted-data-key).
+To do this, the keyring attempts to retrieve a plaintext data key from the input list of [encrypted data keys](#data-structures.md#encrypted-data-key).
 
 If the keyring is able to succesfully get at least one plaintext data key from any [encrypted data key](#data-structures.md#encrypted-data-key)
 and the [decryption materials](#data-structures.md#decryption-materials) still do not include a plaintext data key,
-it SHOULD set one resulting plaintext data key on the [decryption materials](#data-structures.md#decryption-materials).
+it MUST set one resulting plaintext data key on the [decryption materials](#data-structures.md#decryption-materials).
 
-If the keyring is unable to get any plaintext data key using the input [encrypted data keys](#data-structures.md#encrypted-data-key)
+If the keyring is unable to get any plaintext data key from the input [encrypted data keys](#data-structures.md#encrypted-data-key)
 the keyring MUST NOT not update the [decryption materials](#data-structures.md#decryption-materials).
 
 If OnDecrypt updates the [decryption materials](#data-structure.md#decryption-materials) with a plaintext data key,
 this keyring MUST append exactly one trace to the [keyring trace](#data-structures.md#keyring-trace)
 that includes the [DECRYPTED DATA KEY](#data-structures.md#encrypted-data-key) flag.
-Note that this trace MAY include more than one flag, for example the [VERIFIED ENCRYPTION CONTEXT flag](#data-structures.md#verified-encryption-context).
+Note that this trace MAY include more than one flag.
 
 ## Security Considerations
 
 Keyring implementations SHOULD provide integrity guarantees for the [encrypted data keys](#data-structures.md#encrypted-data-key)
 it returns on [OnEncrypt](#onencrypt) such that tampered versions of those encrypted data keys,
-if inputted into [OnDecrypt](#ondecrypt), are overwhelmingly likely to cause a decryption failure
-(i.e. the chance of a successful decryption in this case is negligible).
+if inputted into [OnDecrypt](#ondecrypt), are overwhelmingly likely to cause a decryption failure.
 
 Such integrity guarantees SHOULD include the integrity of the [encryption context](#data-structures.md#encryption-context)
 such that, if the encryption context used as input to OnEncrypt to produce an encrypted data key is
