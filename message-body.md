@@ -57,7 +57,7 @@ due to restrictions imposed by the [implemented algorithms](#algorithm-suite.md)
 
 #### Encrypted Content
 
-The encrypted data as returned by the [encryption algorithm](#algorithm-suite.md).
+The encrypted data as returned by the [encryption algorithm](#encrypt.md).
 
 #### Authentication Tag
 
