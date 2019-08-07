@@ -17,7 +17,7 @@ The purpose of the message header is to define the authenticated metadata requir
 
 - the format of the [message](#message.md) and [message body](#message-body.md)
 - the encrypted data keys needed for decryption of the [message body encrypted content](#message-body.md#encrypted-content)
-- the content of the [encryption context](#encryption-context.md)
+- the [encryption context](#encryption-context.md)
 
 ## Definitions
 
@@ -42,18 +42,18 @@ The bytes are appended in the order shown.
 The following table describes the fields that form the header body.
 The bytes are appended in the order shown.
 
-| Field                                           | Length (bytes)                                                                                  | Interpreted as                                                |
-|-------------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [Version](#version)                             | 1                                                                                               | See [Supported Versions](#supported-versions)                 |
-| [Type](#type)                                   | 1                                                                                               | See [Supported Types](#supported-types)                       |
-| [Algorithm Suite ID](#algorithm-suite-id)       | 2                                                                                               | See [Supported Algorithm Suites](#supported-algorithm-suites) |
-| [Message ID](#message-id)                       | 16                                                                                              | Bytes                                                         |
-| [AAD](#aad)                                     | Variable. Equal to the value of [Key Value Pairs Length](#key-value-pairs-length) field + 2.    | [AAD](#aad)                                                   |
-| [Encrypted Data Keys](#encrypted-data-keys)     | Variable. Determined by the number of encrypted data keys and the length of each.               | [Encrypted Data Keys](#encrypted-data-keys)                   |
-| [Content Type](#content-type)                   | 1                                                                                               | See [Supported Types](#supported-content-types)               |
-| [Reserved](#reserved)                           | 4                                                                                               | See [Reserved](#reserved)                                     |
-| [IV Length](#iv-length)                         | 1                                                                                               | Uint8                                                         |
-| [Frame Length](#frame-length)                   | 4                                                                                               | Uint32                                                        |
+| Field                                           | Length (bytes)                                                                    | Interpreted as                                                |
+|-------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
+| [Version](#version)                             | 1                                                                                 | See [Supported Versions](#supported-versions)                 |
+| [Type](#type)                                   | 1                                                                                 | See [Supported Types](#supported-types)                       |
+| [Algorithm Suite ID](#algorithm-suite-id)       | 2                                                                                 | See [Supported Algorithm Suites](#supported-algorithm-suites) |
+| [Message ID](#message-id)                       | 16                                                                                | Bytes                                                         |
+| [AAD](#aad)                                     | Variable. [Self-describing](#aad).                                                | [AAD](#aad)                                                   |
+| [Encrypted Data Keys](#encrypted-data-keys)     | Variable. Determined by the number of encrypted data keys and the length of each. | [Encrypted Data Keys](#encrypted-data-keys)                   |
+| [Content Type](#content-type)                   | 1                                                                                 | See [Supported Types](#supported-content-types)               |
+| [Reserved](#reserved)                           | 4                                                                                 | See [Reserved](#reserved)                                     |
+| [IV Length](#iv-length)                         | 1                                                                                 | UInt8                                                         |
+| [Frame Length](#frame-length)                   | 4                                                                                 | UInt32                                                        |
 
 #### Version
 
@@ -80,24 +80,27 @@ The value (hex) of this field MUST be a value that exists in the following table
 #### Algorithm Suite ID
 
 The identifier for the algorithm suite used when generating the message.
-The value (hex) of this field MUST be a value that exists in the [Supported Algorithm Suites](#algorithm-suites.md#supported-algorithm-suites) table.
+The value (hex) of this field MUST be a value that exists in the
+[Supported Algorithm Suites](#algorithm-suites.md#supported-algorithm-suites) table.
 
 #### Message ID
 
 A value that MUST uniquely identify the [message](#message.md).
 While implementations cannot guarantee complete uniqueness,
-implementations SHOULD use a good source of randomness when generating messages IDs in order to make the chance of duplicate IDs negligible.
+implementations MUST use a good source of randomness when generating messages IDs in order to make
+the chance of duplicate IDs negligible.
 
 The purpose of the message ID is to:
 
+- protect against accidental reuse of a derived data key or the wearing out of derived data keys in
+  the AWS Encryption SDK
 - uniquely identify the [message](message.md)
-- weakly bind the message header to the [message body](message-body.md)
+- bind the message header to the [message body](message-body.md) [TODO "bind" wording]
 - provide a mechanism to securely reuse a data key with multiple messages
-- protect against accidental reuse of a data key or the wearing out of keys in the AWS Encryption SDK
 
 #### AAD
 
-The additional authenticated data (AAD) for the header.
+The Additional Authenticated Data (AAD) for the header.
 This AAD is an encoding of the [encryption context](#data-structures.md#encryption-context).
 
 The following table describes the fields that form the AAD.
@@ -105,12 +108,13 @@ The bytes are appended in the order shown.
 
 | Field                                             | Length (bytes)                                                                          | Interpreted as                      |
 |---------------------------------------------------|-----------------------------------------------------------------------------------------|-------------------------------------|
-| [Key Value Pairs Length](#key-value-pairs-length) | 2                                                                                       | Uint16                              |
+| [Key Value Pairs Length](#key-value-pairs-length) | 2                                                                                       | UInt16                              |
 | [Key Value Pairs](#key-value-pairs)               | Variable. Determined by the value of [Key Value Pairs Length](#key-value-pairs-length). | [Key Value Pairs](#key-value-pairs) |
 
 ##### Key Value Pairs Length
 
 The length of the [Key Value Pairs](#key-value-pairs) field in bytes.
+
 When the [encryption context](#encryption-context.md) is empty, the value of this field MUST be 0.
 
 ##### Key Value Pairs
@@ -123,7 +127,7 @@ The bytes are appended in the order shown.
 
 | Field                                             | Length (bytes)                                                       | Interpreted as                                    |
 |---------------------------------------------------|----------------------------------------------------------------------|---------------------------------------------------|
-| [Key Value Pair Count](#key-value-pair-count)     | 2                                                                    | Uint16                                            |
+| [Key Value Pair Count](#key-value-pair-count)     | 2                                                                    | UInt16                                            |
 | [Key Value Pair Entries](#key-value-pair-entries) | Variable. Determined by the count and length of each key-value pair. | [Key Value Pair Entries](#key-value-pair-entries) |
 
 ###### Key Value Pair Count
@@ -134,16 +138,21 @@ The value of this field MUST be greater than 0.
 ###### Key Value Pair Entries
 
 A sequence of one or more key-value pair entries.
-Key-value pair entries are sorted, by key, in ascending order according to UTF-8 encoded binary value.
+
+This sequence MUST not contain duplicate entries.
+
+These entries MUST have entries sorted, by key,
+in ascending order according to UTF-8 encoded binary value.
+[TODO does the above informationrmation belong here or as part of encryption context?]
 
 The following table describes the fields that form each key value pair entry.
 The bytes are appended in the order shown.
 
 | Field        | Length (bytes)                                                                 | Interpreted as      |
 |--------------|--------------------------------------------------------------------------------|---------------------|
-| Key Length   | 2                                                                              | Uint16              |
+| Key Length   | 2                                                                              | UInt16              |
 | Key          | Variable. Equal to the value specified in the previous 2 bytes (Key Length).   | UTF-8 encoded bytes |
-| Value Length | 2                                                                              | Uint16              |
+| Value Length | 2                                                                              | UInt16              |
 | Value        | Variable. Equal to the value specified in the previous 2 bytes (Value Length). | UTF-8 encoded bytes |
 
 #### Encrypted Data Keys
@@ -155,7 +164,7 @@ The bytes are appended in the order shown.
 
 | Field                                                    | Length, in bytes                                                     | Interpreted as                                            |
 |----------------------------------------------------------|----------------------------------------------------------------------|-----------------------------------------------------------|
-| [Encrypted Data Key Count](#encrypted-data-key-count)    | 2                                                                    | Uint16                                                    |
+| [Encrypted Data Key Count](#encrypted-data-key-count)    | 2                                                                    | UInt16                                                    |
 | [Encrypted Data Key Entries](#encrypted-data-key-entries)| Variable. Determined by the count and length of each key-value pair. | [Encrypted Data Key Entries](#encrypted-data-key-entries) |
 
 #### Encrypted Data Key Count
@@ -170,24 +179,23 @@ A sequence of one or more encrypted data key entries.
 The following table describes the fields that form each encrypted data key entry.
 The bytes are appended in the order shown.
 
-| Field                                                               | Length, in bytes                                                                                  | Interpreted as       |
-|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|----------------------|
-| [Key Provider ID Length](#key-provider-id-length)                   | 2                                                                                                 | Uint16               |
-| [Key Provider ID](#key-provider-id)                                 | Variable. Equal to the value specified in the previous 2 bytes (Key Provider ID Length).          | UTF-8 encoded bytes  |
-| [Key Provider Information Length](#key-provider-information-length) | 2                                                                                                 | Uint16               |
-| [Key Provider Information](#key-provider-information)               | Variable. Equal to the value specified in the previous 2 bytes (Key Provider Information Length). | Bytes                |
-| [Encrypted Data Key Length](#encrypted-data-key-length)             | 2                                                                                                 | Uint16               |
-| [Encrypted Data Key](#encrypted-data-key)                           | Variable. Equal to the value specified in the previous 2 bytes (Encrypted Data Key Length).       | Bytes                |
+| Field                                                               | Length, in bytes                                                                                  | Interpreted as      |
+|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|---------------------|
+| [Key Provider ID Length](#key-provider-id-length)                   | 2                                                                                                 | UInt16              |
+| [Key Provider ID](#key-provider-id)                                 | Variable. Equal to the value specified in the previous 2 bytes (Key Provider ID Length).          | UTF-8 encoded bytes |
+| [Key Provider Information Length](#key-provider-information-length) | 2                                                                                                 | UInt16              |
+| [Key Provider Information](#key-provider-information)               | Variable. Equal to the value specified in the previous 2 bytes (Key Provider Information Length). | Bytes               |
+| [Encrypted Data Key Length](#encrypted-data-key-length)             | 2                                                                                                 | UInt16              |
+| [Encrypted Data Key](#encrypted-data-key)                           | Variable. Equal to the value specified in the previous 2 bytes (Encrypted Data Key Length).       | Bytes               |
 
 ##### Key Provider ID Length
 
-The length of the key provider identifier.
+The length of the key provider ID.
 
 ##### Key Provider ID
 
-The key provider identifier.
-The value of this field indicates the provider of the encrypted data key.
-See [Key Provider](#key-provider.md) for details on supported key providers.
+The key provider ID.
+See [the specification for encrypted data keys](#data-structures.md#encrypted-data-key).
 
 ##### Key Provider Information Length
 
@@ -196,7 +204,7 @@ The length of the key provider information.
 ##### Key Provider Information
 
 The key provider information.
-The [key provider](#key-provider.md) for this encrypted data key determines what this field contains.
+See [the specification for encrypted data keys](#data-structures.md#encrypted-data-key).
 
 ##### Encrypted Data Key Length
 
@@ -266,7 +274,8 @@ and uses this value to [authenticate the contents of the header during decryptio
 
 ### Example Structure Definition
 
-The example below is a pseudo-ASN.1 definition of the message header format described in this document.
+Below is an example definition of the message header format described in this document.
+[TODO, to avoid confusion about ASN.1, how should we introduce this example?]
 
 ```
 DEFINITIONS ::= BEGIN
@@ -298,7 +307,7 @@ AAD                 SEQUENCE (SIZE(1..2)) {
     }
 }
 
-EncryptedDataKey    SEQUENCE (SIZE(1..2^16-1)) {
+EncryptedDataKey    SEQUENCE (SIZE(6)) {
     ProviderIdLength        UINT16,
     ProviderId              UTF8String (SIZE(0..2^16-1)),
     KeyInfoLength           UINT16,
