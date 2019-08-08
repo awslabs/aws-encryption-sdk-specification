@@ -7,6 +7,8 @@
 - [C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/cipher.c)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/identifiers.py)
 - [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/CryptoAlgorithm.java)
+- [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/node_algorithms.ts)
+- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/web_crypto_algorithms.ts)
 
 ## Overview
 
@@ -67,7 +69,7 @@ If specified to use HKDF, the AWS Encryption SDK MUST use HKDF with the followin
 ### ECDSA
 
 Specification: ANS X9.62-2005
-(Not available publically, but the specification for ECDSA is replicated in [SEC 1 version 2.0](http://www.secg.org/sec1-v2.pdf).
+(Not available publicaly, but the specification for ECDSA is replicated in [SEC 1 version 2.0](http://www.secg.org/sec1-v2.pdf).
 Information about obtaining copies of ANS X9.62 is available at http://www.x9.org.)
 
 The Elliptic Curve Digital Signature Algorithm (ECDSA) is a signature algorithm.
