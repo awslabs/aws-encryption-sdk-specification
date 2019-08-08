@@ -1,4 +1,4 @@
-# Data Structures
+# Structures
 
 ## Definitions
 
@@ -9,7 +9,16 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Overview
 
-This document includes the specifications for common data structures referenced throughout the AWS Encryption SDK specification.
+This document includes the specifications for common structures referenced throughout the
+AWS Encryption SDK specification.
+These structures define a group of related fields that MUST hold certain properties.
+Wherever these structures are referenced in this specification,
+implementations MUST ensure that all properties of a structure's fields are upheld.
+
+Note that this specification does not specify how these structures should be represented or passed
+throughout the AWS Encryption SDK framework.
+While these structures will usually be represented as objects, lower level languages MAY represent
+these fields in a less strictly defined way as long as all field properties are still upheld.
 
 Structures defined in this document:
 
