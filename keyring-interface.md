@@ -40,7 +40,8 @@ and MAY modify it with any of the following behaviors:
 If this keyring attempted any of the above behaviors, and successfully completed those behaviors,
 it MUST output the modified [encryption materials](#data-structures.md#encryption-materials).
 
-If the keyring did not attempt any of the above behaviors, it MUST output the [encryption materials](#data-structures.md#encryption-materials) unmodified.
+If the keyring did not attempt any of the above behaviors, it MUST output the
+[encryption materials](#data-structures.md#encryption-materials) unmodified.
 
 #### Generate Data Key
 
@@ -48,8 +49,13 @@ If the [encryption materials](#data-structures.md#encryption-materials) do not c
 OnEncrypt MAY generate a data key.
 If the encryption materials contain a plaintext data key, OnEncrypt MUST NOT generate a data key.
 
-The keyring generates a plaintext data key, and sets the resulting plaintext data key on the
-[encryption materials](#data-structures.md#encryption-materials).
+Generate Data Key MAY modify the following fields in the [encryption materials](#data-structures.md#encryption-materials):
+
+- [plaintext data key](#data-structures.md#plaintext-data-key)
+- [keyring trace](#data-structures.md#keyring-trace)
+
+To perform this behavior, the keyring generates a [plaintext data key](#data-structures.md#plaintext-data-key)
+and sets the resulting plaintext data key on the [encryption materials](#data-structures.md#encryption-materials).
 
 The length of the output plaintext data key MUST be equal to the KDF input length of the [algorithm suite](#algorithm-suites.md)
 specified in the [encryption materials](#data-structures.md#encryption-materials).
@@ -58,7 +64,6 @@ The value of the plaintext data key MUST consist of cryptographically secure (ps
 If OnEncrypt updates the [encryption materials](#data-structure.md#encryption-materials) with a plaintext data key,
 the [keyring trace](#data-structures.md#keyring-trace) returned by OnEncrypt MUST include one trace
 associated with this keyring that has the [GENERATED DATA KEY](#data-structures.md#generated-data-key) flag.
-Note that this trace MAY include more than one flag.
 
 Note: If the keyring successfully performs this behavior, this means that the keyring MAY then
 perform the [Encrypt Data Key](#encrypt-data-key) behavior.
@@ -69,8 +74,13 @@ If the [encryption materials](#data-structures.md#encryption-materials) contain 
 OnEncrypt MAY encrypt a data key.
 If the encryption materials do not contain a plaintext data key, OnEncrypt MUST NOT encrypt a data key.
 
-The keyring creates one or more [encrypted data keys](#data-structures.md#encrypted-data-key) using
-the plaintext data key from the [encryption materials](#data-structures.md#encryption-materials) as input,
+Encrypt Data Key MAY modify the following fields in the [encryption materials](#data-structures.md#encryption-materials):
+
+- [encrypted data keys](#data-structures.md#encrypted-data-keys)
+- [keyring trace](#data-structures.md#keyring-trace)
+
+To perform this behavior, the keyring creates one or more [encrypted data keys](#data-structures.md#encrypted-data-key)
+using the plaintext data key from the [encryption materials](#data-structures.md#encryption-materials) as input,
 and appends the [encrypted data keys](#data-structures.md#encrypted-data-key) to the encrypted data key list
 in the [encryption materials](#data-structures.md#encryption-materials).
 
@@ -95,7 +105,8 @@ MAY modify it with the following behavior:
 
 If this keyring attempted the above behavior, and succeeded, it MUST output the modified [decryption materials](#data-structures.md#decryption-materials).
 
-If the keyring did not attempt the above behavior, the keyring MUST output the [decryption materials](#data-structures.md#decryption-materials) unmodified.
+If the keyring did not attempt the above behavior,
+the keyring MUST output the [decryption materials](#data-structures.md#decryption-materials) unmodified.
 
 #### Decrypt Data Key
 
@@ -103,7 +114,13 @@ If the encryption materials do contain a plaintext data key, OnDecrypt MUST NOT 
 If the [decryption materials](#data-structures.md#decryption-materials) do not include a plaintext data key,
 OnDecrypt MAY decrypt a data key.
 
-To do this, the keyring attempts to retrieve a plaintext data key using the input list of [encrypted data keys](#data-structures.md#encrypted-data-key).
+Decrypt Data Key MAY modify the following fields in the [encryption materials](#data-structures.md#encryption-materials):
+
+- [plaintext data key](#data-structures.md#plaintext-data-key)
+- [keyring trace](#data-structures.md#keyring-trace)
+
+To perform this behavior, the keyring attempts to retrieve a plaintext data key from the input list
+of [encrypted data keys](#data-structures.md#encrypted-data-key).
 
 If the keyring is able to succesfully get at least one plaintext data key from any [encrypted data key](#data-structures.md#encrypted-data-key)
 and the [decryption materials](#data-structures.md#decryption-materials) still do not include a plaintext data key,
