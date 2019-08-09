@@ -36,7 +36,8 @@ The length of the signature.
 ### Signature
 
 The [signature](#algorithm-suites.md#signature-algorithm) used to authenticate the message.  
-This signature MUST be calculated over both the [message header](#message-header.md) and the [message body](#message-body.md).  
+This signature MUST be calculated over both the [message header](#message-header.md) and the [message body](#message-body.md), 
+in the order of serialization.  
 The [algorithm suite](#algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suites.md#algorithm-suite-id) field
 [determines how the value of this field is calculated](#encrypt.md), 
 and uses this value to [authenticate the contents of the header and body during decryption](#decrypt.md).  
