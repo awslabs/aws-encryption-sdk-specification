@@ -31,7 +31,8 @@ The following sections describe the format of the message body for each content 
 
 ### Non-Framed Data
 
-Non-framed data is a sequence of bytes encrypted in a single blob along with the [initialization vector (IV)](#iv) and body [authentication tag](#authentication-tag).   
+Non-framed data is a sequence of encrypted bytes along with the [initialization vector (IV)](#iv) 
+and body [authentication tag](#authentication-tag).   
 
 The following describes the fields that form non-framed data.    
 The bytes are appended in the order shown.
@@ -51,7 +52,8 @@ The IV MUST be a unique IV within the message.
 #### Encrypted Content Length
 
 The length of the encrypted content.    
-The length MUST be less than `2^36 - 32`, or 64 gibibytes (64 GiB), due to restrictions imposed by the [implemented algorithms](#algorithm-suite.md).
+The length MUST NOT be greater than `2^36 - 32`, or 64 gibibytes (64 GiB), 
+due to restrictions imposed by the [implemented algorithms](#algorithm-suite.md).
 
 #### Encrypted Content
 
@@ -64,17 +66,12 @@ It is used to authenticate the message body.
 
 ### Framed Data
 
-Framed data is a sequence of bytes divided into equal-length parts called as frames.    
+Framed data is a sequence of bytes divided into equal-length parts called frames.    
 Each frame is encrypted separately with a unique [IV](#iv) and body [authentication tag](#authentication-tag).    
 There are two kinds of frames:
 
 - [Regular Frame](#regular-frame)
 - [Final Frame](#final-frame)
-
-Frame Type | No of Frames
----------- | -----------------------------------------------
-Regular    | ceiling(length of plaintext/frame length) - 1
-Final      | 1
 
 Note:
 
@@ -85,19 +82,15 @@ Note:
 
 All frames except the [Final Frame](#final-frame) are Regular Frames.
 
-- When the length of the Plaintext is more than the [Frame Length](#message-header.md#frame-length), the message body MUST contain `ceiling(length of plaintext/frame length) - 1` number of Regular Frames.
-- When the length of the Plaintext is less than or equal to the Frame Length, the message-body MUST NOT contain a regular frame.
-- The total number of regular frames in a single message MUST be less than or equal to `2^32 - 2`.
-
 The following describes the fields that form the Regular Frame Body Structure.    
 The bytes are appended in the order shown.
 
-Field                                     | Length (bytes)                            | Interpreted as
------------------------------------------ | ----------------------------------------- | --------------
-[Sequence Number](#sequence-number)       | 4                                         | Uint32
-[IV](#iv)                                 | [IV Length](#message-header.md#iv-length) | Bytes
-[Encrypted Content](#encrypted-content)   | Variable                                  | Bytes
-[Authentication Tag](#authentication-tag) | Variable                                  | Bytes
+Field                                     | Length (bytes)                                                                                                              | Interpreted as
+----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------
+[Sequence Number](#sequence-number)       | 4                                                                                                                           | UInt32
+[IV](#iv)                                 | [IV Length](#message-header.md#iv-length)                                                                                   | Bytes
+[Encrypted Content](#encrypted-content)   | Variable                                                                                                                    | Bytes
+[Authentication Tag](#authentication-tag) | Algorithm suite ID's [Authentication Tag Length](#algorithm-suites.md#supported-algorithm-suites#authentication-tag-length) | Bytes
 
 ##### Sequence Number
 
@@ -111,6 +104,7 @@ Subsequent frames MUST be in order and MUST contain an increment of 1 from the p
 The initialization vector (IV) for the frame.    
 Each frame in the [Framed Data](framed-data) MUST include an IV that is unique within the message.
 The IV length MUST be equal to the IV length of the algorithm suite specified by the [Algorithm Suite ID](#message-header.md#algorithm-suite-id) field.
+Note: This IV is different from the [Header IV](#message-header.md#iv).  
 
 ##### Encrypted Content
 
@@ -119,7 +113,9 @@ The length of the encrypted content of a Regular Frame MUST be equal to the Fram
 
 ##### Authentication Tag
 
-The authentication value for the frame.
+The authentication value for the frame.  
+The authentication tag length MUST be equal to the authentication tag length of the algorithm suite 
+specified by the [Algorithm Suite ID](#message-header.md#algorithm-suite-id) field.
 
 #### Final Frame
 
@@ -134,14 +130,14 @@ The length of the Final Frame MUST be less than or equal to the [Frame Length](#
 The following describes the fields that form the Final Frame Body Structure.    
 The bytes are appended in the order shown.
 
-Field                                          | Length (bytes)                            | Interpreted as
----------------------------------------------- | ----------------------------------------- | --------------
-[Sequence Number End](#sequence-number-end)    | 4                                         | Bytes
-[Sequence Number](#sequence-number)            | 4                                         | Uint32
-[IV](#iv)                                      | [IV Length](#message-header.md#iv-length) | Bytes
-[Encrypted Content Length](#encrypted-content) | 4                                         | Uint32
-[Encrypted Content](#encrypted-content)        | Variable                                  | Bytes
-[Authentication Tag](#authentication-tag)      | Variable                                  | Bytes
+Field                                          | Length (bytes)                                                                                                              | Interpreted as
+---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------
+[Sequence Number End](#sequence-number-end)    | 4                                                                                                                           | Bytes
+[Sequence Number](#sequence-number)            | 4                                                                                                                           | UInt32
+[IV](#iv)                                      | [IV Length](#message-header.md#iv-length)                                                                                   | Bytes
+[Encrypted Content Length](#encrypted-content) | 4                                                                                                                           | UInt32
+[Encrypted Content](#encrypted-content)        | Variable                                                                                                                    | Bytes
+[Authentication Tag](#authentication-tag)      | Algorithm suite ID's [Authentication Tag Length](#algorithm-suites.md#supported-algorithm-suites#authentication-tag-length) | Bytes
 
 ##### Sequence Number End
 
@@ -160,7 +156,8 @@ The Final Frame Sequence number MUST be equal to the total number of frames in t
 
 The initialization vector for the final frame.    
 The IV MUST be a unique IV within the message.   
-The IV length MUST be equal to the IV length of the [algorithm](#algorithm-suite.md) that generated the message.  
+The IV length MUST be equal to the IV length of the [algorithm](#algorithm-suite.md) that generated the message. 
+Note: This IV is different from the [Header IV](#message-header.md#iv). 
 
 ##### Encrypted Content Length
 
@@ -174,6 +171,8 @@ The encrypted data for the final frame, as returned by the [encryption algorithm
 
 The authentication value for the final frame.    
 It is used to authenticate the final frame.  
+The authentication tag length MUST be equal to the authentication tag length of the algorithm suite 
+specified by the [Algorithm Suite ID](#message-header.md#algorithm-suite-id) field.
 
 ## Test Vectors
 
@@ -263,7 +262,7 @@ RegularFrame SEQUENCE (SIZE(4)) {
     AuthTag OCTET STRING (SIZE(TagLength)),
 }
 
-FinalFrame SEQUENCE (SIZE(5)) {
+FinalFrame SEQUENCE (SIZE(6)) {
     SequenceNumberEnd OCTET STRING (0xFF 0xFF 0xFF 0xFF),
     SequenceNumber UINT32, 
     IV OCTET STRING (SIZE(IvLength)), 

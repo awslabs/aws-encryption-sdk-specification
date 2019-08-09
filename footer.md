@@ -56,6 +56,7 @@ Footer SEQUENCE (SIZE(2)) {
 
 ### Example Bytes 
 
+```
 0067                                     Signature Length (103)
 30650230 7229DDF5 B86A5B64 54E4D627      Signature
 CBE194F1 1CC0F8CF D27B7F8B F50658C0
