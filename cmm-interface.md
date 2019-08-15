@@ -12,9 +12,9 @@
 The Cryptographic Materials Manager (CMM) assembles the cryptographic materials used to encrypt the [message](#message.md) and decrypt the encrypted messages.  
 The CMM interface describes the interface that all CMMs MUST implement.
 
-# Definitions
+## Definitions
 
-## Conventions used in this document
+### Conventions used in this document
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
 in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
@@ -79,14 +79,12 @@ it MUST return [encryption materials](#data-structures.md#encryption-materials) 
 The encryption materials returned MUST include the following:
 
 - [Algorithm Suite](#algorithm-suite.md)
-    - If the encryption materials request contains an algorithm suite, the encryption materials returned MUST contain the same algorithm suite.
-    - If the encryption materials request does not contain an algorithm suite, the CMM MUST select the algorithm suite to be used.
+    - If the encryption materials request contains an algorithm suite, the encryption materials returned SHOULD contain the same algorithm suite.
 - Plaintext Data Key
 - [Encrypted Data Keys](#data-structures.md#encrypted-data-keys)
     - Every encrypted data key in this list MUST correspond to the above plaintext data key. 
 - [Encryption Context](#data-structures.md#encryption-context)
-    - The CMM MUST NOT modify or remove any existing key-value pairs in the encryption context. 
-    - The CMM MAY add additional key-value pairs to the encryption context.   
+    - The CMM MAY modify the encryption context.   
 
 The encryption materials returned MAY include the following:
 
@@ -113,10 +111,10 @@ The decryption materials returned MUST include the following:
 
 - Plaintext Data Key
 - [Encryption Context](#data-structures.md#encryption-context)
-   - The CMM MUST NOT modify or remove any existing key-value pairs in the encryption context. 
-   - The CMM MAY add additional key-value pairs to the encryption context.
+   - The CMM MAY modify the encryption context. 
+   - The operations made on the encryption context on the Get Encryption Materials call SHOULD be inverted on the Decrypt Materials call. 
 - [Algorithm Suite](#algorithm-suite.md)
-  - This algorithm suite returned MUST be the same algorithm suite obtained from the decrypt materials request.
+  - If the decrypt materials request contains an algorithm suite, the decryption materials returned SHOULD contain the same algorithm suite.
 
 The decryption materials returned MAY include the following:
 
