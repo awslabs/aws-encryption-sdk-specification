@@ -75,7 +75,7 @@ and appends the [encrypted data keys](#data-structures.md#encrypted-data-key) to
 in the [encryption materials](#data-structures.md#encryption-materials).
 
 The [encrypted data keys](#data-structures.md#encrypted-data-key) produced by this keyring MUST
-have [ciphertext](#data-structures.md#ciphertext) that can be decrypted to the plaintext data key in the
+have [ciphertexts](#data-structures.md#ciphertext) that can be decrypted to the plaintext data key in the
 [encryption materials](#data-structures.md#encryption-materials).
 
 If OnEncrypt updates the [encryption materials](#data-structure.md#encryption-materials) with at least
@@ -98,17 +98,17 @@ If the keyring did not attempt the above behavior, the keyring MUST output the [
 
 #### Decrypt Data Key
 
+If the encryption materials do contain a plaintext data key, OnDecrypt MUST NOT decrypt a data key.
 If the [decryption materials](#data-structures.md#decryption-materials) do not include a plaintext data key,
 OnDecrypt MAY decrypt a data key.
-If the encryption materials do not contain a plaintext data key, OnDecrypt MUST NOT decrypt a data key.
 
-To do this, the keyring attempts to retrieve a plaintext data key from the input list of [encrypted data keys](#data-structures.md#encrypted-data-key).
+To do this, the keyring attempts to retrieve a plaintext data key using the input list of [encrypted data keys](#data-structures.md#encrypted-data-key).
 
 If the keyring is able to succesfully get at least one plaintext data key from any [encrypted data key](#data-structures.md#encrypted-data-key)
 and the [decryption materials](#data-structures.md#decryption-materials) still do not include a plaintext data key,
 it MUST set one resulting plaintext data key on the [decryption materials](#data-structures.md#decryption-materials).
 
-If the keyring is unable to get any plaintext data key from the input [encrypted data keys](#data-structures.md#encrypted-data-key)
+If the keyring is unable to get any plaintext data key using the input [encrypted data keys](#data-structures.md#encrypted-data-key)
 the keyring MUST NOT not update the [decryption materials](#data-structures.md#decryption-materials).
 
 If OnDecrypt updates the [decryption materials](#data-structure.md#decryption-materials) with a plaintext data key,
