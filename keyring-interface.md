@@ -56,8 +56,8 @@ specified in the [encryption materials](#data-structures.md#encryption-materials
 The value of the plaintext data key MUST consist of cryptographically secure (pseudo-)random bits.
 
 If OnEncrypt updates the [encryption materials](#data-structure.md#encryption-materials) with a plaintext data key,
-this keyring MUST append exactly one trace to the [keyring trace](#data-structures.md#keyring-trace) that includes the
-[GENERATED DATA KEY](#data-structures.md#generated-data-key) flag.
+the [keyring trace](#data-structures.md#keyring-trace) returned by OnEncrypt MUST include one trace
+associated with this keyring that has the [GENERATED DATA KEY](#data-structures.md#generated-data-key) flag.
 Note that this trace MAY include more than one flag.
 
 Note: If the keyring successfully performs this behavior, this means that the keyring MAY then
@@ -79,10 +79,11 @@ have [ciphertexts](#data-structures.md#ciphertext) that can be decrypted to the 
 [encryption materials](#data-structures.md#encryption-materials).
 
 If OnEncrypt updates the [encryption materials](#data-structure.md#encryption-materials) with at least
-one new [encrypted data key](#data-structures.md#encrypted-data-key), this keyring MUST append at least
-one trace to the [keyring trace](#data-structures.md#keyring-trace) that includes the [ENCRYPTED DATA KEY](#data-structures.md#encrypted-data-key)
-flag.
-Note that this trace MAY include more than one flag, for example the [SIGNED ENCRYPTION CONTEXT flag](#data-structures.md#signed-encryption-context).
+one new [encrypted data key](#data-structures.md#encrypted-data-key),
+the [keyring trace](#data-structures.md#keyring-trace) returned by OnEncrypt MUST include at least one trace
+associated with this keyring that has the [ENCRYPTED DATA KEY](#data-structures.md#encrypted-data-key) flag.
+Note that this trace MAY include more than one flag,
+for example the [SIGNED ENCRYPTION CONTEXT flag](#data-structures.md#signed-encryption-context).
 
 ### OnDecrypt
 
@@ -112,8 +113,8 @@ If the keyring is unable to get any plaintext data key using the input [encrypte
 the keyring MUST NOT not update the [decryption materials](#data-structures.md#decryption-materials).
 
 If OnDecrypt updates the [decryption materials](#data-structure.md#decryption-materials) with a plaintext data key,
-this keyring MUST append exactly one trace to the [keyring trace](#data-structures.md#keyring-trace)
-that includes the [DECRYPTED DATA KEY](#data-structures.md#encrypted-data-key) flag.
+the [keyring trace](#data-structures.md#keyring-trace) returned by OnDecrypt MUST include one trace
+associated with this keyring that has the [DECRYPTED DATA KEY](#data-structures.md#encrypted-data-key) flag.
 Note that this trace MAY include more than one flag, for example the [VERIFIED ENCRYPTION CONTEXT flag](#data-structures.md#verified-encryption-context).
 
 ## Security Considerations
