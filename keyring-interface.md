@@ -106,7 +106,7 @@ To do this, the keyring attempts to retrieve a plaintext data key using the inpu
 
 If the keyring is able to succesfully get at least one plaintext data key from any [encrypted data key](#data-structures.md#encrypted-data-key)
 and the [decryption materials](#data-structures.md#decryption-materials) still do not include a plaintext data key,
-it MUST set one resulting plaintext data key on the [decryption materials](#data-structures.md#decryption-materials).
+it SHOULD set one resulting plaintext data key on the [decryption materials](#data-structures.md#decryption-materials).
 
 If the keyring is unable to get any plaintext data key using the input [encrypted data keys](#data-structures.md#encrypted-data-key)
 the keyring MUST NOT not update the [decryption materials](#data-structures.md#decryption-materials).
