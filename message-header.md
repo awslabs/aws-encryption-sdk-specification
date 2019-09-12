@@ -100,7 +100,7 @@ The purpose of the message ID is to:
 
 #### AAD
 
-The additional authenticated data (AAD) for the header.
+The Additional Authenticated Data (AAD) for the header.
 This AAD is an encoding of the [encryption context](#data-structures.md#encryption-context).
 
 The following table describes the fields that form the AAD.
