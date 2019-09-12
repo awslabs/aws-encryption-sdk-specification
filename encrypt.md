@@ -127,7 +127,7 @@ Each frame of the [message body](#message-body.md) is serialized with the follow
   - The AAD is the serialized [message body AAD](#message-body-aad.md)
   - The IV is the [IV](#message-body.md#iv) specified for this frame above.
   - The cipherkey is the derived data key
-  - The plaintext is the input [plaintext message](#plaintext-message)
+  - The plaintext contains part of the input [plaintext](#plaintext) this frame is encrypting.
 - [Authentication Tag](#message-body.md#authentication-tag): MUST be the authentication tag outputted by the above encryption.
 
 If the [algorithm suite](#algorithm-suites.md) contains a [signature algorithm](#algorithm-suites.md#signature-algorithm),
