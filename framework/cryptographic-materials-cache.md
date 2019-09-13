@@ -1,6 +1,10 @@
 # Cryptographic Materials Cache
 
-## Current Implementations
+## Version
+
+0.1.0-preview
+
+## Implementations
 
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/cache.h)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/caches/base.py)
@@ -31,7 +35,7 @@ The cache identifier used to uniquely identify a single cache entry in the crypt
 ### Cache Entry 
 
 A cache entry represents an entry in the cryptographic materials cache.  
-A cache entry contains the cryptographic materials, [encryption](#data-structures.md#encryption-materials) or [decryption](#data-structures.md#decryption-materials) 
+A cache entry contains the cryptographic materials, [encryption](#structures.md#encryption-materials) or [decryption](#structures.md#decryption-materials) 
 materials to be cached along with other metadata.  
 Some implementations of the CMC have the following metadata: 
 

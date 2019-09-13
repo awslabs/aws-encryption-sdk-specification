@@ -1,17 +1,21 @@
 # Decrypt
 
-## Overview
+## Version
 
-This document describes the behavior of decrypting the encrypted message previously received from an encrypt call to the AWS Encryption SDK.
-The AWS Encryption SDK provides a client to decrypt the inputted encrypted message, and returns as the output the plaintext.
+0.1.0-preview
 
-## Implementaitons
+## Implementations
 
 -   [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_decrypt.c)
 -   [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/DecryptionHandler.java)
 -   [JSNode](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/decrypt-node/src/decrypt.ts)
 -   [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/decrypt-browser/src/decrypt.ts)
 -   [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py)
+
+## Overview
+
+This document describes the behavior of decrypting the encrypted message previously received from an encrypt call to the AWS Encryption SDK.
+The AWS Encryption SDK provides a client to decrypt the inputted encrypted message, and returns as the output the plaintext.
 
 ## Definitions
 
@@ -49,14 +53,14 @@ The algorithm suite ID refers to the algorithm suite used to encrypt the message
 
 A CMM that implements the [CMM interface](#cmm-interface.md).  
 
-This CMM MUST obtain the [decryption materials](#data-structures.md#decryption-materials) required for decryption.  
+This CMM MUST obtain the [decryption materials](#structures.md#decryption-materials) required for decryption.  
 
 ### Keyring
 
 A Keyring that implements the [keyring interface](#keyring-interface.md).  
 
 If the Keyring is provided as the input, the client MUST construct a [default CMM](#default-cmm.md) that uses this keyring, 
-to obtain the [decryption materials](#data-structures.md#decryption-materials) that is required for decryption.  
+to obtain the [decryption materials](#structures.md#decryption-materials) that is required for decryption.  
 
 This default CMM MUST obtain the decryption materials required for decryption.   
 
@@ -72,7 +76,7 @@ The decrypted data.
 
 To obtain the decrypted data, a set of valid decryption materials is required.
 
-This behavior MUST obtain this set of [decryption materials](#data-structures.md#decryption-materials), 
+This behavior MUST obtain this set of [decryption materials](#structures.md#decryption-materials), 
 by calling [Decrypt Materials](#cmm-interface.md#decrypt-materials) on a [CMM](#cmm-interface.md).
 
 The CMM used MUST be the input CMM, if supplied.
@@ -84,9 +88,9 @@ The call to CMM's [Decrypt Materials](#cmm-interface.md#decrypt-materials) behav
 [algorithm suite ID](#message-header.md#algorithm-suites-id), obtained from parsing the message header of the encrypted message inputted.
 
 The decryption materials returned by the call to the CMM's Decrypt Materials behaviour MUST contain a valid 
-[plaintext data key](#data-structures.md#decryption-materials#plaintext-data-key),
-[algorithm suite](#data-structures.md#decryption-materials#algorithm-suite) and an
-[encryption context](#data-structures.md#decryption-materials#encryption-context), if an encryption context was used during encryption.    
+[plaintext data key](#structures.md#decryption-materials#plaintext-data-key),
+[algorithm suite](#structures.md#decryption-materials#algorithm-suite) and an
+[encryption context](#structures.md#decryption-materials#encryption-context), if an encryption context was used during encryption.    
 Note: This encryption context MUST be the same encryption context that was used during encryption otherwise the decrypt operation will fail.   
 
 The decrypt behavior MUST then use this plaintext data key, algorithm suite and encryption context, if included, to decrypt the encrypted content 

@@ -1,6 +1,16 @@
-*Update August 2, 2019*
-
 # Encrypt
+
+## Version
+
+0.1.0-preview
+
+## Implementations
+
+- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_encrypt.c)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/EncryptionHandler.java)
+- [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-node/src/encrypt.ts)
+- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-browser/src/encrypt.ts)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py)
 
 ## Overview
 
@@ -8,14 +18,6 @@ This document describes the behavior by which a plaintext is encrypted and seria
 
 Any client provided by the AWS Encryption SDK that performs encryption of user plaintext MUST follow
 this specification for encryption.
-
-## Implementaitons
-
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_encrypt.c)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/EncryptionHandler.java)
-- [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-node/src/encrypt.ts)
-- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-browser/src/encrypt.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py)
 
 ## Input
 
@@ -36,7 +38,7 @@ The plaintext to encrypt.
 
 ### Encryption Context
 
-See [encryption context](#data-structures.md#encryption-context).
+See [encryption context](#structures.md#encryption-context).
 
 The encryption context MUST NOT contain an entry with a [reserved key value](#data-structutes.md#encryption-context).
 
@@ -65,11 +67,11 @@ This behavior MUST output the following if the behavior is successful:
 
 This behavior MAY output the following:
 
-- [keyring trace](#data-structures.md#keyring-trace)
+- [keyring trace](#structures.md#keyring-trace)
 
 To construct the outputs, some fields MUST be constructed using information obtained
-from a set of valid [encryption materials](#data-structures.md#encryption-materials).
-This behavior MUST obtain this set of [encryption materials](#data-structures.md#encryption-materials)
+from a set of valid [encryption materials](#structures.md#encryption-materials).
+This behavior MUST obtain this set of [encryption materials](#structures.md#encryption-materials)
 by calling [Get Encryption Materials](#cmm-interface.md#get-encryption-materials) on a [CMM](#cmm-interface.md).
 The CMM used MUST be the input CMM, if supplied.
 If instead the user supplied a [keyring](#keyring-interface.md), this behavior MUST use a [default CMM](#default-cmm.md),
@@ -100,10 +102,10 @@ The [message header](#message-header.md) is serialized with the following specif
 - [Type](#message-header.md#type): MUST have a value corresponding to [Customer Authenticated Encrypted Data](#message.md#supported-types)
 - [Algorithm Suite ID](#message-header.md#algorithm-suite-id): MUST be the [algorithm suite](#algorithm-suites.md)
   used in this behavior
-- [AAD](#message-header.md#aad): MUST be the serialization of the [encryption context](#data-structures.md#encryption-context)
-  in the [encryption materials](#data-structures.md#encryption-materials)
+- [AAD](#message-header.md#aad): MUST be the serialization of the [encryption context](#structures.md#encryption-context)
+  in the [encryption materials](#structures.md#encryption-materials)
 - [Encrypted Data Keys](#message-header.md#encrypted-data-key): MUST be the serialization of the
-  [encrypted data keys](#data-structures.md#encrypted-data-keys) in the [encryption materials](#data-structures.md#encryption-materials)
+  [encrypted data keys](#structures.md#encrypted-data-keys) in the [encryption materials](#structures.md#encryption-materials)
 - [Content Type](#message-header.md#content-type): MUST be `Framed`
 - [IV Length](#message-header.md#iv-length): MUST match the [IV length](#algorithm-suites.md#iv-length)
   specified by the [algorithm suite](#algorithm-suites.md)
@@ -136,14 +138,14 @@ The footer is serialized with the following specifics:
 
 - [Signature](#message-footer.md#signature): MUST be the output of the [signature algorithm](#algorithm-suites.md#signature-algorithm)
   specified by the [algorithm suite](#algorithm-suites.md), with the following input:
-  - the signature key is the [signing key](#data-structures.md#signing-key) in the [encryption materials](#data-structures.md#encryption-materials)
+  - the signature key is the [signing key](#structures.md#signing-key) in the [encryption materials](#structures.md#encryption-materials)
   - the input to sign is the concatenation of the serialization of the [message header](#message-header) and [message body](#message-body)
 
 Any data that is not specified within the [message format](#message.md) MUST NOT be added to the output message.
 
 ### Keyring Trace
 
-The [keyring trace](#data-structures.md#keyring-trace) obtained from the [encryption materials](#data-structure.md#encryption-materials).
+The [keyring trace](#structures.md#keyring-trace) obtained from the [encryption materials](#data-structure.md#encryption-materials).
 
 ## Security Considerations
 

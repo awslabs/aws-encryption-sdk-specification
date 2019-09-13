@@ -1,6 +1,8 @@
-*Updated June 10, 2019*
-
 # Algorithm Suites
+
+## Version
+
+0.1.0-preview
 
 ## Implementations
 

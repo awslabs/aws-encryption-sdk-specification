@@ -1,6 +1,10 @@
 # Footer Structure
 
-## Current Implementations
+## Version
+
+See [Message Version](#message.md#version).
+
+## Implementations
 
 - [C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/session_encrypt.c) 
 - [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextFooters.java)

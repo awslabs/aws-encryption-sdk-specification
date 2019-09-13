@@ -1,6 +1,10 @@
 # Caching Cryptographic Materials Manager
 
-## Current Implementations
+## Version
+
+0.1.0-preview
+
+## Implementations
 
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/cache.h)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/caching.py)
@@ -108,7 +112,7 @@ The number of bytes encrypted by the [encryption](#data-strucutres.md#encryption
 If the [algorithm suite](#algorithm-suites.md) requested contains a [Identity KDF](#algorithm-suites.md#identity-kdf), 
 the caching CMM MUST obtain the encryption materials by making a call to the underlying CMM's [Get Encryption Materials](#cmm-interface.md#get-encryption-materials) function.  
 
-Otherwise, the caching CMM MUST attempt to find the [encryption materials](#data-structures.md#encryption-materials) 
+Otherwise, the caching CMM MUST attempt to find the [encryption materials](#structures.md#encryption-materials) 
 from the underlying [cryptographic materials cache (CMC)](#underlying-cryptographic-materials-cache).  
 
 If a cache entry is found, the caching CMM MUST return the encryption materials retrieved.
@@ -126,7 +130,7 @@ the caching CMM MUST NOT store the encryption materials in the underlying CMC.
 If the [algorithm suite](#algorithm-suites.md) requested contains a [Identity KDF](#algorithm-suites.md#identity-kdf), 
 the caching CMM MUST obtain the decryption materials by making a call to the underlying CMM's [Decrypt Materials](#cmm-interface.md#decrypt-materials) function.   
 
-Otherwise, the caching CMM MUST attempt to find the [decryption materials](#data-structures.md#decryption-materials) 
+Otherwise, the caching CMM MUST attempt to find the [decryption materials](#structures.md#decryption-materials) 
 from the [underlying CMC](#underlying-cryptographic-materials-cache).
 
 If a cache entry is found, the cachimg CMM MUST return the decryption materials retrieved.   

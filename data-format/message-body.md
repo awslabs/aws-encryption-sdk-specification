@@ -1,6 +1,10 @@
 # Message Body
 
-## Current Implementations
+## Version
+
+See [Message Version](#message.md#version).
+
+## Implementations
 
 - [C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/private/framefmt.h)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/structures.py)
