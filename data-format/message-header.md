@@ -1,6 +1,8 @@
-*Updated July 1, 2019*
-
 #  Message Header
+
+## Version
+
+See [Message Version](#message.md#version).
 
 ## Implementations
 
@@ -101,7 +103,7 @@ The purpose of the message ID is to:
 #### AAD
 
 The Additional Authenticated Data (AAD) for the header.
-This AAD is an encoding of the [encryption context](#data-structures.md#encryption-context).
+This AAD is an encoding of the [encryption context](#structures.md#encryption-context).
 
 The following table describes the fields that form the AAD.
 The bytes are appended in the order shown.
@@ -157,7 +159,7 @@ The bytes are appended in the order shown.
 
 #### Encrypted Data Keys
 
-The encoding of the [encrypted data keys](#data-structures.md#encrypted-data-key).
+The encoding of the [encrypted data keys](#structures.md#encrypted-data-key).
 
 The following table describes the fields that form the encrypted data keys.
 The bytes are appended in the order shown.
@@ -195,7 +197,7 @@ The length of the key provider ID.
 ##### Key Provider ID
 
 The key provider ID.
-See [the specification for encrypted data keys](#data-structures.md#encrypted-data-key).
+See [the specification for encrypted data keys](#structures.md#encrypted-data-key).
 
 ##### Key Provider Information Length
 
@@ -204,7 +206,7 @@ The length of the key provider information.
 ##### Key Provider Information
 
 The key provider information.
-See [the specification for encrypted data keys](#data-structures.md#encrypted-data-key).
+See [the specification for encrypted data keys](#structures.md#encrypted-data-key).
 
 ##### Encrypted Data Key Length
 

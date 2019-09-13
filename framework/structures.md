@@ -1,5 +1,9 @@
 # Structures
 
+## Version
+
+0.1.0-preview
+
 ## Definitions
 
 ### Conventions used in this document

@@ -1,8 +1,8 @@
 # Message Body AAD
 
-## Overview
+## Version
 
-The message body AAD is the serialization of the AAD to be used as input to encryption of the message body.
+See [Message Version](#message.md#version).
 
 ## Implementations
 
@@ -10,6 +10,10 @@ The message body AAD is the serialization of the AAD to be used as input to encr
 - [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/Utils.java)
 - [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/aad_factory.ts)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/internal/formatting/encryption_context.py)
+
+## Overview
+
+The message body AAD is the serialization of the AAD to be used as input to encryption of the message body.
 
 ## Structure
 
