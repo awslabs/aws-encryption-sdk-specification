@@ -1,3 +1,5 @@
+// Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved. // SPDX-License-Identifier: CC-BY-SA-4.0
+
 # Cryptographic Materials Manager Interface
 
 ## Version
