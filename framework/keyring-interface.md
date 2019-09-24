@@ -1,4 +1,5 @@
-// Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved. // SPDX-License-Identifier: CC-BY-SA-4.0
+[//] # (Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.)
+[//] # (SPDX-License-Identifier: CC-BY-SA-4.0)
 
 # Keyring Interface
 
