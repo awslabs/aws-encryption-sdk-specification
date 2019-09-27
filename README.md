@@ -5,7 +5,7 @@
 This repository contains the AWS Encryption SDK Specification.  
 The primary goal of this specification is to define a standard, language independent, description of the AWS Encryption SDK features.  
 It serves as the source of truth for what features make up the AWS Encryption SDK, and is intended to promote consistency and interoperability across implementations of the AWS Encryption SDK.  
-This GitHub project is also intended to track issues, feature requests and collect feedback pertaining to the AWS Encryption SDK.  
+This GitHub project is also intended to track issues and feature requests and to collect feedback pertaining to the AWS Encryption SDK.
 
 ### Current Implementations
 
