@@ -13,7 +13,8 @@ Below is the list of current implementation of this specification:
 
 - [C](https://github.com/aws/aws-encryption-sdk-c)
 - [Java](https://github.com/aws/aws-encryption-sdk-java)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/)
+- [Python](https://github.com/aws/aws-encryption-sdk-python)
+- [CLI](https://github.com/aws/aws-encryption-sdk-cli)
 - [Javascript (Beta)](https://github.com/awslabs/aws-encryption-sdk-javascript)
 
 ## License Summary
