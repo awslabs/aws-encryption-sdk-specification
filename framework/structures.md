@@ -60,24 +60,24 @@ and vice versa MAY be any reversible operation, though we expect that most will 
 
 ##### Key Provider ID
 
-A UTF-8 encoded value related to the [key provider](#key-provider.md) that encrypted this data key.
+A UTF-8 encoded value related to the key provider that encrypted this data key.
 
-This value usually represents the namespace of the [key provider] (#key-provider.md) defined wrapping key
+This value usually represents the namespace of the key provider defined wrapping key
 used to encrypt the plaintext data key.
 
-For example, [encrypted data keys](#encrypted-data-key) encrypted by the [KMS Keyring](#kms-keyring.md)
+For example, [encrypted data keys](#encrypted-data-key) encrypted by the [KMS Keyring](kms-keyring.md)
 have the value of "aws-kms" in this field.
 
-This value MUST NOT be "aws-kms" unless this encrypted data key was produced by the [KMS Keyring](#kms-keyring.md).
+This value MUST NOT be "aws-kms" unless this encrypted data key was produced by the [KMS Keyring](kms-keyring.md).
 
 ##### Key Provider Information
 
-Information related to the [key provider](#key-provider.md).
+Information related to the key provider.
 Its structure and meaning is specified by the key provider that encrypted this data key.
 
 This is usually a UTF-8 encoded value.
 This value is usually the name of a key provider defined wrapping key that is used to encrypt the plaintext data key.
-However, the [raw AES keyring](#raw-aes-keyring.md) defines a specific structure for the key provider information
+However, the [raw AES keyring](raw-aes-keyring.md) defines a specific structure for the key provider information
 that includes more information.
 
 ##### Ciphertext
@@ -102,18 +102,18 @@ an identifier into a key store that will return the plaintext data key.
 #### Structure
 
 The encryption context is a key-value mapping of arbitrary, non-secret, UTF-8 encoded strings.
-It is used during [encryption](#encrypt.md) and [decryption](#decrypt.md) to provide additional authenticated data (AAD).
+It is used during [encryption](../client-apis/encrypt.md) and [decryption](../client-apis/decrypt.md) to provide additional authenticated data (AAD).
 
 Users SHOULD use the encryption context to store:
 
-- non-secret data that MUST remain associated with the [message](#message.md) ciphertext.
+- non-secret data that MUST remain associated with the [message](../data-format/message.md) ciphertext.
 - data that is useful in logging and tracking, such as data about the file type, purpose, or ownership.
 
 Users MUST NOT use the encryption context to store secret data.
 
 The encryption context MUST reserve the following key fields for use by the AWS Encryption SDK:
 
-- `aws-crypto-public-key` (See [the Default CMM spec](#default-cmm.md) for its use)
+- `aws-crypto-public-key` (See [the Default CMM spec](default-cmm.md) for its use)
 
 The encryption context SHOULD reserve any key field with the prefix `aws` for use by AWS KMS and
 other AWS services.
@@ -129,7 +129,7 @@ other AWS services.
 
 #### Structure
 
-Encryption materials are a structure containing materials needed for [encryption](#encrypt.md).
+Encryption materials are a structure containing materials needed for [encryption](../client-apis/encrypt.md).
 This structure MAY include any of the following fields:
 
 - [Algorithm Suite](#algorith-suite)
@@ -141,7 +141,7 @@ This structure MAY include any of the following fields:
 
 ##### Algorithm Suite
 
-The [algorithm suite](#algorithm-suites.md) to be used for [encryption](#encrypt.md).
+The [algorithm suite](algorithm-suites.md) to be used for [encryption](../client-apis/encrypt.md).
 
 ##### Encrypted Data Keys
 
@@ -154,7 +154,7 @@ If the plaintext data key is not included on this set of encryption materials, t
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this [encryption](#encrypt.md).
+The [encryption context](#encryption-context) associated with this [encryption](../client-apis/encrypt.md).
 
 ##### Keyring Trace
 
@@ -163,11 +163,11 @@ of encryption materials.
 
 ##### Plaintext Data Key
 
-A data key to be used as input for [encryption](#encrypt.md).
+A data key to be used as input for [encryption](../client-apis/encrypt.md).
 
 The plaintext data key MUST:
 
-- fit the specification for the [key derivation algorithm](#algorithm-suites.md#key-derivation-algorithm)
+- fit the specification for the [key derivation algorithm](algorithm-suites.md#key-derivation-algorithm)
   included in this decryption material's [algorithm suite](#algorithm-suite).
 - consist of cryptographically secure (pseudo-)random bits.
 - be kept secret.
@@ -178,9 +178,9 @@ The plaintext data key SHOULD offer an interface to zero the plaintext data key
 
 ##### Signing Key
 
-The key to be used as the signing key for signature verification during [encryption](#encrypt.md).
+The key to be used as the signing key for signature verification during [encryption](../client-apis/encrypt.md).
 
-The signing key MUST fit the specification described by the [signature algorithm](#algorithm-suites.md#signature-algorithm)
+The signing key MUST fit the specification described by the [signature algorithm](algorithm-suites.md#signature-algorithm)
 included in this encryption material's [algorithm suite](#algorithm-suite).
 
 The value of this key MUST be kept secret.
@@ -196,7 +196,7 @@ The value of this key MUST be kept secret.
 
 #### Structure
 
-Decryption materials are a structure containing materials needed for [decryption](#decrypt.md).
+Decryption materials are a structure containing materials needed for [decryption](../client-apis/decrypt.md).
 This structure MAY include any of the following fields:
 
 - [Algorithm Suite](#algorith-suite)
@@ -207,11 +207,11 @@ This structure MAY include any of the following fields:
 
 ##### Algorithm Suite
 
-The [algorithm suite](#algorithm-suites.md) to be used for [decryption](#decrypt.md)
+The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client-apis/decrypt.md)
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this [encryption](#encrypt.md)
+The [encryption context](#encryption-context) associated with this [encryption](../client-apis/encrypt.md)
 
 ##### Keyring Trace
 
@@ -219,11 +219,11 @@ A [keyring trace](#keyring-trace) containing all of the actions keyrings have ta
 
 ##### Plaintext Data Key
 
-The data key to be used as input for [decryption](#decrypt.md).
+The data key to be used as input for [decryption](../client-apis/decrypt.md).
 
 The plaintext data key MUST:
 
-- fit the specification for the [encryption algorithm](#algorithm-suites.md#encryption-algorithm)
+- fit the specification for the [encryption algorithm](algorithm-suites.md#encryption-algorithm)
   included in this decryption material's [algorithm suite](#algorithm-suite).
 - consist of cryptographically secure (pseudo-)random bits.
 - be kept secret.
@@ -234,9 +234,9 @@ The plaintext data key SHOULD offer an interface to zero the plaintext data key
 
 ##### Verification Key
 
-The key to be used as the verification key for signature verification during [decryption](#decrypt.md).
+The key to be used as the verification key for signature verification during [decryption](../client-apis/decrypt.md).
 
-The verification key MUST fit the specification for the [signature algorithm](#algorithm-suites.md#signature-algorithm)
+The verification key MUST fit the specification for the [signature algorithm](algorithm-suites.md#signature-algorithm)
 included in this decryption material's [algorithm suite](#algorithm-suite).
 
 ### Keyring Trace
@@ -278,19 +278,19 @@ Note: the underlying value of each enum is implementation specific.
 
 A flag to represent that a keyring has generated a plaintext data key.
 This flag MUST be included in a trace if the keyring has successfully performed the
-[generate data key](#keyring-interface.md#generate-data-key) behavior.
+[generate data key](keyring-interface.md#generate-data-key) behavior.
 
 ###### ENCRYPTED DATA KEY
 
 A flag to represent that a keyring has created an [encrypted data key](#encrypted-data-key).
 This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[encrypt data key](#keyring-interface.md#encrypt-data-key) behavior.
+[encrypt data key](keyring-interface.md#encrypt-data-key) behavior.
 
 ###### DECRYPTED DATA KEY
 
 A flag to represent that a keyring has obtained the corresponding plaintext data key from an [encrypted data key](#encrypted-data-key).
 This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[decrypt data key](#keyring-interface.md#decrypt-data-key) behavior.
+[decrypt data key](keyring-interface.md#decrypt-data-key) behavior.
 
 ###### SIGNED ENCRYPTION CONTEXT
 
@@ -298,7 +298,7 @@ A flag to represent that the keyring has cryptographically bound the [encryption
 to a newly created [encrypted data key](#encrypted-data-key).
 
 This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[encrypt data key](#keyring-interface.md#encrypt-data-key) behavior to create an [encrypted data-key](#encrypted-data-key)
+[encrypt data key](keyring-interface.md#encrypt-data-key) behavior to create an [encrypted data-key](#encrypted-data-key)
 that has the following property:
 
 - If the encryption context used as input to OnEncrypt to produce the encrypted data key is
@@ -311,7 +311,7 @@ A flag to represent that the keyring has verified that an [encrypted data key](#
 originally created with a particular [encryption context](#encryption-context).
 
 This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[decrypt data key](#keyring-interface.md#decrypt-data-key) behavior to decrypt an [encrypted data key](#encrypted-data-key)
+[decrypt data key](keyring-interface.md#decrypt-data-key) behavior to decrypt an [encrypted data key](#encrypted-data-key)
 that has the following property:
 
 - If the encryption context used as input to OnEncrypt to produce the encrypted data key is

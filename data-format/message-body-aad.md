@@ -5,7 +5,7 @@
 
 ## Version
 
-See [Message Version](#message.md#version).
+See [Message Version](message.md#version).
 
 ## Implementations
 
@@ -32,23 +32,23 @@ The bytes are appended in the order shown.
 
 ### Message ID
 
-An identifier for the [message](#message.md) this message body AAD is associated with.
+An identifier for the [message](message.md) this message body AAD is associated with.
 
 ### Body AAD Content
 
 An identifier for the content type of the data this message body AAD is associated with.
 
-This value depends on the [content type](#message-header.md#content-type) of the [message](#message.md):
+This value depends on the [content type](message-header.md#content-type) of the [message](message.md):
 
-- [Non-framed data](#message-body.md#non-framed-data) MUST use the value `AWSKMSEncryptionClient Single Block`.
-- The [regular frames](#message-body.md#regular-frame) in [framed data](#message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Frame`.
-- The [final frame](#message-body.md#final-frame) in [framed data](#message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Final Frame`.
+- [Non-framed data](message-body.md#non-framed-data) MUST use the value `AWSKMSEncryptionClient Single Block`.
+- The [regular frames](message-body.md#regular-frame) in [framed data](message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Frame`.
+- The [final frame](message-body.md#final-frame) in [framed data](message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Final Frame`.
 
 ### Sequence Number
 
 The sequence number of the data this message body AAD belongs to.
-For [framed data](#message-body.md#framed-data), the value of this field MUST be the [frame sequence number](#message-body.md#frame-sequence-number).
-For [non-framed data](#message-body.md#framed-data), the value of this field MUST be `1`.
+For [framed data](message-body.md#framed-data), the value of this field MUST be the [frame sequence number](message-body.md#frame-sequence-number).
+For [non-framed data](message-body.md#framed-data), the value of this field MUST be `1`.
 
 ### Content Length
 

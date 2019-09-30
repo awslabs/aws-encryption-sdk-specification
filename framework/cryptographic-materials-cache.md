@@ -16,11 +16,11 @@
 
 ## Overview
 
-Cryptographic materials cache (CMC) is used by the caching [cryptographic materials manager (CMM)](#caching-cmm.md) 
+Cryptographic materials cache (CMC) is used by the caching [cryptographic materials manager (CMM)](caching-cmm.md) 
 to store cryptographic materials for reuse.  
 The AWS Encryption SDK provides a built-in local cryptographic materials cache. 
 The local CMC is a configurable, in-memory, least recently used (LRU) cache.  
-It provides non-blocking, locking, [cache entries](#cmc-interface.md#cache-entry) per [cache identifier](#cmc-interface.md#cache-id).  
+It provides non-blocking, locking, [cache entries](#cache-entry) per [cache identifier](#cache-identifier).  
 
 ## Definitions
 
@@ -38,7 +38,7 @@ The cache identifier used to uniquely identify a single cache entry in the crypt
 ### Cache Entry 
 
 A cache entry represents an entry in the cryptographic materials cache.  
-A cache entry contains the cryptographic materials, [encryption](#structures.md#encryption-materials) or [decryption](#structures.md#decryption-materials) 
+A cache entry contains the cryptographic materials, [encryption](structures.md#encryption-materials) or [decryption](structures.md#decryption-materials) 
 materials to be cached along with other metadata.  
 Some implementations of the CMC have the following metadata: 
 
