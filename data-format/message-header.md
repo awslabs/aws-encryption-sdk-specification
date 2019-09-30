@@ -5,7 +5,7 @@
 
 ## Version
 
-See [Message Version](#message.md#version).
+See [Message Version](message.md#version).
 
 ## Implementations
 
@@ -16,13 +16,13 @@ See [Message Version](#message.md#version).
 
 ## Overview
 
-The message header is a component of the [message](#message.md).
+The message header is a component of the [message](message.md).
 
 The purpose of the message header is to define the authenticated metadata required for decryption of the [message body](#message-body), including:
 
-- the format of the [message](#message.md) and [message body](#message-body.md)
-- the encrypted data keys needed for decryption of the [message body encrypted content](#message-body.md#encrypted-content)
-- the [encryption context](#encryption-context.md)
+- the format of the [message](message.md) and [message body](message-body.md)
+- the encrypted data keys needed for decryption of the [message body encrypted content](message-body.md#encrypted-content)
+- the [encryption context](../framework/structures.md#encryption-context)
 
 ## Definitions
 
@@ -86,11 +86,11 @@ The value (hex) of this field MUST be a value that exists in the following table
 
 The identifier for the algorithm suite used when generating the message.
 The value (hex) of this field MUST be a value that exists in the
-[Supported Algorithm Suites](#algorithm-suites.md#supported-algorithm-suites) table.
+[Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) table.
 
 #### Message ID
 
-A value that MUST uniquely identify the [message](#message.md).
+A value that MUST uniquely identify the [message](message.md).
 While implementations cannot guarantee complete uniqueness,
 implementations MUST use a good source of randomness when generating messages IDs in order to make
 the chance of duplicate IDs negligible.
@@ -100,13 +100,13 @@ The purpose of the message ID is to:
 - protect against accidental reuse of a derived data key or the wearing out of derived data keys in
   the AWS Encryption SDK
 - uniquely identify the [message](message.md)
-- bind the message header to the [message body](message-body.md) [TODO "bind" wording]
+- bind the message header to the [message body](#dtat-format/message-body.md) [TODO "bind" wording]
 - provide a mechanism to securely reuse a data key with multiple messages
 
 #### AAD
 
 The Additional Authenticated Data (AAD) for the header.
-This AAD is an encoding of the [encryption context](#structures.md#encryption-context).
+This AAD is an encoding of the [encryption context](../framework/structures.md#encryption-context).
 
 The following table describes the fields that form the AAD.
 The bytes are appended in the order shown.
@@ -120,12 +120,12 @@ The bytes are appended in the order shown.
 
 The length of the [Key Value Pairs](#key-value-pairs) field in bytes.
 
-When the [encryption context](#encryption-context.md) is empty, the value of this field MUST be 0.
+When the [encryption context](../framework/structures.md#encryption-context) is empty, the value of this field MUST be 0.
 
 ##### Key Value Pairs
 
 The encoding of the key-value pairs of the [encryption context](#encryption-context).
-When the [encryption context](#encryption-context.md) is empty, this field MUST NOT be included in the [AAD](#aad).
+When the [encryption context](../framework/structures.md#encryption-context) is empty, this field MUST NOT be included in the [AAD](#aad).
 
 The following table describes the fields that form the Key Value Pairs.
 The bytes are appended in the order shown.
@@ -162,7 +162,7 @@ The bytes are appended in the order shown.
 
 #### Encrypted Data Keys
 
-The encoding of the [encrypted data keys](#structures.md#encrypted-data-key).
+The encoding of the [encrypted data keys](../framework/structures.md#encrypted-data-key).
 
 The following table describes the fields that form the encrypted data keys.
 The bytes are appended in the order shown.
@@ -200,7 +200,7 @@ The length of the key provider ID.
 ##### Key Provider ID
 
 The key provider ID.
-See [the specification for encrypted data keys](#structures.md#encrypted-data-key).
+See [the specification for encrypted data keys](../framework/structures.md#encrypted-data-key).
 
 ##### Key Provider Information Length
 
@@ -209,7 +209,7 @@ The length of the key provider information.
 ##### Key Provider Information
 
 The key provider information.
-See [the specification for encrypted data keys](#structures.md#encrypted-data-key).
+See [the specification for encrypted data keys](../framework/structures.md#encrypted-data-key).
 
 ##### Encrypted Data Key Length
 
@@ -218,19 +218,19 @@ The length of the encrypted data key.
 ##### Encrypted Data Key
 
 The encrypted data key.
-It is the data key encrypted by the [key provider](#key-provider.md).
+It is the data key encrypted by the key provider.
 
 #### Content Type
 
-The content type of the [message body](#message-body#content-type.md).
+The content type of the [message body](message-body.md#content-type).
 The value (hex) of this field MUST be a value that exists in the following table:
 
 ##### Supported Content Types
 
-| Value (hex) | Content Type                              |
-|-------------|-------------------------------------------|
-| 01          | [Non-Framed](#message-body.md#non-framed) |
-| 02          | [Framed](#message-body.md#framed)         |
+| Value (hex) | Content Type                                          |
+|-------------|-------------------------------------------------------|
+| 01          | [Non-Framed](message-body.md#non-framed) |
+| 02          | [Framed](message-body.md#framed)         |
 
 #### Reserved
 
@@ -240,12 +240,12 @@ The value (hex) of this field MUST be `00 00 00 00`.
 #### IV Length
 
 The length of the initialization vector (IV).
-This value MUST be equal to the [IV length](#algorithm-suites.md#iv-length) value of the
-[algorithm suite](#algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.
+This value MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-length) value of the
+[algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.
 
 #### Frame Length
 
-The length of the [encrypted content](#message-body.md#encrypted-content) within each [regular frame](#message-body.md#regular-frame) of framed content.
+The length of the [encrypted content](message-body.md#encrypted-content) within each [regular frame](message-body.md#regular-frame) of framed content.
 When the [content type](#Content-Type) is non-framed the value of this field MUST be 0.
 
 ### Header Authentication
@@ -255,21 +255,21 @@ The header authentication contains fields used for authentication of the [header
 The following table describes the fields that form the header authentication.
 The bytes are appended in the order shown.
 
-| Field                                     | Length, in bytes                                                                                                                                                            | Interpreted as |
-|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
-| [IV](#iv)                                 | Variable. Determined by the IV length value of the [algorithm suite](#algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.                | Bytes          |
-| [Authentication Tag](#authentication-tag) | Variable. Determined by the authentication tag bytes value of the [algorithm suite](#algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
+| Field                                     | Length, in bytes                                                                                                                                                                        | Interpreted as |
+|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| [IV](#iv)                                 | Variable. Determined by the IV length value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.                | Bytes          |
+| [Authentication Tag](#authentication-tag) | Variable. Determined by the authentication tag bytes value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
 
 #### IV
 
-The [initialization vector (IV)](#initialization-vector.md) used as input to calculate the [authentication tag](#authentication-tag).
+The initialization vector (IV) used as input to calculate the [authentication tag](#authentication-tag).
 
 #### Authentication Tag
 
 The authentication value for the header.
-The [algorithm suite](#algorithm-suites-id) specified by the [Algorithm Suite ID](#algorith-suite-id) field
-[determines how the value of this field is calculated](#encrypt.md),
-and uses this value to [authenticate the contents of the header during decryption](#decrypt.md).
+The [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorith-suite-id) field
+[determines how the value of this field is calculated](../client-apis/encrypt.md),
+and uses this value to [authenticate the contents of the header during decryption](../client-apis/decrypt.md).
 
 ## Test Vectors
 
