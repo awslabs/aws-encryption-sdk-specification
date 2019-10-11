@@ -58,7 +58,7 @@ A master key MUST supply itself and MUST NOT supply any other master keys.
 
 Inputs and outputs are the same as for [master key providers](./master-key-provider-interface.md).
 
-A master key MUST not attempt to use any other master keys than itself.
+A master key MUST not attempt to use any other master keys.
 
 ### Generate Data Key
 
