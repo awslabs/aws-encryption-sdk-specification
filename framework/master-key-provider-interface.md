@@ -90,7 +90,9 @@ MUST be used to generate the data key.
 This interface is used to decrypt a data key.
 
 The master key provider SHOULD attempt to decrypt the data key
-using any master keys that it has access to.
+by passing the request to any master keys that it has access to
+until it has either run exhausted available master keys
+or obtained a plaintext data key.
 
 Inputs to this interface MUST include
 the algorithm suite,

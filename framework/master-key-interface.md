@@ -58,6 +58,8 @@ A master key MUST supply itself and MUST NOT supply any other master keys.
 
 Inputs and outputs are the same as for [master key providers](./master-key-provider-interface.md).
 
+A master key SHOULD attempt to decrypt data key using itself.
+
 A master key MUST not attempt to use any other master keys.
 
 ### Generate Data Key
@@ -85,12 +87,18 @@ This interface is used to encrypt a data key.
 
 The master key MUST encrypt the data key.
 
-Inputs the this interface MUST include
+Inputs to this interface MUST include
 the algorithm suite,
 the encryption context,
 the encrypted data key,
 and information that can identify which master key
 was used to encrypt the data key.
+
+The output of this interface MUST include
+a value that this master key can use to obtain
+the plaintext data key.
+Most commonly,
+this will be the result of an encryption operation.
 
 If the master key cannot encrypt the data key,
 the call MUST result in an error.
