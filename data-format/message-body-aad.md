@@ -52,7 +52,12 @@ For [non-framed data](#message-body.md#framed-data), the value of this field MUS
 
 ### Content Length
 
-The length, in bytes, of the plaintext data provided to the algorithm for encryption.
+This value depends on the [content type](message-header.md#content-type) of the [message](message.md):
+
+- For [non-framed data](message-body.md#non-framed-data), this value MUST equal the length, in bytes,
+  of the plaintext data provided to the algorithm for encryption.
+- For [framed data](message-body.md#framed-data), this value MUST equal the length, in bytes,
+  of the frame being encrypted.
 
 ## Security Considerations
 
