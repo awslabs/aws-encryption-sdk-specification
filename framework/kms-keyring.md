@@ -160,9 +160,9 @@ If the input [encryption materials](#structures.md#encryption-materials) do not 
 and this keyring has a [generator](#generator) defined, and onEncrypt MUST attempt to generate a new plaintext data key
 and encrypt that data key by calling [KMS GenerateDataKey](#kms-generatedatakey).
 
-The [KMS client](#kms-client) that calls [KMS GenerateDataKey](#kms-generatedatakey) MUST be the
-client returned by the [client supplier](#client-supplier).
-The client MUST be a client that calls the AWS region specified in the [generator](#generator) ARN.
+If an AWS region can be extracted from the [generator](#generator), then the [KMS client](#kms-client) that calls
+[KMS GenerateDataKey](#kms-generatedatakey) MUST be the client returned by the [client supplier](#client-supplier)
+when given that region as input.
 If the [client supplier](#client-supplier) does not provide any client for the given region for this GenerateDataKey call,
 OnEncrypt MUST fail.
 
@@ -266,9 +266,10 @@ in the input encrypted data key list with the following conditions, until it suc
 To attempt to decrypt a particular [encrypted data key](#structures.md#encrypted-data-key),
 OnDecrypt MUST call [KMS Decrypt](#kms-decrypt).
 
-The [KMS client](#kms-client) that calls [KMS Decrypt](#kms-decrypt) MUST be the
-client returned by the [client supplier](#client-supplier).
-The client MUST be a client that calls the AWS region specified in the [generator](#generator) ARN.
+
+If an AWS region can be extracted from the [generator](#generator), then the [KMS client](#kms-client) that calls
+[KMS Decrypt](#kms-decrypt) MUST be the client returned by the [client supplier](#client-supplier)
+when given that region as input.
 If the [client supplier](#client-supplier) does not provide any client for the given region for the Decrypt call,
 OnDecrypt MUST skip that particular [encrypted data key](#encrypted-data-key).
 
