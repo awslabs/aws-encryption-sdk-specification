@@ -81,7 +81,7 @@ Each Key ID MUST be one of the following:
 
 - A CMK [alias](https://docs.aws.amazon.com/kms/latest/developerguide/programming-aliases.html) (e.g. "alias/MyCryptoKey")
 - A well-formed key ARN (e.g. arn:aws:kms:us-east-1:999999999999:key/01234567-89ab-cdef-fedc-ba9876543210)
-- A well-formned alias ARN (e.g. arn:aws:kms:us-east-1:999999999999:alias/MyCryptoKey)
+- A well-formed alias ARN (e.g. arn:aws:kms:us-east-1:999999999999:alias/MyCryptoKey)
 
 See [AWS Documentation](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms).
 
@@ -102,7 +102,7 @@ The string MUST be one of the following:
 
 - A CMK [alias](https://docs.aws.amazon.com/kms/latest/developerguide/programming-aliases.html) (e.g. "alias/MyCryptoKey")
 - A well-formed key ARN (e.g. arn:aws:kms:us-east-1:999999999999:key/01234567-89ab-cdef-fedc-ba9876543210)
-- A well-formned alias ARN (e.g. arn:aws:kms:us-east-1:999999999999:alias/MyCryptoKey)
+- A well-formed alias ARN (e.g. arn:aws:kms:us-east-1:999999999999:alias/MyCryptoKey)
 
 See [AWS Documentation](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms).
 
@@ -207,9 +207,9 @@ as described above, OnEncrypt MUST also attempt to encrypt the plaintext data ke
 
 To attempt to encrypt the plaintext data key with a particular CMK, OnEncrypt MUST call [KMS Encrypt](#kms-encrypt).
 
-The [KMS client](#kms-client) that calls [KMS Encrypt](#kms-encrypt) MUST be the
-client returned by the [client supplier](#client-supplier).
-The client MUST be a client that calls the AWS region specified in the [generator](#generator) ARN.
+If an AWS region can be extracted from the [generator](#generator), then the [KMS client](#kms-client) that calls
+[KMS Encrypt](#kms-encrypt) MUST be the client returned by the [client supplier](#client-supplier)
+when given that region as input.
 If the [client supplier](#client-supplier) does not provide any client for the given region for this Encrypt call,
 OnEncrypt MUST skip that particular CMK.
 
