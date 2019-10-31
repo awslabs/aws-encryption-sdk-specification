@@ -128,7 +128,7 @@ specified by the [Algorithm Suite ID](#message-header.md#algorithm-suite-id) fie
 
 The last frame in a framed body MUST be a Final Frame.  
 
-The length of the Final Frame MUST be less than or equal to the [Frame Length](#message-header.md#frame-length).
+The length of the plaintext to be encrypted in the Final Frame MUST be less than or equal to the [Frame Length](#message-header.md#frame-length).
 
 - When the length of the Plaintext is not an exact multiple of the Frame Length, any remaining data is encrypted into the Final Frame.  
 - When the length of the Plaintext is an exact multiple of the Frame Length, the Final Frame encrypted content length SHOULD be equal to the frame length but MAY be 0.  
