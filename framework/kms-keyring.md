@@ -64,7 +64,7 @@ On keyring initialization, a keyring MAY define the following:
 
 ### Client Supplier
 
-A function that returns a KMS client that can make the following API calls in a particular AWS region:
+A function that maps a region string to a KMS client that can make the following API calls in the given AWS region:
 
 - [GenerateDataKey](#kms-generate-data-key)
 - [Encrypt](#kms-encrypt)
@@ -162,7 +162,8 @@ and encrypt that data key by calling [KMS GenerateDataKey](#kms-generatedatakey)
 
 If an AWS region can be extracted from the [generator](#generator), then the [KMS client](#kms-client) that calls
 [KMS GenerateDataKey](#kms-generatedatakey) MUST be the client returned by the [client supplier](#client-supplier)
-when given that region as input.
+when given that region as input. If an AWS region cannot be extraced from the [generator](#generator),
+then the KMS Keyring MAY choose an arbitrary region.
 If the [client supplier](#client-supplier) does not provide any client for the given region for this GenerateDataKey call,
 OnEncrypt MUST fail.
 
@@ -179,8 +180,7 @@ If the call to [KMS GenerateDataKey](#kms-generatedatakey) does not succeed, OnE
 modify the [encryption materials](#structures.md#encryption-materials) and MUST fail.
 
 If the call succeeds, OnEncrypt MUST verify that the response `Plaintext` length matches the specification
-of the [algorithm suite](#algorithm-suites.md).
-If it does not, OnEncrypt MUST fail.
+of the [algorithm suite](algorithm-suites.md)'s Key Derivation Input Length field. If it does not, OnEncrypt MUST fail.
 If verified, OnEncrypt MUST do the following with the response from [KMS GenerateDataKey](#kms-generatedatakey):
 
 - set the plaintext data key on the [encryption materials](#structures.md#encryption-materials)
@@ -193,13 +193,12 @@ If verified, OnEncrypt MUST do the following with the response from [KMS Generat
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
   in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace contains "aws-kms".
-  - The string field KeyName contains [generator](#generator).
+  - The string field KeyName contains the value of the KMS Keyring's [generator](#generator) field.
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
     - [GENERATED DATA KEY](#structures.md#supported-flags)
     - [ENCRYPTED DATA KEY](#structures.md#supported-flags)
     - [SIGNED ENCRYPTION CONTEXT](#structures.md#supported-flags)
 
-Given a plaintext data key in the [encryption materials](#structures.md#encryption-materials),
 OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in it's [key IDs](#key-ids) list.
 
 If this keyring's [generator](#generator) is defined and was not used to [generate a data key](#kms-generatedatakey)
@@ -207,9 +206,10 @@ as described above, OnEncrypt MUST also attempt to encrypt the plaintext data ke
 
 To attempt to encrypt the plaintext data key with a particular CMK, OnEncrypt MUST call [KMS Encrypt](#kms-encrypt).
 
-If an AWS region can be extracted from the [generator](#generator), then the [KMS client](#kms-client) that calls
-[KMS Encrypt](#kms-encrypt) MUST be the client returned by the [client supplier](#client-supplier)
-when given that region as input.
+For each [KMS Encrypt](#kms-encrypt) call, if an AWS region can be extracted from the CMK ARN, then the
+[KMS client](#kms-client) that calls [KMS Encrypt](#kms-encrypt) MUST be the client returned by the
+[client supplier](#client-supplier) when given that region as input.
+If an AWS region cannot be extraced from the CMK ARN, then the KMS Keyring MAY choose an arbitrary region.
 If the [client supplier](#client-supplier) does not provide any client for the given region for this Encrypt call,
 OnEncrypt MUST skip that particular CMK.
 
@@ -235,7 +235,7 @@ If the call succeeds, OnEncrypt MUST do the following with the response from [KM
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
   in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace contains "aws-kms".
-  - The string field KeyName contains [generator](#generator).
+  - The string field KeyName contains the CMK ARN used for [KMS Encrypt](#kms-encrypt).
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
     - [ENCRYPTED DATA KEY](#structures.md#supported-flags)
     - [SIGNED ENCRYPTION CONTEXT](#structures.md#supported-flags)
@@ -252,7 +252,7 @@ to decrypt depends on if this keyring is a [discovery keyring](#discovery) or no
 
 If this keyring is a [discovery keyring](#discovery), OnDecrypt MUST attempt to decrypt every
 [encrypted data key](#structures.md#encrypted-data-key) in the input encrypted data key list
-with the following conditions, until it successfully decrypts one:
+with the following condition, until it successfully decrypts one:
 
 - the [key provider ID](#structures.md#key-provider-id) field has the value "aws-kms"
 
@@ -267,9 +267,11 @@ To attempt to decrypt a particular [encrypted data key](#structures.md#encrypted
 OnDecrypt MUST call [KMS Decrypt](#kms-decrypt).
 
 
-If an AWS region can be extracted from the [generator](#generator), then the [KMS client](#kms-client) that calls
+If an AWS region can be extracted from the [encrypted data key](structures.md#encrypted-data-key)'s
+[key provider info](structures.md#key-provider-information), then the [KMS client](#kms-client) that calls
 [KMS Decrypt](#kms-decrypt) MUST be the client returned by the [client supplier](#client-supplier)
-when given that region as input.
+when given that region as input. If an AWS region cannot be extraced from the CMK ARN, then the
+KMS Keyring MAY choose an arbitrary region.
 If the [client supplier](#client-supplier) does not provide any client for the given region for the Decrypt call,
 OnDecrypt MUST skip that particular [encrypted data key](#encrypted-data-key).
 
@@ -301,7 +303,7 @@ If the response is successfully verified, OnDecrypt MUST do the following with t
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
   in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace contains "aws-kms".
-  - The string field KeyName contains [generator](#generator).
+  - The string field KeyName contains the [encrypted data key's key provider info](structures.md#key-provider-information).
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
     - [DECRYPTED DATA KEY](#structures.md#supported-flags)
     - [VERIFIED ENCRYPTION CONTEXT](#structures.md#supported-flags)
