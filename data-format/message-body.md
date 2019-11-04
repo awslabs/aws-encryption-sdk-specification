@@ -126,13 +126,22 @@ specified by the [Algorithm Suite ID](#message-header.md#algorithm-suite-id) fie
 
 #### Final Frame
 
-The last frame in a framed body MUST be a Final Frame.  
+Framed data MUST contain exactly one final frame.
+The final frame MUST be the last frame.
 
 The length of the Final Frame MUST be less than or equal to the [Frame Length](#message-header.md#frame-length).
 
 - When the length of the Plaintext is not an exact multiple of the Frame Length, any remaining data is encrypted into the Final Frame.  
-- When the length of the Plaintext is an exact multiple of the Frame Length, the Final Frame encrypted content length SHOULD be equal to the frame length but MAY be 0.  
-- When the length of the Plaintext is less than or equal to the Frame Length, the body MUST contain exactly one frame and that frame MUST be a Final Frame.  
+- When the length of the Plaintext is an exact multiple of the Frame Length (including if it is equal to the frame length), the Final Frame encrypted content length SHOULD be equal to the frame length but MAY be 0.  
+- When the length of the Plaintext is less than the Frame Length, the body MUST contain exactly one frame and that frame MUST be a Final Frame.  
+
+For example, in the case that the length of the Plaintext is equal to the Frame Length, there are two acceptable cases:
+
+- The body contains exactly one frame, the final frame,
+  with a content length equal to the plaintext length.
+- The body contains two frames.
+  The first frame is a regular frame,
+  and the second frame is the final frame with a content length of 0.
 
 The following describes the fields that form the Final Frame Body Structure.    
 The bytes are appended in the order shown.
