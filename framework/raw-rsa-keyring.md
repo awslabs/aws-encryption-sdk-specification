@@ -134,9 +134,9 @@ For each encrypted data key, the keyring MUST attempt to decrypt the encrypted d
 using RSA if and only if the following is true:
 
 - the encrypted data key's [key provider information](#structures.md#key-provider-information)
-  has a value equal to this keyring's [key namespace](#key-name).
+  has a value equal to this keyring's [key name](#key-name).
 - the encrypted data key's [key provider ID](#structures.md#key-provider-id) has a value equal to
-  this keyring's [key name](#key-namespace).
+  this keyring's [key namespace](#key-namespace).
 
 The keyring performs RSA decryption with the following specifics:
 
