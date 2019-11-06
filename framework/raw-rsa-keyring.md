@@ -134,13 +134,13 @@ For each encrypted data key, the keyring MUST attempt to decrypt the encrypted d
 using RSA if and only if the following is true:
 
 - the encrypted data key's [key provider information](#structures.md#key-provider-information)
-  has a value equal to this keyring's [key namespace](#key-namespace).
+  has a value equal to this keyring's [key name](#key-name).
 - the encrypted data key's [key provider ID](#structures.md#key-provider-id) has a value equal to
-  this keyring's [key name](#key-name).
+  this keyring's [key namespace](#key-namespace).
 
 The keyring performs RSA decryption with the following specifics:
 
-- this keyring's [private key](#private-key) is the RSA priavte key
+- this keyring's [private key](#private-key) is the RSA private key
 - this keyring's [padding scheme](padding-scheme) is the RSA padding scheme.
 - an encrypted data key's [ciphertext](#structures.md#ciphertext) is the input ciphertext to RSA decryption.
 
