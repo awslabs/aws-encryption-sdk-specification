@@ -33,7 +33,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 - If the encryption materials request does not contain an algorithm suite, 
 the algorithm suite with algorithm suite ID [03 78 (hex)](algorithm-suites.md#supported-algorithm-suites) 
-MUST be added as the algorithm suite in the encryption materials returned.  
+MUST be referenced as the algorithm suite in the encryption materials returned.  
 - If the encryption materials request does contain an algorithm suite, the encryption materials returned MUST contain the same algorithm suite.
 
 If the algorithm suite contains a [signing algorithm](#algorithm-suites.md#signature-algorithm), the default CMM MUST:

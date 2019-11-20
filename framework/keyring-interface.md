@@ -43,9 +43,10 @@ The following inputs are REQUIRED:
 
 The following inputs are OPTIONAL:
 
-- [Plaintest Data Key](#structures.md#plaintext-data-key)
+- [Plaintext Data Key](#structures.md#plaintext-data-key)
 
-This interface MAY return [data key materials](#structures.md#data-key-materials) appropriate for the request. 
+This interface MAY return [data key materials](#structures.md#data-key-materials) appropriate for the request. If it does return this output
+and a plaintext data key was provided as input, the output must specify the same plaintext data key.
 
 The output of this interface is driven by two behaviours:
 
@@ -122,7 +123,8 @@ This interface MAY perform the following behavior:
 
 - [Decrypt data key](#decrypt-data-key)
 
-If this keyring attempted the above behavior, and succeeded, it MUST output the resulting [data key materials](#structures.md#data-key-materials). The [algorithm suite](#algorithm-suites.md) in the result must match the input [algorithm suite](#algorithm-suites.md).
+If this keyring attempted the above behavior, and succeeded, it MUST output the resulting [data key materials](#structures.md#data-key-materials). The [algorithm suite](#algorithm-suites.md) in the result must match the input [algorithm suite](#algorithm-suites.md), and the [encrypted data keys](#structures.md#encrypted-data-keys)
+list must be empty.
 
 If the keyring did not attempt the above behavior, it MUST produce no output.
 

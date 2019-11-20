@@ -151,13 +151,13 @@ OnEncrypt MUST take [encryption materials](#structures.md#encryption-materials) 
 If this keyring is a [discovery keyring](#is-discovery), OnEncrypt MUST return the input
 [encryption materials](#structures.md#encryption-materials) unmodified.
 
-If the input [encryption materials](#structures.md#encryption-materials) do not contain a plaintext data key
+If the input does not include a plaintext data key
 and this keyring does not have a [generator](#generator) defined,
 OnEncrypt MUST not modify the [encryption materials](#structures.md#encryption-materials.md)
 and MUST fail.
 
-If the input [encryption materials](#structures.md#encryption-materials) do not contain a plaintext data key
-and this keyring has a [generator](#generator) defined, and onEncrypt MUST attempt to generate a new plaintext data key
+If the input does not contain a plaintext data key
+and this keyring has a [generator](#generator) defined, OnEncrypt MUST attempt to generate a new plaintext data key
 and encrypt that data key by calling [KMS GenerateDataKey](#kms-generatedatakey).
 
 The [KMS client](#kms-client) that calls [KMS GenerateDataKey](#kms-generatedatakey) MUST be the
@@ -175,23 +175,22 @@ When calling [KMS GenerateDataKey](#kms-generatedatakey), the keyring MUST call 
    the input [encryption materials](#structures.md#encryption-materials).
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
-If the call to [KMS GenerateDataKey](#kms-generatedatakey) does not succeed, OnEncrypt MUST NOT
-modify the [encryption materials](#structures.md#encryption-materials) and MUST fail.
+If the call to [KMS GenerateDataKey](#kms-generatedatakey) does not succeed, OnEncrypt MUST fail.
 
 If the call succeeds, OnEncrypt MUST verify that the response `Plaintext` length matches the specification
 of the [algorithm suite](#algorithm-suites.md).
 If it does not, OnEncrypt MUST fail.
 If verified, OnEncrypt MUST do the following with the response from [KMS GenerateDataKey](#kms-generatedatakey):
 
-- set the plaintext data key on the [encryption materials](#structures.md#encryption-materials)
+- set the plaintext data key on the [data key materials](#structures.md#data-key-materials)
   as the response `Plaintext`.
 - append a new [encrypted data key](#structures.md#encrypted-data-key) to the encrypted data key list
-  in the [encryption materials](#structures.md#encryption-materials), constructed as follows:
+  in the [data key materials](#structures.md#data-key-materials), constructed as follows:
   - the [ciphertext](#structures.md#ciphertext) is the response `CiphertextBlob`.
   - the [key provider id](#structures.md#key-provider-id) is "aws-kms".
   - the [key provider information](#data-strucures.md#key-provider-information) is the response `KeyId`.
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
-  in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
+  in the output [data key materials](#structures.md#data-key-materials), constructed as follows:
   - The string field KeyNamespace contains "aws-kms".
   - The string field KeyName contains [generator](#generator).
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
@@ -199,7 +198,7 @@ If verified, OnEncrypt MUST do the following with the response from [KMS Generat
     - [ENCRYPTED DATA KEY](#structures.md#supported-flags)
     - [SIGNED ENCRYPTION CONTEXT](#structures.md#supported-flags)
 
-Given a plaintext data key in the [encryption materials](#structures.md#encryption-materials),
+Given a plaintext data key in the input,
 OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in it's [key IDs](#key-ids) list.
 
 If this keyring's [generator](#generator) is defined and was not used to [generate a data key](#kms-generatedatakey)
@@ -217,9 +216,9 @@ To encrypt the plaintext data key with a CMK, OnEncrypt MUST call [KMS Encrypt](
 constructed as follows:
 
 - `KeyId`: the CMK ARN to be used for data key encryption.
-- `PlaintextDataKey`: the plaintext data key in the [encryption materials](#structures.md#encryption-materials).
+- `PlaintextDataKey`: the plaintext data key from the input or the result of the call to [KMS GenerateDataKey](#kms-generatedatakey).
 - `EncryptionContext`: the [encryption context](#structures.md#encryption-context) included in
-  the input [encryption materials](#structures.md#encryption-materials).
+  the input.
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
 If the call to [KMS Encrypt](#kms-encrypt) does not succeed OnEncrypt MUST fail.
@@ -227,25 +226,28 @@ If the call to [KMS Encrypt](#kms-encrypt) does not succeed OnEncrypt MUST fail.
 If the call succeeds, OnEncrypt MUST do the following with the response from [KMS Encrypt](#kms-encrypt):
 
 - append a new [encrypted data key](#structures.md#encrypted-data-key) to the encrypted data key list
-  in the [encryption materials](#structures.md#encryption-materials), constructed as follows:
+  in the [data key materials](#structures.md#encryption-materials), constructed as follows:
   - The [ciphertext](#structures.md#ciphertext) is the response `CiphertextBlob`.
   - The [key provider id](#structures.md#key-provider-id) is "aws-kms".
   - The [key provider information](#data-strucures.md#key-provider-information) is the response `KeyId`.
     Note that the `KeyId` in the response is always in key ARN format.
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
-  in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
+  in the output [data key materials](#structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace contains "aws-kms".
   - The string field KeyName contains [generator](#generator).
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
     - [ENCRYPTED DATA KEY](#structures.md#supported-flags)
     - [SIGNED ENCRYPTION CONTEXT](#structures.md#supported-flags)
 
-If all Encrypt calls succeed, OnEncrypt MUST output the modified [encryption materials](#structures.md#encryption-materials).
+If all Encrypt calls succeed, OnEncrypt MUST output the [data key materials](#structures.md#data-key-materials).
 
 ### OnDecrypt
 
-OnDecrypt MUST take [decryption materials](#structures.md#decryption-materials) and
-a list of [encrypted data keys](#structures.md#encrypted-data-keys) as input.
+The following inputs are REQUIRED:
+
+- [Algorithm Suite](#algorithm-suites.md)
+- [Encryption Context](#structures.md#encryption-context)
+- [Encrypted Data Keys](#structures.md#encrypted-data-keys)
 
 The set of [encrypted data keys](#structures.md#encrypted-data-keys) that OnDecrypt MUST attempt
 to decrypt depends on if this keyring is a [discovery keyring](#discovery) or not.
@@ -291,23 +293,22 @@ If the call to [KMS Decrypt](#kms-decrypt) succeeds OnDecrypt MUST verify the fo
 - verify that the `KeyId` field has a value equal to the [encrypted data key's key provider info](##structures.md#key-provider-info).
 - verify that the `Plaintext` is of a length that fits the [algorithm suite](#algorithm-suites.md) given in the decryption materials.
 
-If any of the above are not true, OnDecrpyt MUST NOT update the [decryption materials](#structures.md#decryption-materials)
-and MUST fail.
+If any of the above are not true, OnDecrpyt MUST fail.
 
 If the response is successfully verified, OnDecrypt MUST do the following with the response:
 
-- set the plaintext data key on the [decryption materials](#structures.md#decryption-materials) as the response `Plaintext`.
+- set the plaintext data key on the [data key materials](#structures.md#decryption-materials) as the response `Plaintext`.
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
-  in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
+  in the output [data key materials](#structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace contains "aws-kms".
   - The string field KeyName contains [generator](#generator).
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
     - [DECRYPTED DATA KEY](#structures.md#supported-flags)
     - [VERIFIED ENCRYPTION CONTEXT](#structures.md#supported-flags)
-- immediately return the modified [decryption materials](#structures.md#decryption-materials).
+- immediately return the [data key materials](#structures.md#decryption-materials).
 
 If OnDecrypt fails to successfully decrypt any [encrypted data key](#structures.md#encrypted-data-key),
-then OnDecrypt MUST output the unmodified input [decryption materials](#structures.md#decryption-materials).
+then OnDecrypt MUST produce no output.
 
 ## Security Considerations
 

@@ -93,26 +93,25 @@ OnEncrypt MUST NOT succeed if this keyring does not have a specified [public key
 
 OnEncrypt MUST take [encryption materials](#structures.md#encryption-materials) as input.
 
-If the [encryption materials](#structures.md#encryption-materials) do not contain a plaintext data key,
-on encrypt MUST generate a random plaintext data key and set it on the [encryption materials](#structures.md#encryption-materials).
+If the input does not contain a plaintext data key, OnEncrypt MUST generate a random plaintext data key.
 
-The keyring MUST attempt to encrypt the plaintext data key in the
-[encryption materials](#structures.md#encryption-materials) using RSA.
+The keyring MUST attempt to encrypt the plaintext data key using RSA.
+
 The keyring performs RSA with the following specifics:
 
 - this keyring's [public key](#public-key) is the RSA public key
 - this keyring's [padding scheme](padding-scheme) is the RSA padding scheme.
 - the plaintext data key is the plaintext input to RSA encryption.
 
-If RSA encryption was successful, OnEncrypt MUST return the input
-[encryption materials](#structures.md#encryption-materials), modified in the following ways:
+If RSA encryption was successful, OnEncrypt MUST return
+[data key materials](#structures.md#encryption-materials), specified in the following ways:
 
-- The encrypted data key list has a new encrypted data key added, constructed as follows:
+- The encrypted data key list contains a single encrypted data key, constructed as follows:
   - the [key provider ID](#structures.md#key-provider-id) field is this keyring's [key namespace](#key-id).
   - the [key provider information](#structures.md#key-provider-information) field is this keyring's [key name](#key-name).
   - the [ciphertext](#structures.md#data-key-encryption) field is the ciphertext outputted from
     the RSA encryption of the plaintext data key.
-- The keyring trace has a new [record](#structures.md#record) appended.
+- The keyring trace has a single [record](#structures.md#record).
   This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
   and the [flags](#structures.md$flags) field of this record MUST include the
   [ENCRYPTED DATA KEY](#structures.md#supported-flags) flag.
@@ -125,8 +124,11 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 OnDecrypt MUST NOT succeed if this keyring does not have a specified [private key](#private-key).
 The keyring MUST NOT derive a private key from a specified [public key](#public-key)
 
-OnDecrypt MUST take [decryption materials](#structures.md#decryption-materials) and
-a list of [encrypted data keys](#structures.md#encrypted-data-key) as input.
+The following inputs are REQUIRED:
+
+- [Algorithm Suite](#algorithm-suites.md)
+- [Encryption Context](#structures.md#encryption-context)
+- [Encrypted Data Keys](#structures.md#encrypted-data-keys)
 
 The keyring MUST attempt to decrypt the inputted encrypted data keys, in list order, until it successfully decrypts one.
 
@@ -144,17 +146,17 @@ The keyring performs RSA decryption with the following specifics:
 - this keyring's [padding scheme](padding-scheme) is the RSA padding scheme.
 - an encrypted data key's [ciphertext](#structures.md#ciphertext) is the input ciphertext to RSA decryption.
 
-If any decryption succeeds, this keyring MUST immediately return the input
-[decryption materials](#structures.md#decryption-materials), modified in the following ways:
+If any decryption succeeds, this keyring MUST immediately return
+[data key materials](#structures.md#data-key-materials), specified in the following ways:
 
-- The output of RSA decryption is set as the decryption material's plaintext data key.
-- The keyring trace has a new [record](#structures.md#record) appended.
+- The output of RSA decryption is set as the data key materials' plaintext data key.
+- The keyring trace has a single [record](#structures.md#record).
   This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
   and the [flags](#structures.md$flags) field of this record MUST include the
   [DECRYPTED DATA KEY](#structures.md#supported-flags) flag.
   The record MUST NOT contain the [VERIFIED ENCRYPTION CONTEXT flag](#structures.md#flags).
 
-If no decryption succeeds, this keyring MUST NOT make any update to the decryption materials.
+If no decryption succeeds, this keyring MUST produce no output.
 
 ## Security Considerations
 

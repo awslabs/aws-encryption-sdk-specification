@@ -122,19 +122,17 @@ The authentication tag outputted from the AES-GCM encryption.
 
 ## Operation
 
-### On Encrypt
+### OnEncrypt
 
-On encrypt MUST take [encryption materials](#structures.md#encryption-materials) as input.
+OnEncrypt MUST take [encryption materials](#structures.md#encryption-materials) as input.
 
-If the [encryption materials](#structures.md#encryption-materials) do not contain a plaintext data key,
-on encrypt MUST generate a random plaintext data key and set it on the [encryption materials](#structures.md#encryption-materials).
+If the input does not contain a plaintext data key, OnEncrypt MUST generate a random plaintext data key.
 
-The keyring MUST encrypt the plaintext data key in the [encryption materials](#structures.md#encryption-materials)
-using AES-GCM.
+The keyring MUST encrypt the plaintext data key using AES-GCM.
 
 The keyring must use AES-GCM with the following specifics:
 
-- it uses the [encryption context in the encryption materials](#structures.md#encryption-materials)
+- it uses the specified [encryption context](#structures.md#encryption-context)
   as the additional authenticated data (AAD)
 - the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](#message-header.md#key-value-pairs)
 - it uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key
@@ -151,27 +149,30 @@ the keyring MUST construct an [encrypted data key](#structures.md) with the foll
   [raw AES keyring ciphertext](#ciphertext)
 
 The keyring MUST append the constructed encrypted data key to the encrypted data key list in the
-[encryption materials](#structures.md#encryption-materials).
+[data key materials](#structures.md#encryption-materials).
 
 The keyring MUST append a [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
-in the input [encryption materials](#structures.md#encryption-materials).
+in the input [data key materials](#structures.md#encryption-materials).
 This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
 and the [flags](#structures.md$flags) field of this record MUST include the following flags:
 
 - [ENCRYPTED DATA KEY](#structures.md#supported-flags)
 
-If this keyring generated the plaintext data key in the [encryption materials](#structures.md#encryption-materials),
-the [keyring trace](#structures.md#keyring-trace) in the returned encryption materials
+If this keyring generated the plaintext data key in the [data key materials](#structures.md#data-key-materials),
+the [keyring trace](#structures.md#keyring-trace) in the returned data key materials
 MUST also include a record that contains this keyring's [key name](#key-name) and [key namespace](#key-namespace)
 with a [flags](#structures.md#flags) field containing the [GENERATED DATA KEY](#structures.md#supported-flags) flag.
 Note that this MAY be the same trace as the one with the ENCRYPTED DATA KEY flag.
 
-On encrypt MUST output the modified [encryption materials](#structures.md#encryption-materials).
+OnEncrypt MUST output the resulting [data key materials](#structures.md#data-key-materials).
 
 ### On Decrypt
 
-On decrypt MUST take [decryption materials](#structures.md#decryption-materials) and
-a list of [encrypted data keys](#structures.md#encrypted-data-keys) as input.
+The following inputs are REQUIRED:
+
+- [Algorithm Suite](#algorithm-suites.md)
+- [Encryption Context](#structures.md#encryption-context)
+- [Encrypted Data Keys](#structures.md#encrypted-data-keys)
 
 The keyring MUST perform the following actions on each [encrypted data key](#structures.md#encrypted-data-key)
 in the input encrypted data key list, serially, until it successfully decrypts one.
@@ -196,19 +197,19 @@ If decrypting, the keyring MUST use AES-GCM with the following specifics:
 - it uses the [authentication tag](#authentication-tag) obtained from deserialization as the AES-GCM input authentication tag.
 - it uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key.
 - it uses the [IV](#iv) obtained from deserialization as the AES-GCM IV.
-- it uses the encryption context from the [decryption materials](#structures.md#decryption-materials) as the AES-GCM AAD.
+- it uses the encryption context from the input as the AES-GCM AAD.
 - the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](#message-header.md#key-value-pairs)
 
 If a decryption succeeds, this keyring MUST:
 
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
-  in the input [decryption materials](#structures.md#decryption-materials).
+  in the output [data key materials](#structures.md#data-key-materials).
   This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
   and the [flags](#structures.md$flags) field of this record MUST include the following flags:
   - [DECRYPTED DATA KEY](#structures.md#supported-flags)
-- add the resulting plaintext data key to the decryption materials and return the modified materials.
+- specify the resulting plaintext data key in the output [data key materials](#structures.md#data-key-materials).
 
-If no decryption succeeds, the decryption MUST NOT make any update to the decryption materials.
+If no decryption succeeds, the decryption MUST produce no output.
 
 ## Security Considerations
 
