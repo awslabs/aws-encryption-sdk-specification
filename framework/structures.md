@@ -26,6 +26,10 @@ Note that this specification does not specify how these structures should be rep
 throughout the AWS Encryption SDK framework.
 While these structures will usually be represented as objects, lower level languages MAY represent
 these fields in a less strictly defined way as long as all field properties are still upheld.
+In addition, this specification describes interfaces as if they accepted immutable values as input and
+produced new immutable values as output. Some languages may implement the interfaces by storing results
+into pre-allocated locations that are passed by reference, or even using a mutable structure as both input and
+output.
 
 Structures defined in this document:
 
@@ -118,48 +122,15 @@ The encryption context MUST reserve the following key fields for use by the AWS 
 The encryption context SHOULD reserve any key field with the prefix `aws` for use by AWS KMS and
 other AWS services.
 
-### Encryption Materials
+### Data Key Materials
 
 #### Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/EncryptionMaterials.java)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py)
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)
 
-#### Structure
-
-Encryption materials are a structure containing materials needed for [encryption](#encrypt.md).
-This structure MAY include any of the following fields:
-
-- [Algorithm Suite](#algorith-suite)
-- [Encrypted Data Keys](#encrypted-data-keys)
-- [Encryption Context](#encryption-context)
-- [Keyring Trace](#keyring-trace)
-- [Plaintext Data Key](#plaintext-data-key)
-- [Signing Key](#signing-key)
 
 ##### Algorithm Suite
 
-The [algorithm suite](#algorithm-suites.md) to be used for [encryption](#encrypt.md).
-
-##### Encrypted Data Keys
-
-A list of the [encrypted data keys](#encrypted-data-key) that correspond to the plaintext data key.
-
-The [ciphertext](#ciphertext) of each encrypted data key in this list MUST be an opaque form of the
-plaintext data key from this set of encryption materials.
-
-If the plaintext data key is not included on this set of encryption materials, this list MUST be empty.
-
-##### Encryption Context
-
-The [encryption context](#encryption-context) associated with this [encryption](#encrypt.md).
-
-##### Keyring Trace
-
-A [keyring trace](#keyring-trace) containing all of the actions that keyrings have taken on this set
-of encryption materials.
+The [algorithm suite](#algorithm-suites.md) to be used for [encryption](#encrypt.md) or [decryption](#decrypt.md).
 
 ##### Plaintext Data Key
 
@@ -176,12 +147,51 @@ The plaintext data key SHOULD be stored as immutable data.
 
 The plaintext data key SHOULD offer an interface to zero the plaintext data key
 
+##### Encrypted Data Keys
+
+A list of the [encrypted data keys](#encrypted-data-key) that correspond to the plaintext data key.
+
+The [ciphertext](#ciphertext) of each encrypted data key in this list MUST be an opaque form of the
+plaintext data key from this set of data key materials.
+
+If the plaintext data key is not included on this set of encryption materials, this list MUST be empty.
+
+##### Keyring Trace
+
+An optional [keyring trace](#keyring-trace) containing all of the actions that keyrings have taken on this set of data key materials.
+
+### Encryption Materials
+
+#### Implementations
+
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/EncryptionMaterials.java)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py)
+- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h)
+- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)
+
+#### Structure
+
+Encryption materials are a structure containing materials needed for [encryption](#encrypt.md) or [decryption](#decrypt.md).
+This structure MAY include any of the following fields:
+
+- [Encryption Context](#encryption-context)
+- [Data Key Materials](#data-key-materials)
+- [Signing Key](#signing-key)
+
+##### Encryption Context
+
+The [encryption context](#encryption-context) associated with this [encryption](#encrypt.md) or [decryption](#decrypt.md).
+
+##### Data Key Materials
+
+The [data key materials](#data-key-materials) to be used in [encryption](#encrypt.md).
+
 ##### Signing Key
 
 The key to be used as the signing key for signature verification during [encryption](#encrypt.md).
 
 The signing key MUST fit the specification described by the [signature algorithm](#algorithm-suites.md#signature-algorithm)
-included in this encryption material's [algorithm suite](#algorithm-suite).
+included in this data key materials' [algorithm suite](#algorithm-suite).
 
 The value of this key MUST be kept secret.
 
@@ -211,7 +221,7 @@ The [algorithm suite](#algorithm-suites.md) to be used for [decryption](#decrypt
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this [encryption](#encrypt.md)
+The [encryption context](#encryption-context) associated with this [decryption](#encrypt.md)
 
 ##### Keyring Trace
 

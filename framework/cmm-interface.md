@@ -85,17 +85,10 @@ it MUST return [encryption materials](#structures.md#encryption-materials) appro
 
 The encryption materials returned MUST include the following:
 
-- [Algorithm Suite](#algorithm-suite.md)
-    - If the encryption materials request contains an algorithm suite, the encryption materials returned SHOULD contain the same algorithm suite.
-- Plaintext Data Key
-- [Encrypted Data Keys](#structures.md#encrypted-data-keys)
-    - Every encrypted data key in this list MUST correspond to the above plaintext data key. 
+- [Data Key Materials](#structures.md#data-key-materials.md)
+    - If the encryption materials request contains an algorithm suite, the data key materials returned SHOULD contain the same algorithm suite.
 - [Encryption Context](#structures.md#encryption-context)
-    - The CMM MAY modify the encryption context.   
-
-The encryption materials returned MAY include the following:
-
-- [Keyring Trace](#structures.md#keyring-trace)
+    - The CMM MAY return an encryption context that differs from the input.   
 
 If the algorithm suite contains a [signing algorithm](#algorithm-suites.md#signature-algorithm): 
 
