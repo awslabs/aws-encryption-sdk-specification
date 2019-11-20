@@ -126,7 +126,9 @@ other AWS services.
 
 #### Implementations
 
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/DataKey.java)
 
+TODO: The above is only a similar data structure related to the deprecated master key/master key provider concepts.
 
 ##### Algorithm Suite
 
