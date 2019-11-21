@@ -271,7 +271,6 @@ OnDecrypt MUST call [KMS Decrypt](#kms-decrypt).
 For each [KMS Decrypt](#kms-decrypt) call, if an AWS region can be extracted from the [encrypted data key](structures.md#encrypted-data-key)'s [key provider info](structures.md#key-provider-information).
 The KMS Keyring MUST call [KMS Decrypt](#kms-decrypt) using the client supplied by the [client supplier](#client-supplier), given the region as input.
 
-If an AWS region cannot be extracted from the [encrypted data key](structures.md#encrypted-data-key)'s [key provider info](structures.md#key-provider-information) then the KMS Keyring MUST input to the [client supplier](#client-supplier) a value denoting an unknown region.
 If the client supplier does not provide any client for the given region for this Decrypt call, OnDecrypt MUST skip that particular [encrypted data key](#encrypted-data-key).
 
 When calling [KMS Decrypt](#kms-decrypt), the keyring MUST call with a request constructed as follows:
