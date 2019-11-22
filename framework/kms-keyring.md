@@ -293,7 +293,7 @@ If the call to [KMS Decrypt](#kms-decrypt) succeeds OnDecrypt MUST verify the fo
 - verify that the `KeyId` field has a value equal to the [encrypted data key's key provider info](##structures.md#key-provider-info).
 - verify that the `Plaintext` is of a length that fits the [algorithm suite](#algorithm-suites.md) given in the decryption materials.
 
-If any of the above are not true, OnDecrpyt MUST fail.
+If any of the above are not true, OnDecrypt MUST fail.
 
 If the response is successfully verified, OnDecrypt MUST do the following with the response:
 
