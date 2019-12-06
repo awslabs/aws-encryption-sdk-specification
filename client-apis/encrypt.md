@@ -55,7 +55,7 @@ A Keyring that implements the [keyring interface](#keyring-interface.md).
 
 ### Frame Length
 
-The length of the frame to use for [framed data](#message-body.md).
+The [frame length](#message-header.md#frame-length) to use for [framed data](#message-body.md).
 This value MUST NOT exceed the value 2^32 - 1.
 
 ### Plaintext Length

@@ -52,7 +52,19 @@ For [non-framed data](#message-body.md#framed-data), the value of this field MUS
 
 ### Content Length
 
-The length, in bytes, of the plaintext data provided to the algorithm for encryption.
+The length, in bytes, of the plaintext data being encrypted that this message body AAD is associated with.
+
+More specifically, depending on the [content type](message-header.md#content-type) of the [message](message.md):
+
+- For [non-framed data](message-body.md#non-framed-data), this value MUST equal the length, in bytes,
+  of the plaintext data provided to the algorithm for encryption.
+- For [framed data](message-body.md#framed-data), this value MUST equal the length, in bytes,
+  of the plaintext being encrypted in this frame.
+  - For [regular frames](message-body.md#regular-frame), this value MUST equal the value of
+    the [frame length](message-hedaer.md#frame-length) field in the message header.
+  - For the [final frame](message-body.md#final-frame), this value MUST be greater than or equal to
+    0 and less than or equal to the value of the [frame length](message-hedaer.md#frame-length)
+    field in the message header.
 
 ## Security Considerations
 
