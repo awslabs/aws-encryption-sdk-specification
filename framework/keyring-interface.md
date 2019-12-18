@@ -27,10 +27,11 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Supported Keyrings
 
-- [KMS Keyring](#kms-keyring.md)
-- [Multi-Keyring](#multi-keyring.md)
-- [Raw AES Keyring](#raw-aes-keyring.md)
-- [Raw RSA Keyring](#raw-rsa-keyring.md)
+- [KMS Keyring](kms-keyring.md)
+- [Multi-Keyring](multi-keyring.md)
+- [Raw AES Keyring](raw-aes-keyring.md)
+- [Raw RSA Keyring](raw-rsa-keyring.md)
+- [Master Key Provider Keyring](master-key-provider-keyring.md)
 
 ## Interface
 
