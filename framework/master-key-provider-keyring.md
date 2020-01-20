@@ -9,7 +9,6 @@
 
 ## Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/MasterKeyProviderKeyring.java)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/src/aws_encryption_sdk/keyrings/master_key.py)
 
 ## Overview
