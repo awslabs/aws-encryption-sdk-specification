@@ -90,7 +90,7 @@ This is because encrypted data keys constructed by the KMS keyring will always s
 CMK used to encrypt it in key ARN format, and [OnDecrypt](#ondecrypt) checks the key ID against that
 value before attempting decryption.
 
-The KMS CMK specified by the generator MUST have
+The KMS CMK specified by the Key ID MUST have
 [kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
 permissions.
 
