@@ -74,21 +74,21 @@ The keyring will use this client supplier to determine the KMS client to use whe
 
 ### Key IDs
 
-Key IDs is a list of strings identifying KMS CMKs, in ARN format.
+Key IDs is a list of strings identifying AWS KMS customer master keys (CMKs).
 This list identifies the CMKs to be used for data key encryption and decryption with this keyring.
 
 Each Key ID MUST be one of the following:
 
-- A CMK [alias](https://docs.aws.amazon.com/kms/latest/developerguide/programming-aliases.html) (e.g. "alias/MyCryptoKey")
-- A well-formed key ARN (e.g. arn:aws:kms:us-east-1:999999999999:key/01234567-89ab-cdef-fedc-ba9876543210)
-- A well-formned alias ARN (e.g. arn:aws:kms:us-east-1:999999999999:alias/MyCryptoKey)
+- A [alias name](https://docs.aws.amazon.com/kms/latest/developerguide/programming-aliases.html) (e.g. "alias/MyCryptoKey")
+- A key ARN (e.g. arn:aws:kms:us-east-1:999999999999:key/01234567-89ab-cdef-fedc-ba9876543210)
+- A alias ARN (e.g. arn:aws:kms:us-east-1:999999999999:alias/MyCryptoKey)
 
 See [AWS Documentation](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms).
 
-Note that only key IDs in the key ARN format will ever be used for decryption.
-This is because encrypted data keys constructed by the KMS keyring will always store the ID of the
-CMK used to encrypt it in key ARN format, and [OnDecrypt](#ondecrypt) checks the key ID against that
-value before attempting decryption.
+In a keyring used for decryption, CMKs must be identified by a key ARN. 
+[OnDecrypt](#ondecrypt) tries to match a CMK in the decryption keyring to the CMK that encrypted a data key. Because the CMKs that encrypted data keys are identified
+by key ARNs, the CMKs in the decryption keyring match only when they are also identified by key ARNs.
+
 
 The KMS CMK specified by the Key ID MUST have
 [kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
