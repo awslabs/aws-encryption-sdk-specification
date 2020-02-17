@@ -236,8 +236,8 @@ If the call succeeds, OnEncrypt MUST do the following with the response from [KM
     Note that the `KeyId` in the response is always in key ARN format.
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
   in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
-  - The string field KeyNamespace contains "aws-kms".
-  - The string field KeyName contains the CMK ARN used for [KMS Encrypt](#kms-encrypt).
+  - The string field KeyNamespace is "aws-kms".
+  - The string field KeyName is the response `KeyId`. Note that the `KeyId` in the response is always in key ARN format.
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
     - [ENCRYPTED DATA KEY](#structures.md#supported-flags)
     - [SIGNED ENCRYPTION CONTEXT](#structures.md#supported-flags)
