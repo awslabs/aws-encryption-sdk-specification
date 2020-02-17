@@ -209,7 +209,7 @@ as described above, OnEncrypt MUST also attempt to encrypt the plaintext data ke
 
 To attempt to encrypt the plaintext data key with a particular CMK, OnEncrypt MUST call [KMS Encrypt](#kms-encrypt).
 
-For each [KMS Encrypt](#kms-encrypt) call, if an AWS region can be extracted from the CMK ARN, then the
+For each [KMS Encrypt](#kms-encrypt) call, if an AWS region can be extracted from the [Key Id](#key-ids), then the
 [KMS client](#kms-client) that calls [KMS Encrypt](#kms-encrypt) MUST be the client returned by the
 [client supplier](#client-supplier) when given that region as input.
 If an AWS region cannot be extracted from the CMK ARN then the KMS Keyring MUST input a value denoting an unknown region.
