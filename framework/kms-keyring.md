@@ -194,8 +194,8 @@ If verified, OnEncrypt MUST do the following with the response from [KMS Generat
   - the [key provider information](#data-strucures.md#key-provider-information) is the response `KeyId`.
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
   in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
-  - The string field KeyNamespace contains "aws-kms".
-  - The string field KeyName contains the value of the KMS Keyring's [generator](#generator) field.
+  - The string field KeyNamespace is "aws-kms".
+  - The string field KeyName is the value of the KMS Keyring's [generator](#generator) field.
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
     - [GENERATED DATA KEY](#structures.md#supported-flags)
     - [ENCRYPTED DATA KEY](#structures.md#supported-flags)
@@ -299,8 +299,8 @@ If the response is successfully verified, OnDecrypt MUST do the following with t
 - set the plaintext data key on the [decryption materials](#structures.md#decryption-materials) as the response `Plaintext`.
 - append a new [record](#structures.md#record) to the [keyring trace](#structures.md#keyring-trace)
   in the input [encryption materials](#structures.md#encryption-materials), constructed as follows:
-  - The string field KeyNamespace contains "aws-kms".
-  - The string field KeyName contains the [encrypted data key's key provider info](structures.md#key-provider-information).
+  - The string field KeyNamespace is "aws-kms".
+  - The string field KeyName is the [encrypted data key's key provider info](structures.md#key-provider-information).
   - The [flags](#structures.md$flags) field of this record includes exactly the following flags:
     - [DECRYPTED DATA KEY](#structures.md#supported-flags)
     - [VERIFIED ENCRYPTION CONTEXT](#structures.md#supported-flags)
