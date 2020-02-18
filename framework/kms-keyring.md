@@ -65,7 +65,7 @@ On keyring initialization, a keyring MAY define the following:
 ### Client Supplier
 
 A function which MUST take as input either a region string (e.g. `us-east-1`), or some value denoting an unknown region,
-and MAY return a KMS Client which can make the following API calls in the given AWS region:
+and MAY return a KMS Client that can make the following API calls in the given AWS region:
 
 - [GenerateDataKey](#kms-generatedatakey)
 - [Encrypt](#kms-encrypt)
