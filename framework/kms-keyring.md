@@ -165,7 +165,7 @@ If an AWS region can be extracted from the [generator](#generator), then the [KM
 [KMS GenerateDataKey](#kms-generatedatakey) MUST be the client returned by the [client supplier](#client-supplier)
 when given that region as input.
 If an AWS region cannot be extracted from the [generator](#generator) then the KMS Keyring MUST input a value denoting an unknown region.
-If the [client supplier](#client-supplier) does not provide any client for the given region for this [KMS GenerateDataKey](#kms-generatedatakey) call, OnEncrypt MUST not modify the [encryption materials](#structures.md#encryption-materials.md)
+If the [client supplier](#client-supplier) does not provide any client for the given region for this [KMS GenerateDataKey](#kms-generatedatakey) call, OnEncrypt MUST NOT modify the [encryption materials](#structures.md#encryption-materials.md)
 and MUST fail.
 
 When calling [KMS GenerateDataKey](#kms-generatedatakey), the keyring MUST call with a request constructed as follows:
