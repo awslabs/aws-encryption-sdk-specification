@@ -200,7 +200,6 @@ If verified, OnEncrypt MUST do the following with the response from [KMS Generat
     - [GENERATED DATA KEY](#structures.md#supported-flags)
     - [ENCRYPTED DATA KEY](#structures.md#supported-flags)
     - [SIGNED ENCRYPTION CONTEXT](#structures.md#supported-flags)
-    
 Given a plaintext data key in the [encryption materials](#structures.md#encryption-materials),
 OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in it's [key IDs](#key-ids) list.
 
