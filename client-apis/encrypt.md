@@ -31,6 +31,7 @@ The following inputs to this behavior are REQUIRED:
 
 The following as inputs to this behavior are OPTIONAL:
 
+- [Algorithm Suite](#algorithm-suite)
 - [Encryption Context](#encryption-context)
 - [Frame Length](#frame-length)
 - [Plaintext Length](#plaintext-length)
@@ -53,6 +54,10 @@ A CMM that implements the [CMM interface](#cmm-interface.md).
 
 A Keyring that implements the [keyring interface](#keyring-interface.md).
 
+### Algorithm Suite
+
+The [algorithm suite](#algorithm-suite.md) that SHOULD be used for encryption.
+
 ### Frame Length
 
 The [frame length](#message-header.md#frame-length) to use for [framed data](#message-body.md).
@@ -67,24 +72,31 @@ A bound on the length of the [plaintext](#plaintext) to encrypt.
 This behavior MUST output the following if the behavior is successful:
 
 - [message](#message.md)
-
-This behavior MAY output the following:
-
 - [keyring trace](#structures.md#keyring-trace)
 
 To construct the outputs, some fields MUST be constructed using information obtained
 from a set of valid [encryption materials](#structures.md#encryption-materials).
 This behavior MUST obtain this set of [encryption materials](#structures.md#encryption-materials)
 by calling [Get Encryption Materials](#cmm-interface.md#get-encryption-materials) on a [CMM](#cmm-interface.md).
+
 The CMM used MUST be the input CMM, if supplied.
 If instead the user supplied a [keyring](#keyring-interface.md), this behavior MUST use a [default CMM](#default-cmm.md),
 constructed using the user supplied keyring as input.
-The call to [Get Encryption Materials](#cmm-interface.md#get-encryption-materials) MUST include the
-input [encryption context](#encryption-context), if supplied.
-If the length is known on the input [plaintext](#plaintext), this call MUST also include that value
+The call to [Get Encryption Materials](#cmm-interface.md#get-encryption-materials) on that CMM
+MUST be constructed as follows:
 
-The [algorithm suite](#algorithm-suites.md) used in all aspects of this behavior MUST be the algorithm suite in the
+- Encryption Context: If provided, this is the [input encryption context](#encryption-context).
+  Otherwise, this is an empty encryption context.
+- Algorithm Suite: If provided, this is the [input algorithm suite](#algorithm-suite).
+  Otherwise, this field is not included.
+- Plaintext Length: If provided, this is the [input plaintext length](#plaintext-length).
+  Otherwise, if the length is known on the input [plaintext](#plaintext), this value MUST equal to
+  the input plaintext length.
+  Otherwise, this field is not included.
+
+The [algorithm suite](#algorithm-suites.md) used in all other aspects of this behavior MUST be the algorithm suite in the
 [encryption materials](#encryption-materials.md) returned from the [Get Encryption Materials](#cmm-interface#get-encryption-materials) call.
+Note that the algorithm suite in the retrieved encryption materials MAY be different from the [input algorithm suite](#algorithm-suite).
 
 The data key used as input for all encryption described below is a data key derived from the plaintext data key
 included in the [encryption materials](#data-strucutres.md#encryption-materials).
