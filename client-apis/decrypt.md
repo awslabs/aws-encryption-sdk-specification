@@ -29,14 +29,16 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 
 ## Input
 
-The client MUST require the following as inputs to this behavior:
+The following inputs to this behavior are REQUIRED:
 
--   [Message](#message)
+- [Encrypted Message](#encrypted-message)
+- either a [Cryptographic Materials Manager (CMM)](cmm-interface.md) or a [Keyring](#keyring-interface.md)
 
-The client MUST require exactly one of the following type of inputs:
+If the length is not known on the input [encrypted message](#encrypted-message)
+(for example, if Decrypt is taking in the input encrypted message as a stream),
+this call MUST also provide the OPTIONAL input:
 
--   [Cryptographic Materials Manager (CMM)](#cmm-interface.md)
--   [Keyring](#keyring-interface.md)
+- [Max Body Length](#max-body-length)
 
 The client SHOULD also provide a way to limit memory usage, such that you can decrypt an arbitrary long ciphertext using limited memory.
 
@@ -66,6 +68,10 @@ If the Keyring is provided as the input, the client MUST construct a [default CM
 to obtain the [decryption materials](#structures.md#decryption-materials) that is required for decryption.  
 
 This default CMM MUST obtain the decryption materials required for decryption.   
+
+### Max Body Length
+
+A bound on the length of the encrypted content that is inputted into the decryption algorithm.
 
 ## Output
 
@@ -117,6 +123,13 @@ The AAD used in decryption is the [Message Body AAD](#message-body-aad.md), cons
 - Sequence Number: This value is the [sequence number](#message-body.md#sequence-number) of the frame being decrypted, if the message contains framed data. 
   If the message contains non framed data, then this value is 1.
 - Content Length: TODO
+
+If [max body length](#max-body-length) is specified on input and the input message contains a
+[message body frame](#message-body.md#framed-data) with an encrypted content length greater than this value,
+Decrypt MUST not perform the decryption algorithm on that message body frame and MUST fail.
+If [max body length](#max-body-length) is specified on input and the input message is unframed and has a
+[encrypted content length](#message-body.md#encrypted-content-length) greater than this value,
+Decrypt MUST not decrypt the message and MUST fail.
 
 If the algorithm suite has a signature algorithm, decrypt MUST verify the message footer using the specified signature algorithm, 
 by using the verification key obtained from the decryption materials.
