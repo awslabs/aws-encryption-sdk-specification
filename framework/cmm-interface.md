@@ -67,7 +67,6 @@ The decrypt materials request MUST include the following:
 
 - [Algorithm Suite](#algorithm-suite.md)
 - [Encrypted Data Keys](#structures.md#encrypted-data-keys)
-    - This list MUST contain at least one encrypted data key.
 - [Encryption Context](#encryption-context.md)
     - The encryption context provided MAY be empty.
 
