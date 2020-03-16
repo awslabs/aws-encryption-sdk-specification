@@ -212,7 +212,7 @@ For each [KMS Encrypt](#kms-encrypt) call, if an AWS region can be extracted fro
 [KMS client](#kms-client) that calls [KMS Encrypt](#kms-encrypt) MUST be the client returned by the
 [client supplier](#client-supplier) when given that region as input.
 If an AWS region cannot be extracted from the Key ID then the KMS Keyring MUST input a value denoting an unknown region.
-If the [client supplier](#client-supplier) does not provide any client for the given region for this Encrypt call, OnEncrypt MUST skip that particular CMK.
+If the [client supplier](#client-supplier) does not provide any client for the given region for this Encrypt call, OnEncrypt MUST fail.
 
 To encrypt the plaintext data key with a CMK, OnEncrypt MUST call [KMS Encrypt](#encrypt) with a request
 constructed as follows:
@@ -313,3 +313,9 @@ then OnDecrypt MUST output the unmodified input [decryption materials](#structur
 
 [TODO: What security properties are guaranteed by this keyring? Also, note how the security properties
 can vary drastically depending on key policies]
+
+## Contributing Issues
+
+This is a record of issues that contributed to this specification.
+
+* [#173 Resolve incorrect description of behavior of additional CMKs on encrypt.](https://github.com/awslabs/aws-encryption-sdk-specification/issues/73)
