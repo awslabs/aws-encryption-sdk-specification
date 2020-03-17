@@ -64,6 +64,12 @@ On keyring initialization, a keyring MAY define the following:
 
 ### Client Supplier
 
+In order to communicate with AWS KMS,
+the KMS keyring requires an AWS SDK client.
+The role of the client supplier is to
+create and configure those clients
+and supply them to the KMS keyring.
+
 A function that MUST take as input either a region string (e.g. `us-east-1`), or some value denoting an unknown region,
 and MAY return a KMS Client that can make the following API calls in the given AWS region:
 
@@ -71,10 +77,8 @@ and MAY return a KMS Client that can make the following API calls in the given A
 - [Encrypt](#kms-encrypt)
 - [Decrypt](#kms-decrypt)
 
-The keyring will use this client supplier to determine the KMS client to use when making KMS calls.
-
-The purpose of the client supplier is
-to control how the KMS keyring communicates with AWS KMS.
+If the client supplier cannot supply a client for the requested region,
+it MUST communicate that fact to the KMS keyring.
 
 ### Key IDs
 
