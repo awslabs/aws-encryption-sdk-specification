@@ -74,7 +74,7 @@ and MAY return a KMS Client that can make the following API calls in the given A
 The keyring will use this client supplier to determine the KMS client to use when making KMS calls.
 
 The purpose of the client supplier is
-to control how the keyring communicates with AWS KMS.
+to control how the KMS keyring communicates with AWS KMS.
 
 ### Key IDs
 
@@ -317,7 +317,7 @@ then OnDecrypt MUST output the unmodified input [decryption materials](#structur
 ### OnEncrypt Goal
 
 When a user configures a KMS keyring with key IDs
-and use that keyring to encrypt a message,
+and uses that keyring to encrypt a message,
 they are stating their intent that they need each one of those CMKs to be able to
 independently decrypt the resulting encrypted message.
 
@@ -349,7 +349,7 @@ then the keyring will attempt to decrypt using CMK C.
 
 However, if the keyring attempts to decrypt using CMK C and cannot,
 this failure still honors the configured intent and MUST NOT halt decryption.
-The configured intent is that they keyring MUST *attempt* with these CMKs,
+The configured intent is that the keyring MUST *attempt* with these CMKs,
 not that they MUST *succeed*.
 
 ### Why OnEncrypt and OnDecrypt are different
@@ -357,7 +357,7 @@ not that they MUST *succeed*.
 On encrypt, the user describes their intent
 for the requirements to decrypt the resulting message.
 Because of this,
-the keyring MUST create encryption materials that satisfies those requirements.
+the keyring MUST create encryption materials that satisfy those requirements.
 
 On decrypt, the user provides resources that *attempt* to do that decryption.
 
@@ -381,7 +381,7 @@ These goals can be reduced to the following two requirements:
 
 1. On encrypt, if any configured CMK cannot be used,
     that is an error and encryption MUST halt.
-1. On decrypt, the keyring MUST never halt decryption because of a failure to decrypt.
+1. On decrypt, the keyring MUST NOT halt decryption because of a failure to decrypt.
 
 ## Security Considerations
 
