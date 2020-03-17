@@ -349,7 +349,7 @@ When a user configures a KMS keyring for use on decrypt,
 they are stating their intent for which CMKs
 the keyring will *attempt* to use to decrypt encrypted data keys.
 
-For example, if a user configures a KMS keyring with CMK C
+For example, if a user configures a KMS keyring with CMK C (using the CMK ARN)
 and uses it to decrypt an encrypted message
 that contains encrypted data keys for CMKs A, B, and C,
 then the keyring will attempt to decrypt using CMK C.
