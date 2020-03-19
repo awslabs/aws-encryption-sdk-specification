@@ -64,6 +64,12 @@ On keyring initialization, a keyring MAY define the following:
 
 ### Client Supplier
 
+In order to communicate with AWS KMS,
+the KMS keyring requires an AWS SDK client.
+The role of the client supplier is to
+create and configure those clients
+and supply them to the KMS keyring.
+
 A function that MUST take as input either a region string (e.g. `us-east-1`), or some value denoting an unknown region,
 and MAY return a KMS Client that can make the following API calls in the given AWS region:
 
@@ -71,7 +77,8 @@ and MAY return a KMS Client that can make the following API calls in the given A
 - [Encrypt](#kms-encrypt)
 - [Decrypt](#kms-decrypt)
 
-The keyring will use this client supplier to determine the KMS client to use when making KMS calls.
+If the client supplier cannot supply a client for the requested region,
+it MUST communicate that fact to the KMS keyring.
 
 ### Key IDs
 
@@ -212,7 +219,10 @@ For each [KMS Encrypt](#kms-encrypt) call, if an AWS region can be extracted fro
 [KMS client](#kms-client) that calls [KMS Encrypt](#kms-encrypt) MUST be the client returned by the
 [client supplier](#client-supplier) when given that region as input.
 If an AWS region cannot be extracted from the Key ID then the KMS Keyring MUST input a value denoting an unknown region.
-If the [client supplier](#client-supplier) does not provide any client for the given region for this Encrypt call, OnEncrypt MUST skip that particular CMK.
+If the [client supplier](#client-supplier) does not provide any client
+for the given region for this [KMS Encrypt](#kms-encrypt) call,
+OnEncrypt MUST NOT modify the [encryption materials](#structures.md#encryption-materials.md)
+and MUST fail.
 
 To encrypt the plaintext data key with a CMK, OnEncrypt MUST call [KMS Encrypt](#encrypt) with a request
 constructed as follows:
@@ -309,7 +319,84 @@ If the response is successfully verified, OnDecrypt MUST do the following with t
 If OnDecrypt fails to successfully decrypt any [encrypted data key](#structures.md#encrypted-data-key),
 then OnDecrypt MUST output the unmodified input [decryption materials](#structures.md#decryption-materials).
 
+## Configuration Intent
+
+### OnEncrypt Goal
+
+When a user configures a KMS keyring with key IDs
+and uses that keyring to encrypt a message,
+they are stating their intent that they need each one of those CMKs to be able to
+independently decrypt the resulting encrypted message.
+
+For example, if a user configures a KMS keyring with CMKs A, B, and C
+and uses that keyring to encrypt a message,
+then that user expects three things to be true:
+
+1. CMK A can decrypt the encrypted message.
+1. CMK B can decrypt the encrypted message.
+1. CMK C can decrypt the encrypted message.
+
+If any of these are not true of the resulting encrypted message,
+the keyring has failed to honor the user's intent.
+
+In order to accomplish this,
+the KMS keyring MUST contribute three encrypted data keys to the encryption materials:
+one from CMK A, one from CMK B, and one from CMK C.
+
+### OnDecrypt Goal
+
+When a user configures a KMS keyring for use on decrypt,
+they are stating their intent for which CMKs
+the keyring will *attempt* to use to decrypt encrypted data keys.
+
+For example, if a user configures a KMS keyring with CMK C (using the CMK ARN)
+and uses it to decrypt an encrypted message
+that contains encrypted data keys for CMKs A, B, and C,
+then the keyring will attempt to decrypt using CMK C.
+
+However, if the keyring attempts to decrypt using CMK C and cannot,
+this failure still honors the configured intent and MUST NOT halt decryption.
+The configured intent is that the keyring MUST *attempt* with these CMKs,
+not that they MUST *succeed*.
+
+### Why OnEncrypt and OnDecrypt are different
+
+On encrypt, the user describes their intent
+for the requirements to decrypt the resulting message.
+Because of this,
+the keyring MUST create encryption materials that satisfy those requirements.
+
+On decrypt, the user provides resources that *attempt* to do that decryption.
+
+This is an asymmetric relationship with very different implications on failure.
+If the keyring encounters a problem on encrypt,
+it cannot fully honor the decryption requirements and so MUST halt message encryption.
+
+However, on decrypt the keyring is not creating anything.
+It is instead attempting to satisfy the requirements that were set on encryption.
+If the keyring cannot satisfy those requirements it MUST NOT halt message decryption.
+
+No keyring can know if it is the last keyring to attempt decryption.
+If all keyrings are exhausted and none of them were able to decrypt an encrypted data key
+then the cryptographic materials manager that managed those keyrings
+will halt message decryption.
+(See [Default Cryptographic Materials Manager](./default-cmm.md))
+
+### Requirements
+
+These goals can be reduced to the following two requirements:
+
+1. On encrypt, if any configured CMK cannot be used,
+    that is an error and encryption MUST halt.
+1. On decrypt, the keyring MUST NOT halt decryption because of a failure to decrypt.
+
 ## Security Considerations
 
 [TODO: What security properties are guaranteed by this keyring? Also, note how the security properties
 can vary drastically depending on key policies]
+
+## Contributing Issues
+
+This is a record of issues that contributed to this specification.
+
+* [#173 Resolve incorrect description of behavior of additional CMKs on encrypt.](https://github.com/awslabs/aws-encryption-sdk-specification/issues/73)
