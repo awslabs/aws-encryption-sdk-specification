@@ -142,7 +142,7 @@ The footer is serialized with the following specifics:
 - [Signature](../data-format/message-footer.md#signature): MUST be the output of the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
   specified by the [algorithm suite](../framework/algorithm-suites.md), with the following input:
   - the signature key is the [signing key](../framework/structures.md#signing-key) in the [encryption materials](../framework/structures.md#encryption-materials)
-  - the input to sign is the concatenation of the serialization of the [message header](#message-header) and [message body](#message-body)
+  - the input to sign is the concatenation of the serialization of the [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md)
 
 Any data that is not specified within the [message format](../data-format/message.md) MUST NOT be added to the output message.
 
