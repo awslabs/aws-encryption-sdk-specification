@@ -107,7 +107,7 @@ The [message header](../data-format/message-header.md) is serialized with the fo
   used in this behavior
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
   in the [encryption materials](../framework/structures.md#encryption-materials)
-- [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key): MUST be the serialization of the
+- [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
   [encrypted data keys](../framework/structures.md#encrypted-data-keys) in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Content Type](../data-format/message-header.md#content-type): MUST be `Framed`
 - [IV Length](../data-format/message-header.md#iv-length): MUST match the [IV length](../framework/algorithm-suites.md#iv-length)
