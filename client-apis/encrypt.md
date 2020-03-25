@@ -43,7 +43,7 @@ The plaintext to encrypt.
 
 See [encryption context](../framework/structures.md#encryption-context).
 
-The encryption context MUST NOT contain an entry with a [reserved key value](data-structutes.md#encryption-context).
+The encryption context MUST NOT contain an entry with a [reserved key value](../framework/structures.md#encryption-context).
 
 ### CMM
 
