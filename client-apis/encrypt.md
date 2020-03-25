@@ -163,7 +163,7 @@ If size is not known, how do we set the bounds?
 
 ### Un-Framed Message Body Encryption
 
-Implementations of the AWS Encryption SDK MUST not encrypt using the Non-Framed content type.
+Implementations of the AWS Encryption SDK MUST NOT encrypt using the Non-Framed content type.
 However, this behavior was supported in the past.
 
 If a message has the [non-framed](../data-format/message-body.md#non-framed-data) content type,
