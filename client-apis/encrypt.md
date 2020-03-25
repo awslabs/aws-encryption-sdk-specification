@@ -148,7 +148,7 @@ Any data that is not specified within the [message format](../data-format/messag
 
 ### Keyring Trace
 
-The [keyring trace](../framework/structures.md#keyring-trace) obtained from the [encryption materials](data-structure.md#encryption-materials).
+The [keyring trace](../framework/structures.md#keyring-trace) obtained from the [encryption materials](../framework/structures.md#encryption-materials).
 
 ## Security Considerations
 
