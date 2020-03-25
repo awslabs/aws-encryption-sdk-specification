@@ -101,8 +101,8 @@ The output message MUST be bytes, as specified by the [message format](../data-f
 
 The [message header](../data-format/message-header.md) is serialized with the following specifics:
 
-- [Version](../data-format/message-header.md#version): MUST have a value corresponding to [1.0](../data-format/message-header.md#supported-versions)
-- [Type](../data-format/message-header.md#type): MUST have a value corresponding to [Customer Authenticated Encrypted Data](../data-format/message.md#supported-types)
+- [Version](../data-format/message-header.md#version-1): MUST have a value corresponding to [1.0](../data-format/message-header.md#supported-versions)
+- [Type](../data-format/message-header.md#type): MUST have a value corresponding to [Customer Authenticated Encrypted Data](../data-format/message-header.md#supported-types)
 - [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST be the [algorithm suite](../framework/algorithm-suites.md)
   used in this behavior
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)

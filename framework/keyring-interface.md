@@ -96,7 +96,7 @@ have [ciphertexts](structures.md#ciphertext) that can be decrypted to the plaint
 If OnEncrypt updates the [encryption materials](#data-structure.md#encryption-materials) with at least
 one new [encrypted data key](structures.md#encrypted-data-key),
 the [keyring trace](structures.md#keyring-trace) returned by OnEncrypt MUST include at least one trace
-associated with this keyring that has the [ENCRYPTED DATA KEY](structures.md#encrypted-data-key) flag.
+associated with this keyring that has the [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1) flag.
 Note that this trace MAY include more than one flag,
 for example the [SIGNED ENCRYPTION CONTEXT flag](structures.md#signed-encryption-context).
 
@@ -121,8 +121,8 @@ OnDecrypt MAY decrypt a data key.
 
 Decrypt Data Key MAY modify the following fields in the [decryption materials](structures.md#decryption-materials):
 
-- [plaintext data key](structures.md#plaintext-data-key)
-- [keyring trace](structures.md#keyring-trace)
+- [plaintext data key](structures.md#plaintext-data-key-1)
+- [keyring trace](structures.md#keyring-trace-1)
 
 To perform this behavior, the keyring attempts to retrieve a plaintext data key from the input list
 of [encrypted data keys](structures.md#encrypted-data-key).
@@ -135,8 +135,8 @@ If the keyring is unable to get any plaintext data key using the input [encrypte
 the keyring MUST NOT not update the [decryption materials](structures.md#decryption-materials).
 
 If OnDecrypt updates the [decryption materials](#data-structure.md#decryption-materials) with a plaintext data key,
-the [keyring trace](structures.md#keyring-trace) returned by OnDecrypt MUST include one trace
-associated with this keyring that has the [DECRYPTED DATA KEY](structures.md#encrypted-data-key) flag.
+the [keyring trace](structures.md#keyring-trace-1) returned by OnDecrypt MUST include one trace
+associated with this keyring that has the [DECRYPTED DATA KEY flag](structures.md#decrypted-data-key).
 Note that this trace MAY include more than one flag, for example the [VERIFIED ENCRYPTION CONTEXT flag](structures.md#verified-encryption-context).
 
 ## Security Considerations
@@ -166,8 +166,8 @@ however users should refer to their specification for notes on their respective 
 
 ### Keyring and Master Key Provider/Master Key Compatability
 
-The following keyrings are compatible with the referenced [master key providers](master-key-provider.md) or
-[master keys](master-key.md) when configured to use the same wrapping key.
+The following keyrings are compatible with the referenced [master key providers](master-key-provider-interface.md) or
+[master keys](master-key-interface.md) when configured to use the same wrapping key.
 
 | Keyring         | Master Key Provider: Java and Python                                                                             |
 |-----------------|------------------------------------------------------------------------------------------------------------------|

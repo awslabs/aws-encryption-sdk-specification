@@ -31,7 +31,7 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 
 The client MUST require the following as inputs to this behavior:
 
--   [Message](#message)
+-   [Encrypted Message](#encrypted-message)
 
 The client MUST require exactly one of the following type of inputs:
 
@@ -91,7 +91,7 @@ The call to CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-mate
 [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id), obtained from parsing the message header of the encrypted message inputted.
 
 The decryption materials returned by the call to the CMM's Decrypt Materials behaviour MUST contain a valid 
-[plaintext data key](../framework/structures.md#plaintext-data-key),
+[plaintext data key](../framework/structures.md#plaintext-data-key-1),
 [algorithm suite](../framework/algorithm-suites.md) and an
 [encryption context](../framework/structures.md#encryption-context), if an encryption context was used during encryption.    
 Note: This encryption context MUST be the same encryption context that was used during encryption otherwise the decrypt operation will fail.   

@@ -47,8 +47,8 @@ This value depends on the [content type](message-header.md#content-type) of the 
 ### Sequence Number
 
 The sequence number of the data this message body AAD belongs to.
-For [framed data](message-body.md#framed-data), the value of this field MUST be the [frame sequence number](message-body.md#frame-sequence-number).
-For [non-framed data](message-body.md#framed-data), the value of this field MUST be `1`.
+For [framed data](message-body.md#framed-data), the value of this field MUST be the [frame sequence number](message-body.md#sequence-number).
+For [non-framed data](message-body.md#non-framed-data), the value of this field MUST be `1`.
 
 ### Content Length
 

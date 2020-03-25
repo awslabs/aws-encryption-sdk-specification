@@ -136,7 +136,7 @@ The following is a derived property of the KMS-keyring:
 
 Indicates whether this keyring is a discovery keyring.
 Discovery keyrings do not perform encryption, and on decryption will attempt to decrypt every inputted
-[encrypted data key](structures.md) if the client supplier return a client.
+[encrypted data key](structures.md#encrypted-data-key) if the client supplier return a client.
 
 If this keyring has defined a [generator](#generator) or [key IDs](#key-ids), this value MUST be false.
 Otherwise, this value MUST be true.
@@ -154,7 +154,7 @@ If this keyring is a [discovery keyring](#is-discovery), OnEncrypt MUST return t
 
 If the input [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key
 and this keyring does not have a [generator](#generator) defined,
-OnEncrypt MUST not modify the [encryption materials](structures.md#encryption-materials.md)
+OnEncrypt MUST not modify the [encryption materials](structures.md#encryption-materials)
 and MUST fail.
 
 If the input [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key
@@ -165,7 +165,7 @@ If an AWS region can be extracted from the [generator](#generator), then the [KM
 [KMS GenerateDataKey](#kms-generatedatakey) MUST be the client returned by the [client supplier](#client-supplier)
 when given that region as input.
 If an AWS region cannot be extracted from the [generator](#generator) then the KMS Keyring MUST input a value denoting an unknown region.
-If the [client supplier](#client-supplier) does not provide any client for the given region for this [KMS GenerateDataKey](#kms-generatedatakey) call, OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials.md)
+If the [client supplier](#client-supplier) does not provide any client for the given region for this [KMS GenerateDataKey](#kms-generatedatakey) call, OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials)
 and MUST fail.
 
 When calling [KMS GenerateDataKey](#kms-generatedatakey), the keyring MUST call with a request constructed as follows:
@@ -192,14 +192,14 @@ If verified, OnEncrypt MUST do the following with the response from [KMS Generat
   - the [ciphertext](structures.md#ciphertext) is the response `CiphertextBlob`.
   - the [key provider id](structures.md#key-provider-id) is "aws-kms".
   - the [key provider information](#data-strucures.md#key-provider-information) is the response `KeyId`.
-- append a new [record](structures.md#record) to the [keyring trace](structures.md#keyring-trace)
+- append a new record to the [keyring trace](structures.md#keyring-trace)
   in the input [encryption materials](structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace is "aws-kms".
   - The string field KeyName is the value of the KMS Keyring's [generator](#generator) field.
   - The [flags](structures.md#flags) field of this record includes exactly the following flags:
-    - [GENERATED DATA KEY](structures.md#supported-flags)
-    - [ENCRYPTED DATA KEY](structures.md#supported-flags)
-    - [SIGNED ENCRYPTION CONTEXT](structures.md#supported-flags)
+    - [GENERATED DATA KEY](structures.md#generated-data-key)
+    - [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1)
+    - [SIGNED ENCRYPTION CONTEXT](structures.md#signed-encryption-context)
 Given a plaintext data key in the [encryption materials](structures.md#encryption-materials),
 OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in it's [key IDs](#key-ids) list.
 
@@ -233,22 +233,22 @@ If the call succeeds, OnEncrypt MUST do the following with the response from [KM
   - The [key provider id](structures.md#key-provider-id) is "aws-kms".
   - The [key provider information](#data-strucures.md#key-provider-information) is the response `KeyId`.
     Note that the `KeyId` in the response is always in key ARN format.
-- append a new [record](structures.md#record) to the [keyring trace](structures.md#keyring-trace)
+- append a new record to the [keyring trace](structures.md#keyring-trace)
   in the input [encryption materials](structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace is "aws-kms".
   - The string field KeyName is the response `KeyId`. Note that the `KeyId` in the response is always in key ARN format.
   - The [flags](structures.md#flags) field of this record includes exactly the following flags:
-    - [ENCRYPTED DATA KEY](structures.md#supported-flags)
-    - [SIGNED ENCRYPTION CONTEXT](structures.md#supported-flags)
+    - [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1)
+    - [SIGNED ENCRYPTION CONTEXT](structures.md#signed-encryption-context)
 
 If all Encrypt calls succeed, OnEncrypt MUST output the modified [encryption materials](structures.md#encryption-materials).
 
 ### OnDecrypt
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
-a list of [encrypted data keys](structures.md#encrypted-data-keys) as input.
+a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
 
-The set of [encrypted data keys](structures.md#encrypted-data-keys) that OnDecrypt MUST attempt
+The set of [encrypted data keys](structures.md#encrypted-data-key) that OnDecrypt MUST attempt
 to decrypt depends on if this keyring is a [discovery keyring](#discovery) or not.
 
 If this keyring is a [discovery keyring](#discovery), OnDecrypt MUST attempt to decrypt every
@@ -261,7 +261,7 @@ Otherwise, OnDecrypt MUST attempt to decrypt each input [encrypted data key](str
 in the input encrypted data key list with the following conditions, until it successfully decrypts one:
 
 - the [key provider ID](structures.md#key-provider-id) field has the value "aws-kms"
-- the [key provider info](structures.md#key-provider-info) has a value equal to one of the
+- the [key provider info](structures.md#key-provider-information) has a value equal to one of the
   ARNs in this keyring's [key IDs](#key-ids) or the [generator](#generator).
 
 To attempt to decrypt a particular [encrypted data key](structures.md#encrypted-data-key),
@@ -280,15 +280,15 @@ When calling [KMS Decrypt](#kms-decrypt), the keyring MUST call with a request c
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
 If the call to [KMS Decrypt](#kms-decrypt) does not succeed OnDecrypt MUST continue and attempt to
-decrypt the remaining [encrypted data keys](structures.md#encrypted-data-keys).
+decrypt the remaining [encrypted data keys](structures.md#encrypted-data-key).
 
 If the `KeyId` field in the response from [KMS Decrypt](#kms-decrypt) does not have a value equal to
-the [encrypted data key's key provider info](structures.md#key-provider-info), then OnDecrypt
+the [encrypted data key's key provider info](structures.md#key-provider-information), then OnDecrypt
 MUST fail.
 
 If the call to [KMS Decrypt](#kms-decrypt) succeeds OnDecrypt MUST verify the following:
 
-- verify that the `KeyId` field has a value equal to the [encrypted data key's key provider info](structures.md#key-provider-info).
+- verify that the `KeyId` field has a value equal to the [encrypted data key's key provider info](structures.md#key-provider-information).
 - verify that the `Plaintext` is of a length that fits the [algorithm suite](algorithm-suites.md) given in the decryption materials.
 
 If any of the above are not true, OnDecrpyt MUST NOT update the [decryption materials](structures.md#decryption-materials)
@@ -297,13 +297,13 @@ and MUST fail.
 If the response is successfully verified, OnDecrypt MUST do the following with the response:
 
 - set the plaintext data key on the [decryption materials](structures.md#decryption-materials) as the response `Plaintext`.
-- append a new [record](structures.md#record) to the [keyring trace](structures.md#keyring-trace)
+- append a new [record](structures.md#record) to the [keyring trace](structures.md#keyring-trace-1)
   in the input [encryption materials](structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace is "aws-kms".
   - The string field KeyName is the [encrypted data key's key provider info](structures.md#key-provider-information).
-  - The [flags](structures.md$flags) field of this record includes exactly the following flags:
-    - [DECRYPTED DATA KEY](structures.md#supported-flags)
-    - [VERIFIED ENCRYPTION CONTEXT](structures.md#supported-flags)
+  - The [flags](structures.md#flags) field of this record includes exactly the following flags:
+    - [DECRYPTED DATA KEY](structures.md#decrypted-data-key)
+    - [VERIFIED ENCRYPTION CONTEXT](structures.md#verified-encryption-context)
 - immediately return the modified [decryption materials](structures.md#decryption-materials).
 
 If OnDecrypt fails to successfully decrypt any [encrypted data key](structures.md#encrypted-data-key),

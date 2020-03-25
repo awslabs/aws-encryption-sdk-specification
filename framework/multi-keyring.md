@@ -51,7 +51,7 @@ a [generator keyring](#generator-keyring) MUST be defined for the keyring.
 ### Children Keyrings
 
 A list of [keyrings](#keyring-interface) to be used to modify the [encryption](structures.md#encryption-materials)
-or [decryption materials](structures.md#encryption-materials).
+or [decryption materials](structures.md#decryption-materials).
 
 If this keyring does not have a [generator keyring](#generator-keyring), this list MUST NOT be empty.
 
@@ -62,7 +62,7 @@ If this keyring does not have a [generator keyring](#generator-keyring), this li
 If this keyring has a [generator keyring](#generator-keyring),
 this keyring MUST first call that generator keyring's [OnEncrypt](keyring-interface.md#onencrypt)
 using the input [encryption materials](structures.md#encryption-materials) as input.
-If the [generator keyring](#generator-keyring) fails [OnEncrypt](keyring-interface.md), this OnEncrypt MUST also fail.
+If the [generator keyring](#generator-keyring) fails [OnEncrypt](keyring-interface.md#onencrypt), this OnEncrypt MUST also fail.
 If the [generator keyring](#generator-keyring) returns [encryption materials](#encryption-materials) missing a plaintext data key,
 OnEncrypt MUST fail.
 
@@ -86,7 +86,7 @@ the [encryption materials](structures.md#encryption-materials) returned by the l
 If the input [decryption materials](structures.md#decryption-materials) contains a plaintext data key,
 OnDecrypt MUST immediately return the unmodified decryption materials.
 
-Otherwise, OnDecrypt MUST attempt to decrypt the [encrypted data keys](structures.md#encrypted-data-key)
+Otherwise, OnDecrypt MUST attempt to decrypt the [encrypted data keys](structures.md#encrypted-data-keys-1)
 in the input [decryption materials](structures.md#decryption-materials) using it's
 [children keyrings](#children-keyrings) and, if it is specified, [generator keyring](#generator-keyring).
 It MUST attempt to decrypt using these keyrings until it either succeeds in decryption,
@@ -96,8 +96,8 @@ If a generator keyring is specified, it MUST be used first.
 For each [keyring](keyring-interface.md) to be used for decryption,
 the multi-keyring MUST call that keyring's [OnDecrypt](keyring-interface.md#ondecrypt) using
 the unmodified [decryption materials](structures.md#decryption-materials) and input
-[encrypted data key](structures.md#encrypted-data-keys) list as input.
-If [OnDecrypt](keyring-interface.md#onencrypt) returns [decryption materials](structures.md#decryption-materials)
+[encrypted data key](structures.md#encrypted-data-key) list as input.
+If [OnDecrypt](keyring-interface.md#ondecrypt) returns [decryption materials](structures.md#decryption-materials)
 containing a plaintext data key, the keyring MUST immediately return the modified decryption materials.
 
 If, after calling [OnDecrypt](keyring-interface.md#ondecrypt) on every one of this keyring's [children keyrings](#children-keyrings)

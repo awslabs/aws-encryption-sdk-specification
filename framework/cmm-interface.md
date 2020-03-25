@@ -50,13 +50,13 @@ This is the input to the [get encryption materials](#get-encryption-materials) b
 
 The encryption materials request MUST include the following:
 
-- [Encryption Context](../data-format/message-header.md#encryption-context)
+- [Encryption Context](structures.md#encryption-context)
     - The encryption context provided MAY be empty.
 
 The encryption request MAY include the following:
 
 - [Algorithm Suite](algorithm-suites.md)
-- [Plaintext Length](../client-apis/encrypt.md)
+- [Plaintext Length](../client-apis/encrypt.md#plaintext-length)
     - The length of the plaintext to be encrypted MUST not be larger than this value.  
 
 #### Decrypt Materials Request
@@ -65,10 +65,10 @@ This is the input to the [decrypt materials](#decrypt-materials) behavior.
 
 The decrypt materials request MUST include the following:
 
-- [Algorithm Suite](algorithm-suite.md)
+- [Algorithm Suite](algorithm-suites.md)
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
     - This list MUST contain at least one encrypted data key.
-- [Encryption Context](structures.md#encryption-context.md)
+- [Encryption Context](structures.md#encryption-context)
     - The encryption context provided MAY be empty.
 
 ### Behaviors
@@ -103,9 +103,9 @@ If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signat
 
 The CMM MUST ensure that the encryption materials returned are valid.
 
-- The encryption materials returned MUST follow the specification for [data structures/encryption-materials](structures.md#encryption-materials).
+- The encryption materials returned MUST follow the specification for [encryption-materials](structures.md#encryption-materials).
 - The value of the plaintext data key MUST be non-NULL. 
-- The plaintext data key length MUST be equal to the [key derivation input length](algorithm-suites.md#supported-algorithm-suites#key-derivation-input-length). 
+- The plaintext data key length MUST be equal to the [key derivation input length](algorithm-suites.md#key-derivation-input-length). 
 - The encrypted data keys list MUST contain at least one encrypted data key. 
 - If the algorithm suite contains a signing algorithm, the encryption materials returned MUST include the generated signing key.
 
@@ -132,7 +132,7 @@ the decryption materials MUST include the [signature verification key](structure
 
 The CMM MUST ensure that the decryption materials returned are valid.  
 
-- The decryption materials returned MUST follow the specification for [data structures/decryption-materials](structures.md#decryption-materials).
+- The decryption materials returned MUST follow the specification for [decryption-materials](structures.md#decryption-materials).
 - The value of the plaintext data key MUST be non-NULL.
 - The plaintext data key returned MUST correspond with at least one of the encrypted data keys. 
     - The is typically done by constructing a CMM that uses keyrings/master keys.

@@ -33,7 +33,7 @@ Structures defined in this document:
 - [Encryption Context](#encryption-context)
 - [Encryption Materials](#encryption-materials)
 - [Decryption Materials](#decryption-materials)
-- [Keyring Trace](#keyring-trace)
+- [Keyring Trace](#keyring-trace-2)
 
 ### Encrypted Data Key
 
@@ -132,9 +132,9 @@ other AWS services.
 Encryption materials are a structure containing materials needed for [encryption](../client-apis/encrypt.md).
 This structure MAY include any of the following fields:
 
-- [Algorithm Suite](#algorith-suite)
+- [Algorithm Suite](#algorithm-suite)
 - [Encrypted Data Keys](#encrypted-data-keys)
-- [Encryption Context](#encryption-context)
+- [Encryption Context](#encryption-context-1)
 - [Keyring Trace](#keyring-trace)
 - [Plaintext Data Key](#plaintext-data-key)
 - [Signing Key](#signing-key)
@@ -158,7 +158,7 @@ The [encryption context](#encryption-context) associated with this [encryption](
 
 ##### Keyring Trace
 
-A [keyring trace](#keyring-trace) containing all of the actions that keyrings have taken on this set
+A [keyring trace](#keyring-trace-2) containing all of the actions that keyrings have taken on this set
 of encryption materials.
 
 ##### Plaintext Data Key
@@ -199,10 +199,10 @@ The value of this key MUST be kept secret.
 Decryption materials are a structure containing materials needed for [decryption](../client-apis/decrypt.md).
 This structure MAY include any of the following fields:
 
-- [Algorithm Suite](#algorith-suite)
-- [Encryption Context](#encryption-context)
-- [Keyring Trace](#keyring-trace)
-- [Plaintext Data Key](#plaintext-data-key)
+- [Algorithm Suite](#algorith-suite-1)
+- [Encryption Context](#encryption-context-2)
+- [Keyring Trace](#keyring-trace-1)
+- [Plaintext Data Key](#plaintext-data-key-1)
 - [Verification Key](#verification-key)
 
 ##### Algorithm Suite
@@ -211,11 +211,11 @@ The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this [encryption](../client-apis/encrypt.md)
+The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md)
 
 ##### Keyring Trace
 
-A [keyring trace](#keyring-trace) containing all of the actions keyrings have taken on this set of decryption materials.
+A [keyring trace](#keyring-trace-2) containing all of the actions keyrings have taken on this set of decryption materials.
 
 ##### Plaintext Data Key
 
@@ -224,7 +224,7 @@ The data key to be used as input for [decryption](../client-apis/decrypt.md).
 The plaintext data key MUST:
 
 - fit the specification for the [encryption algorithm](algorithm-suites.md#encryption-algorithm)
-  included in this decryption material's [algorithm suite](#algorithm-suite).
+  included in this decryption material's [algorithm suite](#algorithm-suite-1).
 - consist of cryptographically secure (pseudo-)random bits.
 - be kept secret.
 
@@ -237,7 +237,7 @@ The plaintext data key SHOULD offer an interface to zero the plaintext data key
 The key to be used as the verification key for signature verification during [decryption](../client-apis/decrypt.md).
 
 The verification key MUST fit the specification for the [signature algorithm](algorithm-suites.md#signature-algorithm)
-included in this decryption material's [algorithm suite](#algorithm-suite).
+included in this decryption material's [algorithm suite](#algorithm-suite-1).
 
 ### Keyring Trace
 
@@ -267,7 +267,7 @@ This set MUST include at least one flag.
 The following list contains the supported flags:
 
 - [GENERATED DATA KEY](#generated-data-key)
-- [ENCRYPTED DATA KEY](#encrypted-data-key)
+- [ENCRYPTED DATA KEY](#encrypted-data-key-1)
 - [DECRYPTED DATA KEY](#decrypted-data-key)
 - [SIGNED ENCRYPTION CONTEXT](#signed-encryption-context)
 - [VERIFIED ENCRYPTION CONTEXT](#verified-encryption-context)
@@ -298,7 +298,7 @@ A flag to represent that the keyring has cryptographically bound the [encryption
 to a newly created [encrypted data key](#encrypted-data-key).
 
 This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[encrypt data key](keyring-interface.md#encrypt-data-key) behavior to create an [encrypted data-key](#encrypted-data-key)
+[encrypt data key](keyring-interface.md#encrypt-data-key) behavior to create an [encrypted data key](#encrypted-data-key)
 that has the following property:
 
 - If the encryption context used as input to OnEncrypt to produce the encrypted data key is

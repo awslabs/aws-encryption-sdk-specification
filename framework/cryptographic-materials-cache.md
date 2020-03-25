@@ -16,7 +16,7 @@
 
 ## Overview
 
-Cryptographic materials cache (CMC) is used by the caching [cryptographic materials manager (CMM)](caching-cmm.md) 
+Cryptographic materials cache (CMC) is used by the [caching cryptographic materials manager (CMM)](caching-cmm.md) 
 to store cryptographic materials for reuse.  
 The AWS Encryption SDK provides a built-in local cryptographic materials cache. 
 The local CMC is a configurable, in-memory, least recently used (LRU) cache.  

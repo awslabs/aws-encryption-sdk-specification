@@ -229,8 +229,8 @@ The value (hex) of this field MUST be a value that exists in the following table
 
 | Value (hex) | Content Type                                          |
 |-------------|-------------------------------------------------------|
-| 01          | [Non-Framed](message-body.md#non-framed) |
-| 02          | [Framed](message-body.md#framed)         |
+| 01          | [Non-Framed](message-body.md#non-framed-data) |
+| 02          | [Framed](message-body.md#framed-data)         |
 
 #### Reserved
 

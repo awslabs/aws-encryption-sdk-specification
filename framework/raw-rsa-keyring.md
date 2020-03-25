@@ -110,15 +110,15 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 - The encrypted data key list has a new encrypted data key added, constructed as follows:
   - the [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](#key-id).
   - the [key provider information](structures.md#key-provider-information) field is this keyring's [key name](#key-name).
-  - the [ciphertext](structures.md#data-key-encryption) field is the ciphertext outputted from
+  - the [ciphertext](structures.md#ciphertext) field is the ciphertext outputted from
     the RSA encryption of the plaintext data key.
-- The keyring trace has a new [record](structures.md#record) appended.
+- The keyring trace has a new record appended.
   This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
-  and the [flags](structures.md$flags) field of this record MUST include the
-  [ENCRYPTED DATA KEY](structures.md#supported-flags) flag.
+  and the [flags](structures.md#flags) field of this record MUST include the
+  [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1) flag.
   If this keyring generated the plaintext data key in the [encryption materials](structures.md#encryption-materials)
-  the record MUST contain the [GENERATED DATA KEY](structures.md#supported-flags) flag.
-  The record MUST NOT contain the [SIGNED ENCRYPTION CONTEXT flag](structures.md#flags).
+  the record MUST contain the [GENERATED DATA KEY](structures.md#generated-data-key) flag.
+  The record MUST NOT contain the [SIGNED ENCRYPTION CONTEXT flag](structures.md#signed-encryption-context).
 
 ### OnDecrypt
 
@@ -148,11 +148,11 @@ If any decryption succeeds, this keyring MUST immediately return the input
 [decryption materials](structures.md#decryption-materials), modified in the following ways:
 
 - The output of RSA decryption is set as the decryption material's plaintext data key.
-- The keyring trace has a new [record](structures.md#record) appended.
+- The keyring trace has a new record appended.
   This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
   and the [flags](structures.md#flags) field of this record MUST include the
-  [DECRYPTED DATA KEY](structures.md#supported-flags) flag.
-  The record MUST NOT contain the [VERIFIED ENCRYPTION CONTEXT flag](structures.md#flags).
+  [DECRYPTED DATA KEY](structures.md#decrypted-data-key) flag.
+  The record MUST NOT contain the [VERIFIED ENCRYPTION CONTEXT flag](structures.md#verified-encryption-context).
 
 If no decryption succeeds, this keyring MUST NOT make any update to the decryption materials.
 
