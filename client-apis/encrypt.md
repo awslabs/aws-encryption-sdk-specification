@@ -84,7 +84,7 @@ input [encryption context](#encryption-context), if supplied.
 If the length is known on the input [plaintext](#plaintext), this call MUST also include that value
 
 The [algorithm suite](../framework/algorithm-suites.md) used in all aspects of this behavior MUST be the algorithm suite in the
-[encryption materials](../framework/structures#encryption-materials.md) returned from the [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) call.
+[encryption materials](../framework/structures.md#encryption-materials) returned from the [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) call.
 
 The data key used as input for all encryption described below is a data key derived from the plaintext data key
 included in the [encryption materials](../framework/structures.md#encryption-materials).
