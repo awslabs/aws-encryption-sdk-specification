@@ -176,5 +176,5 @@ the [message body](../data-format/message-body.md) was serialized with the follo
   - The AAD is the serialized [message body AAD](../data-format/message-body-aad.md)
   - The IV is the [IV](../data-format/message-body.md#iv) specified above.
   - The cipherkey is the derived data key
-  - The plaintext is the input [plaintext message](#plaintext-message)
+  - The plaintext is the input [plaintext](#plaintext)
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag outputted by the above encryption.
