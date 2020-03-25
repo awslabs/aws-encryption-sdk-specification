@@ -84,7 +84,7 @@ by calling [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) 
 
 The CMM used MUST be the input CMM, if supplied.
 If a CMM is not supplied as the input, the decrypt behavior MUST construct a [default CMM](../framework/default-cmm.md) 
-from the [keyring](#keyring) inputted.
+from the [keyring](../framework/keyring-interface.md) inputted.
 
 The call to CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) behavior MUST include as the input the 
 [encryption context](../data-format/message-header.md#aad), if provided, the [encrypted data keys](../data-format/message-header.md#encrypted-data-keys) and the 
@@ -131,4 +131,3 @@ by using the verification key obtained from the decryption materials.
 
 [TODO: Implementations SHOULD support working with a finite amount of working memory for arbitrarly large plaintext. 
 If size is not known, how do we set the bounds?]
-
