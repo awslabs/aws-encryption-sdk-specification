@@ -98,7 +98,7 @@ Note: This encryption context MUST be the same encryption context that was used 
 
 The decrypt behavior MUST then use this plaintext data key, algorithm suite and encryption context, if included, to decrypt the encrypted content 
 and obtain the plaintext to be returned. The [encrypted content](../data-format/message-body.md#encrypted-content) to be decrypted is obtained by parsing the 
-[message body](../framework/message-body.md) of the encrypted message inputted.   
+[message body](../data-format/message-body.md) of the encrypted message inputted.   
 
 Note: If the message is framed, the encrypted content to decrypt is stored across multiple frames.   
 If the message is non framed, the encrypted content to decrypt is stored as a single blob.  
