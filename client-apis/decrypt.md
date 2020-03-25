@@ -91,9 +91,9 @@ The call to CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-mate
 [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id), obtained from parsing the message header of the encrypted message inputted.
 
 The decryption materials returned by the call to the CMM's Decrypt Materials behaviour MUST contain a valid 
-[plaintext data key](../framework/structures.md#decryption-materials#plaintext-data-key),
-[algorithm suite](../framework/structures.md#decryption-materials#algorithm-suite) and an
-[encryption context](../framework/structures.md#decryption-materials#encryption-context), if an encryption context was used during encryption.    
+[plaintext data key](../framework/structures.md#plaintext-data-key),
+[algorithm suite](../framework/algorithm-suites.md) and an
+[encryption context](../framework/structures.md#encryption-context), if an encryption context was used during encryption.    
 Note: This encryption context MUST be the same encryption context that was used during encryption otherwise the decrypt operation will fail.   
 
 The decrypt behavior MUST then use this plaintext data key, algorithm suite and encryption context, if included, to decrypt the encrypted content 
