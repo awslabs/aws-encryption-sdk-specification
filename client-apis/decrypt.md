@@ -88,7 +88,7 @@ from the [keyring](../framework/keyring-interface.md) inputted.
 
 The call to CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) behavior MUST include as the input the 
 [encryption context](../data-format/message-header.md#aad), if provided, the [encrypted data keys](../data-format/message-header.md#encrypted-data-keys) and the 
-[algorithm suite ID](../data-format/message-header.md#algorithm-suites-id), obtained from parsing the message header of the encrypted message inputted.
+[algorithm suite ID](../data-format/message-header.md#algorithm-suite-id), obtained from parsing the message header of the encrypted message inputted.
 
 The decryption materials returned by the call to the CMM's Decrypt Materials behaviour MUST contain a valid 
 [plaintext data key](../framework/structures.md#decryption-materials#plaintext-data-key),
