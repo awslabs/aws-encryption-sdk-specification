@@ -61,9 +61,9 @@ More specifically, depending on the [content type](message-header.md#content-typ
 - For [framed data](message-body.md#framed-data), this value MUST equal the length, in bytes,
   of the plaintext being encrypted in this frame.
   - For [regular frames](message-body.md#regular-frame), this value MUST equal the value of
-    the [frame length](message-hedaer.md#frame-length) field in the message header.
+    the [frame length](message-header.md#frame-length) field in the message header.
   - For the [final frame](message-body.md#final-frame), this value MUST be greater than or equal to
-    0 and less than or equal to the value of the [frame length](message-hedaer.md#frame-length)
+    0 and less than or equal to the value of the [frame length](message-header.md#frame-length)
     field in the message header.
 
 ## Security Considerations

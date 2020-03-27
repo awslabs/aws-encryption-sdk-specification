@@ -22,8 +22,8 @@ The purpose of the message body is to define the structure containing the [encry
 
 The structure of the body depends on the content type:
 
-- [Non-Framed Data](#framed-data)
-- [Framed Data](#non-framed-data)
+- [Non-Framed Data](#non-framed-data)
+- [Framed Data](#framed-data)
 
 ## Definitions
 

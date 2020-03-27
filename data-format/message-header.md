@@ -47,18 +47,18 @@ The bytes are appended in the order shown.
 The following table describes the fields that form the header body.
 The bytes are appended in the order shown.
 
-| Field                                           | Length (bytes)                                                                    | Interpreted as                                                |
-|-------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [Version](#version)                             | 1                                                                                 | See [Supported Versions](#supported-versions)                 |
-| [Type](#type)                                   | 1                                                                                 | See [Supported Types](#supported-types)                       |
-| [Algorithm Suite ID](#algorithm-suite-id)       | 2                                                                                 | See [Supported Algorithm Suites](#supported-algorithm-suites) |
-| [Message ID](#message-id)                       | 16                                                                                | Bytes                                                         |
-| [AAD](#aad)                                     | Variable. [Self-describing](#aad).                                                | [AAD](#aad)                                                   |
-| [Encrypted Data Keys](#encrypted-data-keys)     | Variable. Determined by the number of encrypted data keys and the length of each. | [Encrypted Data Keys](#encrypted-data-keys)                   |
-| [Content Type](#content-type)                   | 1                                                                                 | See [Supported Types](#supported-content-types)               |
-| [Reserved](#reserved)                           | 4                                                                                 | See [Reserved](#reserved)                                     |
-| [IV Length](#iv-length)                         | 1                                                                                 | UInt8                                                         |
-| [Frame Length](#frame-length)                   | 4                                                                                 | UInt32                                                        |
+| Field                                           | Length (bytes)                                                                    | Interpreted as                                                                                |
+|-------------------------------------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| [Version](#version)                             | 1                                                                                 | See [Supported Versions](#supported-versions)                                                 |
+| [Type](#type)                                   | 1                                                                                 | See [Supported Types](#supported-types)                                                       |
+| [Algorithm Suite ID](#algorithm-suite-id)       | 2                                                                                 | See [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) |
+| [Message ID](#message-id)                       | 16                                                                                | Bytes                                                                                         |
+| [AAD](#aad)                                     | Variable. [Self-describing](#aad).                                                | [AAD](#aad)                                                                                   |
+| [Encrypted Data Keys](#encrypted-data-keys)     | Variable. Determined by the number of encrypted data keys and the length of each. | [Encrypted Data Keys](#encrypted-data-keys)                                                   |
+| [Content Type](#content-type)                   | 1                                                                                 | See [Supported Types](#supported-content-types)                                               |
+| [Reserved](#reserved)                           | 4                                                                                 | See [Reserved](#reserved)                                                                     |
+| [IV Length](#iv-length)                         | 1                                                                                 | UInt8                                                                                         |
+| [Frame Length](#frame-length)                   | 4                                                                                 | UInt32                                                                                        |
 
 #### Version
 
