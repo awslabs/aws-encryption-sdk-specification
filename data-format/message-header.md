@@ -18,7 +18,7 @@ See [Message Version](message.md#version).
 
 The message header is a component of the [message](message.md).
 
-The purpose of the message header is to define the authenticated metadata required for decryption of the [message body](#message-body), including:
+The purpose of the message header is to define the authenticated metadata required for decryption of the [message body](message-body.md#encrypted-content), including:
 
 - the format of the [message](message.md) and [message body](message-body.md)
 - the encrypted data keys needed for decryption of the [message body encrypted content](message-body.md#encrypted-content)
@@ -100,7 +100,7 @@ The purpose of the message ID is to:
 - protect against accidental reuse of a derived data key or the wearing out of derived data keys in
   the AWS Encryption SDK
 - uniquely identify the [message](message.md)
-- bind the message header to the [message body](#dtat-format/message-body.md) [TODO "bind" wording]
+- bind the message header to the [message body](message-body.md) [TODO "bind" wording]
 - provide a mechanism to securely reuse a data key with multiple messages
 
 #### AAD
@@ -124,7 +124,7 @@ When the [encryption context](../framework/structures.md#encryption-context) is 
 
 ##### Key Value Pairs
 
-The encoding of the key-value pairs of the [encryption context](#encryption-context).
+The encoding of the key-value pairs of the [encryption context](../framework/structures.md#encryption-context).
 When the [encryption context](../framework/structures.md#encryption-context) is empty, this field MUST NOT be included in the [AAD](#aad).
 
 The following table describes the fields that form the Key Value Pairs.
@@ -267,7 +267,7 @@ The initialization vector (IV) used as input to calculate the [authentication ta
 #### Authentication Tag
 
 The authentication value for the header.
-The [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorith-suite-id) field
+The [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field
 [determines how the value of this field is calculated](../client-apis/encrypt.md),
 and uses this value to [authenticate the contents of the header during decryption](../client-apis/decrypt.md).
 
