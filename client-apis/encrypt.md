@@ -109,7 +109,7 @@ The [message header](../data-format/message-header.md) is serialized with the fo
   in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
   [encrypted data keys](../framework/structures.md#encrypted-data-keys) in the [encryption materials](../framework/structures.md#encryption-materials)
-- [Content Type](../data-format/message-header.md#content-type): MUST be [01](../data-format/message-header.md#supported-content-types)
+- [Content Type](../data-format/message-header.md#content-type): MUST be [02](../data-format/message-header.md#supported-content-types)
 - [IV Length](../data-format/message-header.md#iv-length): MUST match the [IV length](../framework/algorithm-suites.md#iv-length)
   specified by the [algorithm suite](../framework/algorithm-suites.md)
 - [Frame Length](../data-format/message-header.md#frame-length): MUST be the same value as the input [frame length](#frame-length),
