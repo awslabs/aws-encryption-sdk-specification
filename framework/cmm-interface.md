@@ -65,10 +65,9 @@ This is the input to the [decrypt materials](#decrypt-materials) behavior.
 
 The decrypt materials request MUST include the following:
 
-- [Algorithm Suite](algorithm-suites.md)
-- [Encrypted Data Keys](structures.md#encrypted-data-keys)
-    - This list MUST contain at least one encrypted data key.
-- [Encryption Context](structures.md#encryption-context)
+- [Algorithm Suite](#algorithm-suite.md)
+- [Encrypted Data Keys](#structures.md#encrypted-data-keys)
+- [Encryption Context](#encryption-context.md)
     - The encryption context provided MAY be empty.
 
 ### Behaviors
