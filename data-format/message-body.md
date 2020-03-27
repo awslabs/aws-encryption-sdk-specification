@@ -64,7 +64,7 @@ due to restrictions imposed by the [implemented algorithms](../framework/algorit
 
 #### Encrypted Content
 
-The encrypted data as returned by the [encryption algorithm](../client-apis/encrypt.md).
+The encrypted data as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
 
 #### Authentication Tag
 
@@ -115,7 +115,7 @@ Note: This IV is different from the [Header IV](message-header.md#iv).
 
 ##### Encrypted Content
 
-The encrypted data for each frame, as returned by the [encryption algorithm](../framework/algorithm-suites.md).  
+The encrypted data for each frame, as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).  
 The length of the encrypted content of a Regular Frame MUST be equal to the Frame Length.  
 
 ##### Authentication Tag
@@ -152,7 +152,7 @@ Field                                          | Length (bytes)                 
 [Sequence Number End](#sequence-number-end)    | 4                                                                                                            | Bytes
 [Sequence Number](#sequence-number)            | 4                                                                                                            | UInt32
 [IV](#iv)                                      | [IV Length](message-header.md#iv-length)                                                                     | Bytes
-[Encrypted Content Length](#encrypted-content) | 4                                                                                                            | UInt32
+[Encrypted Content Length](#encrypted-content-length-1) | 4                                                                                                            | UInt32
 [Encrypted Content](#encrypted-content)        | Variable                                                                                                     | Bytes
 [Authentication Tag](#authentication-tag)      | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes
 
@@ -173,7 +173,7 @@ The Final Frame Sequence number MUST be equal to the total number of frames in t
 
 The initialization vector for the final frame.    
 The IV MUST be a unique IV within the message.   
-The IV length MUST be equal to the IV length of the [algorithm](../framework/algorithm-suites.md) that generated the message. 
+The IV length MUST be equal to the IV length of the [algorithm suite](../framework/algorithm-suites.md) that generated the message. 
 Note: This IV is different from the [Header IV](message-header.md#iv). 
 
 ##### Encrypted Content Length
@@ -182,7 +182,7 @@ The length of the encrypted content.
 
 ##### Encrypted Content
 
-The encrypted data for the final frame, as returned by the [encryption algorithm](../framework/algorithm-suites.md).  
+The encrypted data for the final frame, as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
 
 ##### Authentication Tag
 
