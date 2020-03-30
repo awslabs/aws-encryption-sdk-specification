@@ -5,7 +5,7 @@
 
 ## Version
 
-See [Message Version](#message.md#version).
+See [Message Version](message.md#version).
 
 ## Implementations
 
@@ -16,8 +16,8 @@ See [Message Version](#message.md#version).
 
 ## Overview
 
-The footer is a component of the [message](#message.md).  
-When an [algorithm suite](#algorithm-suites.md) includes a [signature algorithm](#algorithm-suites.md#signature-algorithm) the [message](message.md) MUST contain a footer.
+The footer is a component of the [message](message.md).  
+When an [algorithm suite](../framework/algorithm-suites.md) includes a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm) the [message](message.md) MUST contain a footer.
 
 ## Definitions
 
@@ -42,12 +42,12 @@ The length of the signature.
 
 ### Signature
 
-The [signature](#algorithm-suites.md#signature-algorithm) used to authenticate the message.  
-This signature MUST be calculated over both the [message header](#message-header.md) and the [message body](#message-body.md), 
+The [signature](../framework/algorithm-suites.md#signature-algorithm) used to authenticate the message.  
+This signature MUST be calculated over both the [message header](message-header.md) and the [message body](message-body.md), 
 in the order of serialization.  
-The [algorithm suite](#algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suites.md#algorithm-suite-id) field
-[determines how the value of this field is calculated](#encrypt.md), 
-and uses this value to [authenticate the contents of the header and body during decryption](#decrypt.md).  
+The [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](../framework/algorithm-suites.md#algorithm-suite-id) field
+[determines how the value of this field is calculated](../client-apis/encrypt.md), 
+and uses this value to [authenticate the contents of the header and body during decryption](../client-apis/decrypt.md).  
 
 ## Example Usage
 

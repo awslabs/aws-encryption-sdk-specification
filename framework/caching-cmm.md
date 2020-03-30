@@ -17,9 +17,9 @@
 
 ## Overview
 
-The Caching Cryptographic Materials Manager (CMM) is a built-in implementation of the [CMM interface](#cmm-interface.md) provided by the AWS Encryption SDK.
+The Caching Cryptographic Materials Manager (CMM) is a built-in implementation of the [CMM interface](cmm-interface.md) provided by the AWS Encryption SDK.
 The caching CMM wraps around another CMM and caches the results of its underlying key provider's encryption and decryption operations.
-A caching CMM reduces the number of calls made to the underlying [key provider](#key-provider.md), thereby reducing cost and/or improving performance.
+A caching CMM reduces the number of calls made to the underlying key provider, thereby reducing cost and/or improving performance.
 
 ## Definitions
 
@@ -41,9 +41,9 @@ On caching CMM initialization, a caching CMM MUST define the following:
 
 ### Underlying Cryptographic Materials Cache
 
-The caching CMM intercepts requests for [encryption](#cmm-interface.md#encryption-materials-request) and
-[decryption](#cmm-interface.md#decrypt-materials-request) materials
-and forwards them to the underlying [cryptographic materials cache (CMC)](#TODO).
+The caching CMM intercepts requests for [encryption](cmm-interface.md#encryption-materials-request) and
+[decryption](cmm-interface.md#decrypt-materials-request) materials
+and forwards them to the underlying [cryptographic materials cache (CMC)](cryptographic-materials-cache.md).
 
 Multiple caching CMMs MAY share the same cryptographic materials cache,
 but by default MUST NOT use each other's cache entries.
@@ -52,7 +52,7 @@ they will share cache entries if and only if the [partition ID](#partition-id) p
 
 ### Underlying Cryptographic Materials Manager
 
-The underlying [Cryptographic Materials Manager (CMM)](#cmm-interface.md#supported-cmms)
+The underlying [Cryptographic Materials Manager (CMM)](cmm-interface.md#supported-cmms)
 to query for encryption/decryption materials on a cache miss.
 
 ### Cache Limit TTL
@@ -91,8 +91,8 @@ to track usage statistics.
 
 The usage stats contains two fields:
 
-- [Messages Encrypted](#messages-encrypted.md)
-- [Bytes Encrypted](#bytes-encrypted.md)
+- [Messages Encrypted](#messages-encrypted)
+- [Bytes Encrypted](#bytes-encrypted)
 
 When the caching CMM stores encryption materials into the cryptographic materials cache,
 the caching CMM MUST set the initial usage stats for the cache entry.
@@ -100,53 +100,53 @@ the caching CMM MUST set the initial usage stats for the cache entry.
 When the caching CMM obtains encryption materials from the cryptographic materials cache,
 the caching CMM MUST update the usage stats for the cache entry retrieved.
 
-#### Message Encrypted
+#### Messages Encrypted
 
-The number of messages encrypted by the [encryption](#data-strucutres.md#encryption-materials) materials.
+The number of messages encrypted by the [encryption](structures.md#encryption-materials) materials.
 
 #### Bytes Encrypted
 
-The number of bytes encrypted by the [encryption](#data-strucutres.md#encryption-materials) materials.
+The number of bytes encrypted by the [encryption](structures.md#encryption-materials) materials.
 
 ## Behaviors
 
 ### Get Encryption Materials
 
-If the [algorithm suite](#algorithm-suites.md) requested contains a [Identity KDF](#algorithm-suites.md#identity-kdf),
-the caching CMM MUST obtain the encryption materials by making a call to the underlying CMM's [Get Encryption Materials](#cmm-interface.md#get-encryption-materials) function.
+If the [algorithm suite](algorithm-suites.md) requested contains a [Identity KDF](algorithm-suites.md#identity-kdf),
+the caching CMM MUST obtain the encryption materials by making a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials) function.
 
-Otherwise, the caching CMM MUST attempt to find the [encryption materials](#structures.md#encryption-materials)
+Otherwise, the caching CMM MUST attempt to find the [encryption materials](structures.md#encryption-materials)
 from the underlying [cryptographic materials cache (CMC)](#underlying-cryptographic-materials-cache).
 
 If a cache entry is found, the caching CMM MUST return the encryption materials retrieved.
 If a cache entry is not found, the caching CMM MUST then attempt to obtain the encryption materials
-by making a call to the underlying CMM's [Get Encryption Materials](#cmm-interface.md#get-encryption-materials).
+by making a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials).
 
-If the [algorithm suite](#algorithm-suites.md) requested does not contain a [Identity KDF](#algorithm-suites.md#identity-kdf),
+If the [algorithm suite](algorithm-suites.md) requested does not contain an [Identity KDF](algorithm-suites.md#identity-kdf),
 the caching CMM MUST add the encryption materials obtained from the underlying CMM into the underlying CMC.
 
-If the [algorithm suite](#algorithm-suites.md) requested contains a Identity KDF,
+If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF,
 the caching CMM MUST NOT store the encryption materials in the underlying CMC.
 
 ### Decrypt Materials
 
-If the [algorithm suite](#algorithm-suites.md) requested contains a [Identity KDF](#algorithm-suites.md#identity-kdf),
-the caching CMM MUST obtain the decryption materials by making a call to the underlying CMM's [Decrypt Materials](#cmm-interface.md#decrypt-materials) function.
+If the [algorithm suite](algorithm-suites.md) requested contains a [Identity KDF](algorithm-suites.md#identity-kdf),
+the caching CMM MUST obtain the decryption materials by making a call to the underlying CMM's [Decrypt Materials](cmm-interface.md#decrypt-materials) function.
 
-Otherwise, the caching CMM MUST attempt to find the [decryption materials](#structures.md#decryption-materials)
+Otherwise, the caching CMM MUST attempt to find the [decryption materials](structures.md#decryption-materials)
 from the [underlying CMC](#underlying-cryptographic-materials-cache).
 
 If a cache entry is found, the cachimg CMM MUST return the decryption materials retrieved.
 If a cache entry is not found or the cache entry is expired, the caching CMM MUST attempt to obtain the decryption materials
-by making a call to the underlying CMM's [Decrypt Materials](#cmm-interface.md#decrypt-materials).
+by making a call to the underlying CMM's [Decrypt Materials](cmm-interface.md#decrypt-materials).
 
-If the [algorithm suite](#algorithm-suites.md) requested does not contain a [Identity KDF](#algorithm-suites.md#identity-kdf),
+If the [algorithm suite](algorithm-suites.md) requested does not contain an [Identity KDF](algorithm-suites.md#identity-kdf),
 the caching CMM MUST add the decryption materials obtained from the underlying CMM into the underlying CMC.
+>>>>>>> 35c0f38428b85320ae3a95d4da52f27707f03404
 
-If the [algorithm suite](#algorithm-suites.md) requested contains a Identity KDF,
+If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF,
 the caching CMM MUST NOT store the decryption materials in the underlying CMC.
 
 ## Security Considerations
 
 [TODO: What security properties can the caching CMM guarantee?]
-
