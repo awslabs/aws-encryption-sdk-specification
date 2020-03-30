@@ -11,7 +11,7 @@
 
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/raw_rsa_keyring.h)
 - [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-node/src/raw_rsa_keyring_node.ts)
-- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-browser/src/raw_rsa_keyring_browser.ts)
+- [Browser JS](https://github.com/aws/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-browser/src/raw_rsa_keyring_web_crypto.ts)
 
 ## Overview
 

@@ -74,7 +74,7 @@ If specified to use HKDF, the AWS Encryption SDK MUST use HKDF with the followin
 ### ECDSA
 
 Specification: ANS X9.62-2005
-(Not available publicaly, but the specification for ECDSA is replicated in [SEC 1 version 2.0](http://www.secg.org/sec1-v2.pdf).
+(Not available publicly, but the specification for ECDSA is replicated in [SEC 1 version 2.0](https://www.secg.org/sec1-v2.pdf).
 Information about obtaining copies of ANS X9.62 is available at http://www.x9.org.)
 
 The Elliptic Curve Digital Signature Algorithm (ECDSA) is a signature algorithm.

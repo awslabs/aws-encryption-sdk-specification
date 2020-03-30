@@ -221,10 +221,10 @@ For each [KMS Encrypt](#kms-encrypt) call, if an AWS region can be extracted fro
 If an AWS region cannot be extracted from the Key ID then the KMS Keyring MUST input a value denoting an unknown region.
 If the [client supplier](#client-supplier) does not provide any client
 for the given region for this [KMS Encrypt](#kms-encrypt) call,
-OnEncrypt MUST NOT modify the [encryption materials](#structures.md#encryption-materials.md)
+OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials.md)
 and MUST fail.
 
-To encrypt the plaintext data key with a CMK, OnEncrypt MUST call [KMS Encrypt](#encrypt) with a request
+To encrypt the plaintext data key with a CMK, OnEncrypt MUST call [KMS Encrypt](#kms-encrypt) with a request
 constructed as follows:
 
 - `KeyId`: the CMK ARN to be used for data key encryption.
@@ -280,7 +280,7 @@ OnDecrypt MUST call [KMS Decrypt](#kms-decrypt).
 For each [KMS Decrypt](#kms-decrypt) call, an AWS region MUST be extracted from the [encrypted data key](structures.md#encrypted-data-key)'s [key provider info](structures.md#key-provider-information).
 The KMS Keyring MUST call [KMS Decrypt](#kms-decrypt) using the client supplied by the [client supplier](#client-supplier), given the region as input.
 
-If the client supplier does not provide any client for the given region for this Decrypt call, OnDecrypt MUST skip that particular [encrypted data key](#encrypted-data-key).
+If the client supplier does not provide any client for the given region for this Decrypt call, OnDecrypt MUST skip that particular [encrypted data key](structures.md#encrypted-data-key).
 
 When calling [KMS Decrypt](#kms-decrypt), the keyring MUST call with a request constructed as follows:
 
