@@ -221,7 +221,7 @@ For each [KMS Encrypt](#kms-encrypt) call, if an AWS region can be extracted fro
 If an AWS region cannot be extracted from the Key ID then the KMS Keyring MUST input a value denoting an unknown region.
 If the [client supplier](#client-supplier) does not provide any client
 for the given region for this [KMS Encrypt](#kms-encrypt) call,
-OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials.md)
+OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials)
 and MUST fail.
 
 To encrypt the plaintext data key with a CMK, OnEncrypt MUST call [KMS Encrypt](#kms-encrypt) with a request
