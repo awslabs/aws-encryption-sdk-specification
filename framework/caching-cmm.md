@@ -142,7 +142,6 @@ by making a call to the underlying CMM's [Decrypt Materials](cmm-interface.md#de
 
 If the [algorithm suite](algorithm-suites.md) requested does not contain an [Identity KDF](algorithm-suites.md#identity-kdf),
 the caching CMM MUST add the decryption materials obtained from the underlying CMM into the underlying CMC.
->>>>>>> 35c0f38428b85320ae3a95d4da52f27707f03404
 
 If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF,
 the caching CMM MUST NOT store the decryption materials in the underlying CMC.
