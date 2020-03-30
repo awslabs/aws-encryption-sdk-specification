@@ -43,7 +43,7 @@ On caching CMM initialization, a caching CMM MUST define the following:
 
 The caching CMM intercepts requests for [encryption](cmm-interface.md#encryption-materials-request) and 
 [decryption](cmm-interface.md#decrypt-materials-request) materials
-and forwards them to the underlying [cryptographic materials cache (CMC)](#TODO).  
+and forwards them to the underlying [cryptographic materials cache (CMC)](cryptographic-materials-cache.md).  
 
 Multiple caching CMMs MAY share the same cryptographic materials cache, 
 but by default MUST NOT use each other's cache entries.  
@@ -100,7 +100,7 @@ the caching CMM MUST set the initial usage stats for the cache entry.
 When the caching CMM obtains encryption materials from the cryptographic materials cache, 
 the caching CMM MUST update the usage stats for the cache entry retrieved. 
 
-#### Message Encrypted
+#### Messages Encrypted
 
 The number of messages encrypted by the [encryption](structures.md#encryption-materials) materials.  
 
@@ -125,7 +125,7 @@ by making a call to the underlying CMM's [Get Encryption Materials](cmm-interfac
 If the [algorithm suite](algorithm-suites.md) requested contains a [Identity KDF](algorithm-suites.md#identity-kdf),
 the caching CMM MUST add the encryption materials obtained from the underlying CMM into the underlying CMC.  
 
-If the [algorithm suite](algorithm-suites.md) requested contains a Identity KDF,
+If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF,
 the caching CMM MUST NOT store the encryption materials in the underlying CMC.  
 
 ### Decrypt Materials
@@ -143,10 +143,9 @@ by making a call to the underlying CMM's [Decrypt Materials](cmm-interface.md#de
 If the [algorithm suite](algorithm-suites.md) requested contains a [Identity KDF](algorithm-suites.md#identity-kdf), 
 the caching CMM MUST adds the decryption materials obtained from the underlying CMM into the underlying CMC.  
 
-If the [algorithm suite](algorithm-suites.md) requested contains a Identity KDF,
+If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF,
 the caching CMM MUST NOT store the decryption materials in the underlying CMC.
 
 ## Security Considerations
 
 [TODO: What security properties can the caching CMM guarantee?] 
-

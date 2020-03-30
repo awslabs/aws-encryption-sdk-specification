@@ -199,7 +199,7 @@ The value of this key MUST be kept secret.
 Decryption materials are a structure containing materials needed for [decryption](../client-apis/decrypt.md).
 This structure MAY include any of the following fields:
 
-- [Algorithm Suite](#algorith-suite-1)
+- [Algorithm Suite](#algorithm-suite-1)
 - [Encryption Context](#encryption-context-2)
 - [Keyring Trace](#keyring-trace-1)
 - [Plaintext Data Key](#plaintext-data-key-1)

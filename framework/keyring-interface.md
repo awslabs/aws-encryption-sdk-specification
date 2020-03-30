@@ -66,7 +66,7 @@ The length of the output plaintext data key MUST be equal to the KDF input lengt
 specified in the [encryption materials](structures.md#encryption-materials).
 The value of the plaintext data key MUST consist of cryptographically secure (pseudo-)random bits.
 
-If OnEncrypt updates the [encryption materials](#data-structure.md#encryption-materials) with a plaintext data key,
+If OnEncrypt updates the [encryption materials](structures.md#encryption-materials) with a plaintext data key,
 the [keyring trace](structures.md#keyring-trace) returned by OnEncrypt MUST include one trace
 associated with this keyring that has the [GENERATED DATA KEY](structures.md#generated-data-key) flag.
 
@@ -93,7 +93,7 @@ The [encrypted data keys](structures.md#encrypted-data-key) produced by this key
 have [ciphertexts](structures.md#ciphertext) that can be decrypted to the plaintext data key in the
 [encryption materials](structures.md#encryption-materials).
 
-If OnEncrypt updates the [encryption materials](#data-structure.md#encryption-materials) with at least
+If OnEncrypt updates the [encryption materials](structures.md#encryption-materials) with at least
 one new [encrypted data key](structures.md#encrypted-data-key),
 the [keyring trace](structures.md#keyring-trace) returned by OnEncrypt MUST include at least one trace
 associated with this keyring that has the [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1) flag.
@@ -134,7 +134,7 @@ it SHOULD set one resulting plaintext data key on the [decryption materials](str
 If the keyring is unable to get any plaintext data key using the input [encrypted data keys](structures.md#encrypted-data-key)
 the keyring MUST NOT not update the [decryption materials](structures.md#decryption-materials).
 
-If OnDecrypt updates the [decryption materials](#data-structure.md#decryption-materials) with a plaintext data key,
+If OnDecrypt updates the [decryption materials](structures.md#decryption-materials) with a plaintext data key,
 the [keyring trace](structures.md#keyring-trace-1) returned by OnDecrypt MUST include one trace
 associated with this keyring that has the [DECRYPTED DATA KEY flag](structures.md#decrypted-data-key).
 Note that this trace MAY include more than one flag, for example the [VERIFIED ENCRYPTION CONTEXT flag](structures.md#verified-encryption-context).
@@ -159,7 +159,7 @@ Examples are:
 - A custom keyring that uses wrapping keys that are stored in your hardware security modules (HSMs)
 - A custom keyring protected by another master key service.
 
-The [raw AES keyring](raw-aes-keyring.md) and [raw RSA keyring](#raw-aes-keyring) MAY be used,
+The [raw AES keyring](raw-aes-keyring.md) and [raw RSA keyring](raw-rsa-keyring.md) MAY be used,
 however users should refer to their specification for notes on their respective security considerations.
 
 ## Appendix

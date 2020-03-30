@@ -198,7 +198,7 @@ If verified, OnEncrypt MUST do the following with the response from [KMS Generat
   in the [encryption materials](structures.md#encryption-materials), constructed as follows:
   - the [ciphertext](structures.md#ciphertext) is the response `CiphertextBlob`.
   - the [key provider id](structures.md#key-provider-id) is "aws-kms".
-  - the [key provider information](#data-strucures.md#key-provider-information) is the response `KeyId`.
+  - the [key provider information](structures.md#key-provider-information) is the response `KeyId`.
 - append a new record to the [keyring trace](structures.md#keyring-trace)
   in the input [encryption materials](structures.md#encryption-materials), constructed as follows:
   - The string field KeyNamespace is "aws-kms".
@@ -241,7 +241,7 @@ If the call succeeds, OnEncrypt MUST do the following with the response from [KM
   in the [encryption materials](structures.md#encryption-materials), constructed as follows:
   - The [ciphertext](structures.md#ciphertext) is the response `CiphertextBlob`.
   - The [key provider id](structures.md#key-provider-id) is "aws-kms".
-  - The [key provider information](#data-strucures.md#key-provider-information) is the response `KeyId`.
+  - The [key provider information](structures.md#key-provider-information) is the response `KeyId`.
     Note that the `KeyId` in the response is always in key ARN format.
 - append a new record to the [keyring trace](structures.md#keyring-trace)
   in the input [encryption materials](structures.md#encryption-materials), constructed as follows:
@@ -259,9 +259,9 @@ OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) a
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
 
 The set of [encrypted data keys](structures.md#encrypted-data-key) that OnDecrypt MUST attempt
-to decrypt depends on if this keyring is a [discovery keyring](#discovery) or not.
+to decrypt depends on if this keyring is a [discovery keyring](#is-discovery) or not.
 
-If this keyring is a [discovery keyring](#discovery), OnDecrypt MUST attempt to decrypt every
+If this keyring is a [discovery keyring](#is-discovery), OnDecrypt MUST attempt to decrypt every
 [encrypted data key](structures.md#encrypted-data-key) in the input encrypted data key list
 with the following condition, until it successfully decrypts one:
 

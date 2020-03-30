@@ -101,14 +101,14 @@ The keyring MUST attempt to encrypt the plaintext data key in the
 The keyring performs RSA with the following specifics:
 
 - this keyring's [public key](#public-key) is the RSA public key
-- this keyring's [padding scheme](padding-scheme) is the RSA padding scheme.
+- this keyring's [padding scheme](#supported-padding-schemes) is the RSA padding scheme.
 - the plaintext data key is the plaintext input to RSA encryption.
 
 If RSA encryption was successful, OnEncrypt MUST return the input
 [encryption materials](structures.md#encryption-materials), modified in the following ways:
 
 - The encrypted data key list has a new encrypted data key added, constructed as follows:
-  - the [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](#key-id).
+  - the [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](#key-namespace).
   - the [key provider information](structures.md#key-provider-information) field is this keyring's [key name](#key-name).
   - the [ciphertext](structures.md#ciphertext) field is the ciphertext outputted from
     the RSA encryption of the plaintext data key.
@@ -141,7 +141,7 @@ using RSA if and only if the following is true:
 The keyring performs RSA decryption with the following specifics:
 
 - this keyring's [private key](#private-key) is the RSA private key
-- this keyring's [padding scheme](padding-scheme) is the RSA padding scheme.
+- this keyring's [padding scheme](#supported-padding-schemes) is the RSA padding scheme.
 - an encrypted data key's [ciphertext](structures.md#ciphertext) is the input ciphertext to RSA decryption.
 
 If any decryption succeeds, this keyring MUST immediately return the input

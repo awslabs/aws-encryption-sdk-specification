@@ -41,7 +41,7 @@ On keyring initialization, a keyring MUST define at least one of the following:
 A [keyring](keyring-interface.md) that can [generate data keys](keyring-interface.md#generate-data-key).
 
 This keyring MUST implement the [Generate Data Key](keyring-interface.md#generate-data-key) behavior
-during [OnEncrypt](#keyring-interface#onencrypt).
+during [OnEncrypt](keyring-interface.md#onencrypt).
 This means that this keyring MUST return [encryption materials](structures.md#encryption-materials) containing
 a plaintext data key on [OnEncrypt](keyring-interface.md#onencrypt).
 
@@ -50,7 +50,7 @@ a [generator keyring](#generator-keyring) MUST be defined for the keyring.
 
 ### Children Keyrings
 
-A list of [keyrings](#keyring-interface) to be used to modify the [encryption](structures.md#encryption-materials)
+A list of [keyrings](keyring-interface.md) to be used to modify the [encryption](structures.md#encryption-materials)
 or [decryption materials](structures.md#decryption-materials).
 
 If this keyring does not have a [generator keyring](#generator-keyring), this list MUST NOT be empty.
@@ -63,7 +63,7 @@ If this keyring has a [generator keyring](#generator-keyring),
 this keyring MUST first call that generator keyring's [OnEncrypt](keyring-interface.md#onencrypt)
 using the input [encryption materials](structures.md#encryption-materials) as input.
 If the [generator keyring](#generator-keyring) fails [OnEncrypt](keyring-interface.md#onencrypt), this OnEncrypt MUST also fail.
-If the [generator keyring](#generator-keyring) returns [encryption materials](#encryption-materials) missing a plaintext data key,
+If the [generator keyring](#generator-keyring) returns [encryption materials](structures.md#encryption-materials) missing a plaintext data key,
 OnEncrypt MUST fail.
 
 If this keyring does not have a [generator keyring](#generator-keyring),
