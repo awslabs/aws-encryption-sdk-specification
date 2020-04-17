@@ -11,6 +11,8 @@
 
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/materials.c)
 - [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/keyring.ts)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/base.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/Keyring.java)
 
 ## Overview
 

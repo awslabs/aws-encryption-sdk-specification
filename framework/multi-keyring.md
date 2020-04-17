@@ -11,6 +11,8 @@
 
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/multi_keyring.c)
 - [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/multi_keyring.ts)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/multi.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/MultiKeyring.java)
 
 ## Overview
 
