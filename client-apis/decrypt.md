@@ -32,7 +32,7 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 The following inputs to this behavior are REQUIRED:
 
 - [Encrypted Message](#encrypted-message)
-- either a [Cryptographic Materials Manager (CMM)](cmm-interface.md) or a [Keyring](#keyring-interface.md)
+- either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
 
 If the length is not known on the input [encrypted message](#encrypted-message)
 (for example, if Decrypt is taking in the input encrypted message as a stream),
@@ -124,11 +124,11 @@ The AAD used in decryption is the [Message Body AAD](#message-body-aad.md), cons
   If the message contains non framed data, then this value is 1.
 - Content Length: TODO
 
-If [max body length](#max-body-length) is specified on input and the input message contains a
-[message body frame](#message-body.md#framed-data) with an encrypted content length greater than this value,
-Decrypt MUST not perform the decryption algorithm on that message body frame and MUST fail.
-If [max body length](#max-body-length) is specified on input and the input message is unframed and has a
-[encrypted content length](#message-body.md#encrypted-content-length) greater than this value,
+If [max body length](#max-body-length) is specified on input and the input message is [framed data](../data-format/message-body.md#framed-data)
+with [frame length](../data-format/message-header.md#frame-length) greater than this value,
+Decrypt MUST not perform the decryption algorithm on the message body and MUST fail.
+If [max body length](#max-body-length) is specified on input and the input message is [unframed data](../data-format/message-body.md#non-framed-data)
+ and has a [encrypted content length](../data-format/message-body.md#encrypted-content-length) greater than this value,
 Decrypt MUST not decrypt the message and MUST fail.
 
 If the algorithm suite has a signature algorithm, decrypt MUST verify the message footer using the specified signature algorithm, 
