@@ -136,7 +136,7 @@ the caching CMM MUST obtain the decryption materials by making a call to the und
 Otherwise, the caching CMM MUST attempt to find the [decryption materials](structures.md#decryption-materials)
 from the [underlying CMC](#underlying-cryptographic-materials-cache).
 
-If a cache entry is found, the cachimg CMM MUST return the decryption materials retrieved.
+If a cache entry is found, the caching CMM MUST return the decryption materials retrieved.
 If a cache entry is not found or the cache entry is expired, the caching CMM MUST attempt to obtain the decryption materials
 by making a call to the underlying CMM's [Decrypt Materials](cmm-interface.md#decrypt-materials).
 
