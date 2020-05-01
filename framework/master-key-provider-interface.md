@@ -91,7 +91,7 @@ This interface is used to decrypt a data key.
 
 The master key provider SHOULD attempt to decrypt the data key
 by passing the request to any master keys that it has access to
-until it has either run exhausted available master keys
+until it has either exhausted available master keys
 or obtained a plaintext data key.
 
 Inputs to this interface MUST include
@@ -102,7 +102,7 @@ and a list of encrypted data keys.
 The output of this interface MUST include
 the decrypted data key
 and information that can identify which master key
-was used to decrypt the data key.
+decrypted the data key.
 
 If the master key provider cannot decrypt the data key,
 the call MUST result in an error.
