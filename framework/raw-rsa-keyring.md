@@ -5,15 +5,27 @@
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+### Changelog
+
+- 0.2.0
+
+    - [Remove Keyring Trace](../changes/0001-remove_keyring_trace.md)
+
+- 0.1.0-preview
+
+    - Initial record
 
 ## Implementations
 
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/raw_rsa_keyring.h)
-- [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-node/src/raw_rsa_keyring_node.ts)
-- [Browser JS](https://github.com/aws/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-browser/src/raw_rsa_keyring_web_crypto.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/raw.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/RawRsaKeyring.java)
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+|----------|----------------------------------------|---------------------------|----------------|
+| C | 0.1.0-preview | 0.1.0 | [raw_rsa_keyring.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/raw_rsa_keyring.h) |
+| NodeJS | 0.1.0-preview | 0.1.0 | [raw_rsa_keyring_node.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-node/src/raw_rsa_keyring_node.ts)|
+| Browser JS | 0.1.0-preview | 0.1.0 | [raw_rsa_keyring_web_crypto.ts](https://github.com/aws/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-browser/src/raw_rsa_keyring_web_crypto.ts)|
+| Python | 0.1.0-preview | n/a | [keyrings/raw.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/raw.py) |
+| Java | 0.1.0-preview | n/a | [RawRsaKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/RawRsaKeyring.java) |
 
 ## Overview
 
@@ -114,13 +126,6 @@ If RSA encryption was successful, OnEncrypt MUST return the input
   - the [key provider information](structures.md#key-provider-information) field is this keyring's [key name](#key-name).
   - the [ciphertext](structures.md#ciphertext) field is the ciphertext outputted from
     the RSA encryption of the plaintext data key.
-- The keyring trace has a new record appended.
-  This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
-  and the [flags](structures.md#flags) field of this record MUST include the
-  [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1) flag.
-  If this keyring generated the plaintext data key in the [encryption materials](structures.md#encryption-materials)
-  the record MUST contain the [GENERATED DATA KEY](structures.md#generated-data-key) flag.
-  The record MUST NOT contain the [SIGNED ENCRYPTION CONTEXT flag](structures.md#signed-encryption-context).
 
 ### OnDecrypt
 
@@ -150,11 +155,6 @@ If any decryption succeeds, this keyring MUST immediately return the input
 [decryption materials](structures.md#decryption-materials), modified in the following ways:
 
 - The output of RSA decryption is set as the decryption material's plaintext data key.
-- The keyring trace has a new record appended.
-  This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
-  and the [flags](structures.md#flags) field of this record MUST include the
-  [DECRYPTED DATA KEY](structures.md#decrypted-data-key) flag.
-  The record MUST NOT contain the [VERIFIED ENCRYPTION CONTEXT flag](structures.md#verified-encryption-context).
 
 If no decryption succeeds, this keyring MUST NOT make any update to the decryption materials.
 

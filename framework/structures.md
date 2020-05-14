@@ -5,7 +5,17 @@
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+### Changelog
+
+- 0.2.0
+
+    - [Remove Keyring Trace](../changes/0001-remove_keyring_trace.md)
+
+- 0.1.0-preview
+
+    - Initial record
 
 ## Definitions
 
@@ -33,7 +43,6 @@ Structures defined in this document:
 - [Encryption Context](#encryption-context)
 - [Encryption Materials](#encryption-materials)
 - [Decryption Materials](#decryption-materials)
-- [Keyring Trace](#keyring-trace-2)
 
 ### Encrypted Data Key
 
@@ -122,10 +131,12 @@ other AWS services.
 
 #### Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/EncryptionMaterials.java)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py)
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+|----------|----------------------------------------|---------------------------|----------------|
+| C | 0.1.0-preview | 0.1.0 | [materials.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h) |
+| Javascript | 0.1.0-preview | 0.1.0 | [cryptographic_material.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)|
+| Python | 0.1.0-preview | n/a | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py) |
+| Java | 0.1.0-preview | n/a | [EncryptionMaterials.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/EncryptionMaterials.java) |
 
 #### Structure
 
@@ -135,7 +146,6 @@ This structure MAY include any of the following fields:
 - [Algorithm Suite](#algorithm-suite)
 - [Encrypted Data Keys](#encrypted-data-keys)
 - [Encryption Context](#encryption-context-1)
-- [Keyring Trace](#keyring-trace)
 - [Plaintext Data Key](#plaintext-data-key)
 - [Signing Key](#signing-key)
 
@@ -155,11 +165,6 @@ If the plaintext data key is not included on this set of encryption materials, t
 ##### Encryption Context
 
 The [encryption context](#encryption-context) associated with this [encryption](../client-apis/encrypt.md).
-
-##### Keyring Trace
-
-A [keyring trace](#keyring-trace-2) containing all of the actions that keyrings have taken on this set
-of encryption materials.
 
 ##### Plaintext Data Key
 
@@ -189,10 +194,12 @@ The value of this key MUST be kept secret.
 
 #### Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/DecryptionMaterials.java)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py)
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+|----------|----------------------------------------|---------------------------|----------------|
+| C | 0.1.0-preview | 0.1.0 | [materials.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h) |
+| Javascript | 0.1.0-preview | 0.1.0 | [cryptographic_material.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)|
+| Python | 0.1.0-preview | n/a | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py) |
+| Java | 0.1.0-preview | n/a | [DecryptionMaterials.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/DecryptionMaterials.java) |
 
 #### Structure
 
@@ -201,7 +208,6 @@ This structure MAY include any of the following fields:
 
 - [Algorithm Suite](#algorithm-suite-1)
 - [Encryption Context](#encryption-context-2)
-- [Keyring Trace](#keyring-trace-1)
 - [Plaintext Data Key](#plaintext-data-key-1)
 - [Verification Key](#verification-key)
 
@@ -212,10 +218,6 @@ The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client
 ##### Encryption Context
 
 The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md)
-
-##### Keyring Trace
-
-A [keyring trace](#keyring-trace-2) containing all of the actions keyrings have taken on this set of decryption materials.
 
 ##### Plaintext Data Key
 
@@ -238,82 +240,3 @@ The key to be used as the verification key for signature verification during [de
 
 The verification key MUST fit the specification for the [signature algorithm](algorithm-suites.md#signature-algorithm)
 included in this decryption material's [algorithm suite](#algorithm-suite-1).
-
-### Keyring Trace
-
-#### Implementations
-
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/keyring_trace.c)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/keyring_trace.ts)
-
-#### Structure
-
-A list of traces, representing actions that keyrings have taken on data keys.
-
-The list MUST be ordered sequentially according to the order the actions were taken,
-with the earliest action corresponding to the first trace in the list.
-
-A trace is a structure that MAY contain any number of string fields,
-but MUST contain the following field:
-
-- [Flags](#flags)
-
-##### Flags
-
-A field representing a set of one or more enums indicating what actions were taken by a keyring.
-
-This set MUST include at least one flag.
-
-The following list contains the supported flags:
-
-- [GENERATED DATA KEY](#generated-data-key)
-- [ENCRYPTED DATA KEY](#encrypted-data-key-1)
-- [DECRYPTED DATA KEY](#decrypted-data-key)
-- [SIGNED ENCRYPTION CONTEXT](#signed-encryption-context)
-- [VERIFIED ENCRYPTION CONTEXT](#verified-encryption-context)
-
-Note: the underlying value of each enum is implementation specific.
-
-###### GENERATED DATA KEY
-
-A flag to represent that a keyring has generated a plaintext data key.
-This flag MUST be included in a trace if the keyring has successfully performed the
-[generate data key](keyring-interface.md#generate-data-key) behavior.
-
-###### ENCRYPTED DATA KEY
-
-A flag to represent that a keyring has created an [encrypted data key](#encrypted-data-key).
-This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[encrypt data key](keyring-interface.md#encrypt-data-key) behavior.
-
-###### DECRYPTED DATA KEY
-
-A flag to represent that a keyring has obtained the corresponding plaintext data key from an [encrypted data key](#encrypted-data-key).
-This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[decrypt data key](keyring-interface.md#decrypt-data-key) behavior.
-
-###### SIGNED ENCRYPTION CONTEXT
-
-A flag to represent that the keyring has cryptographically bound the [encryption context](#encryption-context)
-to a newly created [encrypted data key](#encrypted-data-key).
-
-This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[encrypt data key](keyring-interface.md#encrypt-data-key) behavior to create an [encrypted data key](#encrypted-data-key)
-that has the following property:
-
-- If the encryption context used as input to OnEncrypt to produce the encrypted data key is
-  different than the encryption context inputted to OnDecrypt to decrypt the encrypted data key,
-  the decryption is overwhelmingly likely to fail.
-
-###### VERIFIED ENCRYPTION CONTEXT
-
-A flag to represent that the keyring has verified that an [encrypted data key](#encrypted-data-key) was
-originally created with a particular [encryption context](#encryption-context).
-
-This flag MUST be included in a trace if and only if the keyring has successfully performed the
-[decrypt data key](keyring-interface.md#decrypt-data-key) behavior to decrypt an [encrypted data key](#encrypted-data-key)
-that has the following property:
-
-- If the encryption context used as input to OnEncrypt to produce the encrypted data key is
-  different than the encryption context inputted to OnDecrypt to decrypt the encrypted data key,
-  the decryption is overwhelmingly likely to fail.

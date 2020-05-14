@@ -5,14 +5,26 @@
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+### Changelog
+
+- 0.2.0
+
+    - [Remove Keyring Trace](../changes/0001-remove_keyring_trace.md)
+
+- 0.1.0-preview
+
+    - Initial record
 
 ## Implementations
 
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/materials.c)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/keyring.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/base.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/Keyring.java)
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+|----------|----------------------------------------|---------------------------|----------------|
+| C | 0.1.0-preview | 0.1.0 | [materials.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/materials.c) |
+| Javascript | 0.1.0-preview | 0.1.0 | [keyring.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/keyring.ts)|
+| Python | 0.1.0-preview | n/a | [keyrings/base.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/base.py) |
+| Java | 0.1.0-preview | n/a | [Keyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/Keyring.java) |
 
 ## Overview
 
@@ -59,7 +71,6 @@ If the encryption materials contain a plaintext data key, OnEncrypt MUST NOT gen
 Generate Data Key MAY modify the following fields in the [encryption materials](structures.md#encryption-materials):
 
 - [plaintext data key](structures.md#plaintext-data-key)
-- [keyring trace](structures.md#keyring-trace)
 
 To perform this behavior, the keyring generates a [plaintext data key](structures.md#plaintext-data-key)
 and sets the resulting plaintext data key on the [encryption materials](structures.md#encryption-materials).
@@ -67,10 +78,6 @@ and sets the resulting plaintext data key on the [encryption materials](structur
 The length of the output plaintext data key MUST be equal to the KDF input length of the [algorithm suite](algorithm-suites.md)
 specified in the [encryption materials](structures.md#encryption-materials).
 The value of the plaintext data key MUST consist of cryptographically secure (pseudo-)random bits.
-
-If OnEncrypt updates the [encryption materials](structures.md#encryption-materials) with a plaintext data key,
-the [keyring trace](structures.md#keyring-trace) returned by OnEncrypt MUST include one trace
-associated with this keyring that has the [GENERATED DATA KEY](structures.md#generated-data-key) flag.
 
 Note: If the keyring successfully performs this behavior, this means that the keyring MAY then
 perform the [Encrypt Data Key](#encrypt-data-key) behavior.
@@ -84,7 +91,6 @@ If the encryption materials do not contain a plaintext data key, OnEncrypt MUST 
 Encrypt Data Key MAY modify the following fields in the [encryption materials](structures.md#encryption-materials):
 
 - [encrypted data keys](structures.md#encrypted-data-keys)
-- [keyring trace](structures.md#keyring-trace)
 
 To perform this behavior, the keyring creates one or more [encrypted data keys](structures.md#encrypted-data-key)
 using the plaintext data key from the [encryption materials](structures.md#encryption-materials) as input,
@@ -94,13 +100,6 @@ in the [encryption materials](structures.md#encryption-materials).
 The [encrypted data keys](structures.md#encrypted-data-key) produced by this keyring MUST
 have [ciphertexts](structures.md#ciphertext) that can be decrypted to the plaintext data key in the
 [encryption materials](structures.md#encryption-materials).
-
-If OnEncrypt updates the [encryption materials](structures.md#encryption-materials) with at least
-one new [encrypted data key](structures.md#encrypted-data-key),
-the [keyring trace](structures.md#keyring-trace) returned by OnEncrypt MUST include at least one trace
-associated with this keyring that has the [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1) flag.
-Note that this trace MAY include more than one flag,
-for example the [SIGNED ENCRYPTION CONTEXT flag](structures.md#signed-encryption-context).
 
 ### OnDecrypt
 
@@ -124,7 +123,6 @@ OnDecrypt MAY decrypt a data key.
 Decrypt Data Key MAY modify the following fields in the [decryption materials](structures.md#decryption-materials):
 
 - [plaintext data key](structures.md#plaintext-data-key-1)
-- [keyring trace](structures.md#keyring-trace-1)
 
 To perform this behavior, the keyring attempts to retrieve a plaintext data key from the input list
 of [encrypted data keys](structures.md#encrypted-data-key).
@@ -135,11 +133,6 @@ it SHOULD set one resulting plaintext data key on the [decryption materials](str
 
 If the keyring is unable to get any plaintext data key using the input [encrypted data keys](structures.md#encrypted-data-key)
 the keyring MUST NOT not update the [decryption materials](structures.md#decryption-materials).
-
-If OnDecrypt updates the [decryption materials](structures.md#decryption-materials) with a plaintext data key,
-the [keyring trace](structures.md#keyring-trace-1) returned by OnDecrypt MUST include one trace
-associated with this keyring that has the [DECRYPTED DATA KEY flag](structures.md#decrypted-data-key).
-Note that this trace MAY include more than one flag, for example the [VERIFIED ENCRYPTION CONTEXT flag](structures.md#verified-encryption-context).
 
 ## Security Considerations
 

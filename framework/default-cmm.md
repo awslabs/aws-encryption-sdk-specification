@@ -5,15 +5,27 @@
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+### Changelog
+
+- 0.2.0
+
+    - [Remove Keyring Trace](../changes/0001-remove_keyring_trace.md)
+
+- 0.1.0-preview
+
+    - Initial record
 
 ## Implementations
 
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/default_cmm.h)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/default.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/DefaultCryptoMaterialsManager.java)
-- [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management-node/src/node_cryptographic_materials_manager.ts)
-- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management-browser/src/browser_cryptographic_materials_manager.ts)
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+|----------|----------------------------------------|---------------------------|----------------|
+| C | 0.1.0-preview | 0.1.0 | [default_cmm.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/default_cmm.h) |
+| NodeJS | 0.1.0-preview | 0.1.0 | [node_cryptographic_materials_manager.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management-node/src/node_cryptographic_materials_manager.ts)|
+| Browser JS | 0.1.0-preview | 0.1.0 | [browser_cryptographic_materials_manager.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management-browser/src/browser_cryptographic_materials_manager.ts)|
+| Python | 0.1.0-preview | 1.3.0 | [materials_managers/default.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/default.py) |
+| Java | 0.1.0-preview | 1.3.0 | [DefaultCryptoMaterialsManager.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/DefaultCryptoMaterialsManager.java) |
 
 ## Overview
 
@@ -50,10 +62,6 @@ The default CMM MUST obtain the following from the response:
 - Plaintext Data Key
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
 
-The default CMM MAY obtain the following from the response:
-
-- [Keyring Trace](structures.md#keyring-trace)
-
 The values obtained above MUST be included in the encryption materials returned.  
 
 ### Decrypt Materials
@@ -66,9 +74,5 @@ On each call to Decrypt Materials, the default CMM MUST make a call to the key p
 The default CMM MUST obtain the following from the response:
 
 - Plaintext Data Key 
-
-The default CMM MAY obtain the following from the response:
-
-- [Keyring Trace](structures.md#keyring-trace)
 
 The values obtained above MUST be included in the decrypt materials returned.  

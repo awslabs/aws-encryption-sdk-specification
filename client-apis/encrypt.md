@@ -5,15 +5,27 @@
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+### Changelog
+
+- 0.2.0
+
+    - [Remove Keyring Trace](../changes/0001-remove_keyring_trace.md)
+
+- 0.1.0-preview
+
+    - Initial record
 
 ## Implementations
 
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_encrypt.c)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/EncryptionHandler.java)
-- [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-node/src/encrypt.ts)
-- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-browser/src/encrypt.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py)
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+|----------|----------------------------------------|---------------------------|----------------|
+| C | 0.1.0-preview | 0.1.0 | [session_encrypt.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_encrypt.c) |
+| NodeJS | 0.1.0-preview | 0.1.0 | [encrypt.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-node/src/encrypt.ts) |
+| Browser JS | 0.1.0-preview | 0.1.0 | [encrypt.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-browser/src/encrypt.ts) |
+| Python | 0.1.0-preview | 1.2.0 | [streaming_client.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py) |
+| Java | 0.1.0-preview | 0.0.1 | [EncryptionHandler.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/EncryptionHandler.java) |
 
 ## Overview
 
@@ -67,10 +79,6 @@ A bound on the length of the [plaintext](#plaintext) to encrypt.
 This behavior MUST output the following if the behavior is successful:
 
 - [message](../data-format/message.md)
-
-This behavior MAY output the following:
-
-- [keyring trace](../framework/structures.md#keyring-trace)
 
 To construct the outputs, some fields MUST be constructed using information obtained
 from a set of valid [encryption materials](../framework/structures.md#encryption-materials).
@@ -145,10 +153,6 @@ The footer is serialized with the following specifics:
   - the input to sign is the concatenation of the serialization of the [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md)
 
 Any data that is not specified within the [message format](../data-format/message.md) MUST NOT be added to the output message.
-
-### Keyring Trace
-
-The [keyring trace](../framework/structures.md#keyring-trace) obtained from the [encryption materials](../framework/structures.md#encryption-materials).
 
 ## Security Considerations
 
