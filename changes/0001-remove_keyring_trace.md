@@ -96,7 +96,11 @@ such that the only thing that they _can_ do is what you want them to do.
 
 ## Security Implications
 
-Are there any security implications introduced by this feature?
+The main security implication of this change is the loss of the ability
+to have an audit log of all (successful) actions that keyrings took.
+However, enforcing requirements beforehand
+gives users more control over the actions and results than
+checking for requirements after the fact.
 
 ## Operational Implications
 
