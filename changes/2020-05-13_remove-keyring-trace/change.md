@@ -1,3 +1,6 @@
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
+
 # Remove Keyring Trace
 
 ## Affected Features
@@ -13,15 +16,15 @@ This serves as a reference of all features that this change affects.
 
 This serves as a reference of all specification documents that this change affects.
 
-| Specification                                                              |
-| -------------------------------------------------------------------------- |
-| [Structures](../framework/structures.md)                                   |
-| [Keyring Interface](../framework/keyring-interface.md)                     |
-| [AWS KMS Keyring](../framework/kms-keyring.md)                             |
-| [Raw AES Keyring](../framework/raw-aes-keyring.md)                         |
-| [Raw RSA Keyring](../framework/raw-rsa-keyring.md)                         |
-| [Cryptographic Materials Manager Interface](../framework/cmm-interface.md) |
-| [Default Cryptographic Materials Manager](../framework/default-cmm.md)     |
+| Specification                                                                 |
+| ----------------------------------------------------------------------------- |
+| [Structures](../../framework/structures.md)                                   |
+| [Keyring Interface](../../framework/keyring-interface.md)                     |
+| [AWS KMS Keyring](../../framework/kms-keyring.md)                             |
+| [Raw AES Keyring](../../framework/raw-aes-keyring.md)                         |
+| [Raw RSA Keyring](../../framework/raw-rsa-keyring.md)                         |
+| [Cryptographic Materials Manager Interface](../../framework/cmm-interface.md) |
+| [Default Cryptographic Materials Manager](../../framework/default-cmm.md)     |
 
 ## Affected Implementations
 
@@ -58,7 +61,7 @@ We added the keyring trace with the anticipation that it would be a useful tool
 to make assertions about what keyrings did to encryption and decryption materials.
 However, we never defined how callers should interact with the keyring trace.
 Before adding keyrings to additional implementations beyond C and Javascript,
-[we re-evaluated how callers should interact with the keyring trace](2020-05-13_remove-keyring-trace_background.md)
+[we re-evaluated how callers should interact with the keyring trace](background.md)
 and came to the conclusion that they should not.
 We determined that the keyring trace is unnecessary
 because all expected use-cases are better solved either
@@ -74,7 +77,7 @@ than retrofitting failure information onto the keyring trace.
 ## Drawbacks
 
 We will lose the reactive trace of keyring actions.
-However, [upon review](2020-05-13_remove-keyring-trace_background.md) we concluded that
+However, [upon review](background.md) we concluded that
 any reactive checks that a caller might want to make
 are better addressed by either proactive checks before the keyring(s) take such actions
 or by ensuring that the keyring is correct by construction
@@ -82,7 +85,7 @@ so that the only thing it _can_ do is what the caller wants to happen.
 
 When we [add keyring failure communication](https://github.com/awslabs/aws-encryption-sdk-specification/issues/40),
 we will need a new mechanism to convey that information.
-However, [upon review](2020-05-13_remove-keyring-trace_background.md) we concluded that
+However, [upon review](background.md) we concluded that
 the keyring trace is the wrong tool for that.
 
 One thing that callers could have used the keyring trace to do is to
@@ -115,7 +118,7 @@ through custom keyrings or cryptographic materials managers.
 
 The keyring trace is a record of successful actions taken by keyrings
 that can be used to make decisions in reaction to those actions.
-After [reviewing how callers should interact with the keyring trace](2020-05-13_remove-keyring-trace_background.md),
+After [reviewing how callers should interact with the keyring trace](background.md),
 we have come to the conclusion that anything that a caller might want to do
 in reaction to a successful keyring action
 is better done either proactively _before_ the keyring would take an action

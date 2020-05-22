@@ -11,7 +11,7 @@
 
 - 0.2.0
 
-    - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace.md)
+    - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
 
 - 0.1.0-preview
 
