@@ -1,3 +1,6 @@
+[//]: # (Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.)
+[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+
 # Versioning Policy
 
 We use a three-part X.Y.Z (Major.Minor.Patch) versioning definition, as follows:
