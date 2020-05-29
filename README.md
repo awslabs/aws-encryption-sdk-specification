@@ -30,3 +30,12 @@ Below is the list of current implementation of this specification:
 The documentation is made available under the Creative Commons Attribution-ShareAlike 4.0 International License. See the LICENSE file.
 
 The sample code within this documentation is made available under the MIT-0 license. See the LICENSE-SAMPLECODE file.
+
+## Editing
+
+We use `prettier` to maintain consistent formatting.
+Our CI will stop PRs that do not match our formatting requirements,
+but to easily apply them,
+run `./ci/prettify.sh write`.
+If you want to check them without writing,
+run `./ci/prettify.sh check`.
