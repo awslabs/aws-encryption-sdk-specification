@@ -1,5 +1,5 @@
-[//]: # (Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Cryptographic Materials Manager Interface
 
@@ -11,20 +11,20 @@
 
 - 0.2.0
 
-    - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
 
 - 0.1.0-preview
 
-    - Initial record
+  - Initial record
 
 ## Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-|----------|----------------------------------------|---------------------------|----------------|
-| C | 0.1.0-preview | 0.1.0 | [materials.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h) |
-| Javascript | 0.1.0-preview | 0.1.0 | [materials_manager.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/materials_manager.ts)|
-| Python | 0.1.0-preview | 1.3.0 | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py) |
-| Java | 0.1.0-preview | 1.3.0 | [CryptoMaterialsManager.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/CryptoMaterialsManager.java) |
+| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                  |
+| ---------- | -------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C          | 0.1.0-preview                          | 0.1.0                     | [materials.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h)                                                        |
+| Javascript | 0.1.0-preview                          | 0.1.0                     | [materials_manager.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/materials_manager.ts)               |
+| Python     | 0.1.0-preview                          | 1.3.0                     | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py)                        |
+| Java       | 0.1.0-preview                          | 1.3.0                     | [CryptoMaterialsManager.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/CryptoMaterialsManager.java) |
 
 ## Overview
 
@@ -63,13 +63,13 @@ This is the input to the [get encryption materials](#get-encryption-materials) b
 The encryption materials request MUST include the following:
 
 - [Encryption Context](structures.md#encryption-context)
-    - The encryption context provided MAY be empty.
+  - The encryption context provided MAY be empty.
 
 The encryption request MAY include the following:
 
 - [Algorithm Suite](algorithm-suites.md)
 - [Plaintext Length](../client-apis/encrypt.md#plaintext-length)
-    - The length of the plaintext to be encrypted MUST not be larger than this value.
+  - The length of the plaintext to be encrypted MUST not be larger than this value.
 
 #### Decrypt Materials Request
 
@@ -80,7 +80,7 @@ The decrypt materials request MUST include the following:
 - [Algorithm Suite](algorithm-suites.md)
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
 - [Encryption Context](structures.md#encryption-context)
-    - The encryption context provided MAY be empty.
+  - The encryption context provided MAY be empty.
 
 ### Behaviors
 
@@ -97,12 +97,12 @@ it MUST return [encryption materials](structures.md#encryption-materials) approp
 The encryption materials returned MUST include the following:
 
 - [Algorithm Suite](algorithm-suites.md)
-    - If the encryption materials request contains an algorithm suite, the encryption materials returned SHOULD contain the same algorithm suite.
+  - If the encryption materials request contains an algorithm suite, the encryption materials returned SHOULD contain the same algorithm suite.
 - Plaintext Data Key
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
-    - Every encrypted data key in this list MUST correspond to the above plaintext data key.
+  - Every encrypted data key in this list MUST correspond to the above plaintext data key.
 - [Encryption Context](structures.md#encryption-context)
-    - The CMM MAY modify the encryption context.
+  - The CMM MAY modify the encryption context.
 
 If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm):
 
@@ -125,8 +125,8 @@ The decryption materials returned MUST include the following:
 
 - Plaintext Data Key
 - [Encryption Context](structures.md#encryption-context)
-   - The CMM MAY modify the encryption context.
-   - The operations made on the encryption context on the Get Encryption Materials call SHOULD be inverted on the Decrypt Materials call.
+  - The CMM MAY modify the encryption context.
+  - The operations made on the encryption context on the Get Encryption Materials call SHOULD be inverted on the Decrypt Materials call.
 - [Algorithm Suite](algorithm-suites.md)
   - If the decrypt materials request contains an algorithm suite, the decryption materials returned SHOULD contain the same algorithm suite.
 
@@ -138,7 +138,7 @@ The CMM MUST ensure that the decryption materials returned are valid.
 - The decryption materials returned MUST follow the specification for [decryption-materials](structures.md#decryption-materials).
 - The value of the plaintext data key MUST be non-NULL.
 - The plaintext data key returned MUST correspond with at least one of the encrypted data keys.
-    - The is typically done by constructing a CMM that uses keyrings/master keys.
+  - The is typically done by constructing a CMM that uses keyrings/master keys.
 
 ## Customization
 

@@ -1,5 +1,5 @@
-[//]: # (Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Structures
 
@@ -11,11 +11,11 @@
 
 - 0.2.0
 
-    - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
 
 - 0.1.0-preview
 
-    - Initial record
+  - Initial record
 
 ## Definitions
 
@@ -131,12 +131,12 @@ other AWS services.
 
 #### Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-|----------|----------------------------------------|---------------------------|----------------|
-| C | 0.1.0-preview | 0.1.0 | [materials.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h) |
-| Javascript | 0.1.0-preview | 0.1.0 | [cryptographic_material.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)|
-| Python | 0.1.0-preview | n/a | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py) |
-| Java | 0.1.0-preview | n/a | [EncryptionMaterials.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/EncryptionMaterials.java) |
+| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                  |
+| ---------- | -------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C          | 0.1.0-preview                          | 0.1.0                     | [materials.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h)                                                        |
+| Javascript | 0.1.0-preview                          | 0.1.0                     | [cryptographic_material.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)     |
+| Python     | 0.1.0-preview                          | n/a                       | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py)                        |
+| Java       | 0.1.0-preview                          | n/a                       | [EncryptionMaterials.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/EncryptionMaterials.java) |
 
 #### Structure
 
@@ -194,12 +194,12 @@ The value of this key MUST be kept secret.
 
 #### Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-|----------|----------------------------------------|---------------------------|----------------|
-| C | 0.1.0-preview | 0.1.0 | [materials.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h) |
-| Javascript | 0.1.0-preview | 0.1.0 | [cryptographic_material.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)|
-| Python | 0.1.0-preview | n/a | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py) |
-| Java | 0.1.0-preview | n/a | [DecryptionMaterials.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/DecryptionMaterials.java) |
+| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                  |
+| ---------- | -------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C          | 0.1.0-preview                          | 0.1.0                     | [materials.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/materials.h)                                                        |
+| Javascript | 0.1.0-preview                          | 0.1.0                     | [cryptographic_material.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/cryptographic_material.ts)     |
+| Python     | 0.1.0-preview                          | n/a                       | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py)                        |
+| Java       | 0.1.0-preview                          | n/a                       | [DecryptionMaterials.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/DecryptionMaterials.java) |
 
 #### Structure
 

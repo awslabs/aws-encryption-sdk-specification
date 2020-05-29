@@ -1,5 +1,5 @@
-[//]: # (Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Raw AES Keyring
 
@@ -11,21 +11,21 @@
 
 - 0.2.0
 
-    - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
 
 - 0.1.0-preview
 
-    - Initial record
+  - Initial record
 
 ## Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-|----------|----------------------------------------|---------------------------|----------------|
-| C | 0.1.0-preview | 0.1.0 | [raw_aes_keyring.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/raw_aes_keyring.c) |
-| NodeJS | 0.1.0-preview | 0.1.0 | [raw_aes_keyring_node.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-aes-keyring-node/src/raw_aes_keyring_node.ts)|
-| Browser JS | 0.1.0-preview | 0.1.0 | [raw_aes_keyring_browser.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-aes-keyring-browser/src/raw_aes_keyring_browser.ts) |
-| Python | 0.1.0-preview | n/a | [keyrings/raw.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/raw.py) |
-| Java | 0.1.0-preview | n/a | [RawAesKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/RawAesKeyring.java) |
+| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                    |
+| ---------- | -------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C          | 0.1.0-preview                          | 0.1.0                     | [raw_aes_keyring.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/raw_aes_keyring.c)                                                             |
+| NodeJS     | 0.1.0-preview                          | 0.1.0                     | [raw_aes_keyring_node.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-aes-keyring-node/src/raw_aes_keyring_node.ts)          |
+| Browser JS | 0.1.0-preview                          | 0.1.0                     | [raw_aes_keyring_browser.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-aes-keyring-browser/src/raw_aes_keyring_browser.ts) |
+| Python     | 0.1.0-preview                          | n/a                       | [keyrings/raw.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/raw.py)                                            |
+| Java       | 0.1.0-preview                          | n/a                       | [RawAesKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/RawAesKeyring.java)            |
 
 ## Overview
 
@@ -86,7 +86,7 @@ The following table describes the fields that form the raw AES keyring key provi
 The bytes are appended in the order shown.
 
 | Field                     | Length (bytes)                  | Interpreted as      |
-|---------------------------|---------------------------------|---------------------|
+| ------------------------- | ------------------------------- | ------------------- |
 | Key Name                  | length of [Key Name](#key-name) | UTF-8 encoded bytes |
 | Authentication Tag Length | 4                               | UInt32              |
 | IV Length                 | 4                               | UInt32              |
@@ -122,7 +122,7 @@ The following table describes the fields that form the ciphertext for this keyri
 The bytes are appended in the order shown.
 
 | Field              | Length (bytes)                                          | Interpreted as |
-|--------------------|---------------------------------------------------------|----------------|
+| ------------------ | ------------------------------------------------------- | -------------- |
 | Encrypted Key      | length of AES-GCM ciphertext output                     | Bytes          |
 | Authentication Tag | [Authentication Tag Length](#authentication-tag-length) | Bytes          |
 

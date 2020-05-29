@@ -1,5 +1,5 @@
-[//]: # (Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Keyring Interface
 
@@ -11,20 +11,20 @@
 
 - 0.2.0
 
-    - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
 
 - 0.1.0-preview
 
-    - Initial record
+  - Initial record
 
 ## Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-|----------|----------------------------------------|---------------------------|----------------|
-| C | 0.1.0-preview | 0.1.0 | [materials.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/materials.c) |
-| Javascript | 0.1.0-preview | 0.1.0 | [keyring.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/keyring.ts)|
-| Python | 0.1.0-preview | n/a | [keyrings/base.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/base.py) |
-| Java | 0.1.0-preview | n/a | [Keyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/Keyring.java) |
+| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                             |
+| ---------- | -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| C          | 0.1.0-preview                          | 0.1.0                     | [materials.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/materials.c)                                                  |
+| Javascript | 0.1.0-preview                          | 0.1.0                     | [keyring.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/keyring.ts)              |
+| Python     | 0.1.0-preview                          | n/a                       | [keyrings/base.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/base.py)                   |
+| Java       | 0.1.0-preview                          | n/a                       | [Keyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/Keyring.java) |
 
 ## Overview
 
@@ -165,7 +165,7 @@ The following keyrings are compatible with the referenced [master key providers]
 [master keys](master-key-interface.md) when configured to use the same wrapping key.
 
 | Keyring         | Master Key Provider: Java and Python                                                                             |
-|-----------------|------------------------------------------------------------------------------------------------------------------|
+| --------------- | ---------------------------------------------------------------------------------------------------------------- |
 | KMS keyring     | KMS master key (Java), KMS master key provider (Java), KMS master key (Python), KMS master key provider (Python) |
 | Raw AES keyring | When they are used with symmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                    |
 | Raw RSA keyring | When they are used with asymmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                   |
