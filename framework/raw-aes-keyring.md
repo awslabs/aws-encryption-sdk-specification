@@ -5,15 +5,27 @@
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+### Changelog
+
+- 0.2.0
+
+    - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+
+- 0.1.0-preview
+
+    - Initial record
 
 ## Implementations
 
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/raw_aes_keyring.c)
-- [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-aes-keyring-node/src/raw_aes_keyring_node.ts)
-- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-aes-keyring-browser/src/raw_aes_keyring_browser.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/raw.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/RawAesKeyring.java)
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+|----------|----------------------------------------|---------------------------|----------------|
+| C | 0.1.0-preview | 0.1.0 | [raw_aes_keyring.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/raw_aes_keyring.c) |
+| NodeJS | 0.1.0-preview | 0.1.0 | [raw_aes_keyring_node.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-aes-keyring-node/src/raw_aes_keyring_node.ts)|
+| Browser JS | 0.1.0-preview | 0.1.0 | [raw_aes_keyring_browser.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-aes-keyring-browser/src/raw_aes_keyring_browser.ts) |
+| Python | 0.1.0-preview | n/a | [keyrings/raw.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/raw.py) |
+| Java | 0.1.0-preview | n/a | [RawAesKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/RawAesKeyring.java) |
 
 ## Overview
 
@@ -46,13 +58,13 @@ On keyring initialization, the following inputs are REQUIRED:
 
 A UTF-8 encoded value that, together with the [key name](#key-name), identifies a particular [wrapping key](#wrapping-key).
 
-This value is also used for bookkeeping purposes, for example recorded in [keyring traces](structures.md#keyring-trace-2).
+This value is also used for bookkeeping purposes.
 
 ### Key Name
 
 A UTF-8 encoded value that, together with the [key namespace](#key-namespace), identifies a particular [wrapping key](#wrapping-key).
 
-This value is also used for bookkeeping purposes, for example recorded in [keyring traces](structures.md#keyring-trace-2).
+This value is also used for bookkeeping purposes.
 
 ### Wrapping Key
 
@@ -155,19 +167,6 @@ the keyring MUST construct an [encrypted data key](structures.md#encrypted-data-
 The keyring MUST append the constructed encrypted data key to the encrypted data key list in the
 [encryption materials](structures.md#encryption-materials).
 
-The keyring MUST append a record to the [keyring trace](structures.md#keyring-trace)
-in the input [encryption materials](structures.md#encryption-materials).
-This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
-and the [flags](structures.md#flags) field of this record MUST include the following flags:
-
-- [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1)
-
-If this keyring generated the plaintext data key in the [encryption materials](structures.md#encryption-materials),
-the [keyring trace](structures.md#keyring-trace) in the returned encryption materials
-MUST also include a record that contains this keyring's [key name](#key-name) and [key namespace](#key-namespace)
-with a [flags](structures.md#flags) field containing the [GENERATED DATA KEY](structures.md#generated-data-key) flag.
-Note that this MAY be the same trace as the one with the ENCRYPTED DATA KEY flag.
-
 On encrypt MUST output the modified [encryption materials](structures.md#encryption-materials).
 
 ### On Decrypt
@@ -201,14 +200,8 @@ If decrypting, the keyring MUST use AES-GCM with the following specifics:
 - it uses the encryption context from the [decryption materials](structures.md#decryption-materials) as the AES-GCM AAD.
 - the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
 
-If a decryption succeeds, this keyring MUST:
-
-- append a new record to the [keyring trace](structures.md#keyring-trace-1)
-  in the input [decryption materials](structures.md#decryption-materials).
-  This record MUST contain this keyring's [key name](#key-name) and [key namespace](#key-namespace),
-  and the [flags](structures.md#flags) field of this record MUST include the following flags:
-  - [DECRYPTED DATA KEY](structures.md#decrypted-data-key)
-- add the resulting plaintext data key to the decryption materials and return the modified materials.
+If a decryption succeeds, this keyring MUST
+add the resulting plaintext data key to the decryption materials and return the modified materials.
 
 If no decryption succeeds, the decryption MUST NOT make any update to the decryption materials.
 
