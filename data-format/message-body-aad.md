@@ -1,5 +1,5 @@
-[//]: # (Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Message Body AAD
 
@@ -24,7 +24,7 @@ The following describes the fields that form the message body AAD.
 The bytes are appended in the order shown.
 
 | Field            | Length (bytes) | Interpreted as |
-|------------------|----------------|----------------|
+| ---------------- | -------------- | -------------- |
 | Message ID       | 16             | Bytes          |
 | Body AAD Content | Variable.      | UTF-8 Bytes    |
 | Sequence Number  | 4              | Uint32         |
@@ -69,4 +69,3 @@ More specifically, depending on the [content type](message-header.md#content-typ
 ## Security Considerations
 
 [TODO]
-

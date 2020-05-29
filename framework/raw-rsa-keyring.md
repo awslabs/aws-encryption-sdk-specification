@@ -1,5 +1,5 @@
-[//]: # (Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Raw RSA Keyring
 
@@ -11,21 +11,21 @@
 
 - 0.2.0
 
-    - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
 
 - 0.1.0-preview
 
-    - Initial record
+  - Initial record
 
 ## Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-|----------|----------------------------------------|---------------------------|----------------|
-| C | 0.1.0-preview | 0.1.0 | [raw_rsa_keyring.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/raw_rsa_keyring.h) |
-| NodeJS | 0.1.0-preview | 0.1.0 | [raw_rsa_keyring_node.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-node/src/raw_rsa_keyring_node.ts)|
-| Browser JS | 0.1.0-preview | 0.1.0 | [raw_rsa_keyring_web_crypto.ts](https://github.com/aws/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-browser/src/raw_rsa_keyring_web_crypto.ts)|
-| Python | 0.1.0-preview | n/a | [keyrings/raw.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/raw.py) |
-| Java | 0.1.0-preview | n/a | [RawRsaKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/RawRsaKeyring.java) |
+| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                      |
+| ---------- | -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C          | 0.1.0-preview                          | 0.1.0                     | [raw_rsa_keyring.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/raw_rsa_keyring.h)                                                |
+| NodeJS     | 0.1.0-preview                          | 0.1.0                     | [raw_rsa_keyring_node.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-node/src/raw_rsa_keyring_node.ts)            |
+| Browser JS | 0.1.0-preview                          | 0.1.0                     | [raw_rsa_keyring_web_crypto.ts](https://github.com/aws/aws-encryption-sdk-javascript/blob/master/modules/raw-rsa-keyring-browser/src/raw_rsa_keyring_web_crypto.ts) |
+| Python     | 0.1.0-preview                          | n/a                       | [keyrings/raw.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/raw.py)                                              |
+| Java       | 0.1.0-preview                          | n/a                       | [RawRsaKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/RawRsaKeyring.java)              |
 
 ## Overview
 
