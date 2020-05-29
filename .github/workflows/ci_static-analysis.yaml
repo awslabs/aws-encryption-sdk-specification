@@ -18,7 +18,4 @@ jobs:
       - name: install
         run: npm install --global prettier
       - name: prettify
-        run: ./ci/prettify.sh
-      - name: check for changes
-        # Error if any files have changed
-        run: git diff --exit-code
+        run: ./ci/prettify.sh check
