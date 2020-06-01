@@ -1,7 +1,7 @@
-[//]: # (Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-#  Message Header
+# Message Header
 
 ## Version
 
@@ -38,7 +38,7 @@ The following table describes the fields that form the header.
 The bytes are appended in the order shown.
 
 | Field                                           | Length (bytes) | Interpreted as                                  |
-|-------------------------------------------------|----------------|-------------------------------------------------|
+| ----------------------------------------------- | -------------- | ----------------------------------------------- |
 | [Header Body](#header-body)                     | Variable       | [Header Body](#header-body)                     |
 | [Header Authentication](#header-authentication) | Variable       | [Header Authentication](#header-authentication) |
 
@@ -47,18 +47,18 @@ The bytes are appended in the order shown.
 The following table describes the fields that form the header body.
 The bytes are appended in the order shown.
 
-| Field                                           | Length (bytes)                                                                    | Interpreted as                                                                                |
-|-------------------------------------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| [Version](#version)                             | 1                                                                                 | See [Supported Versions](#supported-versions)                                                 |
-| [Type](#type)                                   | 1                                                                                 | See [Supported Types](#supported-types)                                                       |
-| [Algorithm Suite ID](#algorithm-suite-id)       | 2                                                                                 | See [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) |
-| [Message ID](#message-id)                       | 16                                                                                | Bytes                                                                                         |
-| [AAD](#aad)                                     | Variable. [Self-describing](#aad).                                                | [AAD](#aad)                                                                                   |
-| [Encrypted Data Keys](#encrypted-data-keys)     | Variable. Determined by the number of encrypted data keys and the length of each. | [Encrypted Data Keys](#encrypted-data-keys)                                                   |
-| [Content Type](#content-type)                   | 1                                                                                 | See [Supported Types](#supported-content-types)                                               |
-| [Reserved](#reserved)                           | 4                                                                                 | See [Reserved](#reserved)                                                                     |
-| [IV Length](#iv-length)                         | 1                                                                                 | UInt8                                                                                         |
-| [Frame Length](#frame-length)                   | 4                                                                                 | UInt32                                                                                        |
+| Field                                       | Length (bytes)                                                                    | Interpreted as                                                                                |
+| ------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [Version](#version)                         | 1                                                                                 | See [Supported Versions](#supported-versions)                                                 |
+| [Type](#type)                               | 1                                                                                 | See [Supported Types](#supported-types)                                                       |
+| [Algorithm Suite ID](#algorithm-suite-id)   | 2                                                                                 | See [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) |
+| [Message ID](#message-id)                   | 16                                                                                | Bytes                                                                                         |
+| [AAD](#aad)                                 | Variable. [Self-describing](#aad).                                                | [AAD](#aad)                                                                                   |
+| [Encrypted Data Keys](#encrypted-data-keys) | Variable. Determined by the number of encrypted data keys and the length of each. | [Encrypted Data Keys](#encrypted-data-keys)                                                   |
+| [Content Type](#content-type)               | 1                                                                                 | See [Supported Types](#supported-content-types)                                               |
+| [Reserved](#reserved)                       | 4                                                                                 | See [Reserved](#reserved)                                                                     |
+| [IV Length](#iv-length)                     | 1                                                                                 | UInt8                                                                                         |
+| [Frame Length](#frame-length)               | 4                                                                                 | UInt32                                                                                        |
 
 #### Version
 
@@ -68,7 +68,7 @@ The value (hex) of this field MUST be a value that exists in the following table
 ##### Supported Versions
 
 | Value (hex) | Version |
-|-------------|---------|
+| ----------- | ------- |
 | 01          | 1.0     |
 
 #### Type
@@ -79,7 +79,7 @@ The value (hex) of this field MUST be a value that exists in the following table
 ##### Supported Types
 
 | Value (hex) | Type                                  |
-|-------------|---------------------------------------|
+| ----------- | ------------------------------------- |
 | 80          | Customer Authenticated Encrypted Data |
 
 #### Algorithm Suite ID
@@ -112,7 +112,7 @@ The following table describes the fields that form the AAD.
 The bytes are appended in the order shown.
 
 | Field                                             | Length (bytes)                                                                          | Interpreted as                      |
-|---------------------------------------------------|-----------------------------------------------------------------------------------------|-------------------------------------|
+| ------------------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------- |
 | [Key Value Pairs Length](#key-value-pairs-length) | 2                                                                                       | UInt16                              |
 | [Key Value Pairs](#key-value-pairs)               | Variable. Determined by the value of [Key Value Pairs Length](#key-value-pairs-length). | [Key Value Pairs](#key-value-pairs) |
 
@@ -131,7 +131,7 @@ The following table describes the fields that form the Key Value Pairs.
 The bytes are appended in the order shown.
 
 | Field                                             | Length (bytes)                                                       | Interpreted as                                    |
-|---------------------------------------------------|----------------------------------------------------------------------|---------------------------------------------------|
+| ------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------- |
 | [Key Value Pair Count](#key-value-pair-count)     | 2                                                                    | UInt16                                            |
 | [Key Value Pair Entries](#key-value-pair-entries) | Variable. Determined by the count and length of each key-value pair. | [Key Value Pair Entries](#key-value-pair-entries) |
 
@@ -154,7 +154,7 @@ The following table describes the fields that form each key value pair entry.
 The bytes are appended in the order shown.
 
 | Field        | Length (bytes)                                                                 | Interpreted as      |
-|--------------|--------------------------------------------------------------------------------|---------------------|
+| ------------ | ------------------------------------------------------------------------------ | ------------------- |
 | Key Length   | 2                                                                              | UInt16              |
 | Key          | Variable. Equal to the value specified in the previous 2 bytes (Key Length).   | UTF-8 encoded bytes |
 | Value Length | 2                                                                              | UInt16              |
@@ -167,10 +167,10 @@ The encoding of the [encrypted data keys](../framework/structures.md#encrypted-d
 The following table describes the fields that form the encrypted data keys.
 The bytes are appended in the order shown.
 
-| Field                                                    | Length, in bytes                                                     | Interpreted as                                            |
-|----------------------------------------------------------|----------------------------------------------------------------------|-----------------------------------------------------------|
-| [Encrypted Data Key Count](#encrypted-data-key-count)    | 2                                                                    | UInt16                                                    |
-| [Encrypted Data Key Entries](#encrypted-data-key-entries)| Variable. Determined by the count and length of each key-value pair. | [Encrypted Data Key Entries](#encrypted-data-key-entries) |
+| Field                                                     | Length, in bytes                                                     | Interpreted as                                            |
+| --------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------- |
+| [Encrypted Data Key Count](#encrypted-data-key-count)     | 2                                                                    | UInt16                                                    |
+| [Encrypted Data Key Entries](#encrypted-data-key-entries) | Variable. Determined by the count and length of each key-value pair. | [Encrypted Data Key Entries](#encrypted-data-key-entries) |
 
 #### Encrypted Data Key Count
 
@@ -185,7 +185,7 @@ The following table describes the fields that form each encrypted data key entry
 The bytes are appended in the order shown.
 
 | Field                                                               | Length, in bytes                                                                                  | Interpreted as      |
-|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|---------------------|
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------- |
 | [Key Provider ID Length](#key-provider-id-length)                   | 2                                                                                                 | UInt16              |
 | [Key Provider ID](#key-provider-id)                                 | Variable. Equal to the value specified in the previous 2 bytes (Key Provider ID Length).          | UTF-8 encoded bytes |
 | [Key Provider Information Length](#key-provider-information-length) | 2                                                                                                 | UInt16              |
@@ -227,8 +227,8 @@ The value (hex) of this field MUST be a value that exists in the following table
 
 ##### Supported Content Types
 
-| Value (hex) | Content Type                                          |
-|-------------|-------------------------------------------------------|
+| Value (hex) | Content Type                                  |
+| ----------- | --------------------------------------------- |
 | 01          | [Non-Framed](message-body.md#non-framed-data) |
 | 02          | [Framed](message-body.md#framed-data)         |
 
@@ -256,7 +256,7 @@ The following table describes the fields that form the header authentication.
 The bytes are appended in the order shown.
 
 | Field                                     | Length, in bytes                                                                                                                                                                        | Interpreted as |
-|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | [IV](#iv)                                 | Variable. Determined by the IV length value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.                | Bytes          |
 | [Authentication Tag](#authentication-tag) | Variable. Determined by the authentication tag bytes value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
 

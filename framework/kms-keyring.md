@@ -1,18 +1,30 @@
-[//]: # (Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # KMS Keyring
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+### Changelog
+
+- 0.2.0
+
+  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+
+- 0.1.0-preview
+
+  - Initial record
 
 ## Implementations
 
-- [C (KMS keyring implementation in C++)](https://github.com/aws/aws-encryption-sdk-c/blob/master/aws-encryption-sdk-cpp/source/kms_keyring.cpp)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/kms-keyring/src/kms_keyring.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/aws_kms/__init__.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/AwsKmsKeyring.java)
+| Language                              | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                         |
+| ------------------------------------- | -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C (KMS keyring implementation in C++) | 0.1.0-preview                          | 0.1.0                     | [kms_keyring.cpp](https://github.com/aws/aws-encryption-sdk-c/blob/master/aws-encryption-sdk-cpp/source/kms_keyring.cpp)                               |
+| Javascript                            | 0.1.0-preview                          | 0.1.0                     | [kms_keyring.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/kms-keyring/src/kms_keyring.ts)                          |
+| Python                                | 0.1.0-preview                          | n/a                       | [keyrings/aws_kms](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/aws_kms/__init__.py)                   |
+| Java                                  | 0.1.0-preview                          | n/a                       | [AwsKmsKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/AwsKmsKeyring.java) |
 
 ## Overview
 
@@ -183,7 +195,7 @@ When calling [KMS GenerateDataKey](#kms-generatedatakey), the keyring MUST call 
 - `NumberOfBytes`: the [key derivation input length](algorithm-suites.md#key-derivation-input-length)
   specified by the [algorithm suite](algorithm-suites.md) included in the input [encryption materials](structures.md#encryption-materials).
 - `EncryptionContext`: the [encryption context](structures.md#encryption-context) included in
-   the input [encryption materials](structures.md#encryption-materials).
+  the input [encryption materials](structures.md#encryption-materials).
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
 If the call to [KMS GenerateDataKey](#kms-generatedatakey) does not succeed, OnEncrypt MUST NOT
@@ -201,16 +213,8 @@ If verified, OnEncrypt MUST do the following with the response from [KMS Generat
   - the [ciphertext](structures.md#ciphertext) is the response `CiphertextBlob`.
   - the [key provider id](structures.md#key-provider-id) is "aws-kms".
   - the [key provider information](structures.md#key-provider-information) is the response `KeyId`.
-- append a new record to the [keyring trace](structures.md#keyring-trace)
-  in the input [encryption materials](structures.md#encryption-materials), constructed as follows:
-  - The string field KeyNamespace is "aws-kms".
-  - The string field KeyName is the value of the KMS Keyring's [generator](#generator) field.
-  - The [flags](structures.md#flags) field of this record includes exactly the following flags:
-    - [GENERATED DATA KEY](structures.md#generated-data-key)
-    - [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1)
-    - [SIGNED ENCRYPTION CONTEXT](structures.md#signed-encryption-context)
-Given a plaintext data key in the [encryption materials](structures.md#encryption-materials),
-OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in it's [key IDs](#key-ids) list.
+    Given a plaintext data key in the [encryption materials](structures.md#encryption-materials),
+    OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in it's [key IDs](#key-ids) list.
 
 If this keyring's [generator](#generator) is defined and was not used to [generate a data key](#kms-generatedatakey)
 as described above, OnEncrypt MUST also attempt to encrypt the plaintext data key using the CMK specified by the [generator](#generator).
@@ -245,13 +249,6 @@ If the call succeeds, OnEncrypt MUST do the following with the response from [KM
   - The [key provider id](structures.md#key-provider-id) is "aws-kms".
   - The [key provider information](structures.md#key-provider-information) is the response `KeyId`.
     Note that the `KeyId` in the response is always in key ARN format.
-- append a new record to the [keyring trace](structures.md#keyring-trace)
-  in the input [encryption materials](structures.md#encryption-materials), constructed as follows:
-  - The string field KeyNamespace is "aws-kms".
-  - The string field KeyName is the response `KeyId`. Note that the `KeyId` in the response is always in key ARN format.
-  - The [flags](structures.md#flags) field of this record includes exactly the following flags:
-    - [ENCRYPTED DATA KEY](structures.md#encrypted-data-key-1)
-    - [SIGNED ENCRYPTION CONTEXT](structures.md#signed-encryption-context)
 
 If all Encrypt calls succeed, OnEncrypt MUST output the modified [encryption materials](structures.md#encryption-materials).
 
@@ -309,13 +306,6 @@ and MUST fail.
 If the response is successfully verified, OnDecrypt MUST do the following with the response:
 
 - set the plaintext data key on the [decryption materials](structures.md#decryption-materials) as the response `Plaintext`.
-- append a new [record](structures.md#record) to the [keyring trace](structures.md#keyring-trace-1)
-  in the input [encryption materials](structures.md#encryption-materials), constructed as follows:
-  - The string field KeyNamespace is "aws-kms".
-  - The string field KeyName is the [encrypted data key's key provider info](structures.md#key-provider-information).
-  - The [flags](structures.md#flags) field of this record includes exactly the following flags:
-    - [DECRYPTED DATA KEY](structures.md#decrypted-data-key)
-    - [VERIFIED ENCRYPTION CONTEXT](structures.md#verified-encryption-context)
 - immediately return the modified [decryption materials](structures.md#decryption-materials).
 
 If OnDecrypt fails to successfully decrypt any [encrypted data key](structures.md#encrypted-data-key),
@@ -349,7 +339,7 @@ one from CMK A, one from CMK B, and one from CMK C.
 
 When a user configures a KMS keyring for use on decrypt,
 they are stating their intent for which CMKs
-the keyring will *attempt* to use to decrypt encrypted data keys.
+the keyring will _attempt_ to use to decrypt encrypted data keys.
 
 For example, if a user configures a KMS keyring with CMK C (using the CMK ARN)
 and uses it to decrypt an encrypted message
@@ -358,8 +348,8 @@ then the keyring will attempt to decrypt using CMK C.
 
 However, if the keyring attempts to decrypt using CMK C and cannot,
 this failure still honors the configured intent and MUST NOT halt decryption.
-The configured intent is that the keyring MUST *attempt* with these CMKs,
-not that they MUST *succeed*.
+The configured intent is that the keyring MUST _attempt_ with these CMKs,
+not that they MUST _succeed_.
 
 ### Why OnEncrypt and OnDecrypt are different
 
@@ -368,7 +358,7 @@ for the requirements to decrypt the resulting message.
 Because of this,
 the keyring MUST create encryption materials that satisfy those requirements.
 
-On decrypt, the user provides resources that *attempt* to do that decryption.
+On decrypt, the user provides resources that _attempt_ to do that decryption.
 
 This is an asymmetric relationship with very different implications on failure.
 If the keyring encounters a problem on encrypt,
@@ -389,7 +379,7 @@ will halt message decryption.
 These goals can be reduced to the following two requirements:
 
 1. On encrypt, if any configured CMK cannot be used,
-    that is an error and encryption MUST halt.
+   that is an error and encryption MUST halt.
 1. On decrypt, the keyring MUST NOT halt decryption because of a failure to decrypt.
 
 ## Security Considerations
@@ -401,4 +391,4 @@ can vary drastically depending on key policies]
 
 This is a record of issues that contributed to this specification.
 
-* [#173 Resolve incorrect description of behavior of additional CMKs on encrypt.](https://github.com/awslabs/aws-encryption-sdk-specification/issues/73)
+- [#173 Resolve incorrect description of behavior of additional CMKs on encrypt.](https://github.com/awslabs/aws-encryption-sdk-specification/issues/73)

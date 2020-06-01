@@ -1,5 +1,5 @@
-[//]: # (Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Master Key Provider Interface
 
@@ -43,17 +43,17 @@ as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
 ### Terms
 
-* Provider ID : A value that identifies a master key provider.
-    This concept is equivalent to "key namespace" for Keyrings.
-* Key ID : A value that identifies a master key
-    within the context of a master key provider.
-    This concept is equivalent to "key name" for Keyrings.
-* Provider Info : The value that is written to a serialized encrypted data key
-    that identifies a master key within the context of a master key provider.
-    This MUST always be equal to the master key's key ID
-    with the exception of the raw AES master key.
-    For a detailed description of this exception,
-    see the [Raw AES Keyring specification](./raw-aes-keyring.md).
+- Provider ID : A value that identifies a master key provider.
+  This concept is equivalent to "key namespace" for Keyrings.
+- Key ID : A value that identifies a master key
+  within the context of a master key provider.
+  This concept is equivalent to "key name" for Keyrings.
+- Provider Info : The value that is written to a serialized encrypted data key
+  that identifies a master key within the context of a master key provider.
+  This MUST always be equal to the master key's key ID
+  with the exception of the raw AES master key.
+  For a detailed description of this exception,
+  see the [Raw AES Keyring specification](./raw-aes-keyring.md).
 
 ## Interface
 
