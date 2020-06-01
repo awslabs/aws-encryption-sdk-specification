@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.0
+0.2.1
 
 ### Changelog
+
+- 0.2.1
+
+  - [Record how the default CMM uses master key providers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/98)
 
 - 0.2.0
 
@@ -70,7 +74,7 @@ The values obtained above MUST be included in the encryption materials returned.
 ### Decrypt Materials
 
 If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
-the default CMM MUST remove the verification key from the encryption context.  
+the default CMM MUST remove the verification key from the encryption context.
 
 On each call to Decrypt Materials,
 the default CMM MUST make a call to the keyring's [On Decrypt](keyring-interface.md#ondecrypt) function.
@@ -85,7 +89,7 @@ The default CMM MUST obtain the following from the response:
 
 - Plaintext Data Key
 
-The values obtained above MUST be included in the decrypt materials returned.  
+The values obtained above MUST be included in the decrypt materials returned.
 
 ## Legacy Behavior : Master Key Providers
 
