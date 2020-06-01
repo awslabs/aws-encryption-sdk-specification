@@ -1,13 +1,17 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# KMS Keyring
+# AWS KMS Keyring
 
 ## Version
 
-0.2.0
+0.3.0
 
 ### Changelog
+
+- 0.3.0
+
+  - Clarify naming of KMS to AWS KMS
 
 - 0.2.0
 
@@ -19,17 +23,19 @@
 
 ## Implementations
 
-| Language                              | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                         |
-| ------------------------------------- | -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| C (KMS keyring implementation in C++) | 0.1.0-preview                          | 0.1.0                     | [kms_keyring.cpp](https://github.com/aws/aws-encryption-sdk-c/blob/master/aws-encryption-sdk-cpp/source/kms_keyring.cpp)                               |
-| Javascript                            | 0.1.0-preview                          | 0.1.0                     | [kms_keyring.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/kms-keyring/src/kms_keyring.ts)                          |
-| Python                                | 0.1.0-preview                          | n/a                       | [keyrings/aws_kms](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/aws_kms/__init__.py)                   |
-| Java                                  | 0.1.0-preview                          | n/a                       | [AwsKmsKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/AwsKmsKeyring.java) |
+| Language                                  | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                         |
+| ----------------------------------------- | -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C (AWS KMS keyring implementation in C++) | 0.1.0-preview                          | 0.1.0                     | [kms_keyring.cpp](https://github.com/aws/aws-encryption-sdk-c/blob/master/aws-encryption-sdk-cpp/source/kms_keyring.cpp)                               |
+| Javascript                                | 0.1.0-preview                          | 0.1.0                     | [kms_keyring.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/kms-keyring/src/kms_keyring.ts)                          |
+| Python                                    | 0.1.0-preview                          | n/a                       | [keyrings/aws_kms](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/keyrings/aws_kms/__init__.py)                   |
+| Java                                      | 0.1.0-preview                          | n/a                       | [AwsKmsKeyring.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/keyrings/AwsKmsKeyring.java) |
+
+For legacy reasons, the JavaScript implementation of this keyring is represented as the KMS Keyring instead of the AWS KMS Keyring.
 
 ## Overview
 
-A keyring which interacts with AWS Key Management Service (KMS) to create, encrypt, and decrypt data keys
-using KMS defined Customer Master Keys (CMKs).
+A keyring which interacts with AWS Key Management Service (AWS KMS) to create, encrypt, and decrypt data keys
+using AWS KMS defined Customer Master Keys (CMKs).
 
 ## Definitions
 
@@ -38,29 +44,29 @@ using KMS defined Customer Master Keys (CMKs).
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
 in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
-#### KMS Client
+#### AWS KMS Client
 
 A client which implements the following APIs:
 
-- [KMS GenerateDataKey](#kms-generatedatakey)
-- [KMS Encrypt](#kms-encrypt)
-- [KMS Decrypt](#kms-decrypt)
+- [AWS KMS GenerateDataKey](#aws-kms-generatedatakey)
+- [AWS KMS Encrypt](#aws-kms-encrypt)
+- [AWS KMS Decrypt](#aws-kms-decrypt)
 
-### KMS GenerateDataKey
+### AWS KMS GenerateDataKey
 
-A KMS API for generating a unique data key, and encrypting that data key under a specified CMK.
+An AWS KMS API for generating a unique data key, and encrypting that data key under a specified CMK.
 
 See [AWS Documentation](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
 
-### KMS Encrypt
+### AWS KMS Encrypt
 
-A KMS API for encrypting plaintext under a specified CMK.
+An AWS KMS API for encrypting plaintext under a specified CMK.
 
 See [AWS Documentation](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html).
 
-### KMS Decrypt
+### AWS KMS Decrypt
 
-A KMS API for decrypting ciphertext previously encrypted by [GenerateDataKey](#kms-generatedatakey) or [Encrypt](#kms-encrypt).
+An AWS KMS API for decrypting ciphertext previously encrypted by [GenerateDataKey](#aws-kms-generatedatakey) or [Encrypt](#aws-kms-encrypt).
 
 See [AWS Documenetation](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html).
 
@@ -79,24 +85,24 @@ On keyring initialization, a keyring MAY define the following:
 ### Client Supplier
 
 In order to communicate with AWS KMS,
-the KMS keyring requires an AWS SDK client.
+the AWS KMS keyring requires an AWS SDK client.
 The role of the client supplier is to
 create and configure those clients
-and supply them to the KMS keyring.
+and supply them to the AWS KMS keyring.
 
 A function that MUST take as input either a region string (e.g. `us-east-1`), or some value denoting an unknown region,
-and MAY return a KMS Client that can make the following API calls in the given AWS region:
+and MAY return an AWS KMS Client that can make the following API calls in the given AWS region:
 
-- [GenerateDataKey](#kms-generatedatakey)
-- [Encrypt](#kms-encrypt)
-- [Decrypt](#kms-decrypt)
+- [GenerateDataKey](#aws-kms-generatedatakey)
+- [Encrypt](#aws-kms-encrypt)
+- [Decrypt](#aws-kms-decrypt)
 
 If the client supplier cannot supply a client for the requested region,
-it MUST communicate that fact to the KMS keyring.
+it MUST communicate that fact to the AWS KMS keyring.
 
 ### Key IDs
 
-Key IDs is a list of strings identifying KMS CMKs, in ARN format.
+Key IDs is a list of strings identifying AWS KMS CMKs, in ARN format.
 This list identifies the CMKs to be used for data key encryption and decryption with this keyring.
 
 Each Key ID MUST be one of the following:
@@ -108,17 +114,17 @@ Each Key ID MUST be one of the following:
 See [AWS Documentation](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms).
 
 Note that only key IDs in the key ARN format will ever be used for decryption.
-This is because encrypted data keys constructed by the KMS keyring will always store the ID of the
+This is because encrypted data keys constructed by the AWS KMS keyring will always store the ID of the
 CMK used to encrypt it in key ARN format, and [OnDecrypt](#ondecrypt) checks the key ID against that
 value before attempting decryption.
 
-The KMS CMK specified by the Key ID MUST have
+The AWS KMS CMK specified by the Key ID MUST have
 [kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
 permissions.
 
 ### Generator
 
-A string that identifies a KMS CMK responsible for generating a data key, as well as encrypting and
+A string that identifies an AWS KMS CMK responsible for generating a data key, as well as encrypting and
 decrypting data keys.
 The string MUST be one of the following:
 
@@ -129,27 +135,27 @@ The string MUST be one of the following:
 See [AWS Documentation](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms).
 
 Note that only key IDs in the key ARN format will ever be used for decryption.
-This is because encrypted data keys constructed by the KMS keyring will always store the ID of the
+This is because encrypted data keys constructed by the AWS KMS keyring will always store the ID of the
 CMK used to encrypt it in key ARN format, and [OnDecrypt](#ondecrypt) checks the key ID against that
 value before attempting decryption.
 
 The generator SHOULD NOT be included in the [key IDs](#key-ids), otherwise this CMK will be used
 twice to encrypt the plaintext data key.
 
-The KMS CMK specified by the generator MUST have
+The AWS KMS CMK specified by the generator MUST have
 [kms:GenerateDataKey](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
 permissions.
 
 ### Grant Tokens
 
-A list of string grant tokens to be included in all KMS calls.
+A list of string grant tokens to be included in all AWS KMS calls.
 
 See [AWS Documentation](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token)
-for how KMS uses grant tokens.
+for how AWS KMS uses grant tokens.
 
 ## Derived Properties
 
-The following is a derived property of the KMS-keyring:
+The following is a derived property of the AWS KMS keyring:
 
 - [Is Discovery](#is-discovery)
 
@@ -162,7 +168,7 @@ Discovery keyrings do not perform encryption, and on decryption will attempt to 
 If this keyring has defined a [generator](#generator) or [key IDs](#key-ids), this value MUST be false.
 Otherwise, this value MUST be true.
 
-If this value is true, the keyring MUST only ever call [KMS Decrypt](#kms-decrypt).
+If this value is true, the keyring MUST only ever call [AWS KMS Decrypt](#aws-kms-decrypt).
 
 ## Operation
 
@@ -180,16 +186,16 @@ and MUST fail.
 
 If the input [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key
 and this keyring has a [generator](#generator) defined, and onEncrypt MUST attempt to generate a new plaintext data key
-and encrypt that data key by calling [KMS GenerateDataKey](#kms-generatedatakey).
+and encrypt that data key by calling [AWS KMS GenerateDataKey](#aws-kms-generatedatakey).
 
-If an AWS region can be extracted from the [generator](#generator), then the [KMS client](#kms-client) that calls
-[KMS GenerateDataKey](#kms-generatedatakey) MUST be the client returned by the [client supplier](#client-supplier)
+If an AWS region can be extracted from the [generator](#generator), then the [AWS KMS client](#aws-kms-client) that calls
+[AWS KMS GenerateDataKey](#aws-kms-generatedatakey) MUST be the client returned by the [client supplier](#client-supplier)
 when given that region as input.
-If an AWS region cannot be extracted from the [generator](#generator) then the KMS Keyring MUST input a value denoting an unknown region.
-If the [client supplier](#client-supplier) does not provide any client for the given region for this [KMS GenerateDataKey](#kms-generatedatakey) call, OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials)
+If an AWS region cannot be extracted from the [generator](#generator) then the AWS KMS Keyring MUST input a value denoting an unknown region.
+If the [client supplier](#client-supplier) does not provide any client for the given region for this [AWS KMS GenerateDataKey](#aws-kms-generatedatakey) call, OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials)
 and MUST fail.
 
-When calling [KMS GenerateDataKey](#kms-generatedatakey), the keyring MUST call with a request constructed as follows:
+When calling [AWS KMS GenerateDataKey](#aws-kms-generatedatakey), the keyring MUST call with a request constructed as follows:
 
 - `KeyId`: this keyring's [generator](#generator).
 - `NumberOfBytes`: the [key derivation input length](algorithm-suites.md#key-derivation-input-length)
@@ -198,13 +204,13 @@ When calling [KMS GenerateDataKey](#kms-generatedatakey), the keyring MUST call 
   the input [encryption materials](structures.md#encryption-materials).
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
-If the call to [KMS GenerateDataKey](#kms-generatedatakey) does not succeed, OnEncrypt MUST NOT
+If the call to [AWS KMS GenerateDataKey](#aws-kms-generatedatakey) does not succeed, OnEncrypt MUST NOT
 modify the [encryption materials](structures.md#encryption-materials) and MUST fail.
 
 If the call succeeds, OnEncrypt MUST verify that the response `Plaintext` length matches the specification
 of the [algorithm suite](algorithm-suites.md)'s Key Derivation Input Length field.
 If it does not, OnEncrypt MUST fail.
-If verified, OnEncrypt MUST do the following with the response from [KMS GenerateDataKey](#kms-generatedatakey):
+If verified, OnEncrypt MUST do the following with the response from [AWS KMS GenerateDataKey](#aws-kms-generatedatakey):
 
 - set the plaintext data key on the [encryption materials](structures.md#encryption-materials)
   as the response `Plaintext`.
@@ -216,21 +222,21 @@ If verified, OnEncrypt MUST do the following with the response from [KMS Generat
     Given a plaintext data key in the [encryption materials](structures.md#encryption-materials),
     OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in it's [key IDs](#key-ids) list.
 
-If this keyring's [generator](#generator) is defined and was not used to [generate a data key](#kms-generatedatakey)
+If this keyring's [generator](#generator) is defined and was not used to [generate a data key](#aws-kms-generatedatakey)
 as described above, OnEncrypt MUST also attempt to encrypt the plaintext data key using the CMK specified by the [generator](#generator).
 
-To attempt to encrypt the plaintext data key with a particular CMK, OnEncrypt MUST call [KMS Encrypt](#kms-encrypt).
+To attempt to encrypt the plaintext data key with a particular CMK, OnEncrypt MUST call [AWS KMS Encrypt](#aws-kms-encrypt).
 
-For each [KMS Encrypt](#kms-encrypt) call, if an AWS region can be extracted from the [Key ID](#key-ids), then the
-[KMS client](#kms-client) that calls [KMS Encrypt](#kms-encrypt) MUST be the client returned by the
+For each [AWS KMS Encrypt](#aws-kms-encrypt) call, if an AWS region can be extracted from the [Key ID](#key-ids), then the
+[AWS KMS client](#aws-kms-client) that calls [AWS KMS Encrypt](#aws-kms-encrypt) MUST be the client returned by the
 [client supplier](#client-supplier) when given that region as input.
-If an AWS region cannot be extracted from the Key ID then the KMS Keyring MUST input a value denoting an unknown region.
+If an AWS region cannot be extracted from the Key ID then the AWS KMS Keyring MUST input a value denoting an unknown region.
 If the [client supplier](#client-supplier) does not provide any client
-for the given region for this [KMS Encrypt](#kms-encrypt) call,
+for the given region for this [AWS KMS Encrypt](#aws-kms-encrypt) call,
 OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials)
 and MUST fail.
 
-To encrypt the plaintext data key with a CMK, OnEncrypt MUST call [KMS Encrypt](#kms-encrypt) with a request
+To encrypt the plaintext data key with a CMK, OnEncrypt MUST call [AWS KMS Encrypt](#aws-kms-encrypt) with a request
 constructed as follows:
 
 - `KeyId`: the CMK ARN to be used for data key encryption.
@@ -239,9 +245,9 @@ constructed as follows:
   the input [encryption materials](structures.md#encryption-materials).
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
-If the call to [KMS Encrypt](#kms-encrypt) does not succeed OnEncrypt MUST fail.
+If the call to [AWS KMS Encrypt](#aws-kms-encrypt) does not succeed OnEncrypt MUST fail.
 
-If the call succeeds, OnEncrypt MUST do the following with the response from [KMS Encrypt](#kms-encrypt):
+If the call succeeds, OnEncrypt MUST do the following with the response from [AWS KMS Encrypt](#aws-kms-encrypt):
 
 - append a new [encrypted data key](structures.md#encrypted-data-key) to the encrypted data key list
   in the [encryption materials](structures.md#encryption-materials), constructed as follows:
@@ -274,28 +280,28 @@ in the input encrypted data key list with the following conditions, until it suc
   ARNs in this keyring's [key IDs](#key-ids) or the [generator](#generator).
 
 To attempt to decrypt a particular [encrypted data key](structures.md#encrypted-data-key),
-OnDecrypt MUST call [KMS Decrypt](#kms-decrypt).
+OnDecrypt MUST call [AWS KMS Decrypt](#aws-kms-decrypt).
 
-For each [KMS Decrypt](#kms-decrypt) call, an AWS region MUST be extracted from the [encrypted data key](structures.md#encrypted-data-key)'s [key provider info](structures.md#key-provider-information).
-The KMS Keyring MUST call [KMS Decrypt](#kms-decrypt) using the client supplied by the [client supplier](#client-supplier), given the region as input.
+For each [AWS KMS Decrypt](#aws-kms-decrypt) call, an AWS region MUST be extracted from the [encrypted data key](structures.md#encrypted-data-key)'s [key provider info](structures.md#key-provider-information).
+The AWS KMS Keyring MUST call [AWS KMS Decrypt](#aws-kms-decrypt) using the client supplied by the [client supplier](#client-supplier), given the region as input.
 
 If the client supplier does not provide any client for the given region for this Decrypt call, OnDecrypt MUST skip that particular [encrypted data key](structures.md#encrypted-data-key).
 
-When calling [KMS Decrypt](#kms-decrypt), the keyring MUST call with a request constructed as follows:
+When calling [AWS KMS Decrypt](#aws-kms-decrypt), the keyring MUST call with a request constructed as follows:
 
 - `CiphertextBlob`: the [encrypted data key ciphertext](structures.md#ciphertext).
 - `EncryptionContext`: the [encryption context](structures.md#encryption-context) included in
   the input [decryption materials](structures.md#decryption-materials).
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
-If the call to [KMS Decrypt](#kms-decrypt) does not succeed OnDecrypt MUST continue and attempt to
+If the call to [AWS KMS Decrypt](#aws-kms-decrypt) does not succeed OnDecrypt MUST continue and attempt to
 decrypt the remaining [encrypted data keys](structures.md#encrypted-data-key).
 
-If the `KeyId` field in the response from [KMS Decrypt](#kms-decrypt) does not have a value equal to
+If the `KeyId` field in the response from [AWS KMS Decrypt](#aws-kms-decrypt) does not have a value equal to
 the [encrypted data key's key provider info](structures.md#key-provider-information), then OnDecrypt
 MUST fail.
 
-If the call to [KMS Decrypt](#kms-decrypt) succeeds OnDecrypt MUST verify the following:
+If the call to [AWS KMS Decrypt](#aws-kms-decrypt) succeeds OnDecrypt MUST verify the following:
 
 - verify that the `KeyId` field has a value equal to the [encrypted data key's key provider info](structures.md#key-provider-information).
 - verify that the `Plaintext` is of a length that fits the [algorithm suite](algorithm-suites.md) given in the decryption materials.
@@ -315,12 +321,12 @@ then OnDecrypt MUST output the unmodified input [decryption materials](structure
 
 ### OnEncrypt Goal
 
-When a user configures a KMS keyring with key IDs
+When a user configures an AWS KMS keyring with key IDs
 and uses that keyring to encrypt a message,
 they are stating their intent that they need each one of those CMKs to be able to
 independently decrypt the resulting encrypted message.
 
-For example, if a user configures a KMS keyring with CMKs A, B, and C
+For example, if a user configures an AWS KMS keyring with CMKs A, B, and C
 and uses that keyring to encrypt a message,
 then that user expects three things to be true:
 
@@ -332,16 +338,16 @@ If any of these are not true of the resulting encrypted message,
 the keyring has failed to honor the user's intent.
 
 In order to accomplish this,
-the KMS keyring MUST contribute three encrypted data keys to the encryption materials:
+the AWS KMS keyring MUST contribute three encrypted data keys to the encryption materials:
 one from CMK A, one from CMK B, and one from CMK C.
 
 ### OnDecrypt Goal
 
-When a user configures a KMS keyring for use on decrypt,
+When a user configures an AWS KMS keyring for use on decrypt,
 they are stating their intent for which CMKs
 the keyring will _attempt_ to use to decrypt encrypted data keys.
 
-For example, if a user configures a KMS keyring with CMK C (using the CMK ARN)
+For example, if a user configures an AWS KMS keyring with CMK C (using the CMK ARN)
 and uses it to decrypt an encrypted message
 that contains encrypted data keys for CMKs A, B, and C,
 then the keyring will attempt to decrypt using CMK C.
