@@ -156,7 +156,7 @@ The following is a derived property of the AWS KMS keyring:
 ### Is Discovery
 
 Indicates whether this keyring is a discovery keyring.
-Discovery keyrings do not perform encryption, and on decryption attempt to decrypt every inputted
+Discovery keyrings do not perform encryption and on decryption attempt to decrypt every inputted
 [encrypted data key](structures.md#encrypted-data-key) if the client supplier return a client.
 
 If this keyring has defined a [generator](#generator) or [key names](#key-names), this value MUST be false.
@@ -225,7 +225,6 @@ For each [AWS KMS Encrypt](#aws-kms-encrypt) call, if an AWS region can be extra
 [AWS KMS client](#aws-kms-client) that calls [AWS KMS Encrypt](#aws-kms-encrypt) MUST be the client returned by the
 [client supplier](#client-supplier) when given that region as input.
 If an AWS region cannot be extracted from the key name then the AWS KMS Keyring MUST input a value denoting an unknown region.
-
 If the [client supplier](#client-supplier) does not provide any client
 for the given region for this [AWS KMS Encrypt](#aws-kms-encrypt) call,
 OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials)
