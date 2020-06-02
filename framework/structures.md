@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.0
+0.2.1
 
 ### Changelog
+
+- 0.2.1
+
+  - [Clarify naming of KMS to AWS KMS](https://github.com/awslabs/aws-encryption-sdk-specification/issues/67)
 
 - 0.2.0
 
@@ -74,10 +78,10 @@ A UTF-8 encoded value related to the key provider that encrypted this data key.
 This value usually represents the namespace of the key provider defined wrapping key
 used to encrypt the plaintext data key.
 
-For example, [encrypted data keys](#encrypted-data-key) encrypted by the [KMS Keyring](kms-keyring.md)
+For example, [encrypted data keys](#encrypted-data-key) encrypted by the [AWS KMS Keyring](kms-keyring.md)
 have the value of "aws-kms" in this field.
 
-This value MUST NOT be "aws-kms" unless this encrypted data key was produced by the [KMS Keyring](kms-keyring.md).
+This value MUST NOT be "aws-kms" unless this encrypted data key was produced by the [AWS KMS Keyring](kms-keyring.md).
 
 ##### Key Provider Information
 
