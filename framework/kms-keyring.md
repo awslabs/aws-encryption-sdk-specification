@@ -5,11 +5,11 @@
 
 ## Version
 
-0.3.0
+0.2.1
 
 ### Changelog
 
-- 0.3.0
+- 0.2.1
 
   - Rename Key IDs to [Key Names](#key-names) for increased clarity
   - Update [Key Names](#key-names) and [Generator](#generator) sections to reinforce support for all AWS KMS key identifiers
@@ -101,38 +101,38 @@ it MUST communicate that fact to the KMS keyring.
 
 ### Key Names
 
-The key name identifies the [AWS KMS customer master keys (CMKs)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id)
-that the AWS KMS keyring uses for data key encryption and decryption.
+A list of strings identifying the [AWS KMS customer master keys (CMKs)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id)
+that the AWS KMS keyring uses to encrypt and decrypt data keys.
 
-The AWS KMS keyring accepts all [key identifiers accepted by AWS KMS](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) as key names.
+The AWS KMS keyring accepts any value for a key name that is [accepted by AWS KMS as a key identifer](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id).
+The AWS KMS keyring does not validate any value for a key name and passes this information to AWS KMS.
 
-Note that only key names in the [key ARN format](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms) will ever be used for decryption.
-This is because encrypted data keys constructed by the AWS KMS keyring will always store the ID of the
-CMK used to encrypt it in key ARN format, and [OnDecrypt](#ondecrypt) checks the key name against that
+Note that only key names in the [key ARN format](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms) are used for decryption
+because encrypted data keys constructed by the AWS KMS keyring always store the ID of the CMK used to encrypt it in the key ARN format.
+[OnDecrypt](#ondecrypt) checks the key name against that
 value before attempting decryption.
 
-The AWS KMS CMK specified by the key names MUST have
-[kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
-permissions.
+The AWS KMS caller using each AWS KMS CMK specified in the key names
+MUST have [kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions) permissions.
 
 ### Generator
 
-A string that identifies an [AWS KMS customer master key (CMK)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) that the AWS KMS keyring uses for data key generation,
-as well as data key encryption and decryption.
+A string that identifies an [AWS KMS customer master key (CMK)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id)
+that the AWS KMS keyring uses to generate, encrypt, and decrypt data keys.
 
-The AWS KMS keyring accepts any [key identifier accepted by AWS KMS](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id) as a generator.
+The AWS KMS keyring accepts any value for a generator that is [accepted by AWS KMS as a key identifer](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id).
+The AWS KMS keyring does not validate any value for a generator and passes this information to AWS KMS.
 
-Note that only generators in the [key ARN format](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms) will ever be used for decryption.
-This is because encrypted data keys constructed by the AWS KMS keyring will always store the ID of the
-CMK used to encrypt it in key ARN format, and [OnDecrypt](#ondecrypt) checks the generator against that
+Note that only generators in the [key ARN format](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms) are used for decryption
+because encrypted data keys constructed by the AWS KMS keyring always store the ID of the CMK used to encrypt it in the key ARN format.
+[OnDecrypt](#ondecrypt) checks the generator against that
 value before attempting decryption.
 
-The generator SHOULD NOT be included in the [key names](#key-names), otherwise this CMK will be used
-twice to encrypt the plaintext data key.
+The generator SHOULD NOT be included in the [key names](#key-names),
+otherwise this CMK is used to encrypt the plaintext data key twice.
 
-The KMS CMK specified by the generator MUST have
-[kms:GenerateDataKey](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
-permissions.
+The AWS KMS caller using the AWS KMS CMK specified by the generator
+MUST have [kms:GenerateDataKey](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions) permissions.
 
 ### Grant Tokens
 
