@@ -5,13 +5,13 @@
 
 ## Version
 
-0.3.0
+0.2.1
 
 ### Changelog
 
-- 0.3.0
+- 0.2.1
 
-  - Clarify naming of KMS to AWS KMS
+  - [Clarify naming of KMS to AWS KMS](https://github.com/awslabs/aws-encryption-sdk-specification/issues/67)
 
 - 0.2.0
 
