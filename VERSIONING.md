@@ -61,3 +61,7 @@ This information SHOULD be presented in a table with the following format:
 | Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation     |
 | -------- | -------------------------------------- | ------------------------- | ------------------ |
 | Python   | 0.1.0                                  | 1.3.0                     | [module_name](url) |
+
+This table SHOULD only define the current state.
+Historical record of implementation and specification compatibility
+SHOULD be tracked elsewhere.
