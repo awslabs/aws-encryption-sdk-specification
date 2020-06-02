@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.0
+0.2.1
 
 ### Changelog
+
+- 0.2.1
+
+  - [Clarify naming of KMS to AWS KMS](https://github.com/awslabs/aws-encryption-sdk-specification/issues/67)
 
 - 0.2.0
 
@@ -41,7 +45,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Supported Keyrings
 
-- [KMS Keyring](kms-keyring.md)
+- [AWS KMS Keyring](kms-keyring.md)
 - [Multi-Keyring](multi-keyring.md)
 - [Raw AES Keyring](raw-aes-keyring.md)
 - [Raw RSA Keyring](raw-rsa-keyring.md)
@@ -149,7 +153,7 @@ the decryption is overwhelmingly likely to fail.
 Users SHOULD use a keyring that protects wrapping keys and performs cryptographic operations within a secure boundary.
 Examples are:
 
-- The built-in [KMS keyring](kms-keyring.md),
+- The built-in [AWS KMS keyring](kms-keyring.md),
   which uses AWS Key Management Service (AWS KMS) customer master keys (CMKs) that never leave AWS KMS plaintext.
 - A custom keyring that uses wrapping keys that are stored in your hardware security modules (HSMs)
 - A custom keyring protected by another master key service.
@@ -166,7 +170,7 @@ The following keyrings are compatible with the referenced [master key providers]
 
 | Keyring         | Master Key Provider: Java and Python                                                                             |
 | --------------- | ---------------------------------------------------------------------------------------------------------------- |
-| KMS keyring     | KMS master key (Java), KMS master key provider (Java), KMS master key (Python), KMS master key provider (Python) |
+| AWS KMS keyring | KMS master key (Java), KMS master key provider (Java), KMS master key (Python), KMS master key provider (Python) |
 | Raw AES keyring | When they are used with symmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                    |
 | Raw RSA keyring | When they are used with asymmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                   |
 
