@@ -150,7 +150,7 @@ The following is a derived property of the KMS-keyring:
 ### Is Discovery
 
 Indicates whether this keyring is a discovery keyring.
-Discovery keyrings do not perform encryption, and on decryption will attempt to decrypt every inputted
+Discovery keyrings do not perform encryption, and on decryption attempt to decrypt every inputted
 [encrypted data key](structures.md#encrypted-data-key) if the client supplier return a client.
 
 If this keyring has defined a [generator](#generator) or [key names](#key-names), this value MUST be false.
@@ -333,12 +333,12 @@ one from CMK A, one from CMK B, and one from CMK C.
 
 When a user configures a KMS keyring for use on decrypt,
 they are stating their intent for which CMKs
-the keyring will _attempt_ to use to decrypt encrypted data keys.
+the keyring _attempts_ to use to decrypt encrypted data keys.
 
 For example, if a user configures a KMS keyring with CMK C (using the CMK ARN)
 and uses it to decrypt an encrypted message
 that contains encrypted data keys for CMKs A, B, and C,
-then the keyring will attempt to decrypt using CMK C.
+then the keyring attempts to decrypt using CMK C.
 
 However, if the keyring attempts to decrypt using CMK C and cannot,
 this failure still honors the configured intent and MUST NOT halt decryption.
@@ -365,7 +365,7 @@ If the keyring cannot satisfy those requirements it MUST NOT halt message decryp
 No keyring can know if it is the last keyring to attempt decryption.
 If all keyrings are exhausted and none of them were able to decrypt an encrypted data key
 then the cryptographic materials manager that managed those keyrings
-will halt message decryption.
+halts message decryption.
 (See [Default Cryptographic Materials Manager](./default-cmm.md))
 
 ### Requirements
