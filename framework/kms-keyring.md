@@ -5,9 +5,15 @@
 
 ## Version
 
-0.2.1
+0.2.2
 
 ### Changelog
+
+- 0.2.2
+
+  - Rename Key IDs to [Key Names](#key-names) for increased clarity
+  - Update [Key Names](#key-names) and [Generator](#generator) sections to reinforce support for all AWS KMS key identifiers
+  - [Pull request link for discussions](https://github.com/awslabs/aws-encryption-sdk-specification/pull/123)
 
 - 0.2.1
 
@@ -78,7 +84,7 @@ On keyring initialization, a keyring MUST define the following:
 
 On keyring initialization, a keyring MAY define the following:
 
-- [Key IDs](#key-ids)
+- [Key Names](#key-names)
 - [Generator](#generator)
 - [Grant Tokens](#grant-tokens)
 
@@ -100,51 +106,42 @@ and MAY return an AWS KMS Client that can make the following API calls in the gi
 If the client supplier cannot supply a client for the requested region,
 it MUST communicate that fact to the AWS KMS keyring.
 
-### Key IDs
+### Key Names
 
-Key IDs is a list of strings identifying AWS KMS CMKs, in ARN format.
-This list identifies the CMKs to be used for data key encryption and decryption with this keyring.
+A list of strings identifying the [AWS KMS customer master keys (CMKs)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id)
+that the AWS KMS keyring uses to encrypt and decrypt data keys.
 
-Each Key ID MUST be one of the following:
+The AWS KMS keyring accepts any value for a key name that is [accepted by AWS KMS as a key identifer](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id).
+The AWS KMS keyring does not validate any value for a key name and passes this information to AWS KMS.
 
-- A CMK [alias](https://docs.aws.amazon.com/kms/latest/developerguide/programming-aliases.html) (e.g. "alias/MyCryptoKey")
-- A well-formed key ARN (e.g. arn:aws:kms:us-east-1:999999999999:key/01234567-89ab-cdef-fedc-ba9876543210)
-- A well-formed alias ARN (e.g. arn:aws:kms:us-east-1:999999999999:alias/MyCryptoKey)
-
-See [AWS Documentation](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms).
-
-Note that only key IDs in the key ARN format will ever be used for decryption.
-This is because encrypted data keys constructed by the AWS KMS keyring will always store the ID of the
-CMK used to encrypt it in key ARN format, and [OnDecrypt](#ondecrypt) checks the key ID against that
+Note that only key names in the [key ARN format](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms) are used for decryption
+because encrypted data keys constructed by the AWS KMS keyring always store the ID of the CMK used to encrypt it in the key ARN format
+and [OnDecrypt](#ondecrypt) checks the key name against that
 value before attempting decryption.
 
-The AWS KMS CMK specified by the Key ID MUST have
-[kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
-permissions.
+The AWS KMS caller
+MUST have [kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions) permission
+for each AWS KMS CMK specified in the key names.
 
 ### Generator
 
-A string that identifies an AWS KMS CMK responsible for generating a data key, as well as encrypting and
-decrypting data keys.
-The string MUST be one of the following:
+A string that identifies an [AWS KMS customer master key (CMK)](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id)
+that the AWS KMS keyring uses to generate, encrypt, and decrypt data keys.
 
-- A CMK [alias](https://docs.aws.amazon.com/kms/latest/developerguide/programming-aliases.html) (e.g. "alias/MyCryptoKey")
-- A well-formed key ARN (e.g. arn:aws:kms:us-east-1:999999999999:key/01234567-89ab-cdef-fedc-ba9876543210)
-- A well-formed alias ARN (e.g. arn:aws:kms:us-east-1:999999999999:alias/MyCryptoKey)
+The AWS KMS keyring accepts any value for a generator that is [accepted by AWS KMS as a key identifer](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#key-id).
+The AWS KMS keyring does not validate any value for a generator and passes this information to AWS KMS.
 
-See [AWS Documentation](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms).
-
-Note that only key IDs in the key ARN format will ever be used for decryption.
-This is because encrypted data keys constructed by the AWS KMS keyring will always store the ID of the
-CMK used to encrypt it in key ARN format, and [OnDecrypt](#ondecrypt) checks the key ID against that
+Note that only generators in the [key ARN format](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms) are used for decryption
+because encrypted data keys constructed by the AWS KMS keyring always store the ID of the CMK used to encrypt it in the key ARN format
+and [OnDecrypt](#ondecrypt) checks the generator against that
 value before attempting decryption.
 
-The generator SHOULD NOT be included in the [key IDs](#key-ids), otherwise this CMK will be used
-twice to encrypt the plaintext data key.
+The generator SHOULD NOT be included in the [key names](#key-names),
+otherwise this CMK is used to encrypt the plaintext data key twice.
 
-The AWS KMS CMK specified by the generator MUST have
-[kms:GenerateDataKey](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
-permissions.
+The AWS KMS caller
+MUST have [kms:GenerateDataKey](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions) permission
+for the AWS KMS CMK specified by the generator.
 
 ### Grant Tokens
 
@@ -162,10 +159,11 @@ The following is a derived property of the AWS KMS keyring:
 ### Is Discovery
 
 Indicates whether this keyring is a discovery keyring.
-Discovery keyrings do not perform encryption, and on decryption will attempt to decrypt every inputted
-[encrypted data key](structures.md#encrypted-data-key) if the client supplier return a client.
+Discovery keyrings do not perform encryption and on decryption attempt to decrypt
+any [encrypted data key](structures.md#encrypted-data-key) that was encrypted by the AWS KMS keyring,
+if the client supplier returns a client.
 
-If this keyring has defined a [generator](#generator) or [key IDs](#key-ids), this value MUST be false.
+If this keyring has defined a [generator](#generator) or [key names](#key-names), this value MUST be false.
 Otherwise, this value MUST be true.
 
 If this value is true, the keyring MUST only ever call [AWS KMS Decrypt](#aws-kms-decrypt).
@@ -220,17 +218,17 @@ If verified, OnEncrypt MUST do the following with the response from [AWS KMS Gen
   - the [key provider id](structures.md#key-provider-id) is "aws-kms".
   - the [key provider information](structures.md#key-provider-information) is the response `KeyId`.
     Given a plaintext data key in the [encryption materials](structures.md#encryption-materials),
-    OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in it's [key IDs](#key-ids) list.
+    OnEncrypt MUST attempt to encrypt the plaintext data key using each CMK specified in its [key names](#key-names) list.
 
 If this keyring's [generator](#generator) is defined and was not used to [generate a data key](#aws-kms-generatedatakey)
 as described above, OnEncrypt MUST also attempt to encrypt the plaintext data key using the CMK specified by the [generator](#generator).
 
 To attempt to encrypt the plaintext data key with a particular CMK, OnEncrypt MUST call [AWS KMS Encrypt](#aws-kms-encrypt).
 
-For each [AWS KMS Encrypt](#aws-kms-encrypt) call, if an AWS region can be extracted from the [Key ID](#key-ids), then the
+For each [AWS KMS Encrypt](#aws-kms-encrypt) call, if an AWS region can be extracted from the [key name](#key-names), then the
 [AWS KMS client](#aws-kms-client) that calls [AWS KMS Encrypt](#aws-kms-encrypt) MUST be the client returned by the
 [client supplier](#client-supplier) when given that region as input.
-If an AWS region cannot be extracted from the Key ID then the AWS KMS Keyring MUST input a value denoting an unknown region.
+If an AWS region cannot be extracted from the key name then the AWS KMS Keyring MUST input a value denoting an unknown region.
 If the [client supplier](#client-supplier) does not provide any client
 for the given region for this [AWS KMS Encrypt](#aws-kms-encrypt) call,
 OnEncrypt MUST NOT modify the [encryption materials](structures.md#encryption-materials)
@@ -277,7 +275,7 @@ in the input encrypted data key list with the following conditions, until it suc
 
 - the [key provider ID](structures.md#key-provider-id) field has the value "aws-kms"
 - the [key provider info](structures.md#key-provider-information) has a value equal to one of the
-  ARNs in this keyring's [key IDs](#key-ids) or the [generator](#generator).
+  ARNs in this keyring's [key names](#key-names) or the [generator](#generator).
 
 To attempt to decrypt a particular [encrypted data key](structures.md#encrypted-data-key),
 OnDecrypt MUST call [AWS KMS Decrypt](#aws-kms-decrypt).
@@ -321,7 +319,7 @@ then OnDecrypt MUST output the unmodified input [decryption materials](structure
 
 ### OnEncrypt Goal
 
-When a user configures an AWS KMS keyring with key IDs
+When a user configures an AWS KMS keyring with key names
 and uses that keyring to encrypt a message,
 they are stating their intent that they need each one of those CMKs to be able to
 independently decrypt the resulting encrypted message.
@@ -345,12 +343,12 @@ one from CMK A, one from CMK B, and one from CMK C.
 
 When a user configures an AWS KMS keyring for use on decrypt,
 they are stating their intent for which CMKs
-the keyring will _attempt_ to use to decrypt encrypted data keys.
+the keyring _attempts_ to use to decrypt encrypted data keys.
 
 For example, if a user configures an AWS KMS keyring with CMK C (using the CMK ARN)
 and uses it to decrypt an encrypted message
 that contains encrypted data keys for CMKs A, B, and C,
-then the keyring will attempt to decrypt using CMK C.
+then the keyring attempts to decrypt using CMK C.
 
 However, if the keyring attempts to decrypt using CMK C and cannot,
 this failure still honors the configured intent and MUST NOT halt decryption.
@@ -377,7 +375,7 @@ If the keyring cannot satisfy those requirements it MUST NOT halt message decryp
 No keyring can know if it is the last keyring to attempt decryption.
 If all keyrings are exhausted and none of them were able to decrypt an encrypted data key
 then the cryptographic materials manager that managed those keyrings
-will halt message decryption.
+halts message decryption.
 (See [Default Cryptographic Materials Manager](./default-cmm.md))
 
 ### Requirements
