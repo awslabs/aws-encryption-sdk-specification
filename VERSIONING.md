@@ -52,16 +52,15 @@ that records the changes made to each version of the document.
 
 ## Implementations
 
-Each specification document SHOULD maintain a matrix of
-known implementations,
-what version of the specification document they implement,
-and the implementation version that first implemented that specification version.
-This information SHOULD be presented in a table with the following format:
+Each specification document SHOULD maintain a listing of
+implementations that have been known to comply with
+a version of that specification document.
+Each implementation listing MUST identify the language
+as well as provide a link to a file in the implementation
+that states what version of the specification document
+it implements.
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation     |
-| -------- | -------------------------------------- | ------------------------- | ------------------ |
-| Python   | 0.1.0                                  | 1.3.0                     | [module_name](url) |
-
-This table SHOULD only define the current state.
-Historical record of implementation and specification compatibility
-SHOULD be tracked elsewhere.
+NOTE:
+The presence of a reference to an implementation does not imply that
+every listed implementation complies with the current version of
+the specification document that contains that reference.
