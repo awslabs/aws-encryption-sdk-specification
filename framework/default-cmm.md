@@ -61,8 +61,6 @@ If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signat
 
 On each call to Get Encryption Materials,
 the default CMM MUST make a call to the keyring's [On Encrypt](keyring-interface.md#onencrypt) function.
-If the default CMM is configured with a master key provider instead,
-see [Get Encryption Materials (master key provider)](#get-encryption-materials-master-key-provider).
 
 The default CMM MUST obtain the following from the response:
 
@@ -78,8 +76,6 @@ the default CMM MUST remove the verification key from the encryption context.
 
 On each call to Decrypt Materials,
 the default CMM MUST make a call to the keyring's [On Decrypt](keyring-interface.md#ondecrypt) function.
-If the default CMM is configured with a master key provider instead,
-see [Decrypt Materials (master key provider)](#decrypt-materials-master-key-provider).
 
 The default CMM MUST obtain the following from the response:
 
