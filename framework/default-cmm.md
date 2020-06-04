@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.0
+0.2.1
 
 ### Changelog
+
+- 0.2.1
+
+  - [Record how the default CMM uses master key providers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/98)
 
 - 0.2.0
 
@@ -55,7 +59,8 @@ If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signat
   - The key MUST be the reserved name, `aws-crypto-public-key`.
   - The value MUST be the base64-encoded public verification key.
 
-On each call to Get Encryption Materials, the default CMM MUST make a call to the key provider's [On Encrypt](keyring-interface.md#onencrypt) function.
+On each call to Get Encryption Materials,
+the default CMM MUST make a call to the keyring's [On Encrypt](keyring-interface.md#onencrypt) function.
 
 The default CMM MUST obtain the following from the response:
 
@@ -69,10 +74,47 @@ The values obtained above MUST be included in the encryption materials returned.
 If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
 the default CMM MUST remove the verification key from the encryption context.
 
-On each call to Decrypt Materials, the default CMM MUST make a call to the key provider's [On Decrypt](keyring-interface.md#ondecrypt) function.
+On each call to Decrypt Materials,
+the default CMM MUST make a call to the keyring's [On Decrypt](keyring-interface.md#ondecrypt) function.
 
 The default CMM MUST obtain the following from the response:
 
 - Plaintext Data Key
 
 The values obtained above MUST be included in the decrypt materials returned.
+
+## Legacy Behavior : Master Key Providers
+
+For implementations that support [master key providers](master-key-provider-interface.md),
+the default CMM MUST support generating, encrypting, and decrypting data keys
+using master key providers.
+
+### Legacy
+
+This is a legacy specification.
+Master key providers SHOULD NOT be included in any additional implementations.
+
+### Get Encryption Materials (master key provider)
+
+In place of calling a keyring's [On Encrypt](keyring-interface.md#onencrypt) function:
+
+The default CMM MUST call the master key provider's
+[Get Master Keys for Encryption](master-key-provider-interface.md#get-master-keys-for-encryption) function
+to obtain a list of master keys to use.
+
+If the master key provider does not identify which master key MUST generate the data key,
+the default CMM MUST use the first master key in the list for that purpose.
+The default CMM MUST generate the data key using this master key's
+[Generate Data Key](master-key-interface.md#generate-data-key) function.
+
+For each remaining master key,
+the default CMM MUST call the master key's
+[Encrypt Data Key](master-key-interface.md#encrypt-data-key) function
+with the plaintext data key.
+
+### Decrypt Materials (master key provider)
+
+In place of calling a keyring's [On Decrypt](keyring-interface.md#ondecrypt) function:
+
+The default CMM MUST call the master key provider's
+[Decrypt Data Key](master-key-provider-interface.md#decrypt-data-key) function.
