@@ -115,12 +115,13 @@ The AWS KMS keyring accepts any value for a key name that is [accepted by AWS KM
 The AWS KMS keyring does not validate any value for a key name and passes this information to AWS KMS.
 
 Note that only key names in the [key ARN format](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms) are used for decryption
-because encrypted data keys constructed by the AWS KMS keyring always store the ID of the CMK used to encrypt it in the key ARN format.
-[OnDecrypt](#ondecrypt) checks the key name against that
+because encrypted data keys constructed by the AWS KMS keyring always store the ID of the CMK used to encrypt it in the key ARN format
+and [OnDecrypt](#ondecrypt) checks the key name against that
 value before attempting decryption.
 
-The AWS KMS caller using each AWS KMS CMK specified in the key names
-MUST have [kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions) permissions.
+The AWS KMS caller
+MUST have [kms:Encrypt](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions) permission
+for each AWS KMS CMK specified in the key names.
 
 ### Generator
 
@@ -131,15 +132,16 @@ The AWS KMS keyring accepts any value for a generator that is [accepted by AWS K
 The AWS KMS keyring does not validate any value for a generator and passes this information to AWS KMS.
 
 Note that only generators in the [key ARN format](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms) are used for decryption
-because encrypted data keys constructed by the AWS KMS keyring always store the ID of the CMK used to encrypt it in the key ARN format.
-[OnDecrypt](#ondecrypt) checks the generator against that
+because encrypted data keys constructed by the AWS KMS keyring always store the ID of the CMK used to encrypt it in the key ARN format
+and [OnDecrypt](#ondecrypt) checks the generator against that
 value before attempting decryption.
 
 The generator SHOULD NOT be included in the [key names](#key-names),
 otherwise this CMK is used to encrypt the plaintext data key twice.
 
-The AWS KMS caller using the AWS KMS CMK specified by the generator
-MUST have [kms:GenerateDataKey](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions) permissions.
+The AWS KMS caller
+MUST have [kms:GenerateDataKey](https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-permissions-reference.html#AWS-KMS-API-Operations-and-Permissions) permission
+for the AWS KMS CMK specified by the generator.
 
 ### Grant Tokens
 
@@ -157,8 +159,9 @@ The following is a derived property of the AWS KMS keyring:
 ### Is Discovery
 
 Indicates whether this keyring is a discovery keyring.
-Discovery keyrings do not perform encryption and on decryption attempt to decrypt every inputted
-[encrypted data key](structures.md#encrypted-data-key) if the client supplier return a client.
+Discovery keyrings do not perform encryption and on decryption attempt to decrypt
+any [encrypted data key](structures.md#encrypted-data-key) that was encrypted by the AWS KMS keyring,
+if the client supplier returns a client.
 
 If this keyring has defined a [generator](#generator) or [key names](#key-names), this value MUST be false.
 Otherwise, this value MUST be true.
