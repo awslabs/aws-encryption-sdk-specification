@@ -85,10 +85,6 @@ The default CMM MUST obtain the following from the response:
 
 - Plaintext Data Key
 
-The default CMM MUST obtain the following from the response:
-
-- Plaintext Data Key
-
 The values obtained above MUST be included in the decrypt materials returned.
 
 ## Legacy Behavior : Master Key Providers
