@@ -1,3 +1,6 @@
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
+
 # How to fail with Keyrings in the AWS Encryption SDK
 
 # Definitions
