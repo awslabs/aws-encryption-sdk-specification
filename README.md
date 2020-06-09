@@ -15,6 +15,8 @@ across implementations of the AWS Encryption SDK.
 This GitHub project is also intended to track issues and feature requests,
 and to collect feedback pertaining to the AWS Encryption SDK.
 
+[Security issue notifications](./CONTRIBUTING.md#security-issue-notifications)
+
 ### Current Implementations
 
 Below is the list of current implementation of this specification:
