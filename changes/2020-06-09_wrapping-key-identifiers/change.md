@@ -88,9 +88,7 @@ This change SHOULD NOT have any security implications.
 
 ## Operational Implications
 
-If the keyring chooses to write a provider info value that does not equal its key name,
-that keyring's behavior can be more complex for customers to configure
-than if they are the same.
+This change SHOULD NOT have any operational implications.
 
 ## Guide-level Explanation
 
