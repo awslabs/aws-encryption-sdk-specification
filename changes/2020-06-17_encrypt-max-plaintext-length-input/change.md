@@ -10,14 +10,12 @@
 | [Encrypt](../../client-apis/encrypt.md)           |
 | [CMM Interface](../../framework/cmm-interface.md) |
 
-
 ## Affected Specifications
 
 | Specification                                     |
 | ------------------------------------------------- |
 | [Encrypt](../../client-apis/encrypt.md)           |
 | [CMM Interface](../../framework/cmm-interface.md) |
-
 
 ## Affected Implementations
 
@@ -116,7 +114,7 @@ This change SHOULD NOT have any security implications.
 This change will break any JS user that is currently using Encrypt with a known-length plaintext
 and inputting a plaintextLength less than that length.
 
-This change will break any Python user that depends on the source\_length being sent to the
+This change will break any Python user that depends on the source_length being sent to the
 CMM instead of the true length of a known-length plaintext.
 
 ## Guide-level Explanation
@@ -151,7 +149,7 @@ The ESDK MUST NOT encrypt a plaintext greater than this length,
 and MUST fail if it can be determined during encryption that the actual plaintext length
 is greater than what the user supplied on input.
 The actual name of this input, and how the user specifies this value for the Encrypt operation
- MAY be different per implementation.
+MAY be different per implementation.
 
 We also need to specify the exact behavior for how this input is used in the CMM's GetEncryptionMaterials call:
 
