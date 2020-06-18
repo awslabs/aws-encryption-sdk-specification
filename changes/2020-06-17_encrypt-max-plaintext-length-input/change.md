@@ -21,7 +21,7 @@
 
 | Language   | Repository                                                                            |
 | ---------- | ------------------------------------------------------------------------------------- |
-| Python     | [aws-encryption-sdk-c](https://github.com/aws/aws-encryption-sdk-python)              |
+| Python     | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python)              |
 | Javascript | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-javascript) |
 
 ## Definitions
@@ -54,11 +54,14 @@ When performing the encrypt operation on an unknown length plaintext,
 users MUST be able to specify some input that bounds the length of the plaintext to be encrypted.
 
 This input already exists in the specification as [plaintext length](../../client-apis/encrypt.md#plaintext-length)
-however it's effect on the Encrypt operation's behavior is unspecified.
+however its effect on the Encrypt operation's behavior is unspecified.
 
 This change renames this input in the specification
-to be a more accurate reflection of it's behavior,
+to be a more accurate reflection of its behavior,
 and specifies the correct behavior during the Encrypt operation.
+
+This change also forbids exposing any API which only performs Encrypt on known-length plaintexts
+from allowing users to specify this input.
 
 ## Out of Scope
 
@@ -70,14 +73,14 @@ and specifies the correct behavior during the Encrypt operation.
 
 All implementations allow users to specify a plaintext length when calling Encrypt with a
 unknown-length plaintext.
-However, it's behavior in the Encrypt operation is not clearly specified.
+However, its behavior in the Encrypt operation is not clearly specified.
 
 Additionally, some implementations also allow a plaintext length to be specified on Encrypt with a
 known-length plaintext.
 The behavior of Encrypt in this case is not consistent between implementations.
 
 The purpose of this change is to document the correct behavior of this input and
-rename this input to clarify it's intent.
+rename this input to clarify its intent.
 
 This change renames this input within the spec because
 the intention behind the value of this input is that
@@ -120,7 +123,7 @@ CMM instead of the true length of a known-length plaintext.
 ## Guide-level Explanation
 
 This change renames the `plaintext length` Encryption input to `max plaintext length` in the specification,
-and clarifies it's behavior in the Encrypt operation.
+and clarifies its behavior in the Encrypt operation.
 
 If during the Encrypt operation it is determined that
 the actual plaintext length is greater than a supplied `max plaintext length`,
@@ -140,7 +143,7 @@ if and only if the input plaintext can be of unknown-length.
 ## Reference-level Explanation
 
 We need to update the spec to make the purpose and behavior of the `plaintext length` input clear
-by renaming it and specifying it's exact behavior within the Encrypt operation:
+by renaming it and specifying its exact behavior within the Encrypt operation:
 
 When performing the encrypt operation on a unknown-length plaintext,
 users MUST be able to specify an optional parameter `maxPlaintextLength`.
