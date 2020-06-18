@@ -21,7 +21,7 @@
 
 | Language   | Repository                                                                            |
 | ---------- | ------------------------------------------------------------------------------------- |
-| Python     | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python)              |
+| Python     | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python)         |
 | Javascript | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-javascript) |
 
 ## Definitions
