@@ -154,7 +154,7 @@ is greater than what the user supplied on input.
 The actual name of this input, and how the user specifies this value for the Encrypt operation
 MAY be different per implementation.
 
-We also need to specify the exact behavior for how this input is used in the CMM's GetEncryptionMaterials call:
+We also need to specify the exact behavior for how this input is passed to the CMM's GetEncryptionMaterials call:
 
 - If this is a known-length plaintext,
   the Encrypt operation MUST pass the real plaintext length as
