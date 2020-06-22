@@ -19,10 +19,9 @@
 
 ## Affected Implementations
 
-| Language   | Repository                                                                            |
-| ---------- | ------------------------------------------------------------------------------------- |
-| Python     | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python)         |
-| Javascript | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-javascript) |
+| Language | Repository                                                                    |
+| -------- | ----------------------------------------------------------------------------- |
+| Python   | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python) |
 
 ## Definitions
 
@@ -36,7 +35,7 @@ in this document are to be interpreted as described in
 
 ### Known-Length Plaintext
 
-Any plaintext input to the Encrypt where the total length of that plaintext
+Any plaintext input to the Encrypt operation where the total length of that plaintext
 can be immediately determined.
 For example, if a user supplies plaintext as a string or byte array to Encrypt,
 that is a known-length plaintext.
@@ -50,23 +49,38 @@ that is a unknown-length plaintext.
 
 ## Summary
 
-When performing the encrypt operation on an unknown length plaintext,
-users MUST be able to specify some input that bounds the length of the plaintext to be encrypted.
+The Encrypt operation takes a plaintext as input that can either have a known length or an
+unknown length.
+If the input plaintext is a unknown-length plaintext,
+the Encrypt operation MUST also take an optional input that bounds the length of that input.
 
-This input already exists in the specification as [plaintext length](../../client-apis/encrypt.md#plaintext-length)
+The specification already specifies a [plaintext length](../../client-apis/encrypt.md#plaintext-length)
+input on the Encrypt operation that describes a bound on the plaintext length,
 however its effect on the Encrypt operation's behavior is unspecified.
 
-This change renames this input in the specification
-to be a more accurate reflection of its behavior,
+This change renames this input to `plaintext length bound` in the specification
+to be a more accurate reflection of its behavior and intent,
 and specifies the correct behavior during the Encrypt operation.
+Specifically, in the scope of the Encrypt operation it's value MUST be passed to the CMM.
 
-This change also forbids exposing any API which only performs Encrypt on known-length plaintexts
-from allowing users to specify this input.
+Additionally, it is unclear in the spec what the behavior should be
+if the input plaintext has a known-length
+and the user specifies a bound on the length of that plaintext.
+
+This change proposes that in the scope of the Encrypt operation,
+an input plaintext is either of known length,
+of unknown length with user supplied estimated size,
+or unknown length with no user supplied estimated size.
+The Encrypt operation should never consider a `plaintext length bound` alongside
+a known-length plaintext.
+
+How a user should express on the API level the intent to encrypt a known-length plaintext
+or unknown-length plaintext with or without a bound on the length
+depends on the specific implementation
+and the idioms of that implementation's language to describe APIs.
 
 ## Out of Scope
 
-- How different implementations may allow a user to specify this input for the Encrypt operation
-  is out of scope.
 - Significantly changing the shape of any of our Encrypt API implementations is out of scope.
 
 ## Motivation
@@ -79,26 +93,48 @@ Additionally, some implementations also allow a plaintext length to be specified
 known-length plaintext.
 The behavior of Encrypt in this case is not consistent between implementations.
 
-The purpose of this change is to document the correct behavior of this input and
-rename this input to clarify its intent.
+The purpose of this change is to specify exactly how this input affects the Encrypt operation.
 
-This change renames this input within the spec because
+This change renames this input to `plaintext length bound` within the spec because
 the intention behind the value of this input is that
-it is a bound on the plaintext length,
-not the exact value.
-This is what the Encrypt operation enforces when this value is set,
-and this is how CMMs should interpret this value in GetEncryptionMaterials if it is set.
-Implementations already treat this input with this intent in mind,
-so we should describe it in the specification as such.
+it is a max bound of the plaintext length,
+set by the user when streaming encryption.
+If the actual plaintext length is greater than this value,
+something is wrong and the operation MUST fail.
+Otherwise, the Encrypt operation MUST pass this value to the CMM.
 
-This change specifies that the Encrypt operation MUST pass the real length of the plaintext
-to the CMM if known instead of a user supplied bound because the former is more accurate.
-There is no case where a user would benefit from passing
-a less accurate `max plaintext length` to the CMM.
-If there were such a case,
-then such a CMM is not correctly using the intent behind `maxPlaintextLength`.
-It is better to restrict flexibilty here so that users have less opportunity
-to depend on behaviors from CMMs that are misusing this value.
+The intention of this value is not to be a one to one passthrough value to the CMM.
+If that were the case,
+then we would be concerned with always letting users specify this value for known-length plaintexts,
+or with possibly letting users pass in a "unknown length" intent.
+We do not want to support these cases.
+Users should not be setting a `max plaintext length` value for known-length plaintexts
+with the intention of changing CMM behavior.
+Instead, users should be specifying this value in for unknown-length plaintexts in order to use CMMs
+that depend on plaintext length for their internal logic.
+
+This change additionally renames the `plaintext length` field on GetEncryptionMaterialsRequest to
+`max plaintext length` because that better explains the intent behind this field.
+This field describes the max size of the plaintext which will be encrypted using the materials
+the CMM is to generate.
+This is the current state of the behavior, so the specification should describe it as such.
+This is renamed to a different name than `plaintext length bound` in order to
+distinguish the two controls.
+
+This change does not strictly prescribe how users should express intent for the plaintext
+and a possible `plaintext length bound` through an API.
+How an API should be designed with these controls in mind depends greatly on the capabilities and
+idioms of the language in use.
+Specifically, this gets tricky for languages where the idiom is to
+accept an object represent a set of user supplied params.
+If a user supplies both a known-length plaintext and a `max plaintext length`,
+what should be done?
+It doesn't make sense to have to check for bad values in the user supplied params,
+given it's unstructured nature.
+Thus, our specification reccomends that languages SHOULD either ensure that `max plaintext length`
+isn't supplied with a known-length plaintext by construction.
+If it doesn't, then it SHOULD ignore any user supplied `max plaintext length` in the case that
+a known-length plaintext is supplied.
 
 ## Drawbacks
 
@@ -114,52 +150,33 @@ This change SHOULD NOT have any security implications.
 
 ## Operational Implications
 
-This change will break any JS user that is currently using Encrypt with a known-length plaintext
-and inputting a plaintextLength less than that length.
-
 This change will break any Python user that depends on the source_length being sent to the
 CMM instead of the true length of a known-length plaintext.
 
 ## Guide-level Explanation
 
-This change renames the `plaintext length` Encryption input to `max plaintext length` in the specification,
-and clarifies its behavior in the Encrypt operation.
-
-If during the Encrypt operation it is determined that
-the actual plaintext length is greater than a supplied `max plaintext length`,
-the operation MUST fail.
-
-Additionally, when calling the CMM's GetEncryptionMaterials call during the Encrypt operation,
-the operation MUST pass in the length of the input plaintext if it can be known.
-If it can't be known, the operation passes in `max plaintext input` if supplied.
-If it can't be known and no `max plaintext input` is supplied, the operation supplies no value for
-this field.
-
-This change also renames the `plaintext length` field in the CMM interface to `max plaintext length`.
-
-Finally, this change specifies when this input should be available for users to specify:
-if and only if the input plaintext can be of unknown-length.
-
-## Reference-level Explanation
-
 We need to update the spec to make the purpose and behavior of the `plaintext length` input clear
 by renaming it and specifying its exact behavior within the Encrypt operation:
 
-When performing the encrypt operation on a unknown-length plaintext,
-users MUST be able to specify an optional parameter `maxPlaintextLength`.
-The value of this field represents the bound on the length of the plaintext to be encrypted.
+When performing the Encrypt operation on an unknown-length plaintext,
+users MUST be able to specify an optional parameter `plaintext length bound`.
+The value of this field represents the max length of the plaintext to be encrypted.
 The ESDK MUST NOT encrypt a plaintext greater than this length,
 and MUST fail if it can be determined during encryption that the actual plaintext length
 is greater than what the user supplied on input.
 The actual name of this input, and how the user specifies this value for the Encrypt operation
 MAY be different per implementation.
 
-We also need to specify the exact behavior for how this input is passed to the CMM's GetEncryptionMaterials call:
+When performing the Encrypt operation on a known-length plaintext,
+users SHOULD NOT be able to specify a `plaintext length bound`.
+If the Encrypt operation is performing on a known-length plaintext,
+any such `plaintext length bound` value MUST be ignored.
+
+We also need to specify the exact behavior for how this input is used in the CMM's GetEncryptionMaterials call:
 
 - If this is a known-length plaintext,
   the Encrypt operation MUST pass the real plaintext length as
-  `maxPlaintextLength` in the CMM GetEncryptionMaterials call.
-  (regardless of whether maxPlaintextLength was supplied on input),
+  `max plaintext length` in the CMM GetEncryptionMaterials call.
 - If the length of the plaintext is not known and `maxPlaintextLength` was supplied on input,
   the Encrypt operation MUST pass the supplied `maxPlaintextLength`
   to the CMM GetEncryptionMaterials call.
@@ -176,7 +193,11 @@ The actual name of this field MAY be different per implementation.
 
 Finally, we should specify the following for implementations of APIs that do the Encrypt operation:
 
-- If exposing an API where the plaintext length is always known from the input plaintext,
-  then the ESDK MUST NOT provide `max plaintext length` as a user input.
-- If exposing an API where it is possible for the length of the plaintext to be unknown on input,
-  then the ESDK MUST provide an optional `max plaintext length` input.
+- Implementations SHOULD ensure that a user is not able to specify both a known-length plaintext
+  and a `plaintext length bound` by construction.
+- If a user is able to specify both a known-length plaintext and a `plaintext length bound`,
+  `plaintext length bound` MUST NOT be used during the Encrypt operation and MUST be ignored.
+
+## Reference-level Explanation
+
+See [Guide-level Explanation](#guide-level-explanation) above.
