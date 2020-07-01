@@ -98,7 +98,7 @@ This change SHOULD NOT have any security implications.
 This change adds operational controls that more strictly bound some fields in the
 message header.
 Users who are especially concerned with the memory usage of their systems should consider
-setting these controls in order to put a stricter bound on the messages that the ESDK will decrypt.
+setting these controls to restrict resource consumption.
 
 This change breaks JS users who currently set `Max Body Size`
 and expect a message with a encrypted content field length of exactly `Max Body Size`
@@ -128,9 +128,7 @@ require a significant amount of memory to process.
 The message format contains the following highly-bounded variable length fields:
 
 1.  The Encrypted Content field in an unframed message.
-    The message format allows this to be up to 2^64 - 1 bytes (16 EiB)
-    however in implementation this is actually limited to 2^36 - 32 bytes (~64 GiB)
-    due to restrictions in the algorithm suite.
+    The message format allows this to be up to 2^36 - 32 bytes (~64 GiB).
     For some implementations this is further restricted
     (e.g. Java arrays cannot have more than 2^31 - 1 members).
     In order to decrypt an unframed message,
@@ -152,10 +150,11 @@ The message format contains the following highly-bounded variable length fields:
     process the largest EDK set the message format allows.
     The actual memory required depends on how a specific language and implementation
     represents these objects in memory.
-    These objects need to be held in memory for the duration of the decryption operation.
+    These objects MUST be held in memory for the duration of the decryption operation
+    because the decrypt operation MUST output the parsed header.
 
-The above represents ways in which a message can become large such that their processing
-would exhaust many memory runtime limits.
+Messages with the above fields at their size limits, when processed,
+can exhaust many memory runtime limits.
 As such, customers who are concerned with the stability and memory usage of their systems
 may care about providing stricter bounds to these fields.
 
@@ -256,8 +255,9 @@ If `max body size` is set on Decrypt, then the operation:
     This means that implementations MUST NOT fail
     based on the frame size in the message header alone,
     and MUST check the first frame in the message.
-    We allow this is because the Frame Size input is idependent of Max Body Size,
-    and thus expresses a user intent that should not be conflated with Max Body Size.
+    We allow this is because the Frame Size input is independent of Max Body Size.
+    Frame Size expresses a user intent on encrypt that should not be conflated with
+    the user intent for Max Body Size on decrypt.
 
 ### Max Header Size
 
