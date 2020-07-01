@@ -134,7 +134,7 @@ The message format contains the following highly-bounded variable length fields:
     For some implementations this is further restricted
     (e.g. Java arrays cannot have more than 2^31 - 1 members).
     In order to decrypt an unframed message,
-    the entire Encrypted Content field must be buffered.
+    the ESDK MUST buffer the entire Encrypted Content field.
     In order to release the plaintext to the user safely,
     the ESDK MUST hold both the plaintext and the ciphertext in memory at the same time.
     Assuming an encryption algorithm where the length of the output equals the length of the input,
