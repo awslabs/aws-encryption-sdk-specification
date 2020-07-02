@@ -7,33 +7,33 @@
 
 This serves as a reference of all features that this change affects.
 
-| Features                                                                                                                                              |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md) |
-| [AWS KMS Discovery Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/84)                                                    |
-| [Client Suppliers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/94)                                                             |
-| [Limiting network calls to specific AWS regions](https://github.com/awslabs/aws-encryption-sdk-specification/issues/90)                               |
-| [AWS SDK KMS service client caching](https://github.com/awslabs/aws-encryption-sdk-specification/issues/16)                                           |
-| [AWS SDK KMS service client initialization/configuration](https://github.com/awslabs/aws-encryption-sdk-specification/issues/15)                      |
-| [AWS SDK KMS service client user agent string](https://github.com/awslabs/aws-encryption-sdk-specification/issues/59)                                 |
-| [Passing provider info to the AWS KMS Decrypt API Call](https://github.com/awslabs/aws-encryption-sdk-specification/issues/139)                       |
+| Features                                                                                                                         |
+| -------------------------------------------------------------------------------------------------------------------------------- |
+| [AWS KMS Keyring](../../framework/kms-keyring.md)                                                                                |
+| [AWS KMS Discovery Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/84)                               |
+| [Client Suppliers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/94)                                        |
+| [Limiting network calls to specific AWS regions](https://github.com/awslabs/aws-encryption-sdk-specification/issues/90)          |
+| [AWS SDK KMS service client caching](https://github.com/awslabs/aws-encryption-sdk-specification/issues/16)                      |
+| [AWS SDK KMS service client initialization/configuration](https://github.com/awslabs/aws-encryption-sdk-specification/issues/15) |
+| [AWS SDK KMS service client user agent string](https://github.com/awslabs/aws-encryption-sdk-specification/issues/59)            |
+| [Passing provider info to the AWS KMS Decrypt API Call](https://github.com/awslabs/aws-encryption-sdk-specification/issues/139)  |
 
 ## Affected Specifications
 
 This serves as a reference of all specification documents that this change affects.
 
-| Specification                                                                                                                                         |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md) |
+| Specification                                     |
+| ------------------------------------------------- |
+| [AWS KMS Keyring](../../framework/kms-keyring.md) |
 
 ## Affected Implementations
 
 This serves as a reference for all implementations that this change affects.
 
-| Language                                  | Implementation                                                                                                                                              |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C (AWS KMS keyring implementation in C++) | [kms_keyring.cpp](https://github.com/aws/aws-encryption-sdk-c/blob/aa85ca224d550cfe110e2112821a84506b9aca3e/aws-encryption-sdk-cpp/source/kms_keyring.cpp)  |
-| Javascript                                | [kms_keyring.ts](https://github.com/aws/aws-encryption-sdk-javascript/blob/75803ed4d3c8b5e86005108c173941c43e81cb56/modules/kms-keyring/src/kms_keyring.ts) |
+| Language   | Implementation                                                                        |
+| ---------- | ------------------------------------------------------------------------------------- |
+| C          | [aws-encryption-sdk-c](https://github.com/aws/aws-encryption-sdk-c)                   |
+| Javascript | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-javascript) |
 
 This change additionally affects the unreleased AWS KMS keyring implementations for Java and Python.
 
