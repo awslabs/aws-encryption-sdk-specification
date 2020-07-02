@@ -89,10 +89,6 @@ MUST be constructed as follows:
   Otherwise, this is an empty encryption context.
 - Algorithm Suite: If provided, this is the [input algorithm suite](#algorithm-suite).
   Otherwise, this field is not included.
-- Plaintext Length: If provided, this is the [input plaintext length](#plaintext-length).
-  Otherwise, if the length is known on the input [plaintext](#plaintext), this value MUST equal to
-  the input plaintext length.
-  Otherwise, this field is not included.
 
 The [algorithm suite](#algorithm-suites.md) used in all other aspects of this behavior MUST be the algorithm suite in the
 [encryption materials](#encryption-materials.md) returned from the [Get Encryption Materials](#cmm-interface#get-encryption-materials) call.
