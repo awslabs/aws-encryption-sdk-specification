@@ -174,9 +174,9 @@ The smaller-scoped AWS KMS keyrings become the basic building blocks that keyrin
 
 From a customer standpoint, naming will be clearer.
 Customers interact with the keyring-producing operations and do not directly interact with the basic building blocks.
-However, more advanced users can directly interact with the smaller-scoped keyrings
+However, more advanced customers can directly interact with the smaller-scoped keyrings
 and write their own keyring-producing operations.
-This gives advanced users more flexibility and reduces the need to fork ESDK code in order to meet a specific use case.
+This gives advanced customers more flexibility and reduces the need to fork ESDK code in order to meet a specific use case.
 
 ## Reference-level Explanation
 
