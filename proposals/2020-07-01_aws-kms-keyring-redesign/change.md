@@ -313,8 +313,9 @@ The ESDK MUST provide customers a way to use the following:
 1. Initialize/configure the AWS SDK client(s) required for communicating with AWS KMS for the given key names/AWS regions
 2. Configure each AWS KMS keyring with the AWS SDK client it needs to communicate with AWS KMS
 3. Be configurable with an optional AWS SDK client configuration (client config)
-   or a similar AWS SDK language-specific client configuration option 1. If a client config is provided,
-   the keyring-producing operation MUST configure all AWS SDK clients with the provided client config
+   or a similar AWS SDK language-specific client configuration option
+   1. If a client config is provided,
+      the keyring-producing operation MUST configure all AWS SDK clients with the provided client config
 4. Limit the initialization of new AWS SDK client(s) when possible
    1. Multiple keyrings can be configured with the same AWS SDK client if the following conditions are all met:
       1. Keyrings MUST be configured in the same keyring-producing operation call
