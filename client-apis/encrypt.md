@@ -43,6 +43,7 @@ The following inputs to this behavior are REQUIRED:
 
 The following as inputs to this behavior are OPTIONAL:
 
+- [Algorithm Suite](#algorithm-suite)
 - [Encryption Context](#encryption-context)
 - [Frame Length](#frame-length)
 - [Plaintext Length](#plaintext-length)
@@ -64,6 +65,10 @@ A CMM that implements the [CMM interface](../framework/cmm-interface.md).
 ### Keyring
 
 A Keyring that implements the [keyring interface](../framework/keyring-interface.md).
+
+### Algorithm Suite
+
+The [algorithm suite](#algorithm-suite.md) that SHOULD be used for encryption.
 
 ### Frame Length
 
@@ -87,12 +92,17 @@ by calling [Get Encryption Materials](../framework/cmm-interface.md#get-encrypti
 The CMM used MUST be the input CMM, if supplied.
 If instead the user supplied a [keyring](../framework/keyring-interface.md), this behavior MUST use a [default CMM](../framework/default-cmm.md),
 constructed using the user supplied keyring as input.
-The call to [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) MUST include the
-input [encryption context](#encryption-context), if supplied.
-If the length is known on the input [plaintext](#plaintext), this call MUST also include that value
+The call to [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) on that CMM
+MUST be constructed as follows:
+
+- Encryption Context: If provided, this is the [input encryption context](#encryption-context).
+  Otherwise, this is an empty encryption context.
+- Algorithm Suite: If provided, this is the [input algorithm suite](#algorithm-suite).
+  Otherwise, this field is not included.
 
 The [algorithm suite](../framework/algorithm-suites.md) used in all aspects of this behavior MUST be the algorithm suite in the
 [encryption materials](../framework/structures.md#encryption-materials) returned from the [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) call.
+Note that the algorithm suite in the retrieved encryption materials MAY be different from the [input algorithm suite](#algorithm-suite).
 
 The data key used as input for all encryption described below is a data key derived from the plaintext data key
 included in the [encryption materials](../framework/structures.md#encryption-materials).
