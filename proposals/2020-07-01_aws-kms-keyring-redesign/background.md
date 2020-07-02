@@ -244,15 +244,6 @@ The ESDK MUST provide customers a way to use the following:
       2. with each AWS KMS symmetric region discovery keyring configured with the configured AWS account ID, if applicable
       3. with each AWS KMS symmetric region discovery keyring configured with the configured grant tokens, if applicable
       4. where the order of the child keyrings matches the order of the configured AWS regions
-3. **AWS KMS symmetric all region discovery keyring**
-   1. MAY be configured with an AWS account ID
-   2. MAY be configured with a list of string [grant tokens](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#grant-tokens)
-      to be included in all AWS KMS calls
-   3. MUST configure an AWS KMS symmetric multi-region discovery keyring...
-      1. with a list of all AWS regions
-         1. obtained directly from the AWS SDK or from a configuration provided by the AWS SDK
-      2. with the configured AWS account ID, if applicable
-      3. with the configured grant tokens, if applicable
 
 **All keyring-producing operations MUST...**
 
@@ -648,13 +639,14 @@ The AWS KMS discovery keyring limits communication to the single AWS region it i
 
 ### Issue 8: Be able to attempt decryption without needing to specify the CMKs to use for decryption
 
-Customers want to maintain the existing _Is Discovery_ keyring use case.
 See [_Issue 8a_](#issue-8a-optionally-limit-and-order-the-cmks-to-attempt-decryption-with-based-on-their-aws-region-or-aws-account-id).
 
 ### Issue 8a: Optionally limit and order the CMKs to attempt decryption with based on their AWS region or AWS account ID
 
 Customers want to maintain the existing [AWS KMS regional discovery keyring](https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/choose-keyring.html#kms-keyring-regional)
-use case.
+use case,
+where a keyring can _attempt_ decryption for any encrypted data key in a specific region,
+regardless of the AWS KMS CMK used to encrypt it.
 We also want to enable customers to have ordered region limiting,
 where customers provide an ordered list of AWS regions
 and decryption is _attempted_ in the provided order.
@@ -671,9 +663,14 @@ and configures it with the optional AWS account ID.
 Each AWS KMS discovery keyring is a child in a multi-keyring,
 in the same order as the regions configured by the customer.**
 
-**A keyring-producing operation that is only configured with an optional AWS account ID also exists.
-This operation initializes AWS KMS discovery keyrings in all AWS regions.
-Each AWS KMS discovery keyring is a child in a multi-keyring.**
+**If customers need a keyring that _attempts_ decryption in all AWS regions,
+they SHOULD call a service/API
+to get an updated list of AWS regions.
+This will prevent any ESDK or AWS SDK region-list from becoming stale over time.
+In most cases, customers SHOULD simply use the keyring-producing operation
+for the specific regions they need.
+This will provide flexibility for adding more regions over time,
+without allowing access to regions that are not currently required.**
 
 1. By configuring the keyring-producing operation,
    customers configure the region(s) and AWS account ID they want to communicate with.
@@ -683,7 +680,6 @@ Each AWS KMS discovery keyring is a child in a multi-keyring.**
    1. Multi-keyring behavior is unchanged
    2. Supports new ordered region filtering use case
    3. Supports new AWS account ID filtering use case
-   4. Customers can access a keyring that will _attempt_ decryption in all AWS regions
 
 ```
 // Without a keyring-producing operation, the proposal is represented as
@@ -704,23 +700,6 @@ multiKeyring = MakeAwsKmsSymmetricMultiRegionDiscoveryKeyring(["us-west-2", "us-
 
 // If customers do not need to limit the AWS account ID...
 multiKeyring = MakeAwsKmsSymmetricMultiRegionDiscoveryKeyring(["us-west-2", "us-east-1", ...])
-
-// If customers do not want to configure any regions,
-// a keyring-producing operation can produce
-// an AWS KMS symmetric all region discovery keyring.
-//
-// The keyring-producing operation uses the AWS SDK
-// to determine all AWS regions
-// and configures one AWS KMS discovery keyring per AWS region.
-//
-// This would be the same as using a multi-region discovery keyring
-// configured with all AWS regions:
-// MakeAwsKmsSymmetricMultiRegionDiscoveryKeyring([every AWS region in list])
-anyRegionDiscoveryKeyring = MakeAwsKmsSymmetricAllRegionDiscoveryKeyring()
-
-// Customers can configure a keyring that limits AWS KMS calls
-// to a specific AWS account ID, but MAY communicate with all AWS regions.
-myDiscoveryKeyring = new MakeAwsKmsSymmetricDiscoveryKeyring(awsAccountId)
 ```
 
 ### Issue 8b: Ensure it is possible to efficiently limit decryption to specific CMKs, even if the decryption operation has a large number of CMKs that my credentials have access to

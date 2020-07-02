@@ -298,15 +298,6 @@ The ESDK MUST provide customers a way to use the following:
       2. with each AWS KMS symmetric region discovery keyring configured with the configured AWS account ID, if applicable
       3. with each AWS KMS symmetric region discovery keyring configured with the configured grant tokens, if applicable
       4. where the order of the child keyrings matches the order of the configured AWS regions
-3. **AWS KMS symmetric all region discovery keyring**
-   1. MAY be configured with an AWS account ID
-   2. MAY be configured with a list of string [grant tokens](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#grant-tokens)
-      to be included in all AWS KMS calls
-   3. MUST configure an AWS KMS symmetric multi-region discovery keyring...
-      1. with a list of all AWS regions
-         1. obtained directly from the AWS SDK or from a configuration provided by the AWS SDK
-      2. with the configured AWS account ID, if applicable
-      3. with the configured grant tokens, if applicable
 
 **All keyring-producing operations MUST...**
 
