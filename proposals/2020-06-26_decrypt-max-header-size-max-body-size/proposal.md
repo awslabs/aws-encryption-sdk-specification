@@ -49,7 +49,7 @@ especially for such users that care about the memory usage of their systems.
 
 Most ESDK implementations have a way to mitigate some of these concerns through
 user specified controls on the Decrypt operation,
-however these controls are not described in our specification,
+however these controls are not described in our specification
 and are not consistent across implementations.
 
 This change clearly defines the specification for two inputs,
@@ -70,7 +70,7 @@ on the messages the ESDK will process.
 
 - Additional controls to limit the memory used to process messages with invalid signature lengths
   is out of scope.
-  The bounds of the signature length field are small enough (2^16 bytes)
+  The bounds of the signature length field are small enough (2^16 - 1 bytes)
   that they are not a concern.
 
 ## Motivation
@@ -80,7 +80,7 @@ when decrypting messages.
 However, none of these mitigations behave consistently across implementations
 and none of them bound the fields in the message header specifically.
 
-As such, this change proposes two standard controls
+This change proposes two standard controls
 that bound resource consumption.
 
 ## Drawbacks
@@ -100,8 +100,8 @@ message header.
 Users who are especially concerned with the memory usage of their systems should consider
 setting these controls to restrict resource consumption.
 
-This change breaks JS users who currently set `Max Body Size`
-and expect a message with a encrypted content field length of exactly `Max Body Size`
+This change breaks Javascript and Node.js users who currently set `Max Body Size`
+and expect a message with an encrypted content field length of exactly `Max Body Size`
 to fail.
 This change makes `Max Body Size` inclusive,
 allowing encryption content fields of that exact length.
@@ -186,10 +186,10 @@ rather than using these controls.
 
 ### What value should they set it to?
 
-Users should choose reasonable values for their use case and
+Users SHOULD choose reasonable values for their use case and
 the messages that they expect to decrypt.
-They should expect the memory usage of the ESDK to scale linearly with this control,
-and can performance test their application to determine
+They can expect the memory usage of the ESDK to scale linearly with this control,
+and SHOULD performance test their application to determine
 the ESDKs memory cost in practice for their use case.
 
 ### Why not just provide one control that “does the right thing” for most use cases?
@@ -212,7 +212,7 @@ so that they can be easily understood and applied.
 To allow for the smallest possible message header
 (no AAD, one EDK but the EDK fields themselves are empty),
 the `Max Header Size` MUST NOT be less than 40 bytes.
-Because future message format revisions might have different lower limits,
+However, because future message format revisions might have different lower limits,
 we cannot know if a limit is too low until we start processing a message.
 
 ### Will this value still be valid if/when we update the message format?
@@ -241,7 +241,7 @@ If `max body size` is set on Decrypt, then the operation:
     if Max Body Size is set then the ESDK MUST fail if the encrypted content length field
     in the message body is greater than (>) Max Body Size.
 - MUST halt and fail if processing a message frame with an encrypted content field
-  of a length greater than (>) Max Body Size, and MUST NOT attempt decryption on any such frame.
+  of a length greater than (>) Max Body Size and MUST NOT attempt decryption on any such frame.
   - This means that when decrypting a regular frame in a framed message,
     if Max Body Size is set then the ESDK MUST fail if the frame length
     set in the header is greater than Max Body Size.
@@ -249,15 +249,13 @@ If `max body size` is set on Decrypt, then the operation:
     if Max Body Size is set then the ESDK MUST fail if the encrypted content length field
     set in the final frame is greater than Max Body Size.
   - Note that there is an edge case for messages with bodies that only consist of a final frame.
-    Specifically, a message MAY have a frame size (stated in the header)
-    greater than (>) Max Body Size but the message only contains one final frame,
-    and that final frame has an encrypted content length less than or equal to (<=) Max Body Size.
-    This means that implementations MUST NOT fail
-    based on the frame size in the message header alone,
+    If a message body contains a single frame,
+    that final frame MAY have a content length less then (<) the frame size in the header.
+    For this reason, the implementation MUST NOT fail
+    based on the frame size in the message header alone
     and MUST check the first frame in the message.
-    We allow this is because the Frame Size input is independent of Max Body Size.
-    Frame Size expresses a user intent on encrypt that should not be conflated with
-    the user intent for Max Body Size on decrypt.
+    Such a message is valid because the Frame Size is set on encrypt
+    while Max Body Size is set only on decrypt.
 
 ### Max Header Size
 
