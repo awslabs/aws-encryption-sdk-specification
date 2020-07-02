@@ -180,9 +180,8 @@ mitigate highly-bounded resource consumption for certain use cases.
 If a user has a security requirement to not decrypt messages with a certain content length
 or message header length
 (ex, to enforce a “sign only” use case by only decrypting zero length messages),
-that security requirement should be met
-with a custom CMM that only allows desired requests
-rather than using these controls.
+they SHOULD meet that security requirement using
+a custom CMM that only allows desired requests.
 
 ### What value should they set it to?
 
