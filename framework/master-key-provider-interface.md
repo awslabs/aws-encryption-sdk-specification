@@ -1,5 +1,5 @@
-[//]: # (Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Master Key Provider Interface
 
@@ -43,17 +43,17 @@ as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
 ### Terms
 
-* Provider ID : A value that identifies a master key provider.
-    This concept is equivalent to "key namespace" for Keyrings.
-* Key ID : A value that identifies a master key
-    within the context of a master key provider.
-    This concept is equivalent to "key name" for Keyrings.
-* Provider Info : The value that is written to a serialized encrypted data key
-    that identifies a master key within the context of a master key provider.
-    This MUST always be equal to the master key's key ID
-    with the exception of the raw AES master key.
-    For a detailed description of this exception,
-    see the [Raw AES Keyring specification](./raw-aes-keyring.md).
+- Provider ID : A value that identifies a master key provider.
+  This concept is equivalent to "key namespace" for Keyrings.
+- Key ID : A value that identifies a master key
+  within the context of a master key provider.
+  This concept is equivalent to "key name" for Keyrings.
+- Provider Info : The value that is written to a serialized encrypted data key
+  that identifies a master key within the context of a master key provider.
+  This MUST always be equal to the master key's key ID
+  with the exception of the raw AES master key.
+  For a detailed description of this exception,
+  see the [Raw AES Keyring specification](./raw-aes-keyring.md).
 
 ## Interface
 
@@ -91,7 +91,7 @@ This interface is used to decrypt a data key.
 
 The master key provider SHOULD attempt to decrypt the data key
 by passing the request to any master keys that it has access to
-until it has either run exhausted available master keys
+until it has either exhausted available master keys
 or obtained a plaintext data key.
 
 Inputs to this interface MUST include
@@ -102,7 +102,7 @@ and a list of encrypted data keys.
 The output of this interface MUST include
 the decrypted data key
 and information that can identify which master key
-was used to decrypt the data key.
+decrypted the data key.
 
 If the master key provider cannot decrypt the data key,
 the call MUST result in an error.

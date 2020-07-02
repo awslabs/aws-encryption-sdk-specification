@@ -1,11 +1,11 @@
-[//]: # (Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.)
-[//]: # (SPDX-License-Identifier: CC-BY-SA-4.0)
+[//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
+[//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
 # Message Body AAD
 
 ## Version
 
-See [Message Version](#message.md#version).
+See [Message Version](message.md#version).
 
 ## Implementations
 
@@ -24,7 +24,7 @@ The following describes the fields that form the message body AAD.
 The bytes are appended in the order shown.
 
 | Field            | Length (bytes) | Interpreted as |
-|------------------|----------------|----------------|
+| ---------------- | -------------- | -------------- |
 | Message ID       | 16             | Bytes          |
 | Body AAD Content | Variable.      | UTF-8 Bytes    |
 | Sequence Number  | 4              | Uint32         |
@@ -32,23 +32,23 @@ The bytes are appended in the order shown.
 
 ### Message ID
 
-An identifier for the [message](#message.md) this message body AAD is associated with.
+An identifier for the [message](message.md) this message body AAD is associated with.
 
 ### Body AAD Content
 
 An identifier for the content type of the data this message body AAD is associated with.
 
-This value depends on the [content type](#message-header.md#content-type) of the [message](#message.md):
+This value depends on the [content type](message-header.md#content-type) of the [message](message.md):
 
-- [Non-framed data](#message-body.md#non-framed-data) MUST use the value `AWSKMSEncryptionClient Single Block`.
-- The [regular frames](#message-body.md#regular-frame) in [framed data](#message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Frame`.
-- The [final frame](#message-body.md#final-frame) in [framed data](#message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Final Frame`.
+- [Non-framed data](message-body.md#non-framed-data) MUST use the value `AWSKMSEncryptionClient Single Block`.
+- The [regular frames](message-body.md#regular-frame) in [framed data](message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Frame`.
+- The [final frame](message-body.md#final-frame) in [framed data](message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Final Frame`.
 
 ### Sequence Number
 
 The sequence number of the data this message body AAD belongs to.
-For [framed data](#message-body.md#framed-data), the value of this field MUST be the [frame sequence number](#message-body.md#frame-sequence-number).
-For [non-framed data](#message-body.md#framed-data), the value of this field MUST be `1`.
+For [framed data](message-body.md#framed-data), the value of this field MUST be the [frame sequence number](message-body.md#sequence-number).
+For [non-framed data](message-body.md#non-framed-data), the value of this field MUST be `1`.
 
 ### Content Length
 
@@ -61,12 +61,11 @@ More specifically, depending on the [content type](message-header.md#content-typ
 - For [framed data](message-body.md#framed-data), this value MUST equal the length, in bytes,
   of the plaintext being encrypted in this frame.
   - For [regular frames](message-body.md#regular-frame), this value MUST equal the value of
-    the [frame length](message-hedaer.md#frame-length) field in the message header.
+    the [frame length](message-header.md#frame-length) field in the message header.
   - For the [final frame](message-body.md#final-frame), this value MUST be greater than or equal to
-    0 and less than or equal to the value of the [frame length](message-hedaer.md#frame-length)
+    0 and less than or equal to the value of the [frame length](message-header.md#frame-length)
     field in the message header.
 
 ## Security Considerations
 
 [TODO]
-
