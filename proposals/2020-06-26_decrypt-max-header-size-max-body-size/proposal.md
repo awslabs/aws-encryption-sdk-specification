@@ -125,7 +125,7 @@ the ESDK MUST buffer variable length fields from the ESDK message format.
 Some variable length fields can be large enough that they
 require a significant amount of memory to process.
 
-The message format contains the following highly-bounded variable length fields:
+The message format contains the following variable length fields with maximum bounds high enough to be of concern:
 
 1.  The Encrypted Content field in an unframed message.
     The message format allows this to be up to 2^36 - 32 bytes (~64 GiB).
@@ -221,7 +221,7 @@ how we might update the message format in the future.
 
 Conceptually, this should apply nicely to any new message format.
 With a new message format, our concerns about memory limits should be similar.
-There is not a way around needing to process a whole frame before releasing any plaintext,
+There is no way to avoid processing a whole frame before releasing any plaintext,
 meaning that we will always want some control on the encrypted content size.
 The message header will always contain some metadata that the ESDK might need to hold in memory,
 meaning that a control on the header size would still be useful.
@@ -232,7 +232,7 @@ Specify two optional inputs on Decrypt, `Max Header Size` and `Max Body Size`.
 
 ### Max Body Size
 
-If `max body size` is set on Decrypt, then the operation:
+If `Max Body Size` is set on Decrypt, then the operation:
 
 - MUST halt and fail if processing an unframed message with encrypted content field
   of a length greater than (>) Max Body Size, and MUST NOT attempt decryption on such a message.
