@@ -49,7 +49,7 @@ that is a unknown-length plaintext.
 
 ## Summary
 
-The Encrypt operation takes a plaintext as input that can either have a known length or an
+The Encrypt operation interacts with plaintext that can either have a known length or an
 unknown length.
 If the input plaintext is a unknown-length plaintext,
 the Encrypt operation MUST also take an optional input that bounds the length of that input.
