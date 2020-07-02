@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.0
+0.3.0
 
 ### Changelog
+
+- 0.3.0
+
+  - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
 
 - 0.2.0
 
@@ -31,7 +35,7 @@
 
 This document describes the behavior by which a plaintext is encrypted and serialized into a [message](../data-format/message.md).
 
-Any client provided by the AWS Encryption SDK that performs encryption of user plaintext MUST follow
+Any client provided by the AWS Encryption SDK that performs encryption of caller plaintext MUST follow
 this specification for encryption.
 
 ## Input
@@ -51,6 +55,14 @@ The following as inputs to this behavior are OPTIONAL:
 ### Plaintext
 
 The plaintext to encrypt.
+This MUST be a sequence of bytes.
+
+The caller MAY stream the sequence of bytes to this operation.
+
+- The caller MAY supply the plaintext bytes sequentially and temporally to this operation.
+- The caller MUST be able to indicate an end to the sequential input to this operation.
+- This operation MAY process on any plaintext supplied thus far.
+- This operation MUST NOT complete until the caller has indicated an end to the input.
 
 ### Encryption Context
 
@@ -83,26 +95,62 @@ A bound on the length of the [plaintext](#plaintext) to encrypt.
 
 This behavior MUST output the following if the behavior is successful:
 
-- [message](../data-format/message.md)
+- [encrypted message](#encrypted-message)
 
-To construct the outputs, some fields MUST be constructed using information obtained
+### Encrypted Message
+
+An encrypted form of the input [plaintext](#plaintext),
+encrypted according to the [operation specified below](#operation).
+This MUST be a sequence of bytes
+and conform to the [message format specification](../data-format/message.md).
+
+This operation MAY stream the encrypted message to the caller.
+
+- The operation MAY release the output message sequentially and temporally to the caller.
+- The operation MUST be able to indicate an end to the released sequential output.
+
+## Operation
+
+The Encrypt operation is divided into several distinct parts:
+
+- [Get the encryption materials](#get-the-encryption-materials)
+- [Construct the header](#construct-the-header)
+- [Construct the body](#construc-the-body)
+- [(Optional) Construct the signature](#construct-the-signature)
+
+This operation MUST perform these steps in order.
+These steps calculate and serialize the components of the output [encrypted message](#encrypted-message).
+Any data that is not specified within the [message format](../data-format/message.md)
+MUST NOT be added to the output message.
+
+The bytes of the output encrypted message MAY be released to the caller as soon as they are serialized.
+
+If any of these steps fails, this operation MUST halt and indicate a failure to the caller.
+
+### Get the encryption materials
+
+To construct the [encrypted message](#encrypted-message),
+some fields MUST be constructed using information obtained
 from a set of valid [encryption materials](../framework/structures.md#encryption-materials).
-This behavior MUST obtain this set of [encryption materials](../framework/structures.md#encryption-materials)
+This operation MUST obtain this set of [encryption materials](../framework/structures.md#encryption-materials)
 by calling [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) on a [CMM](../framework/cmm-interface.md).
 The CMM used MUST be the input CMM, if supplied.
-If instead the user supplied a [keyring](../framework/keyring-interface.md), this behavior MUST use a [default CMM](../framework/default-cmm.md),
-constructed using the user supplied keyring as input.
-The call to [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) on that CMM
-MUST be constructed as follows:
+If instead the caller supplied a [keyring](../framework/keyring-interface.md),
+this behavior MUST use a [default CMM](../framework/default-cmm.md)
+constructed using the caller supplied keyring as input.
+The call to [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials)
+on that CMM MUST be constructed as follows:
 
 - Encryption Context: If provided, this is the [input encryption context](#encryption-context).
   Otherwise, this is an empty encryption context.
 - Algorithm Suite: If provided, this is the [input algorithm suite](#algorithm-suite).
   Otherwise, this field is not included.
 
-The [algorithm suite](../framework/algorithm-suites.md) used in all aspects of this behavior MUST be the algorithm suite in the
-[encryption materials](../framework/structures.md#encryption-materials) returned from the [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) call.
-Note that the algorithm suite in the retrieved encryption materials MAY be different from the [input algorithm suite](#algorithm-suite).
+The [algorithm suite](../framework/algorithm-suites.md) used in all aspects of this operation
+MUST be the algorithm suite in the [encryption materials](../framework/structures.md#encryption-materials)
+returned from the [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) call.
+Note that the algorithm suite in the retrieved encryption materials MAY be different
+from the [input algorithm suite](#algorithm-suite).
 
 The data key used as input for all encryption described below is a data key derived from the plaintext data key
 included in the [encryption materials](../framework/structures.md#encryption-materials).
@@ -113,16 +161,22 @@ This document refers to the output of the key derivation algorithm as the derive
 Note that if the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
 then the derived data key is the same as the plaintext data key.
 
-### Message
+The frame length used in the procedures described below is the input [frame length](#frame-size),
+if supplied.
+If a frame length is not specified on input, this operation MUST choose a reasonable value to
+default to.
 
-The output message MUST be bytes, as specified by the [message format](../data-format/message.md).
+### Construct the header
 
-The [message header](../data-format/message-header.md) is serialized with the following specifics:
+Before encrypting input plaintext, this operation MUST serialize the [message header body](../data-format/message-header.md)
+with the following specifics:
 
-- [Version](../data-format/message-header.md#version-1): MUST have a value corresponding to [1.0](../data-format/message-header.md#supported-versions)
-- [Type](../data-format/message-header.md#type): MUST have a value corresponding to [Customer Authenticated Encrypted Data](../data-format/message-header.md#supported-types)
-- [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST be the [algorithm suite](../framework/algorithm-suites.md)
-  used in this behavior
+- [Version](../data-format/message-header.md#version-1): MUST have a value corresponding to
+  [1.0](../data-format/message-header.md#supported-versions)
+- [Type](../data-format/message-header.md#type): MUST have a value corresponding to
+  [Customer Authenticated Encrypted Data](../data-format/message-header.md#supported-types)
+- [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST correspond to
+  the [algorithm suite](../framework/algorithm-suites.md) used in this behavior
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
   in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
@@ -130,50 +184,144 @@ The [message header](../data-format/message-header.md) is serialized with the fo
 - [Content Type](../data-format/message-header.md#content-type): MUST be [02](../data-format/message-header.md#supported-content-types)
 - [IV Length](../data-format/message-header.md#iv-length): MUST match the [IV length](../framework/algorithm-suites.md#iv-length)
   specified by the [algorithm suite](../framework/algorithm-suites.md)
-- [Frame Length](../data-format/message-header.md#frame-length): MUST be the same value as the input [frame length](#frame-length),
-  if included.
+- [Frame Length](../data-format/message-header.md#frame-length): MUST be the value of the frame size determined above.
+
+After serializing the message header body,
+this operation MUST calculate an [authentication tag](../data-format/message-header.md#authentication-tag)
+over the message header body.
+The value of this MUST be the output of the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
+specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
+
+- The AAD is the serialized [message header body](../data-format/message-header.md#header-body).
+- The IV has a value of 0.
+- The cipherkey is the derived data key
+- The plaintext is an empty byte array
+
+With the authentication tag calculated, this operation MUST serialize the
+[message header authentication](../data-format/message-header.md#header-authentication)
+with the following specifics.
+
 - [IV](../data-format/message-header.md#iv): MUST have a value of 0, padded to the [IV length](../data-format/message-header.md#iv-length).
-- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST be the output of the
-  [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
-  specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
-  - The AAD is the serialized [message header body](../data-format/message-header.md#header-body)
-  - The IV is the [IV specified above](../data-format/message-header.md#iv)
-  - The cipherkey is the derived data key
-  - The plaintext is an empty byte array
+- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
+  of the authentication tag calculated above.
 
-Each frame of the [message body](../data-format/message-body.md) is serialized with the following specifics:
+The encrypted message outputted by this operation MUST have a message header equal
+to the message header calculated in this step.
 
-- [IV](../data-format/message-body.md#iv): MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
-  used in the [message body AAD](../data-format/message-body-aad.md) for this frame.
-- [Encrypted Content](../data-format/message-body.md#encrypted-content): MUST be the output of the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
-  specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
-  - The AAD is the serialized [message body AAD](../data-format/message-body-aad.md)
-  - The IV is the [IV](../data-format/message-body.md#iv) specified for this frame above.
-  - The cipherkey is the derived data key
-  - The plaintext contains part of the input [plaintext](#plaintext) this frame is encrypting.
-- [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag outputted by the above encryption.
+If the algorithm suite contains a signature algorithm and
+this operation is streaming the encrypted message output to the caller,
+this operation MUST input the serialized header to the signature algorithm as soon as it is serialized,
+such that the serialized header isn't required to remain in memory to complete
+the [signature calculation](#signature-calculation).
+
+## Construct the body
+
+The encrypted message outputted by this operation MUST have a message body equal
+to the message body calculated in this step.
+
+While there MAY still be plaintext left to encrypt,
+this operation MUST either wait for more plaintext to become available,
+wait for the caller to indicate an end to the plaintext,
+or to perform encryption on the available plaintext to construct frames
+which make up the message body.
+
+Frames MUST be constructed sequentially such that the concatenation of their decryption
+in [sequence number](#.../data-format/message-body/md#sequence-number)
+order is equal to the input plaintext which has been encrypted so far.
+
+If the caller has not indicated an end to the input plaintext yet
+and there are not enough input plaintext bytes available to create a new
+[regular frame](#../data-format/message-body.md#regular-frame),
+then this operation MUST wait until either enough plaintext bytes become available
+or the caller indicates an end to the plaintext.
+
+If the caller has not indicated an end to the input plaintext yet
+but there is enough plaintext available to construct a new regular frame,
+then this operation MUST [construct a regular frame](#construct-a-frame)
+with the avilable plaintext.
+
+If the caller has indicated an end to the input plaintext
+and there is exactly enough plaintext bytes available to create one regular frame,
+then this operation MUST [construct either a final frame or regular frame](#construct-a-frame)
+with the remaining plaintext.
+If they construct a regular frame, they MUST also construct a empty final frame.
+
+If the caller has indicated an end to the input plaintext
+and there are not enough input plaintext bytes available to create a new regular frame,
+then this operation MUST [construct a final frame](#construct-a-frame)
+with the remaining plaintext.
+
+### Construct a frame
+
+To construct a regular or final frame that represents the next frame in the encrypted message's body,
+this operation MUST calculate encrypted content and an authentication tag using the
+[authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
+specified by the [algorithm suite](../framework/algorithm-suites.md),
+with the following inputs:
+
+- The AAD is the serialized [message body AAD](../data-format/message-body-aad.md),
+  constructed as follows:
+  - The [message ID](../data-format/message-body-aad.md#message-id) is the same as the
+    [message ID](../data-frame/message-header.md#message-id) serialized in the header of this message.
+  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) depends on
+    whether the thing being encrypted is a regular frame or final frame.
+    Refer to [Message Body AAD](../data-format/message-body-aad.md) specification for more information.
+  - The [sequence number](../data-format/message-body-aad.md#sequence-number) is the sequence
+    number of the frame being encrypted.
+    If this is the first frame sequentially, this value MUST be 1.
+    Otherwise, this value MUST be 1 greater than the value of the sequence number
+    of the previous frame.
+  - The [content length](../data-format/message-body-aad.md#content-length) MUST have a value
+    equal to the length of the plaintext being encrypted.
+- The IV is the [sequence number](../data-format/message-body-aad.md#sequence-number)
+  used in the message body AAD above.
+- The cipherkey is the derived data key
+- The plaintext is the next subsequence of available plaintext bytes that have not yet been encrypted.
+  - For a regular frame the length of this plaintext subsequence MUST equal the frame length.
+  - For a final frame this MUST be the remaining plaintext bytes which have not yet been encrypted,
+    whose length MUST be equal to or less than the frame length.
+
+this operation MUST serialize a regular frame or final frame with the following specifics:
+
+- [Sequence Number](../data-format/message-body.md#sequence-number): MUST be the sequence number of this frame,
+  as determined above.
+- [IV](../data-format/message-body.md#iv): MUST be the IV used when calculating the encrypted content above
+- [Encrypted Content](../data-format/message-body.md#encrypted-content): MUST be the encrypted content calculated above.
+- [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag
+  outputted when calculating the encrypted content above.
+
+If the algorithm suite contains a signature algorithm and
+this operation is streaming the encrypted message output to the caller,
+this operation MUST input the serialized frame to the signature algorithm as soon as it is serialized,
+such that the serialized frame isn't required to remain in memory to complete
+the [signature calculation](#signature-calculation).
+
+### Construct the Signature
 
 If the [algorithm suite](../framework/algorithm-suites.md) contains a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
-the output [message](../data-format/message.md) MUST contain a [message footer](../data-format/message-footer.md).
-The footer is serialized with the following specifics:
+this operation MUST calculate a signature over the message,
+and the output [encrypted message](#encrypted-message) MUST contain a [message footer](../data-format/message-footer.md).
 
-- [Signature](../data-format/message-footer.md#signature): MUST be the output of the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
-  specified by the [algorithm suite](../framework/algorithm-suites.md), with the following input:
-  - the signature key is the [signing key](../framework/structures.md#signing-key) in the [encryption materials](../framework/structures.md#encryption-materials)
-  - the input to sign is the concatenation of the serialization of the [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md)
+To calculate a signature, this operation MUST use the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
+specified by the [algorithm suite](../framework/algorithm-suites.md), with the following input:
 
-Any data that is not specified within the [message format](../data-format/message.md) MUST NOT be added to the output message.
+- the signature key is the [signing key](../framework/structures.md#signing-key) in the [encryption materials](../framework/structures.md#encryption-materials)
+- the input to sign is the concatenation of the serialization of the [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md)
+
+Note that the message header and message body MAY have already been inputted during previous steps.
+
+This operation MUST then serialize serialized a message footer with the following specifics:
+
+- [Signature](../data-format/message-footer.md#signature): MUST be the output of the calculation above.
+
+The encrypted message outputted by this operation MUST have a message footer equal
+to the message footer calculated in this step.
 
 ## Security Considerations
 
 [TODO]
 
 ## Appendix
-
-### Streaming
-
-TODO: Implementations SHOULD support working with a finite amount of working memory for arbitrarly large plaintext.
-If size is not known, how do we set the bounds?
 
 ### Un-Framed Message Body Encryption
 
