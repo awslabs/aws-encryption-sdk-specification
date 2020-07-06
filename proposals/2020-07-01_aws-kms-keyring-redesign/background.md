@@ -106,7 +106,7 @@ To handle multiple strings identifying AWS KMS CMKs
 ([key names](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#key-names))
 or multiple AWS regions,
 the proposal uses _keyring-producing operations_
-to produce a multi-keyring of smaller-scoped child AWS KMS keyrings.
+that produce a multi-keyring of smaller-scoped child AWS KMS keyrings.
 Each child AWS KMS keyring is tied to a single AWS SDK KMS service client (AWS SDK client)
 that is initialized before child keyring initialization.
 We refer to the keyrings that keyring-producing operations produce as _derived keyrings_.
