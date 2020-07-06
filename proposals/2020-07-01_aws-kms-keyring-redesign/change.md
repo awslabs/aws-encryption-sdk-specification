@@ -156,7 +156,7 @@ Client suppliers maintain logic for limiting communication to specific AWS regio
 
 To reduce the scope of the AWS KMS keyring,
 we are moving the keyring’s functionality into multiple smaller-scoped keyrings.
-These smaller-scoped keyrings are configured by what the document calls _keyring-producing operations_.
+These smaller-scoped keyrings are configured by _keyring-producing operations_.
 Depending on the implementation, keyring-producing operations can be thought of as factory methods/builders.
 They initialize keyrings.
 
@@ -165,6 +165,7 @@ Like client suppliers, they initialize AWS SDK clients.
 However, AWS SDK clients are now initialized before a keyring is configured.
 Keyring-producing operations also handle the load of manually initializing multiple, smaller-scoped keyrings.
 They initialize all keyrings required to meet a specific customer use case.
+We refer to the keyrings that keyring-producing operations produce as _derived keyrings_.
 If a use case involves multiple AWS regions or multiple key names,
 the keyring-producing operation will initialize a [multi-keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/multi-keyring.md)
 of smaller-scoped keyrings.
@@ -224,7 +225,7 @@ The AWS KMS symmetric keyring MAY...
 ### AWS KMS symmetric region discovery keyring
 
 Customers MUST declare their intent to use the AWS KMS symmetric region discovery keyring instead of the AWS KMS symmetric keyring.
-Any keyring-producing operations that produce this kind of keyring MUST be distinct from those that produce non-discovery keyrings.
+Any keyring-producing operations that initialize this kind of keyring MUST be distinct from those that produce non-discovery keyrings.
 
 **Initialization**
 
@@ -273,6 +274,46 @@ The AWS KMS symmetric region discovery keyring MAY...
 
 ### Keyring-Producing Operations
 
+**Please note the following applies to the keyring-producing operations
+that produce the [derived keyrings](#derived-keyrings) below.**
+
+**All keyring-producing operations MUST...**
+
+1. Produce a single [derived keyring](#derived-keyrings)
+   1. Each keyring-producing operation MUST be configured with the additional arguments or parameters
+      required to satisfy the specification of the derived keyring it produces.
+2. Initialize the AWS SDK client(s) required for communicating with AWS KMS for the given key names/AWS regions
+3. Configure each AWS KMS keyring with the AWS SDK client it needs to communicate with AWS KMS
+4. Be configurable with an optional AWS SDK client configuration (client config) that includes custom AWS SDK credentials
+   or a similar AWS SDK language-specific client configuration option
+   (examples include:
+   Java's [Client Configuration](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/ClientConfiguration.html)
+   AND [AWS Credentials Provider](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/AWSCredentialsProvider.html),
+   Python's [botocore Config](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html)
+   AND [botocore Session](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/core/session.html),
+   etc.)
+   1. If a client config is provided,
+      the keyring-producing operation MUST configure all AWS SDK clients with the provided client config
+5. Limit the initialization of new AWS SDK client(s) when possible
+   1. Multiple keyrings can be configured with the same AWS SDK client if the following conditions are all met:
+      1. Keyrings MUST be configured in the same keyring-producing operation call
+      2. Keyrings MUST communicate with AWS KMS in the same AWS region
+      3. AWS SDK clients MUST share the same AWS SDK client configuration
+6. Maintain the order of all key names/AWS regions provided by the customer
+
+**All keyring-producing operations MAY...**
+
+1. Add an identifier to the user agent string in the AWS SDK client
+   that was initialized by the keyring-producing operation to note the ESDK language and version
+
+**All keyring-producing operations MUST NOT...**
+
+1. Modify any customer-provided client config
+2. Modify the user agent string if the customer has already provided one
+3. Modify any AWS SDK client(s) initialized directly by the customer
+
+### Derived Keyrings
+
 **Please note the following names are not finalized.**
 
 The ESDK MUST provide keyring-producing operations for the following derived keyrings:
@@ -296,36 +337,3 @@ The ESDK MUST provide keyring-producing operations for the following derived key
       2. with each AWS KMS symmetric region discovery keyring configured with the configured AWS account ID, if applicable
       3. with each AWS KMS symmetric region discovery keyring configured with the configured grant tokens, if applicable
       4. where the order of the child keyrings matches the order of the configured AWS regions
-
-**All keyring-producing operations MUST...**
-
-1. Initialize the AWS SDK client(s) required for communicating with AWS KMS for the given key names/AWS regions
-2. Configure each AWS KMS keyring with the AWS SDK client it needs to communicate with AWS KMS
-3. Be configurable with an optional AWS SDK client configuration (client config) that includes custom AWS SDK credentials
-   or a similar AWS SDK language-specific client configuration option
-   (examples include:
-   Java's [Client Configuration](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/ClientConfiguration.html)
-   AND [AWS Credentials Provider](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/AWSCredentialsProvider.html),
-   Python's [botocore Config](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html)
-   AND [botocore Session](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/core/session.html),
-   etc.)
-   1. If a client config is provided,
-      the keyring-producing operation MUST configure all AWS SDK clients with the provided client config
-4. Limit the initialization of new AWS SDK client(s) when possible
-   1. Multiple keyrings can be configured with the same AWS SDK client if the following conditions are all met:
-      1. Keyrings MUST be configured in the same keyring-producing operation call
-      2. Keyrings MUST communicate with AWS KMS in the same AWS region
-      3. AWS SDK clients MUST share the same AWS SDK client configuration
-5. Maintain the order of all key names/AWS regions provided by the customer
-
-**All keyring-producing operations MAY...**
-
-1. Add an identifier to the user agent string in the AWS SDK client
-   that was initialized by the keyring-producing operation
-   to note the ESDK language and version
-
-**All keyring-producing operations MUST NOT...**
-
-1. Modify any customer-provided client config
-2. Modify the user agent string if the customer has already provided one
-3. Modify any AWS SDK client(s) initialized directly by the customer
