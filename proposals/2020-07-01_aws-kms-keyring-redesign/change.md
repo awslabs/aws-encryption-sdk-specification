@@ -12,6 +12,7 @@ This serves as a reference of all features that this change affects.
 | [AWS KMS Keyring](../../framework/kms-keyring.md)                                                                                |
 | [AWS KMS Discovery Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/84)                               |
 | [Client Suppliers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/94)                                        |
+| [Generators](https://github.com/awslabs/aws-encryption-sdk-specification/issues/49)                                              |
 | [Limiting network calls to specific AWS regions](https://github.com/awslabs/aws-encryption-sdk-specification/issues/90)          |
 | [AWS SDK KMS service client caching](https://github.com/awslabs/aws-encryption-sdk-specification/issues/16)                      |
 | [AWS SDK KMS service client initialization/configuration](https://github.com/awslabs/aws-encryption-sdk-specification/issues/15) |
