@@ -133,7 +133,7 @@ The caller MAY forgoe indicating an end to the encrypted message.
 This operation MAY still succeed as long as it can successfully process the first
 sequential bytes inputted to it as an encrypted message.
 
-If any of these steps fails, this oepration MUST falt and indicate a failure to the caller.
+If any of these steps fails, this operation MUST fail and indicate a failure to the caller.
 
 ### Parse the header
 
@@ -188,7 +188,7 @@ The CMM used MUST be the input CMM, if supplied.
 If a CMM is not supplied as the input, the decrypt operation MUST construct a [default CMM](../framework/default-cmm.md)
 from the [keyring](../framework/keyring-interface.md) inputted.
 
-The call to CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) operation
+The call to the CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) operation
 MUST include as the input the [encryption context](../data-format/message-header.md#aad)
 (if the encryption context is empty, this operation MAY pass no encryption context),
 the [encrypted data keys](../data-format/message-header.md#encrypted-data-keys), and the
