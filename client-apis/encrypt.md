@@ -86,7 +86,7 @@ This value MUST NOT exceed the value 2^32 - 1.
 
 ### Plaintext Length Bound
 
-A bound on the length of the [plaintext](#plaintext) to encrypt.
+A bound on the length of [plaintext](#plaintext) with an unknown length to encrypt.
 
 If this input is provided, this operation MUST NOT encrypt a plaintext with length
 greater than this value.
@@ -111,8 +111,8 @@ MUST be constructed as follows:
   Otherwise, this is an empty encryption context.
 - Algorithm Suite: If provided, this is the [input algorithm suite](#algorithm-suite).
   Otherwise, this field is not included.
-- Max Plaintext Length: If the [input plaintext](#plaintext) has known length, this is the
-  length of the plaintext.
+- Max Plaintext Length: If the [input plaintext](#plaintext) has known length,
+  this length MUST be used.
   If the input [plaintext](#plaintext) has unknown length and a [Plaintext Length Bound](#plaintext-length-bound)
   was provided, this is the [Plaintext Length Bound](#plaintext-length-bound).
   Otherwise, this field is not included.
@@ -171,7 +171,7 @@ Each frame of the [message body](../data-format/message-body.md) is serialized w
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag outputted by the above encryption.
 
 If [Plaintext Length Bound](#plaintext-length-bound) was specified on input
-and this operation can determine that the plaintext being encrypted has a length greater than this value,
+and this operation determines that the plaintext being encrypted has a length greater than this value,
 this operation MUST immediately fail.
 
 If the [algorithm suite](../framework/algorithm-suites.md) contains a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),

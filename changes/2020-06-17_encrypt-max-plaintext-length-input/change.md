@@ -162,9 +162,10 @@ by renaming it and specifying its exact behavior within the Encrypt operation:
 When performing the Encrypt operation on an unknown-length plaintext,
 customers MUST be able to specify an optional parameter `plaintext length bound`.
 The value of this field represents the max length of the plaintext to be encrypted.
-The ESDK MUST NOT encrypt a plaintext greater than this length,
-and MUST fail if it can be determined during encryption that the actual plaintext length
-is greater than what the customer supplied on input.
+The ESDK MUST NOT encrypt a plaintext greater than this length.
+If it is determined during encryption that the actual plaintext length
+is greater than what the customer supplied on input
+the ESDK MUST fail.
 The actual name of this input, and how the customer specifies this value for the Encrypt operation
 MAY be different per implementation.
 
