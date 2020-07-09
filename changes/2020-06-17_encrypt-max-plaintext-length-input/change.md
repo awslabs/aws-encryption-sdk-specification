@@ -116,7 +116,7 @@ that depend on plaintext length for their internal logic.
 
 This change additionally renames the `plaintext length` field on GetEncryptionMaterialsRequest to
 `max plaintext length` because that better explains the intent behind this field.
-This field describes the max size of the plaintext which will be encrypted using the materials
+This field describes the max size of the plaintext that will be encrypted using the materials
 the CMM is to generate.
 This is the current state of the behavior, so the specification should describe it as such.
 This is renamed to a different name than `plaintext length bound` in order to
