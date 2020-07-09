@@ -85,7 +85,8 @@ This lowers the likelihood that advanced customers fork ESDK code.
    by creating an AWS KMS symmetric keyring and a separate AWS KMS symmetric region discovery keyring
    (see [Reference-level Explanation](#reference-level-explanation)).
    New features are supported by writing operations that configure one or more of these smaller-scoped keyrings.
-   These operations also serve as examples, to show customers how we use the basic building blocks for more complex use cases.
+   These operations require us to use our own APIs,
+   and also serve as examples to show customers how we use the basic building blocks for more complex use cases.
    This lowers the risk for one-way doors and makes the customer-facing API easy to use, hard to misuse.
 3. **Move AWS SDK client initialization/configuration logic outside of the keyring API runtime**.
    This lowers the potential for keyring API runtime failures.
@@ -165,11 +166,9 @@ Keyring-producing operations act as the customer-facing APIs.
 Like client suppliers, they initialize AWS SDK clients.
 However, AWS SDK clients are now initialized before a keyring is configured.
 Keyring-producing operations also handle the load of manually initializing multiple, smaller-scoped keyrings.
-They initialize all keyrings required to meet a specific customer use case.
+They initialize all keyrings and AWS SDK clients required to meet a specific customer use case.
+This means a keyring-producing operation will produce a multi-keyring of smaller-scoped keyrings.
 We refer to the keyrings that keyring-producing operations produce as _derived keyrings_.
-If a use case involves multiple AWS regions or multiple key names,
-the keyring-producing operation will initialize a [multi-keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/multi-keyring.md)
-of smaller-scoped keyrings.
 
 In summary, rather than having a single keyring maintain all AWS KMS logic,
 logic is broken up into multiple smaller-scoped keyrings.
@@ -191,14 +190,11 @@ This gives advanced customers more flexibility and reduces the need to fork ESDK
 
 **Initialization**
 
-On keyring initialization, an AWS KMS symmetric keyring MUST define the following:
+On keyring initialization, an AWS KMS symmetric keyring MUST accept the following:
 
 - [Key Name](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#key-names)
 - AWS SDK KMS service client (AWS SDK client)
-
-On keyring initialization, an AWS KMS symmetric keyring MAY define the following:
-
-- Grant Tokens
+- Optional list of string [grant tokens](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#grant-tokens)
 
 **Behavior**
 
@@ -213,6 +209,12 @@ The AWS KMS symmetric keyring MUST...
 3. Have an AWS KMS symmetric decryption contract
    that ensures the encrypted data key’s [provider info](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/structures.md#key-provider-information)
    matches the keyring’s configured key name.
+   1. Note that only key names in the key ARN format are used for decryption
+      because encrypted data keys constructed by this keyring always store the identifier
+      of the CMK used to encrypt it in the key ARN format.
+      The OnDecrypt API checks the key name against that value before attempting decryption.
+      This behavior is consistent
+      with the [existing specification](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#key-names).
 4. Have an AWS KMS symmetric decryption contract
    that ensures the encrypted data key’s encryption context exactly matches the encryption context used on encrypt.
 5. Provide the encrypted data key’s [provider info](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/structures.md#key-provider-information)
@@ -230,14 +232,11 @@ Any keyring-producing operations that initialize this kind of keyring MUST be di
 
 **Initialization**
 
-On keyring initialization, an AWS KMS symmetric region discovery keyring MUST define the following:
+On keyring initialization, an AWS KMS symmetric region discovery keyring MUST accept the following:
 
 - AWS SDK client (and the AWS SDK client’s region)
-
-On keyring initialization, an AWS KMS symmetric region discovery keyring MAY define the following:
-
-- AWS account ID
-- Grant Tokens
+- Optional AWS account ID
+- Optional list of string [grant tokens](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#grant-tokens)
 
 **Behavior**
 
