@@ -92,7 +92,7 @@ This change SHOULD NOT have any operational implications.
 
 ## Guide-level Explanation
 
-Key namespace and key name are configuration values that MAY determine the behavior of a keyring.
+Key namespace and key name are configuration values that determine the behavior of a keyring.
 
 Provider ID and provider info are values that identify the keyring configuration
 that can fulfill the keyring's decryption contract.
@@ -100,7 +100,7 @@ The keyring attaches these values to the encrypted data key ciphertext.
 
 ## Reference-level Explanation
 
-"Key namespace", "key name", "provider ID", "provider info"
+"Key namespace", "key name", "provider ID", and "provider info"
 are all concepts that identify a wrapping key.
 
 ### key namespace
@@ -109,11 +109,15 @@ A configuration value for a keyring
 that identifies the grouping or categorization
 for the wrapping keys that keyring can access.
 
+The key namespace MUST be a string value.
+
 ### key name
 
 A configuration value for a keyring
 that identifies a single wrapping key
 within a key namespace.
+
+The key name MUST be a string value.
 
 ### provider ID
 
@@ -122,7 +126,8 @@ as part of an encrypted data key structure
 that identifies the grouping or categorization
 for the keyring that can fulfill this keyring's decryption contract.
 
-The provider ID SHOULD be equal to the key namespace.
+The provider ID MUST be a binary value
+and SHOULD be equal to a UTF-8 encoding of the key namespace.
 
 ### provider info
 
@@ -131,14 +136,15 @@ as part of an encrypted data key structure
 that provides necessary information for a keyring
 to fulfill this keyring's decryption contract.
 
-The provider info SHOULD be equal to the key name.
+The provider info MUST be a binary value
+and SHOULD be equal to a UTF-8 encoding of the key name.
 
 One example of a keyring where the key name and provider info can differ
 is the AWS KMS keyring.
 This keyring uses its key name to identify the desired CMK in its call to AWS KMS.
 However, the provider info that this keyring writes is
 the CMK identifier that AWS KMS includes in its response.
-If the key name is a CMK ARN these two values are identical
+If the key name is a CMK ARN, these two values are identical
 because this response value is always the CMK ARN of the CMK that AWS KMS used.
 However, if the key name is some other valid CMK identifier,
 such as an alias,
