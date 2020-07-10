@@ -129,23 +129,24 @@ This change states these security considerations.
 We should consider improvements to the format to further reduce or eliminate the need to release
 unverified plaintext in the streaming use case, however that is outside the scope of this document.
 
-### How and when does the encryption context become available?
+### How and when does the header information become available?
 
-In the one-shot case, the operation MUST verify the whole message before outputting the encryption
-context.
+Any information from the header MUST NOT be released before the message header is authenticated.
 
-In the streaming case, the opeartion MAY release the encryption context before the message is verified,
-but it MUST be interpreted as unverified data.
+In the one-shot case, the operation MUST verify the whole message before outputting the header information.
 
-This is important to release because a common use case for the encryption context is
+In the streaming case, the operation SHOULD release header informatoin before the message is verified,
+and it MUST be interpreted as unverified data.
+
+This is important to release because a common use case for the header information is
 to check the data within it in order to ensure that the correct thing is being decrypted.
 
 Requiring customers to make such a check after already performing decryption on a large message
 could be very expensive, when they could instead immediately see possibly unexpected data within
-the encryption context.
+the header information.
 
-This change specifies the encryption context as an output, and makes these security considerations
-clear.
+This change specifies the encryption context, algorithm suite ID, and parsed header as an output,
+and makes the above security considerations clear.
 
 ## Reference-level Explanation
 

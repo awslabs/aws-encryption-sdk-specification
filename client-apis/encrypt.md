@@ -57,12 +57,17 @@ The following as inputs to this behavior are OPTIONAL:
 The plaintext to encrypt.
 This MUST be a sequence of bytes.
 
-The caller MAY stream the sequence of bytes to this operation.
+This input MAY be streamed to this operation.
+This means that bytes are made available to this operation sequentially and over time,
+and that an end to the input is eventually indicated.
+This means that:
 
-- The caller MAY supply the plaintext bytes sequentially and temporally to this operation.
-- The caller MUST be able to indicate an end to the sequential input to this operation.
-- This operation MAY process on any plaintext supplied thus far.
-- This operation MUST NOT complete until the caller has indicated an end to the input.
+- There MUST be a mechanism for input bytes to become available to be processed.
+- There MUST be a mechanism to indicate that there are no more input bytes,
+  or whether more bytes MAY be made available in the future.
+
+If an implementation requires holding the input entire plaintext in memory in order to perform this operation,
+that implementation SHOULD NOT provide an API that allows this input to be streamed.
 
 ### Encryption Context
 
@@ -104,10 +109,17 @@ encrypted according to the [operation specified below](#operation).
 This MUST be a sequence of bytes
 and conform to the [message format specification](../data-format/message.md).
 
-This operation MAY stream the encrypted message to the caller.
+This operation MAY stream the encrypted message.
+This means that output bytes are released sequentially and over time,
+and that an end to the output is eventually indicated.
+This means that:
 
-- The operation MAY release the output message sequentially and temporally to the caller.
-- The operation MUST be able to indicate an end to the released sequential output.
+- There MUST be a mechanism for output bytes to be released
+- There MUST be a mechanism to indicate that the entire output has been released,
+  or whether more bytes MAY be released in the future.
+
+If an implementation requires holding the entire input plaintext in memory in order to perform this operation,
+that implementation SHOULD NOT provide an API that allows this output to be streamed.
 
 ## Operation
 
@@ -201,7 +213,8 @@ With the authentication tag calculated, this operation MUST serialize the
 [message header authentication](../data-format/message-header.md#header-authentication)
 with the following specifics.
 
-- [IV](../data-format/message-header.md#iv): MUST have a value of 0, padded to the [IV length](../data-format/message-header.md#iv-length).
+- [IV](../data-format/message-header.md#iv): MUST have a value of 0,
+  padded to the [IV length](../data-format/message-header.md#iv-length).
 - [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
   of the authentication tag calculated above.
 
@@ -221,7 +234,7 @@ to the message body calculated in this step.
 
 While there MAY still be plaintext left to encrypt,
 this operation MUST either wait for more plaintext to become available,
-wait for the caller to indicate an end to the plaintext,
+wait for an end to the plaintext to be indicated,
 or to perform encryption on the available plaintext to construct frames
 which make up the message body.
 
@@ -273,8 +286,13 @@ with the following inputs:
     of the previous frame.
   - The [content length](../data-format/message-body-aad.md#content-length) MUST have a value
     equal to the length of the plaintext being encrypted.
+    - For a regular frame the length of this plaintext MUST equal the frame length.
+    - For a final frame this MUST be length of the remaining plaintext bytes
+      which have not yet been encrypted,
+      whose length MUST be equal to or less than the frame length.
 - The IV is the [sequence number](../data-format/message-body-aad.md#sequence-number)
-  used in the message body AAD above.
+  used in the message body AAD above,
+  padded to the [IV length](../data-format/message-header.md#iv-length).
 - The cipherkey is the derived data key
 - The plaintext is the next subsequence of available plaintext bytes that have not yet been encrypted.
   - For a regular frame the length of this plaintext subsequence MUST equal the frame length.
@@ -312,6 +330,8 @@ Note that the message header and message body MAY have already been inputted dur
 
 This operation MUST then serialize serialized a message footer with the following specifics:
 
+- [Signature Length](../data-format/message-footer.md#signature-length): MUST be the length of the
+  output of the calculation above.
 - [Signature](../data-format/message-footer.md#signature): MUST be the output of the calculation above.
 
 The encrypted message outputted by this operation MUST have a message footer equal
