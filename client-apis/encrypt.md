@@ -135,8 +135,6 @@ These steps calculate and serialize the components of the output [encrypted mess
 Any data that is not specified within the [message format](../data-format/message.md)
 MUST NOT be added to the output message.
 
-The bytes of the output encrypted message MAY be released to the caller as soon as they are serialized.
-
 If any of these steps fails, this operation MUST halt and indicate a failure to the caller.
 
 ### Get the encryption materials
@@ -218,6 +216,9 @@ with the following specifics.
 - [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
   of the authentication tag calculated above.
 
+Once the entire message header has been authenticated and serialized,
+the serialized message header MAY be released.
+
 The encrypted message outputted by this operation MUST have a message header equal
 to the message header calculated in this step.
 
@@ -242,24 +243,24 @@ Frames MUST be constructed sequentially such that the concatenation of their dec
 in [sequence number](#.../data-format/message-body/md#sequence-number)
 order is equal to the input plaintext which has been encrypted so far.
 
-If the caller has not indicated an end to the input plaintext yet
+If more input plaintext MAY become available
 and there are not enough input plaintext bytes available to create a new
 [regular frame](#../data-format/message-body.md#regular-frame),
 then this operation MUST wait until either enough plaintext bytes become available
 or the caller indicates an end to the plaintext.
 
-If the caller has not indicated an end to the input plaintext yet
-but there is enough plaintext available to construct a new regular frame,
+If more input plaintext MAY become available
+and there is enough plaintext available to construct a new regular frame,
 then this operation MUST [construct a regular frame](#construct-a-frame)
 with the avilable plaintext.
 
-If the caller has indicated an end to the input plaintext
+If more input plaintext MUST NOT become available
 and there is exactly enough plaintext bytes available to create one regular frame,
 then this operation MUST [construct either a final frame or regular frame](#construct-a-frame)
 with the remaining plaintext.
 If they construct a regular frame, they MUST also construct a empty final frame.
 
-If the caller has indicated an end to the input plaintext
+If more input plaintext MUST NOT become available
 and there are not enough input plaintext bytes available to create a new regular frame,
 then this operation MUST [construct a final frame](#construct-a-frame)
 with the remaining plaintext.
@@ -308,6 +309,9 @@ this operation MUST serialize a regular frame or final frame with the following 
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag
   outputted when calculating the encrypted content above.
 
+Once the entire frame is serialized,
+the serialized frame MAY be released.
+
 If the algorithm suite contains a signature algorithm and
 this operation is streaming the encrypted message output to the caller,
 this operation MUST input the serialized frame to the signature algorithm as soon as it is serialized,
@@ -333,6 +337,9 @@ This operation MUST then serialize serialized a message footer with the followin
 - [Signature Length](../data-format/message-footer.md#signature-length): MUST be the length of the
   output of the calculation above.
 - [Signature](../data-format/message-footer.md#signature): MUST be the output of the calculation above.
+
+Once the entire message is signed and the message footer is serialized,
+the serialized message footer MAY be released.
 
 The encrypted message outputted by this operation MUST have a message footer equal
 to the message footer calculated in this step.

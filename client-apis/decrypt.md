@@ -250,6 +250,16 @@ this operation MUST either wait for more of the encrypted message to become avai
 wait for the an end to the encrypted message to be indicated,
 or to deserialize and/or decrypt the available bytes.
 
+If deserializing [framed data](../data-format/message-body.md#framed-data),
+this operation MUST use the first 4 bytes of a frame to determine if the frame
+MUST be deserialized as a [final frame](../data-format/message-body.md#final-frame)
+or [regular frame](../fata-format/message-body/md#regular-frame).
+If the first 4 bytes have a value of 0xFFFF,
+then this MUST be deserialized as the [sequence number end](../data-format/message-header.md#sequence-number-end)
+and the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
+Otherwise, this MUST be deserialized as the [sequence number](../data-format/message-header.md#sequence-number)
+and the following bytes according to the [regular frame spec](../data-format/message0body.md#regular-frame).
+
 If deserializing a [final frame](../data-format/message-body.md#final-frame),
 this operation MUST ensure that the length of the encrypted content field is
 less than or equal to the frame length deserialized in the message header.
