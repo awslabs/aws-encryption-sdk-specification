@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.1
+0.2.2
 
 ### Changelog
+
+- 0.2.2
+
+  - [Define wrapping key identifier terms](../changes/2020-06-09_wrapping-key-identifiers/change.md)
 
 - 0.2.1
 
@@ -42,6 +46,42 @@ The keyring interface specified in this document describes the interface all key
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
 in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
+
+### key namespace
+
+A configuration value for a keyring
+that identifies the grouping or categorization
+for the wrapping keys that keyring can access.
+
+The key namespace MUST be a string value.
+
+### key name
+
+A configuration value for a keyring
+that identifies a single wrapping key
+within a key namespace.
+
+The key name MUST be a string value.
+
+### provider ID
+
+An output value returned by a keyring on encrypt
+as part of an encrypted data key structure
+that identifies the grouping or categorization
+for the keyring that can fulfill this keyring's decryption contract.
+
+The provider ID MUST be a binary value
+and SHOULD be equal to a UTF-8 encoding of the key namespace.
+
+### provider info
+
+An output value returned by a keyring on encrypt
+as part of an encrypted data key structure
+that provides necessary information for a keyring
+to fulfill this keyring's decryption contract.
+
+The provider info MUST be a binary value
+and SHOULD be equal to a UTF-8 encoding of the key name.
 
 ## Supported Keyrings
 
