@@ -124,7 +124,7 @@ The key name MUST be a string value.
 An output value returned by a keyring on encrypt
 as part of an encrypted data key structure
 that identifies the grouping or categorization
-for the keyring that can fulfill this keyring's decryption contract.
+for a keyring that can fulfill this decryption contract.
 
 The provider ID MUST be a binary value
 and SHOULD be equal to a UTF-8 encoding of the key namespace.
@@ -134,7 +134,7 @@ and SHOULD be equal to a UTF-8 encoding of the key namespace.
 An output value returned by a keyring on encrypt
 as part of an encrypted data key structure
 that provides necessary information for a keyring
-to fulfill this keyring's decryption contract.
+to fulfill this decryption contract.
 
 The provider info MUST be a binary value
 and SHOULD be equal to a UTF-8 encoding of the key name.
