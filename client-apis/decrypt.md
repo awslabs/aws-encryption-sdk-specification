@@ -7,6 +7,16 @@
 
 0.1.0-preview
 
+### Changelog
+
+- 0.2.0
+
+  - [Detect Base64-encoded Messages](../changes/2020-05-13_remove-keyring-trace/change.md)
+
+- 0.1.0-preview
+
+  - Initial record
+
 ## Implementations
 
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_decrypt.c)
@@ -54,7 +64,7 @@ The algorithm suite ID refers to the algorithm suite used to encrypt the message
 
 #### Encrypted Message Format
 
-That the message format is a binary format, but it is a common mistake for users to attempt decryption on the Base64 encoding of this data instead.
+The message format is a binary format, but it is a common mistake for users to attempt decryption on the Base64 encoding of this data instead.
 Because the first two bytes of the message format have a very limited set of possible values 
 (currently they are in fact fixed),
 the first two bytes of the Base64 encoding of a valid message are also simple to recognize.
