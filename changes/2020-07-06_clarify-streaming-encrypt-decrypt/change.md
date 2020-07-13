@@ -86,7 +86,7 @@ Additionally, we use similar conditions to specify when the output of the operat
 This change SHOULD NOT introduce any language which is implementation specific for
 a specific streaming interface.
 Any streaming interface which is capable of moving bytes over time from one place to another,
-and is able to indicate and end to the bytes MUST be able to implement this specification as written.
+and is able to indicate an end to the bytes MUST be able to implement this specification as written.
 
 ### How should verification and signing be performed?
 

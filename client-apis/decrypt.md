@@ -160,10 +160,14 @@ If the input encrypted message is being streamed to this operation:
 - If no more input plaintext bytes MAY become available and this operation
   is unable to complete the above steps with the available plaintext,
   this operation MUST halt and indicate a failure to the caller.
-- If this operation completes the above steps,
-  but more input plaintext bytes are available to be processed,
-  this operation MUST either fail or
-  ignore any bytes trailing the valid encrypted message.
+- If this operation successfully completes the above steps
+  and has processed all available input bytes,
+  this operation MAY immediately complete and succeed,
+  or it MAY wait until an end of the input bytes is indicated
+  to complete and succeed.
+- If this operation successfully completes the above steps
+  but there are available bytes which have not been processed,
+  this operation MUST fail.
 
 ### Parse the header
 
@@ -304,7 +308,7 @@ If this decryption fails, this operation MUST immediately halt and fail.
 If the input encrypted message is being streamed to this operation:
 
 - This operation SHOULD release the plaintext as soon as tag verification succeeds.
-  However, if this operation is using an algorithm suite with a signature algorithm
+  However, if this operation is using an algorithm suite with a signature algorithm,
   all released plaintext MUST NOT be considered verified until
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
