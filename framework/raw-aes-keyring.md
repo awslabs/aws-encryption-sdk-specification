@@ -157,6 +157,7 @@ The keyring must use AES-GCM with the following specifics:
 - it uses the [encryption context](structures.md#encryption-context-1) in the encryption materials
   as the additional authenticated data (AAD)
 - the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
+  - if the AAD cannot be serialized, On Encrypt MUST fail
 - it uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key
 - it uses a randomly generated IV of 12 bytes
 - it uses a authentication tag bit length of 128
@@ -205,6 +206,7 @@ If decrypting, the keyring MUST use AES-GCM with the following specifics:
 - it uses the [IV](#iv) obtained from deserialization as the AES-GCM IV.
 - it uses the encryption context from the [decryption materials](structures.md#decryption-materials) as the AES-GCM AAD.
 - the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
+  - if the AAD cannot be serialized, On Decrypt MUST fail
 
 If a decryption succeeds, this keyring MUST
 add the resulting plaintext data key to the decryption materials and return the modified materials.
