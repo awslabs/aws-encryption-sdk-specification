@@ -127,7 +127,7 @@ The Encrypt operation is divided into several distinct parts:
 
 - [Get the encryption materials](#get-the-encryption-materials)
 - [Construct the header](#construct-the-header)
-- [Construct the body](#construc-the-body)
+- [Construct the body](#construct-the-body)
 - [(Optional) Construct the signature](#construct-the-signature)
 
 This operation MUST perform these steps in order.
@@ -171,7 +171,7 @@ This document refers to the output of the key derivation algorithm as the derive
 Note that if the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
 then the derived data key is the same as the plaintext data key.
 
-The frame length used in the procedures described below is the input [frame length](#frame-size),
+The frame length used in the procedures described below is the input [frame length](#frame-length),
 if supplied.
 If a frame length is not specified on input, this operation MUST choose a reasonable value to
 default to.
@@ -236,11 +236,11 @@ to the message body calculated in this step.
 While there MAY still be plaintext left to encrypt,
 this operation MUST either wait for more plaintext to become available,
 wait for an end to the plaintext to be indicated,
-or to perform encryption on the available plaintext to construct frames
+or perform encryption on the available plaintext to construct frames
 which make up the message body.
 
 Frames MUST be constructed sequentially such that the concatenation of their decryption
-in [sequence number](#.../data-format/message-body/md#sequence-number)
+in [sequence number](#.../data-format/message-body.md#sequence-number)
 order is equal to the input plaintext which has been encrypted so far.
 
 If more input plaintext MAY become available
@@ -252,13 +252,13 @@ or the caller indicates an end to the plaintext.
 If more input plaintext MAY become available
 and there is enough plaintext available to construct a new regular frame,
 then this operation MUST [construct a regular frame](#construct-a-frame)
-with the avilable plaintext.
+with the available plaintext.
 
 If more input plaintext MUST NOT become available
 and there is exactly enough plaintext bytes available to create one regular frame,
 then this operation MUST [construct either a final frame or regular frame](#construct-a-frame)
 with the remaining plaintext.
-If they construct a regular frame, they MUST also construct a empty final frame.
+If they construct a regular frame, they MUST also construct an empty final frame.
 
 If more input plaintext MUST NOT become available
 and there are not enough input plaintext bytes available to create a new regular frame,
@@ -288,7 +288,7 @@ with the following inputs:
   - The [content length](../data-format/message-body-aad.md#content-length) MUST have a value
     equal to the length of the plaintext being encrypted.
     - For a regular frame the length of this plaintext MUST equal the frame length.
-    - For a final frame this MUST be length of the remaining plaintext bytes
+    - For a final frame this MUST be the length of the remaining plaintext bytes
       which have not yet been encrypted,
       whose length MUST be equal to or less than the frame length.
 - The IV is the [sequence number](../data-format/message-body-aad.md#sequence-number)
@@ -300,7 +300,7 @@ with the following inputs:
   - For a final frame this MUST be the remaining plaintext bytes which have not yet been encrypted,
     whose length MUST be equal to or less than the frame length.
 
-this operation MUST serialize a regular frame or final frame with the following specifics:
+This operation MUST serialize a regular frame or final frame with the following specifics:
 
 - [Sequence Number](../data-format/message-body.md#sequence-number): MUST be the sequence number of this frame,
   as determined above.
@@ -332,7 +332,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
 
 Note that the message header and message body MAY have already been inputted during previous steps.
 
-This operation MUST then serialize serialized a message footer with the following specifics:
+This operation MUST then serialize a message footer with the following specifics:
 
 - [Signature Length](../data-format/message-footer.md#signature-length): MUST be the length of the
   output of the calculation above.

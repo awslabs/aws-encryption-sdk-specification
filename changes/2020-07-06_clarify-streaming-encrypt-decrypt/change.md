@@ -64,9 +64,9 @@ to answer important questions.
 
 ### How should the operation process data in parts?
 
-This change rewites these specifications to
+This change rewrites these specifications to
 better specify how these operations are allowed to process data in parts.
-Specifically, we attempt to be completely language agnostic and frame streaming as a way for
+Specifically, we attempt to be completely language agnostic and describe streaming as a way for
 bytes to move sequentially, over time.
 
 With this framing, the things the encrypt and decrypt operations care about are:
@@ -76,7 +76,7 @@ With this framing, the things the encrypt and decrypt operations care about are:
 
 In the context of the encrypt or decrypt operation, we specify the conditions
 for when the operation MAY or MUST perform some processing.
-These conditions include how many input bytes are avaiable,
+These conditions include how many input bytes are available,
 whether more bytes MAY be available,
 at what step in the operation you are in,
 and the result of various calculations.
@@ -86,7 +86,7 @@ Additionally, we use similar conditions to specify when the output of the operat
 This change SHOULD NOT introduce any language which is implementation specific for
 a specific streaming interface.
 Any streaming interface which is capable of moving bytes over time from one place to another,
-and is able to indicate EOF MUST be able to implement this specification as written.
+and is able to indicate and end to the bytes MUST be able to implement this specification as written.
 
 ### How should verification and signing be performed?
 
@@ -119,7 +119,7 @@ Thus, the plaintext needs to go somewhere other than memory.
 Because this is a client-side library, we MUST give it to the customer.
 
 In the case of any decryption failure,
-the operation MUST zero out any avilable but unreleaed plaintext.
+the operation MUST zero out any available but unreleaed plaintext.
 The customer MUST understand that all released plaintext is unverified until the operation
 completes and succeeds.
 The customer MUST discard any released plaintext if the operation fails, and MUST roll back
@@ -135,7 +135,7 @@ Any information from the header MUST NOT be released before the message header i
 
 In the one-shot case, the operation MUST verify the whole message before outputting the header information.
 
-In the streaming case, the operation SHOULD release header informatoin before the message is verified,
+In the streaming case, the operation SHOULD release header information before the message is verified,
 and it MUST be interpreted as unverified data.
 
 This is important to release because a common use case for the header information is

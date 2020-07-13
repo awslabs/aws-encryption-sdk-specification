@@ -258,7 +258,7 @@ If the first 4 bytes have a value of 0xFFFF,
 then this MUST be deserialized as the [sequence number end](../data-format/message-header.md#sequence-number-end)
 and the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
 Otherwise, this MUST be deserialized as the [sequence number](../data-format/message-header.md#sequence-number)
-and the following bytes according to the [regular frame spec](../data-format/message0body.md#regular-frame).
+and the following bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
 
 If deserializing a [final frame](../data-format/message-body.md#final-frame),
 this operation MUST ensure that the length of the encrypted content field is
@@ -305,7 +305,7 @@ If the input encrypted message is being streamed to this operation:
 
 - This operation SHOULD release the plaintext as soon as tag verification succeeds.
   However, if this operation is using an algorithm suite with a signature algorithm
-  all released plaintext MUST be not considered verified until
+  all released plaintext MUST NOT be considered verified until
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
 - This operation SHOULD input the serialized frame to the signature algorithm as soon as it is deserialized,
