@@ -10,7 +10,7 @@ This serves as a reference of all features that this change affects.
 | Feature                                                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Decrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/623992d999db0b309d8a8adbd664f0d72feee813/client-apis/decrypt.md) |
-|  |
+|                                                                                                                                             |
 
 ## Affected Specifications
 
