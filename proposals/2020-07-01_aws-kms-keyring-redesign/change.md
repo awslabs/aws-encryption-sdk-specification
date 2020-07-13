@@ -106,6 +106,18 @@ We present a different development style from the existing AWS KMS keyring.
 Rather than having a single keyring maintain all AWS KMS logic, logic is broken up into multiple keyrings.
 This will require additional documentation
 and updated usage examples.
+
+We no longer support a _discovery_ keyring that _attempts_ decryption for any encrypted data key in any/all AWS regions
+without additional configurations.
+If customers need a keyring that _attempts_ decryption in all AWS regions,
+they SHOULD call a service/API to get an updated list of AWS regions.
+They can then use this list with the [keyring-producing operations defined below](#keyring-producing-operations).
+This will prevent any ESDK or AWS SDK region-list from becoming stale over time.
+In most cases, customers SHOULD simply use the keyring-producing operation for the specific AWS region(s) they want to communicate with.
+This will allow customers to add additional AWS regions over time,
+without allowing access to AWS regions that are not currently required.
+This additionally reinforces customer intent.
+
 This is a one-way door, but allows for increased flexibility and significantly reduces the risk of future refactors and deprecations.
 
 ## Security Implications
