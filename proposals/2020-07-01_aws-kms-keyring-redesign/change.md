@@ -11,6 +11,8 @@ This serves as a reference of all features that this change affects.
 | -------------------------------------------------------------------------------------------------------------------------------- |
 | [AWS KMS Keyring](../../framework/kms-keyring.md)                                                                                |
 | [AWS KMS Discovery Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/84)                               |
+| [Split AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/83)                                   |
+| [AWS KMS Keyring Error Handling](https://github.com/awslabs/aws-encryption-sdk-specification/issues/40)                          |
 | [Client Suppliers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/94)                                        |
 | [Generators](https://github.com/awslabs/aws-encryption-sdk-specification/issues/49)                                              |
 | [Limiting network calls to specific AWS regions](https://github.com/awslabs/aws-encryption-sdk-specification/issues/90)          |
