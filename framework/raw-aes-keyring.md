@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
+
+- 0.4.0
+
+  - [Specify behavior for RawAESKeyring for invalid input EC](https://github.com/awslabs/aws-encryption-sdk-specification/issues/65)
 
 - 0.3.0
 
