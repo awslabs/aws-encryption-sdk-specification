@@ -108,37 +108,43 @@ the security properties of each keyring.
 
 Clearly defining what causes keyrings to fail
 makes it simpler for users to predict failing behavior
-based on either environment
-and across implementations.
+in different environments and implementations.
 
 ## Guide-level Explanation
 
-When a keyring succeeds on encryption,
-it creates an artifact: one or more encrypted data keys.
+On encryption,
+a keyring creates an artifact:
+one or more encrypted data keys.
 This artifact has certain requirements that
 MUST be met on decryption
 in order to obtain the plaintext data key.
-This set of requirements is what we call
-the "keyring decryption contract."
-The process that a keyring uses to create this artifact
-is largely irrelevant to the decryption contract.
-What matters is the requirements
-that a decryption contract defines.
+This set of requirements,
+manifested as the artifact,
+is what we call the "keyring decryption contract."
 
 ## Reference-level Explanation
 
 ### Definitions and Terms
 
+- **decryption contract** :
+  This refers to a set of requirements
+  that MUST be satisfied in order to obtain
+  the plaintext data key.
+
+- **decryption contract artifact** :
+  One or more encrypted data keys,
+  bound to a decryption contract,
+  that enable a keyring to obtain a plaintext data key
+  after meeting decryption contract's requirements.
+
 - **writing the decryption contract** :
-  This refers to the process of taking the plaintext data key
-  and successfully creating an artifact
-  (one or more encrypted data keys)
-  that requires a decrypting keyring to
-  fulfill the encrypting keyring's decryption contract.
+  The process of taking the plaintext data key
+  and successfully creating a
+  decryption contract artifact.
 
 - **fulfilling the decryption contract** :
-  This refers to the process of taking one or more encrypted data keys
-  and successfully using them to obtain the plaintext data key.
+  The process of taking a decryption contract artifact
+  and successfully obtaining the plaintext data key.
 
 ### How to Fail
 
@@ -149,8 +155,8 @@ that keyring MUST fail.
 
 On decryption,
 if a keyring is unable or unwilling to
-fulfill its decryption contract
-using the encrypted data keys that it receives,
+fulfill any decryption contract
+using the artifacts that it receives,
 that keyring MUST fail.
 
 ### Application to Keyring Specifications
@@ -203,7 +209,8 @@ they might look something like this:
 - AWS KMS discovery keyring
 
   - The AWS KMS discovery keyring is unable to write a decryption contract.
-  - The AWS KMS discovery keyring MAY fulfill any AWS KMS decryption contract.
+  - The AWS KMS discovery keyring MAY fulfill any AWS KMS decryption contract
+    within its configured AWS region.
 
     - NOTE: Successfully fulfilling an AWS KMS decryption contract
       depends on access to credentials for an AWS principal
