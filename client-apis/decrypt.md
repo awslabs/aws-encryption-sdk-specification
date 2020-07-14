@@ -7,7 +7,7 @@
 
 0.2.0
 
-## Changlog
+## Changelog
 
 - 0.2.0
 
@@ -161,16 +161,20 @@ A collection of deserialized fields of the [encrypted message's](#encrypted-mess
 
 ## Behavior
 
-The Decrypt operation is divided into several distinct parts:
+The Decrypt operation is divided into several distinct steps:
 
 - [Parse the header](#parse-the-header)
 - [Get the decryption materials](#get-the-decryption-materials)
 - [Verify the header](#verify-the-header)
 - [Decrypt the body](#decrypt-the-body)
-- [Verify the signature (optional)](#verify-the-signature-optional)
+- [Verify the signature](#verify-the-signatue)
+  - If the message header contains an algorithm suite including a
+    [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
+    this operation MUST perform this step.
+    Otherwise this operation MUST NOT perform this step.
 
-This operation MUST perform these steps in order.
-If any of these steps fails, this operation MUST fail and indicate a failure to the caller.
+This operation MUST perform all the above steps unless otherwise specified,
+and it MUST perform them in the above order.
 
 If the input encrypted message is not being streamed to this operation,
 all output MUST NOT be released until after these steps complete successfully.
@@ -338,7 +342,7 @@ If the input encrypted message is being streamed to this operation:
   such that the serialized frame isn't required to remain in memory to complete
   the [signature calculation](#signature-calculation).
 
-### Verify the signature (Optional)
+### Verify the signature
 
 If the algorithm suite has a signature algorithm,
 this operation MUST verify the message footer using the specified signature algorithm.

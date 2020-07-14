@@ -123,14 +123,20 @@ that implementation SHOULD NOT provide an API that allows this output to be stre
 
 ## Behavior
 
-The Encrypt operation is divided into several distinct parts:
+The Encrypt operation is divided into several distinct steps:
 
 - [Get the encryption materials](#get-the-encryption-materials)
 - [Construct the header](#construct-the-header)
 - [Construct the body](#construct-the-body)
-- [(Optional) Construct the signature](#construct-the-signature)
+- [Construct the signature](#construct-the-signature)
+  - If the [encryption materials gathered](#get-the-encryption-materials) has a algorithm suite
+    including a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
+    this operation MUST perform this step.
+    Otherwise this operation MUST NOT perform this step.
 
-This operation MUST perform these steps in order.
+This operation MUST perform all the above steps unless otherwise specified,
+and it MUST perform them in the above order.
+
 These steps calculate and serialize the components of the output [encrypted message](#encrypted-message).
 Any data that is not specified within the [message format](../data-format/message.md)
 MUST NOT be added to the output message.
@@ -318,7 +324,7 @@ this operation MUST input the serialized frame to the signature algorithm as soo
 such that the serialized frame isn't required to remain in memory to complete
 the [signature calculation](#signature-calculation).
 
-### Construct the Signature
+### Construct the signature
 
 If the [algorithm suite](../framework/algorithm-suites.md) contains a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
 this operation MUST calculate a signature over the message,
