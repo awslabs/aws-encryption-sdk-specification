@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.0
+0.3.0
 
 ### Changelog
+
+- 0.3.0
+
+  - [Raw RSA keyring MUST NOT accept a key namespace of "aws-kms".](https://github.com/awslabs/aws-encryption-sdk-specification/issues/101)
 
 - 0.2.0
 
@@ -57,9 +61,15 @@ On keyring initialization, the following inputs are REQUIRED:
 
 A UTF-8 encoded value that namespaces this keyring.
 
+The raw RSA keyring MUST NOT accept a key namespace of "aws-kms".
+
+This value is also used for bookkeeping purposes.
+
 ### Key Name
 
 A UTF-8 encoded value that names this keyring.
+
+This value is also used for bookkeeping purposes.
 
 ### Padding Scheme
 
