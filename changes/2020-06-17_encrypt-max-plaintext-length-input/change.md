@@ -72,7 +72,7 @@ This change proposes that in the scope of the Encrypt operation,
 an input plaintext is either of known length,
 of unknown length with customer supplied estimated size,
 or unknown length with no customer supplied estimated size.
-The Encrypt operation should never consider a `plaintext length bound` alongside
+The Encrypt operation should not allow a `plaintext length bound` alongside
 a known-length plaintext.
 
 How a customer should express on the API level the intent to encrypt a known-length plaintext
