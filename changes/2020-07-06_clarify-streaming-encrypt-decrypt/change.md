@@ -203,4 +203,3 @@ the header information.
 
 This change specifies the encryption context, algorithm suite ID, and parsed header as an output,
 and makes the above security considerations clear.
-
