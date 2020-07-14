@@ -45,6 +45,27 @@ The AWS Encryption SDK provides a client to decrypt the inputted encrypted messa
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
 in this document are to be interpreted as described in [RFC2119](https://tools.ietf.org/html/rfc2119).
 
+### Authenticated Data
+
+Plaintext or associated data is considered authenticated if the associated
+[authentication tag](../data-format/message-body.md#authentication-tag) is successfully checked
+as defined by the algorithm suite indicated in the message header.
+
+Authenticated data has the property that only those with access to the plaintext data key
+can create a message with authenticated data.
+
+This operation MUST NOT release any unauthenticated plaintext or unauthenticated associated data.
+
+### Signed Data
+
+Plaintext and associated data is considered signed if the associated [message signature](../data-format/message-footer.md)
+is successfully verified using the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
+of the algorithm suite indicated in the message header.
+
+Signed data has the property that only those who have access to wrap the plaintext data key
+(i.e. convert a plaintext data key into some [ciphertext](../framework/structures.md#ciphertext))
+can create a message with signed plaintext and associated data.
+
 ## Input
 
 The client MUST require the following as inputs to this operation:
@@ -138,7 +159,7 @@ This output MAY be satisfied by outputting a [parsed header](#parsed-header) con
 
 A collection of deserialized fields of the [encrypted message's](#encrypted-message) header.
 
-## Operation
+## Behavior
 
 The Decrypt operation is divided into several distinct parts:
 
@@ -157,14 +178,9 @@ all output MUST NOT be released until after these steps complete successfully.
 If the input encrypted message is being streamed to this operation:
 
 - Output MUST NOT be released until otherwise indicated.
-- If no more input plaintext bytes MAY become available and this operation
-  is unable to complete the above steps with the available plaintext,
+- If all bytes have been provided and this operation
+  is unable to complete the above steps with the available encrypted message bytes,
   this operation MUST halt and indicate a failure to the caller.
-- If this operation successfully completes the above steps
-  and has processed all available input bytes,
-  this operation MAY immediately complete and succeed,
-  or it MAY wait until an end of the input bytes is indicated
-  to complete and succeed.
 - If this operation successfully completes the above steps
   but there are available bytes which have not been processed,
   this operation MUST fail.
@@ -227,6 +243,8 @@ to decrypt with the following inputs:
 - the IV is the value serialized in the message header's [IV field](../data-format/message-header#iv).
 - the cipherkey is the derived data key
 - the ciphertext is an empty byte array
+- the tag is the value serialized in the message header's
+  [authentication tag field](../data-format/message-header.md#authentication-tag)
 
 If this tag verification fails, this operation MUST immediately halt and fail.
 
@@ -237,7 +255,7 @@ If the input encrypted message is being streamed to this operation:
   and [other header information](#parsed-header)
   as soon as tag verification succeeds.
   However, if this operation is using an algorithm suite with a signature algorithm
-  all released output MUST be not considered verified until
+  all released output MUST be not considered signed data until
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
 - This operation SHOULD input the serialized header to the signature algorithm as soon as it is deserialized,
@@ -302,14 +320,18 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
   padded to the [IV length](../data-format/message-header.md#iv-length).
 - The cipherkey is the derived data key
 - The ciphertext is the [encrypted content](../data-format/message-body.md#encrypted-content).
+- the tag is the value serialized in the
+  [authentication tag field](../data-format/message-body.md#authentication-tag)
+  in the message body or frame.
 
 If this decryption fails, this operation MUST immediately halt and fail.
+This operation MUST NOT release any unauthenticated plaintext.
 
 If the input encrypted message is being streamed to this operation:
 
 - This operation SHOULD release the plaintext as soon as tag verification succeeds.
   However, if this operation is using an algorithm suite with a signature algorithm,
-  all released plaintext MUST NOT be considered verified until
+  all released plaintext MUST NOT be considered signed data until
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
 - This operation SHOULD input the serialized frame to the signature algorithm as soon as it is deserialized,
@@ -345,9 +367,18 @@ If this verification is not successful, this operation MUST immediately halt and
 
 ## Security Considerations
 
+Authenticated data has the property that only those with access to the plaintext data key
+can create a message with authenticated data.
+
+All plaintext and associated data released by this operation MUST be authenticated.
+
+Signed data has the property that only those who have access to wrap the plaintext data key
+(i.e. convert a plaintext data key into some [ciphertext](../framework/structures.md#ciphertext))
+can create a message with signed plaintext and associated data.
+
 If this operation is streaming output to the caller
 and is decrypting messages created with an algorithm suite including a signature algorithm,
-any released plaintext MUST NOT be considered verified until this operation finishes
+any released plaintext MUST NOT be considered signed data until this operation finishes
 successfully.
 
 This means that callers that process such released plaintext MUST NOT consider any processing successful

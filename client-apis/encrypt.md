@@ -121,7 +121,7 @@ This means that:
 If an implementation requires holding the entire input plaintext in memory in order to perform this operation,
 that implementation SHOULD NOT provide an API that allows this output to be streamed.
 
-## Operation
+## Behavior
 
 The Encrypt operation is divided into several distinct parts:
 

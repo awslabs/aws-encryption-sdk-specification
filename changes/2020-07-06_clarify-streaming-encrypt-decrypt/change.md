@@ -27,6 +27,25 @@ This change affects no implementations.
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
 in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
+### Authenticated Data
+
+Plaintext or associated data is considered authenticated if the associated
+[authentication tag](../data-format/message-body.md#authentication-tag) is successfully checked
+as defined by the algorithm suite indicated in the message header.
+
+Authenticated data has the property that only those with access to the plaintext data key
+can create a message with authenticated data.
+
+### Signed Data
+
+Plaintext and associated data is considered signed if the associated [message signature](../data-format/message-footer.md)
+is successfully verified using the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
+of the algorithm suite indicated in the message header.
+
+Signed data has the property that only those who have access to wrap the plaintext data key
+(i.e. convert a plaintext data key into some [ciphertext](../framework/structures.md#ciphertext))
+can create a message with signed plaintext and associated data.
+
 ## Summary
 
 We specify how to perform encryption and decryption in
@@ -59,20 +78,42 @@ There SHOULD be no operational implications for specifying the streaming use cas
 
 ## Guide-level Explanation
 
+This change clarifies the specification of the encrypt and decrypt operations,
+focusing on defining their behavior in the streaming use cases.
+
+This change introduces no new features for customers,
+however it does clarify important concepts around the release
+of authenticated and signed data for the decrypt streaming use case.
+
+The Decrypt operation MUST NOT release any unauthenticated data.
+However, in the case of streaming messages with signatures,
+any plaintext released by the Decrypt operation MUST NOT be
+considered signed data until the operation completes and succeeds.
+
+This means that customers that process such released plaintext MUST NOT consider any processing successful
+until this operation completes successfully.
+Additionally, if this operation fails, customers MUST discard the released plaintext and encryption context
+and MUST rollback any processing done due to the released plaintext or encryption context.
+
+This change adds these security considerations are stated in the Decrypt specification.
+
+## Reference-level Explanation
+
 The following sections describe how this change is updating the specification
-to answer important questions.
+to answer important questions for implementors of the specification.
 
 ### How should the operation process data in parts?
 
 This change rewrites these specifications to
 better specify how these operations are allowed to process data in parts.
 Specifically, we attempt to be completely language agnostic and describe streaming as a way for
-bytes to move sequentially, over time.
+bytes to be read or written sequentially, over time.
 
 With this framing, the things the encrypt and decrypt operations care about are:
 
-- Is the caller allowed to send any more data?
+- Can any more data be read or written?
 - What data is currently available to me?
+- What data can I release?
 
 In the context of the encrypt or decrypt operation, we specify the conditions
 for when the operation MAY or MUST perform some processing.
@@ -83,24 +124,38 @@ and the result of various calculations.
 
 Additionally, we use similar conditions to specify when the output of the operation MAY be released.
 
-This change SHOULD NOT introduce any language which is implementation specific for
-a specific streaming interface.
+This change SHOULD be agnostic to streaming interface implementations.
 Any streaming interface which is capable of moving bytes over time from one place to another,
 and is able to indicate an end to the bytes MUST be able to implement this specification as written.
 
 ### How should verification and signing be performed?
 
-In order to not require holding the entire message in memory to either create
-or verify a signature, this change specifies that streaming use cases input the message
+For one step decryption or encryption,
+where the entire message is available in memory,
+verification and signing can be performed in one step,
+after the message header and message body has been serialized or
+deserialized.
+
+For streaming use cases,
+in order to not require holding the entire message in memory to either create or verify a signature,
+this change specifies that streaming use cases input the message
 to the signature algorithm in parts, as it is being parsed or serialized.
 
 As such, this change states that once the header or a frame is serialized or parsed,
-it MUST be inputted to the signature algorithm (if included) such that it
+it SHOULD be inputted to the signature algorithm (if included) such that it
 isn't required to remain in memory for the duration of the operation.
+
+If an implementation is unable to do this,
+it SHOULD NOT extend an API that supports streaming.
 
 ### How and when should plaintext be released?
 
-For one-shot cases,
+The ESDK MUST NOT release any unauthenticated plaintext.
+If the plaintext comes from a message with a signature,
+the answer depends on whether the decryption is being streamed
+or done in one step.
+
+For one step decryption,
 where the entire message is available in memory,
 it is obvious that the operation MUST NOT release any plaintext until the
 signature (if included) is verified.
@@ -111,8 +166,8 @@ loaded into memory.
 This allows the processing of arbitrarily long messages with finite memory.
 However, when processing messages with a signature,
 the operation obtains plaintext in parts as it processes the message,
-but has no way of knowing whether the message is verified until the end of the operation.
-So what should we do with the unverified plaintext decrypted thus far?
+but has no way of knowing whether the message signature can be verified until the end of the operation.
+So what should we do with the plaintext decrypted thus far?
 Because streaming is being used, we MUST NOT buffer the entire plaintext,
 as that would defeat the point of streaming.
 Thus, the plaintext needs to go somewhere other than memory.
@@ -120,23 +175,24 @@ Because this is a client-side library, we MUST give it to the customer.
 
 In the case of any decryption failure,
 the operation MUST zero out any available but unreleaed plaintext.
-The customer MUST understand that all released plaintext is unverified until the operation
-completes and succeeds.
+The customer MUST understand that all released plaintext is cannot be considered signed data
+until the operation completes and succeeds.
 The customer MUST discard any released plaintext if the operation fails, and MUST roll back
 any processing done with that released plaintext.
 This change states these security considerations.
 
 We should consider improvements to the format to further reduce or eliminate the need to release
-unverified plaintext in the streaming use case, however that is outside the scope of this document.
+of such plaintext in the streaming use case, however that is outside the scope of this document.
 
 ### How and when does the header information become available?
 
 Any information from the header MUST NOT be released before the message header is authenticated.
 
-In the one-shot case, the operation MUST verify the whole message before outputting the header information.
+In the one step case, the operation MUST verify the whole message before outputting the header information.
 
-In the streaming case, the operation SHOULD release header information before the message is verified,
-and it MUST be interpreted as unverified data.
+In the streaming case,
+the operation SHOULD release header information before the message signature is verified,
+and it MUST NOT be interperted as signed data until the operation completes successfully.
 
 This is important to release because a common use case for the header information is
 to check the data within it in order to ensure that the correct thing is being decrypted.
@@ -148,7 +204,3 @@ the header information.
 This change specifies the encryption context, algorithm suite ID, and parsed header as an output,
 and makes the above security considerations clear.
 
-## Reference-level Explanation
-
-The only changes needed are to the specification,
-described by the section above.
