@@ -134,7 +134,7 @@ It doesn't make sense to have to check for bad values in the customer supplied p
 given its unstructured nature.
 Thus, our specification recommends that languages SHOULD ensure that `max plaintext length`
 isn't supplied with a known-length plaintext by construction.
-If it doesn't, then it SHOULD ignore any customer supplied `max plaintext length` in the case that
+If it doesn't, then it MUST ignore any customer supplied `max plaintext length` in the case that
 a known-length plaintext is supplied.
 
 ## Drawbacks
