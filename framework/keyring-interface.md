@@ -63,24 +63,24 @@ within a key namespace.
 
 The key name MUST be a string value.
 
-### provider ID
+### key provider ID
 
 An output value returned by a keyring on encrypt
 as part of an encrypted data key structure
 that identifies the grouping or categorization
 for a keyring that can fulfill this decryption contract.
 
-The provider ID MUST be a binary value
+The key provider ID MUST be a binary value
 and SHOULD be equal to a UTF-8 encoding of the key namespace.
 
-### provider info
+### key provider info
 
 An output value returned by a keyring on encrypt
 as part of an encrypted data key structure
 that provides necessary information for a keyring
 to fulfill this decryption contract.
 
-The provider info MUST be a binary value
+The key provider info MUST be a binary value
 and SHOULD be equal to a UTF-8 encoding of the key name.
 
 ## Supported Keyrings
