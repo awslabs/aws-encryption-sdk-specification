@@ -308,7 +308,7 @@ when using our tools.
 
 Examples of features used to express clear inputs
 at the call site are
-named parameters, enums, and option hash.
+named parameters, enums, and options mappings.
 
 ## Motivation
 
