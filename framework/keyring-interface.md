@@ -73,6 +73,9 @@ for a keyring that can fulfill this decryption contract.
 The key provider ID MUST be a binary value
 and SHOULD be equal to a UTF-8 encoding of the key namespace.
 
+This value MUST NOT be "aws-kms"
+unless this encrypted data key was produced by the [AWS KMS Keyring](kms-keyring.md).
+
 ### key provider info
 
 An output value returned by a keyring on encrypt
