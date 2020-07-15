@@ -165,7 +165,7 @@ by calling [Get Encryption Materials](../framework/cmm-interface.md#get-encrypti
 The CMM used MUST be the input CMM, if supplied.
 If instead the caller supplied a [keyring](../framework/keyring-interface.md),
 this behavior MUST use a [default CMM](../framework/default-cmm.md)
-constructed using the caller supplied keyring as input.
+constructed using the caller-supplied keyring as input.
 The call to [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials)
 on that CMM MUST be constructed as follows:
 
@@ -278,7 +278,7 @@ then this operation MUST [construct a regular frame](#construct-a-frame)
 with the available plaintext.
 
 If more input plaintext MUST NOT become available
-and there is exactly enough plaintext bytes available to create one regular frame,
+and there are exactly enough plaintext bytes available to create one regular frame,
 then this operation MUST [construct either a final frame or regular frame](#construct-a-frame)
 with the remaining plaintext.
 If they construct a regular frame, they MUST also construct an empty final frame.
@@ -295,7 +295,7 @@ this operation MUST immediately fail.
 ### Construct a frame
 
 To construct a regular or final frame that represents the next frame in the encrypted message's body,
-this operation MUST calculate encrypted content and an authentication tag using the
+this operation MUST calculate the encrypted content and an authentication tag using the
 [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
 specified by the [algorithm suite](../framework/algorithm-suites.md),
 with the following inputs:
