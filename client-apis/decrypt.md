@@ -259,7 +259,7 @@ If the input encrypted message is being streamed to this operation:
   and [other header information](#parsed-header)
   as soon as tag verification succeeds.
   However, if this operation is using an algorithm suite with a signature algorithm
-  all released output MUST be not considered signed data until
+  all released output MUST NOT be considered signed data until
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
 - This operation SHOULD input the serialized header to the signature algorithm as soon as it is deserialized,

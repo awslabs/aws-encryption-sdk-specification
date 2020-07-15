@@ -95,7 +95,7 @@ until this operation completes successfully.
 Additionally, if this operation fails, customers MUST discard the released plaintext and encryption context
 and MUST rollback any processing done due to the released plaintext or encryption context.
 
-This change adds these security considerations are stated in the Decrypt specification.
+This change adds these security considerations in the Decrypt specification.
 
 ## Reference-level Explanation
 
@@ -175,14 +175,14 @@ Because this is a client-side library, we MUST give it to the customer.
 
 In the case of any decryption failure,
 the operation MUST zero out any available but unreleaed plaintext.
-The customer MUST understand that all released plaintext is cannot be considered signed data
+The customer MUST understand that all released plaintext cannot be considered signed data
 until the operation completes and succeeds.
 The customer MUST discard any released plaintext if the operation fails, and MUST roll back
 any processing done with that released plaintext.
 This change states these security considerations.
 
 We should consider improvements to the format to further reduce or eliminate the need to release
-of such plaintext in the streaming use case, however that is outside the scope of this document.
+such plaintext in the streaming use case, however that is outside the scope of this document.
 
 ### How and when does the header information become available?
 
