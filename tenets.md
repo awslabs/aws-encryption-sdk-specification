@@ -394,7 +394,7 @@ SHOULD be gated by access control and correctness,
 not configuration options.
 
 Therefore since access control and correctness options
-_must_ agree between encrypt and decrypt
+_must_ agree between encrypt and decrypt,
 they SHOULD NOT have defaults
 and SHOULD BE set at encryption time.
 Because if these defaults need to change
