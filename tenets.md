@@ -92,7 +92,7 @@ then along this dimension
 these implementations are not inter-operable.
 
 For customers this means
-as we design features
+as we design features,
 they will be better understood
 and as they develop over time they should trend
 towards a consistent idea.
