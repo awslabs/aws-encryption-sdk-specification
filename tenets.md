@@ -193,25 +193,25 @@ incorrectness can be identified.
 
 1. Development
 
-    During development the code
-    as written may not satisfy the requirements.
-    It is rarely the case that
-    the code satisfies none of the requirements.
-    The problem is more often
-    that the code is only _mostly_ correct
-    as opposed to **all** correct.
+   During development the code
+   as written may not satisfy the requirements.
+   It is rarely the case that
+   the code satisfies none of the requirements.
+   The problem is more often
+   that the code is only _mostly_ correct
+   as opposed to **all** correct.
 
 1. Initialization
 
-    At runtime when components are configured,
-    instantiated, or created 
-    not all combinations are correct.
+   At runtime when components are configured,
+   instantiated, or created
+   not all combinations are correct.
 
 1. Use
 
-    At runtime when the configured components
-    are used dynamically
-    during steady state operation.
+   At runtime when the configured components
+   are used dynamically
+   during steady state operation.
 
 The AWS Encryption SDK (ESDK) is a component
 that customers use to achieve their security requirements.
@@ -392,14 +392,14 @@ decryption of that message
 SHOULD BE gated by access control and correctness,
 not configuration options.
 
-Therefore since access control and correctness options 
+Therefore since access control and correctness options
 _must_ agree between encrypt and decrypt
 they SHOULD NOT have defaults
 and SHOULD BE set at encryption time.
 Because if these defaults need to change
 the ESDK would no longer be backwards compatible.
 
-A  example of this
+A example of this
 is the padding for wrapping the data key
 in the raw RSA keyring.
 The padding value is not stored
