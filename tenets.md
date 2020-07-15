@@ -160,8 +160,8 @@ if there are sharp edges and where.
 An example of "hard to misuse"
 is gas and water pipes.
 In the US they have opposite threading.
-This make is very difficult to connect
-a gas line to water line accidentally.
+This makes it very difficult to connect
+a gas line to a water line accidentally.
 
 The AWS Encryption SDK (ESDK) SHOULD be [easy to use](#Easy-to-use)
 but SHOULD NOT easily go together unsafely.
