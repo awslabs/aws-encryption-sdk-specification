@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Specify behavior for RawAESKeyring for invalid input EC
+# Specify behavior for Raw AES Keyring for invalid input encryption context
 
 ## Affected Features
 
@@ -9,7 +9,7 @@ This serves as a reference of all features that this change affects.
 
 | Feature                                               |
 | ----------------------------------------------------- |
-| [raw-aes-keyring](../../framework/raw-aes-keyring.md) |
+| [Raw AES Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/623992d999db0b309d8a8adbd664f0d72feee813/framework/raw-aes-keyring.md) |
 
 ## Affected Specifications
 
@@ -17,7 +17,7 @@ This serves as a reference of all specification documents that this change affec
 
 | Specification                                         |
 | ----------------------------------------------------- |
-| [raw-aes-keyring](../../framework/raw-aes-keyring.md) |
+| [Raw AES Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/623992d999db0b309d8a8adbd664f0d72feee813/framework/raw-aes-keyring.md) |
 
 ## Affected Implementations
 
@@ -43,27 +43,27 @@ in this document are to be interpreted as described in
 
 ## Summary
 
-The raw-aes-keyring must serialize the encryption context for use as AAD.
+The Raw AES Keyring must serialize the encryption context for use as AAD.
 The specification did not describe how the keyring should behave when given an unserializable encryption context.
 
-With this change, the raw-aes-keyring MUST attempt to serialize the encryption context,
+With this change, the Raw AES Keyring MUST attempt to serialize the encryption context,
 prior to attempting encryption/decryption.
-If the raw-aes-keyring cannot serialize the encryption context, it MUST fail.
+If the Raw AES Keyring cannot serialize the encryption context, it MUST fail.
 
 ## Out of Scope
 
-- All keyrings aside from the raw-aes-keyring
+- All keyrings aside from the Raw AES Keyring
 - The encryption context serialization format
 
 ## Motivation
 
-The C and Javascript implementations of the raw-aes-keyring check for serializability at different points in OnDecrypt.
-This has potential to lead to different behavior under specific circumstances.
+The C and Javascript implementations of the Raw AES Keyring check for serializability at different points in OnDecrypt.
+This has the potential to lead to different behaviors under specific circumstances.
 
 ## Drawbacks
 
 Since we attempt to serialize the encryption context before attempting any decryption,
-the raw-aes-keyring may attempt to serialize an encryption context in cases where no EDK matches the keyring.
+the Raw AES Keyring may attempt to serialize an encryption context in cases where no EDK matches the keyring.
 This scenario results in slower operation when compared to the current Javascript implementation,
 which only checks serializability when attempting to decrypt an EDK.
 
@@ -73,12 +73,12 @@ This change SHOULD NOT have any security implications.
 
 ## Operational Implications
 
-This change will improve behavioral consistency between raw-aes-keyring implications.
-This should improve customer experience, and reduce support engagements.
+This change will improve behavioral consistency between Raw AES Keyring implications.
+This should improve customer experience and reduce support engagements.
 
 ## Guide-level Explanation
 
-Serialize the encryption/decryption materials' encryption context before attempting encryption.
+Serialize the encryption/decryption materials' encryption context before attempting encryption/decryption.
 If serialization fails, the OnEncrypt/OnDecrypt operation MUST fail.
 When encrypting/decryption the datakey, use the already serialized encryption context as the AAD.
 
@@ -88,7 +88,7 @@ When encrypting/decryption the datakey, use the already serialized encryption co
 
 Before encrypting the plaintext datakey, OnEncrypt MUST attempt to serialize the encryption context.
 If serialization fails, OnEncrypt MUST fail.
-(This is not a change, but is more explicit now)
+This is not a new change, but is more explicit now.
 
 ### OnDecrypt
 
