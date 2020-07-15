@@ -94,8 +94,8 @@ these implementations are not inter-operable.
 For customers this means
 as we design features
 they will be better understood
-and they develop over time they should trend
-towards a constant idea.
+and as they develop over time they should trend
+towards a consistent idea.
 
 ## Easy to use/Hard to misuse
 
