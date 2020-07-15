@@ -45,12 +45,21 @@ The following inputs to this behavior are REQUIRED:
 - [Plaintext](#plaintext)
 - either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
 
-The following as inputs to this behavior are OPTIONAL:
+The following inputs to this behavior are OPTIONAL:
 
 - [Algorithm Suite](#algorithm-suite)
 - [Encryption Context](#encryption-context)
 - [Frame Length](#frame-length)
-- [Plaintext Length](#plaintext-length)
+
+If the input [plaintext](#plaintext) is of unknown length, the caller MAY also input a
+[Plaintext Length Bound](#plaintext-length-bound).
+
+Implementations SHOULD ensure that a caller is not able to specify both a [plaintext](#plaintext)
+with known length and a [Plaintext Length Bound](#plaintext-length-bound) by construction.
+If a caller is able to specify both an input [plaintext](#plaintext) with known length and
+a [Plaintext Length Bound](#plaintext-length-bound),
+[Plaintext Length Bound](#plaintext-length-bound) MUST NOT be used during the Encrypt operation
+and MUST be ignored.
 
 ### Plaintext
 
@@ -92,9 +101,12 @@ The [algorithm suite](#algorithm-suite.md) that SHOULD be used for encryption.
 The [frame length](../data-format/message-header.md#frame-length) to use for [framed data](../data-format/message-body.md).
 This value MUST NOT exceed the value 2^32 - 1.
 
-### Plaintext Length
+### Plaintext Length Bound
 
-A bound on the length of the [plaintext](#plaintext) to encrypt.
+A bound on the length of [plaintext](#plaintext) with an unknown length to encrypt.
+
+If this input is provided, this operation MUST NOT encrypt a plaintext with length
+greater than this value.
 
 ## Output
 
@@ -160,6 +172,11 @@ on that CMM MUST be constructed as follows:
 - Encryption Context: If provided, this is the [input encryption context](#encryption-context).
   Otherwise, this is an empty encryption context.
 - Algorithm Suite: If provided, this is the [input algorithm suite](#algorithm-suite).
+  Otherwise, this field is not included.
+- Max Plaintext Length: If the [input plaintext](#plaintext) has known length,
+  this length MUST be used.
+  If the input [plaintext](#plaintext) has unknown length and a [Plaintext Length Bound](#plaintext-length-bound)
+  was provided, this is the [Plaintext Length Bound](#plaintext-length-bound).
   Otherwise, this field is not included.
 
 The [algorithm suite](../framework/algorithm-suites.md) used in all aspects of this operation
@@ -270,6 +287,10 @@ If more input plaintext MUST NOT become available
 and there are not enough input plaintext bytes available to create a new regular frame,
 then this operation MUST [construct a final frame](#construct-a-frame)
 with the remaining plaintext.
+
+If [Plaintext Length Bound](#plaintext-length-bound) was specified on input
+and this operation determines that the plaintext being encrypted has a length greater than this value,
+this operation MUST immediately fail.
 
 ### Construct a frame
 
