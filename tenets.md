@@ -405,7 +405,7 @@ in the raw RSA keyring.
 The padding value is not stored
 and MUST be configured for decrypt.
 There will generally be an optimal security answer
-at any give point in time.
+at any given point in time.
 
 As time progresses however,
 this answer will change.
