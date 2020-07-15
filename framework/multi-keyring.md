@@ -61,14 +61,18 @@ If this keyring does not have a [generator keyring](#generator-keyring), this li
 
 ### OnEncrypt
 
-If this keyring has a [generator keyring](#generator-keyring),
-this keyring MUST first generate a plaintext data key using the generator keyring.
-If the input encryption materials already include a plaintext data key, OnEncrypt MUST fail.
-Otherwise, this keyring MUST first call that generator keyring's [OnEncrypt](keyring-interface.md#onencrypt)
-using the input [encryption materials](structures.md#encryption-materials) as input.
-If the [generator keyring](#generator-keyring) fails [OnEncrypt](keyring-interface.md#onencrypt), this OnEncrypt MUST also fail.
-If the [generator keyring](#generator-keyring) returns [encryption materials](structures.md#encryption-materials) missing a plaintext data key,
-OnEncrypt MUST fail.
+If this keyring has a generator keyring,
+this keyring MUST first generate a plaintext data key using the generator keyring:
+
+- If the input encryption materials already include a plaintext data key,
+  OnEncrypt MUST fail.
+- Otherwise,
+  this keyring MUST first call that generator keyring's OnEncrypt
+  using the input encryption materials as input.
+  If the generator keyring fails OnEncrypt,
+  this OnEncrypt MUST also fail.
+  If the generator keyring returns encryption materials missing a plaintext data key,
+  OnEncrypt MUST fail.
 
 If this keyring does not have a [generator keyring](#generator-keyring),
 and the input [encryption materials](structures.md#encryption-materials)

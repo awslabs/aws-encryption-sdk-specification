@@ -7,10 +7,10 @@
 
 This serves as a reference of all features that this change affects.
 
-| Feature                                                                                           |
-| ------------------------------------------------------------------------------------------------- |
-| [Multi-Keyring](../../framework/multi-keyring.md)                                                 |
-| [Multi keyring generator](https://github.com/awslabs/aws-encryption-sdk-specification/issues/114) |
+| Feature                                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Multi-Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/31b0534c4259aad365f048b73231545583389c67/framework/multi-keyring.md) |
+| [Multi-Keyring Generator](https://github.com/awslabs/aws-encryption-sdk-specification/issues/114)                                                     |
 
 ## Affected Specifications
 
@@ -47,8 +47,13 @@ it MUST generate the data key.
 
 ## Out of Scope
 
-Detecting at keyring configuration time that encryption will always fail
-because keyrings are not capable of meeting these requirements
+If a multi-keyring is configured with another multi-keyring as its generator,
+and this second multi-keyring has no generator,
+the outer multi-keyring cannot ever successfully complete an OnEncrypt operation.
+This is one of several examples of keyring configurations
+that cannot satisfy the requirements of an operation.
+Detecting at keyring configuration time that encryption/decryption will always fail
+because keyrings are not capable of meeting their requirements
 is [tracked separately](https://github.com/awslabs/aws-encryption-sdk-specification/issues/144).
 
 ## Motivation
@@ -96,13 +101,14 @@ The description of OnEncrypt for the multi-keyring
 will be changed to read as follows:
 
 If this keyring has a generator keyring,
-this keyring MUST first generate a plaintext data key using the generator keyring.
-If the input encryption materials already include a plaintext data key,
-OnEncrypt MUST fail.
-Otherwise,
-this keyring MUST first call that generator keyring's OnEncrypt
-using the input encryption materials as input.
-If the generator keyring fails OnEncrypt,
-this OnEncrypt MUST also fail.
-If the generator keyring returns encryption materials missing a plaintext data key,
-OnEncrypt MUST fail.
+this keyring MUST first generate a plaintext data key using the generator keyring:
+
+- If the input encryption materials already include a plaintext data key,
+  OnEncrypt MUST fail.
+- Otherwise,
+  this keyring MUST first call that generator keyring's OnEncrypt
+  using the input encryption materials as input.
+  If the generator keyring fails OnEncrypt,
+  this OnEncrypt MUST also fail.
+  If the generator keyring returns encryption materials missing a plaintext data key,
+  OnEncrypt MUST fail.
