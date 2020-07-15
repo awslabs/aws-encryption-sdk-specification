@@ -7,19 +7,17 @@
 
 This serves as a reference of all features that this change affects.
 
-| Feature                                                                                                                 |
-| ----------------------------------------------------------------------------------------------------------------------- |
-| [raw-aes-keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/raw-aes-keyring.md) |
-|                                                                                                                         |
+| Feature                                               |
+| ----------------------------------------------------- |
+| [raw-aes-keyring](../../framework/raw-aes-keyring.md) |
 
 ## Affected Specifications
 
 This serves as a reference of all specification documents that this change affects.
 
-| Specification                                                                                                           |
-| ----------------------------------------------------------------------------------------------------------------------- |
-| [raw-aes-keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/raw-aes-keyring.md) |
-|                                                                                                                         |
+| Specification                                         |
+| ----------------------------------------------------- |
+| [raw-aes-keyring](../../framework/raw-aes-keyring.md) |
 
 ## Affected Implementations
 
