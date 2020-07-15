@@ -413,8 +413,8 @@ at any given point in time.
 
 As time progresses however,
 this answer will change.
-If we provided such a default
-changing it default to reflect this
+If we provided such a default,
+changing it
 will break existing customers.
 Because the padding value is not stored
 with the wrapped data key.
