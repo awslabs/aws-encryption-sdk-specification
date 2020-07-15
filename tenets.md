@@ -277,7 +277,7 @@ may be complete and expressive,
 but it is also confusing
 and is not [hard to misuse](#hard-to-misuse).
 
-An assembled components
+Assembled components
 should do one thing well.
 Leaving the determination of
 what requirement is being satisfied
