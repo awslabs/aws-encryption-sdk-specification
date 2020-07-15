@@ -7,19 +7,17 @@
 
 This serves as a reference of all features that this change affects.
 
-| Feature |
-| ------- |
+| Feature                                                                                                                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Raw RSA Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/31b0534c4259aad365f048b73231545583389c67/framework/raw-rsa-keyring.md) |
-
 
 ## Affected Specifications
 
 This serves as a reference of all specification documents that this change affects.
 
-| Specification |
-| ------------- |
+| Specification                                                                                                                                             |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Raw RSA Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/31b0534c4259aad365f048b73231545583389c67/framework/raw-rsa-keyring.md) |
-
 
 ## Affected Implementations
 
@@ -33,7 +31,7 @@ This serves as a reference for all implementations that this change affects.
 ## Definitions
 
 - "match", "matching pair" describe an interoperable RSA public key, and RSA private key
- (i.e. a ciphertext encrypted by the public key can be decrypted by the private key)
+  (i.e. a ciphertext encrypted by the public key can be decrypted by the private key)
 
 ### Conventions used in this document
 
