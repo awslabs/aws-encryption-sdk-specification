@@ -189,7 +189,7 @@ independent of the value of new features.
 
 To verify that code is correct
 there are three stages
-incorrectness can be identified.
+in which incorrectness can be identified.
 
 1. Development
 
