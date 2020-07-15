@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
+
+- 0.4.0
+
+  - [Raw RSA Keyring public/private key validation](../changes/2020-07-15_raw-rsa-keyring-public-private-key-validation/change.md)
 
 - 0.3.0
 
@@ -56,6 +60,10 @@ On keyring initialization, the following inputs are REQUIRED:
 - [Key Name](#key-name)
 - [Padding Scheme](#padding-scheme)
 - [Public Key](#public-key) and/or [Private Key](#private-key)
+
+If both a public key and private key are provided,
+and the two keys to not form a valid key pair,
+the keyring initialization MUST fail.
 
 ### Key Namespace
 
@@ -113,7 +121,7 @@ The private key SHOULD contain all Chinese Remainder Theorem (CRT) components (p
 
 ### OnEncrypt
 
-OnEncrypt MUST NOT succeed if this keyring does not have a specified [public key](#public-key).
+OnEncrypt MUST fail if this keyring does not have a specified [public key](#public-key).
 
 OnEncrypt MUST take [encryption materials](structures.md#encryption-materials) as input.
 
@@ -139,7 +147,7 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 
 ### OnDecrypt
 
-OnDecrypt MUST NOT succeed if this keyring does not have a specified [private key](#private-key).
+OnDecrypt MUST fail if this keyring does not have a specified [private key](#private-key).
 The keyring MUST NOT derive a private key from a specified [public key](#public-key)
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
