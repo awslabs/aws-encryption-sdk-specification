@@ -275,7 +275,7 @@ A single component that satisfies
 multiple conflicting requirements
 may be complete and expressive,
 but it is also confusing
-and is not [hard to misuse](#Hard-to-misuse).
+and is not [hard to misuse](#hard-to-misuse).
 
 An assembled components
 should do one thing well.
