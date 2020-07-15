@@ -18,8 +18,8 @@ This serves as a reference for all implementations that this change affects.
 
 | Language   | Repository                                                                            |
 | ---------- | ------------------------------------------------------------------------------------- |
-| Python     | [aws-encryption-sdk-c](https://github.com/aws/aws-encryption-sdk-python)              |
-| Java       | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-java)       |
+| Python     | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python)              |
+| Java       | [aws-encryption-sdk-java](https://github.com/aws/aws-encryption-sdk-java)       |
 | C          | [aws-encryption-sdk-c](https://github.com/aws/aws-encryption-sdk-c)                   |
 | Javascript | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-javascript) |
 
@@ -45,11 +45,17 @@ The template document for each example contains those details.
 
 ## Motivation
 
-The two primary motivations for requiring examples are
-to provide guidance to AWS Encryption SDK customers
-and to force AWS Encryption SDK developers
-to use the APIs that they design and build
-to verify that they provide the intended user experience.
+The primary motivations for requiring examples include:
+
+- Providing guidance to AWS Encryption SDK customers.
+- Facilitating documentation and interoperability.
+- Encouraging AWS Encryption SDK developers
+  to work backwards from the caller experience
+  to verify that APIs and components
+  provide the intended functionality,
+  clarity, and ease of use.
+- Demonstrating that all implementations
+  can be used to solve the same problems.
 
 ## Drawbacks
 
@@ -90,8 +96,10 @@ the implementation's continuous integration testing.
 
 - Every example MUST only contain logic that is reasonable for production use.
 - If an example MUST contain logic that is not reasonable for production use,
-  it MUST include clear comments identifying that logic as such
-  and instructing the reader what they SHOULD do instead.
+  it MUST include clear comments that
+  MUST identify that logic as not fit for production use,
+  SHOULD explain why it is not fit for production use,
+  and MUST instruct the reader what they SHOULD do instead.
 
   - ex: Raw keyring examples generate wrapping keys as part of the example.
     These examples MUST contain guidance that
