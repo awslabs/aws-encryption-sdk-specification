@@ -48,7 +48,7 @@ we can't have any confidence that it will do what we want.
 
 Examples of recording
 the requirements before development
-include test driven development,
+include test-driven development
 and specification by example.
 
 ## Motivation
