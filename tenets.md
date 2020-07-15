@@ -359,7 +359,7 @@ because callers do not need
 to select a value.
 
 An example is the principle of least surprise.
-Customers MUST have the freedom consider,
+Customers MUST have the freedom configure,
 but SHOULD NOT need extensive domain understanding
 to get started.
 
@@ -410,7 +410,8 @@ at any given point in time.
 
 As time progresses however,
 this answer will change.
-Changing this default to reflect this
+If we provided such a default
+changing it default to reflect this
 will break existing customers.
 Because the padding value is not stored
 with the wrapped data key.
