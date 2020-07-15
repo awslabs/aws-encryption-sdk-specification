@@ -322,7 +322,7 @@ what parameters do what and how they are passed.
 But this requires time and effort.
 
 Due to the critical nature
-of the data handled by the AWS Encryption SDK
+of the data handled by the AWS Encryption SDK,
 this extensive experience MUST NOT
 be a requirement for review.
 The reviewer, auditor,
