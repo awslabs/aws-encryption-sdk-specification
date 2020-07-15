@@ -38,7 +38,7 @@ to support adoption.
 
 ## The specification first
 
-## Summary
+### Summary
 
 We write changes in the specification
 before they are developed in an implementation.
@@ -51,7 +51,7 @@ the requirements before development
 include test-driven development
 and specification by example.
 
-## Motivation
+### Motivation
 
 The purpose of having a single specification
 is to create alignment and accountability.
@@ -99,7 +99,7 @@ towards a consistent idea.
 
 ## Easy to use/Hard to misuse
 
-## Summary
+### Summary
 
 This principle is often referenced as one
 but is two parts.
@@ -109,7 +109,7 @@ and how they reinforce each other.
 
 ## Easy to use
 
-## Summary
+### Summary
 
 Tools should be easy to use.
 The form should lend itself to the function.
@@ -133,7 +133,7 @@ to accomplish their goals.
 The ESDK MUST facilitate the customer goal,
 not frustrate it.
 
-## Motivation
+### Motivation
 
 Our priority is to
 design parts that intuitively compose together.
@@ -151,7 +151,7 @@ that takes away from their goal.
 
 ## Hard to misuse
 
-## Summary
+### Summary
 
 Tools should be safe.
 It should be clear to customers
@@ -169,7 +169,7 @@ but SHOULD NOT easily go together unsafely.
 Customers should not be surprised
 by unexpected or unsafe behavior.
 
-## Motivation
+### Motivation
 
 Not every configuration is safe to use.
 Expressiveness and power
@@ -185,7 +185,7 @@ independent of the value of new features.
 
 ## Correct by construction
 
-## Summary
+### Summary
 
 To verify that code is correct
 there are three stages
@@ -242,7 +242,7 @@ will be _less_ complicated as time goes on.
 This is true both for the ESDK
 and for our customers using the ESDK.
 
-## Motivation
+### Motivation
 
 The ESDK's priority is to
 create interfaces that can be correct by construction.
@@ -285,7 +285,7 @@ to dynamic runtime behavior is suboptimal.
 
 ## Clear Inputs
 
-## Summary
+### Summary
 
 Functions take arguments.
 What these arguments are
@@ -310,7 +310,7 @@ Examples of features used to express clear inputs
 at the call site are
 named parameters, enums, and options mappings.
 
-## Motivation
+### Motivation
 
 Although expressing intent at the call site
 makes the AWS Encryption SDK (ESDK) more verbose,
@@ -347,7 +347,7 @@ to help drive home the intention.
 
 ## Sensible Defaults
 
-## Summary
+### Summary
 
 Functions need parameters to know what actions to take.
 Sometimes these parameters should have defaults.
@@ -370,7 +370,7 @@ they can do so in an informed manner.
 In this way another example might be
 nudge theory from behavioral economics.
 
-## Motivation
+### Motivation
 
 The AWS Encryption SDK (ESDK) aims
 to be [easy to use](#easy-to-use).
