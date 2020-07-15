@@ -155,7 +155,7 @@ that takes away from their goal.
 
 Tools should be safe.
 It should be clear to customers
-if and where the sharp edges are.
+if there are sharp edges and where.
 
 An example of "hard to misuse"
 is gas and water pipes.
