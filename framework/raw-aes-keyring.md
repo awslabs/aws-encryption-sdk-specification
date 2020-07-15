@@ -11,7 +11,7 @@
 
 - 0.4.0
 
-  - [Specify behavior for RawAESKeyring for invalid input EC](https://github.com/awslabs/aws-encryption-sdk-specification/issues/65)
+  - [Specify behavior for RawAESKeyring for invalid input EC](../changes/2020-07-15_specify-behavior-for-raw-aes-keyring-for-invalid-EC/change.md)
 
 - 0.3.0
 
