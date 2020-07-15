@@ -390,7 +390,7 @@ Given the relationship between encrypt and decrypt,
 options are preferred on encrypt.
 Once a message has been encrypted,
 decryption of that message
-SHOULD BE gated by access control and correctness,
+SHOULD be gated by access control and correctness,
 not configuration options.
 
 Therefore since access control and correctness options
