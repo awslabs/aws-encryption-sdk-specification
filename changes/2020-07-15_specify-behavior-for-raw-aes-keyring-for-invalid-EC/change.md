@@ -21,7 +21,6 @@ This serves as a reference of all specification documents that this change affec
 | [raw-aes-keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/raw-aes-keyring.md) |
 |                                                                                                                         |
 
-
 ## Affected Implementations
 
 This serves as a reference for all implementations that this change affects.
@@ -34,7 +33,7 @@ This serves as a reference for all implementations that this change affects.
 ## Definitions
 
 - "serialize", "serialization", and "serializability" all refer to
-[message header serialization of AAD key value pairs](../../data-format/message-header.md#key-value-pairs)
+  [message header serialization of AAD key value pairs](../../data-format/message-header.md#key-value-pairs)
 
 ### Conventions used in this document
 
