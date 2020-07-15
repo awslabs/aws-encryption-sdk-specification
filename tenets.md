@@ -163,7 +163,7 @@ In the US they have opposite threading.
 This makes it very difficult to connect
 a gas line to a water line accidentally.
 
-The AWS Encryption SDK (ESDK) SHOULD be [easy to use](#Easy-to-use)
+The AWS Encryption SDK (ESDK) SHOULD be [easy to use](#easy-to-use)
 but SHOULD NOT easily go together unsafely.
 
 Customers should not be surprised
