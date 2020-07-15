@@ -386,7 +386,7 @@ then it dominates all other options.
 These kinds of dominate options
 SHOULD NOT be configurable at all.
 
-Given the relationship between encrypt and decrypt
+Given the relationship between encrypt and decrypt,
 options are preferred on encrypt.
 Once a message has been encrypted,
 decryption of that message
