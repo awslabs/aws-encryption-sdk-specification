@@ -179,7 +179,7 @@ This is another property you get with [design for assembly](https://en.wikipedia
 
 This means we will decline to build features
 if the danger of misuse is too high.
-This is not simply case case of cost vs. benefit.
+This is not simply a case of cost vs. benefit.
 The downside risk of misuse SHOULD be evaluated
 independent of the value of new features.
 
