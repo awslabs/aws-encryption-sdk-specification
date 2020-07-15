@@ -311,9 +311,9 @@ named parameters, enums, and option hash.
 
 ## Motivation
 
-Though expressing intent at the call site
-makes the AWS Encryption SDK (ESDK) more verbose
-it makes function calls obviously correct by construction.
+Although expressing intent at the call site
+makes the AWS Encryption SDK (ESDK) more verbose,
+it also makes function calls obviously correct by construction.
 
 As a developer gets more experience
 with a library they will remember
