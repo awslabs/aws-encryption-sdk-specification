@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.0
+0.3.0
 
 ### Changelog
+
+- 0.3.0
+
+  - [Raw RSA keyring MUST NOT accept a key namespace of "aws-kms".](https://github.com/awslabs/aws-encryption-sdk-specification/issues/101)
 
 - 0.2.0
 
