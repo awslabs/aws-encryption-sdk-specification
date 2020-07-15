@@ -87,7 +87,7 @@ They also work against inter-operability,
 because a unique behavior in one implementation
 may be relied on by customers.
 If this behavior does not exist
-in other implementations
+in other implementations,
 then along this dimension
 these implementations are not inter-operable.
 
