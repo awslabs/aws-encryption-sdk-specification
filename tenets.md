@@ -105,7 +105,7 @@ This principle is often referenced as one
 but is two parts.
 Discussing them individually helps
 clarify what each one means
-and how they reenforce each other.
+and how they reinforce each other.
 
 ## Easy to use
 
