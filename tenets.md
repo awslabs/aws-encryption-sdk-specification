@@ -336,8 +336,8 @@ there is no requirement that
 the experience and understanding
 of the people maintaining these system must increase.
 Just because something is crystal clear to you today
-does not mean it will be equally clear to you later.
-Let alone someone without your experience and understanding.
+does not mean it will be equally clear to you later,
+let alone someone without your experience and understanding.
 
 We express this in the specification
 by naming options and encouraging enums.
