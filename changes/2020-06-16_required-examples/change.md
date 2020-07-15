@@ -18,8 +18,8 @@ This serves as a reference for all implementations that this change affects.
 
 | Language   | Repository                                                                            |
 | ---------- | ------------------------------------------------------------------------------------- |
-| Python     | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python)              |
-| Java       | [aws-encryption-sdk-java](https://github.com/aws/aws-encryption-sdk-java)       |
+| Python     | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python)         |
+| Java       | [aws-encryption-sdk-java](https://github.com/aws/aws-encryption-sdk-java)             |
 | C          | [aws-encryption-sdk-c](https://github.com/aws/aws-encryption-sdk-c)                   |
 | Javascript | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-javascript) |
 
