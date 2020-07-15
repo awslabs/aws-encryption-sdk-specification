@@ -292,7 +292,7 @@ What these arguments are
 and how they are intended to be used
 SHOULD be clear at the call site.
 This is a specific use of
-[correct by construction](#Correct-by-construction)
+[correct by construction](#correct-by-construction)
 and [easy to use](#easy-to-use).
 
 Code is read much more often
