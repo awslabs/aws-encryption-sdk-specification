@@ -322,8 +322,13 @@ that produce the [derived keyrings](#derived-keyrings) below.**
 
 **All keyring-producing operations MUST NOT...**
 
-1. Modify any customer-provided client config
-2. Modify the user agent string if the customer has already provided one
+1. Modify any customer-provided client configuration
+2. Modify a customer-provided user agent string
+   1. When a keyring-producing operation initializes an AWS SDK client,
+      if customer overrides are not provided,
+      the keyring-producing operation MAY append content to note
+      the ESDK language and version to the user agent string
+      as part of the AWS SDK client initialization process
 3. Modify any AWS SDK client(s) initialized directly by the customer
 
 ### Derived Keyrings
