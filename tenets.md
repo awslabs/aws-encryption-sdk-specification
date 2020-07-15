@@ -420,5 +420,5 @@ because the customer never set this value before.
 This burns trust
 and forces customers to explicitly set a value
 which defeats the purpose of having a default.
-Therefore we do not provide defaults
+Therefore, we do not provide defaults
 for such configurations.
