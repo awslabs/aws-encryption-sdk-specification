@@ -174,7 +174,7 @@ by unexpected or unsafe behavior.
 Not every configuration is safe to use.
 Expressiveness and power
 can be at odds with safety.
-Therefore we actively discourage unsafe use.
+Therefore, we actively discourage unsafe use.
 This is another property you get with [design for assembly](https://en.wikipedia.org/wiki/Design_for_assembly).
 
 This means we will decline to build features
