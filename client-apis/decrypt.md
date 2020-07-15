@@ -11,7 +11,7 @@
 
 - 0.2.0
 
-  - [Detect Base64-encoded Messages](../changes/2020-05-13_remove-keyring-trace/change.md)
+  - [Detect Base64-encoded Messages](../changes/2020-07-13_detect-base64-encoded-messages/change.md)
 
 - 0.1.0-preview
 

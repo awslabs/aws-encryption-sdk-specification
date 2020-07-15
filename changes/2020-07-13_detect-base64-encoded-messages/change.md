@@ -10,7 +10,6 @@ This serves as a reference of all features that this change affects.
 | Feature                                                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Decrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/623992d999db0b309d8a8adbd664f0d72feee813/client-apis/decrypt.md) |
-|                                                                                                                                             |
 
 ## Affected Specifications
 
@@ -52,10 +51,11 @@ the first two bytes of the Base64 encoding of a valid message are also simple to
 
 ## Drawbacks
 
-This feature technically means the version value is capped to 40 or less,
-to ensure that the Base64-encoded values are not ambiguous.
+This feature technically means the version value
+cannot be incremented beyond the hex value `40`,
+since `41` would then conflict with the Base64-encoded value for `1`.
 This does not seem worth worrying about
-given how rarely we intended to change the version.
+given how rarely we intended to change the version, however.
 
 ## Security Implications
 
