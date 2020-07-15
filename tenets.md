@@ -58,7 +58,7 @@ is to create alignment and accountability.
 We describe what a feature is,
 why such a feature is important,
 and how such a feature should be used.
-This is like Test Driven Development
+This is like Test-Driven Development
 where we create the requirement
 before we create the implementation.
 
