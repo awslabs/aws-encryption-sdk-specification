@@ -399,7 +399,7 @@ not configuration options.
 Therefore since access control and correctness options
 _must_ agree between encrypt and decrypt,
 they SHOULD NOT have defaults
-and SHOULD BE set at encryption time.
+and SHOULD be set at encryption time.
 Because if these defaults need to change
 the ESDK would no longer be backwards compatible.
 
