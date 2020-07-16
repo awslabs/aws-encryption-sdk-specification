@@ -121,7 +121,7 @@ The number of bytes encrypted by the [encryption](structures.md#encryption-mater
 
 ### Get Encryption Materials
 
-If the [algorithm suite](algorithm-suites.md) requested contains a [Identity KDF](algorithm-suites.md#identity-kdf),
+If the [algorithm suite](algorithm-suites.md) requested contains a [Identity KDF](algorithm-suites.md#identity-kdf)
 or if the request does not include a [Max Plaintext Length](cmm-interface.md#encryption-materials-request) value,
 the caching CMM MUST obtain the encryption materials by making a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials) function.
 
@@ -133,14 +133,14 @@ If a cache entry is not found, the caching CMM MUST then attempt to obtain the e
 by making a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials).
 
 If the caching CMM makes a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials) operation,
-then it MUST include a [Max Plaintext Length](cmm-interface.md#encryption-materials-request) value,
-which MUST be equal to its [Limit Bytes](#limit-bytes) value.
+then the request MUST include a [Max Plaintext Length](cmm-interface.md#encryption-materials-request)
+with a value equal to its [Limit Bytes](#limit-bytes) value.
 
-If the [algorithm suite](algorithm-suites.md) requested does not contain an [Identity KDF](algorithm-suites.md#identity-kdf),
+If the [algorithm suite](algorithm-suites.md) requested does not contain an [Identity KDF](algorithm-suites.md#identity-kdf)
 and if the request includes a [Max Plaintext Length](cmm-interface.md#encryption-materials-request) value,
 the caching CMM MUST add the encryption materials obtained from the underlying CMM into the underlying CMC.
 
-If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF,
+If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF
 or if the request does not include a [Max Plaintext Length](cmm-interface.md#encryption-materials-request) value,
 the caching CMM MUST NOT store the encryption materials in the underlying CMC.
 
