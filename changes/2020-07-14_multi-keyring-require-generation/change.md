@@ -91,7 +91,7 @@ Customers that are currently using a single multi-keyring instance
 in multiple contexts with inconsistent data key generation patterns
 will encounter errors when upgrading.
 This may lead to an increase in support requests,
-but should also reduce troubleshooting requests
+but SHOULD also reduce troubleshooting requests
 related to unexpected behaviour around data key generation,
 or unexpected permissions errors due to the same.
 
