@@ -58,13 +58,13 @@ rather than on all encryption context values.
 
 It is possible that an existing encryption context used as input to encrypt
 will be broken by this change.
-Designing a migration approach for affected users
+Designing a migration approach for affected customers
 is out of scope for this document.
 
 ## Motivation
 
 The current statement using "SHOULD" is too weak to be of any use.
-Some users could be providing encryption contexts
+Some customers could be providing encryption contexts
 with key fields using the `aws` prefix,
 and in fact this is relatively likely
 since the context of many uses of the ESDK
@@ -79,16 +79,16 @@ is questionable.
 Interpreted literally, this leads to a contradiction
 since the [Default CMM](../../framework/default-cmm.md) itself adds a key field with the reserved prefix.
 Therefore, it is clearer to specify this
-as a restriction on user input to the decrypt operation.
+as a restriction on the input to the decrypt operation.
 This still allows any [CMM](../../framework/cmm-interface.md) to use the reserved scope.
 
 ## Drawbacks
 
 Even reserving the less general `aws-crypto-` prefix
 is still a breaking change,
-since it is currently possible for users
+since it is currently possible for customers
 to include key fields beginning with this prefix.
-This is much less likely to actually break any users
+This is much less likely to actually break any customers
 compared to any variation of the `aws` prefix, however.
 
 ## Security Implications
@@ -101,7 +101,7 @@ There is still a very slight chance
 this change will break an existing use case.
 This change will be released under a new major version of each implementation,
 and it will at least be possible if difficult
-for any affected users to migrate to using a different key field.
+for any affected customers to migrate to using a different key field.
 
 ## Guide-level/Reference-level Explanation
 
