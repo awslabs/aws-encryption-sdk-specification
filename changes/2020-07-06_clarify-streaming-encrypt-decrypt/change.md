@@ -74,7 +74,7 @@ There SHOULD be no operational implications for specifying the streaming use cas
 This change clarifies the specification of the encrypt and decrypt operations,
 focusing on defining their behavior in the streaming use cases.
 
-This change introduces no new features for customers,
+This change introduces no new features for users,
 however it does clarify important concepts around the release
 of authenticated and signed data for the decrypt streaming use case.
 
@@ -83,9 +83,9 @@ However, in the case of streaming messages with signatures,
 any plaintext released by the Decrypt operation MUST NOT be
 considered signed data until the operation completes and succeeds.
 
-This means that customers that process such released plaintext MUST NOT consider any processing successful
+This means that users that process such released plaintext MUST NOT consider any processing successful
 until this operation completes successfully.
-Additionally, if this operation fails, customers MUST discard the released plaintext and encryption context
+Additionally, if this operation fails, users MUST discard the released plaintext and encryption context
 and MUST rollback any processing done due to the released plaintext or encryption context.
 
 This change adds these security considerations in the Decrypt specification.
@@ -164,13 +164,13 @@ So what should we do with the plaintext decrypted thus far?
 Because streaming is being used, we MUST NOT buffer the entire plaintext,
 as that would defeat the point of streaming.
 Thus, the plaintext needs to go somewhere other than memory.
-Because this is a client-side library, we MUST give it to the customer.
+Because this is a client-side library, we MUST give it to the user.
 
 In the case of any decryption failure,
 the operation MUST zero out any available but unreleaed plaintext.
-The customer MUST understand that all released plaintext cannot be considered signed data
+The user MUST understand that all released plaintext cannot be considered signed data
 until the operation completes and succeeds.
-The customer MUST discard any released plaintext if the operation fails, and MUST roll back
+The user MUST discard any released plaintext if the operation fails, and MUST roll back
 any processing done with that released plaintext.
 This change states these security considerations.
 
@@ -190,7 +190,7 @@ and it MUST NOT be interperted as signed data until the operation completes succ
 This is important to release because a common use case for the header information is
 to check the data within it in order to ensure that the correct thing is being decrypted.
 
-Requiring customers to make such a check after already performing decryption on a large message
+Requiring users to make such a check after already performing decryption on a large message
 could be very expensive, when they could instead immediately see possibly unexpected data within
 the header information.
 

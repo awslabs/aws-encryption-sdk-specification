@@ -254,15 +254,19 @@ by [constructing regular frames](#construct-a-frame).
 When it is indicated that no more plaintext will be available,
 this operation MUST perform the following until all available plaintext is processed:
 
-- If there are enough input plaintext bytes available to create a new regular frame,
-  then this operation MUST [construct a regular frame](#construct-a-frame).
-  using the available plaintext.
 - If there are exactly enough plaintext bytes available to create one regular frame,
   then this operation MUST [construct either a final frame or regular frame](#construct-a-frame)
   with the remaining plaintext.
-  If they construct a regular frame, they MUST also construct an empty final frame.
+- If there are enough input plaintext bytes available to create a new regular frame
+  with some plaintext left over,
+  then this operation MUST [construct a regular frame](#construct-a-frame)
+  using the available plaintext.
 - If there are not enough input plaintext bytes available to create a new regular frame,
   then this operation MUST [construct a final frame](#construct-a-frame)
+
+If an end to the input has been indicated, there is no more available plaintext to process,
+and a final frame has not yet been constructed,
+this operation MUST [construct an empty final frame](#construct-a-frame).
 
 ### Construct a frame
 
