@@ -250,6 +250,7 @@ and for our customers using the ESDK.
 The ESDK's priority is to
 create interfaces that are correct by construction.
 Our priority in identifying incorrectness MUST be
+
 1. Development
 1. Initialization
 1. Use
