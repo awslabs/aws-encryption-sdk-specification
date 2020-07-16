@@ -192,7 +192,7 @@ independent of the value of new features.
 ### Summary
 
 Correctness can be evaluated
-at different stages construction.
+at different stages of construction.
 
 1. Development
 
