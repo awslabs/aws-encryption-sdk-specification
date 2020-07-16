@@ -374,7 +374,9 @@ the best in class configurations that we know of.
 As customers need to consider tradeoffs,
 they can do so in an informed manner.
 In this way another example might be
-nudge theory from behavioral economics.
+[nudge theory](https://en.wikipedia.org/wiki/Nudge_theory) from behavioral economics:
+defaults can always be overridden,
+but help to gently encourage improvements over time.
 
 ### Motivation
 
