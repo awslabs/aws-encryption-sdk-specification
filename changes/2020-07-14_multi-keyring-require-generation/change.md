@@ -105,10 +105,9 @@ this keyring MUST first generate a plaintext data key using the generator keyrin
 
 - If the input encryption materials already include a plaintext data key,
   OnEncrypt MUST fail.
-- Otherwise,
-  this keyring MUST first call that generator keyring's OnEncrypt
+- This keyring MUST first call the generator keyring's OnEncrypt
   using the input encryption materials as input.
-  If the generator keyring fails OnEncrypt,
+- If the generator keyring fails OnEncrypt,
   this OnEncrypt MUST also fail.
-  If the generator keyring returns encryption materials missing a plaintext data key,
+- If the generator keyring returns encryption materials missing a plaintext data key,
   OnEncrypt MUST fail.
