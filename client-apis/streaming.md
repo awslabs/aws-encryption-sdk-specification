@@ -24,7 +24,7 @@ sequentially and over time.
 
 If an implementation requires holding the entire input in memory in order to perform the operation,
 that implementation SHOULD NOT provide an API that allows the caller to stream the operation.
-APIs that support streaming of the encrypt or decrypt operation SHOULD allow users
+APIs that support streaming of the encrypt or decrypt operation SHOULD allow customers
 to be able to process arbitrarily large inputs with a finite amount of working memory.
 
 ## Definitions
@@ -36,28 +36,28 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 
 ### Available Bytes
 
-In the scope of an operation, bytes are considered available if:
+In the scope of an operation, bytes are considered consumable if:
 
 - The operation has not yet processed those bytes,
 - The operation has access to those bytes,
 - Those bytes are intended to be processed.
   This intention is expressed through the specific streaming interface.
 
-For example, in a framework where a user is sending input bytes to an operation
+For example, in a framework where a customer is sending input bytes to an operation
 and that operation must write those bytes to some sink,
-the input bytes received from the user are considered available.
-Here the user is expressing intent to process their supplied bytes.
+the input bytes received from the customer are considered consumable.
+Here the customer is expressing intent to process their supplied bytes.
 
-For a framework where a user is requesting output bytes from an operation
+For a framework where a customer is requesting output bytes from an operation
 and that operation must read from some source in order to produce bytes,
 this is slightly more complicated.
-Bytes are considered available if:
+Bytes are considered consumable if:
 
 - Those bytes have not yet been processed.
 - Those bytes are able to be read by the operation from the source.
 - Those bytes are required to be processed in order for the operation
-  to release the output requested by the user.
-  Here the user expresses intent for the operation to process
+  to release the output requested by the customer.
+  Here the customer expresses intent for the operation to process
   whatever the operation needs to consume to produce its complete output
 
 ### Release
@@ -76,12 +76,12 @@ In order to support streaming, the operation MUST accept some input within a str
 
 This means that:
 
-- There MUST be a mechanism for input bytes to become available to be processed.
+- There MUST be a mechanism for input bytes to become consumable.
 - There MUST be a mechanism to indicate that there are no more input bytes.
 
 These mechanisms are used to allow the operation to process input bytes in parts, over time.
 
-The bytes that represent the entire input to the operation are the bytes that the user intended
+The bytes that represent the entire input to the operation are the bytes that the customer intended
 to be processed.
 
 ## Outputs
@@ -105,8 +105,8 @@ Operations MUST NOT indicate completion or success until an end to the output ha
 
 By using the mechanisms for [inputs](#inputs) and [outputs](#outputs),
 some actor expresses intent through a streaming interface
-for bytes to be made available to the operation
+for bytes to be made consumable to the operation
 and for bytes to be released by the operation.
 
-The behavior of the operation specifies how the operation processes available bytes,
+The behavior of the operation specifies how the operation processes consumable bytes,
 and specifies when processed bytes MAY be released.

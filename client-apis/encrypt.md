@@ -247,24 +247,25 @@ and this operation determines at any time that the plaintext being encrypted
 has a length greater than this value,
 this operation MUST immediately fail.
 
-Before it is indicated that no more plaintext will be available,
-this operation MUST process as much of the available bytes as possible
+Before and end to the input is indicated,
+this operation MUST process as much of the consumable bytes as possible
 by [constructing regular frames](#construct-a-frame).
 
-When it is indicated that no more plaintext will be available,
-this operation MUST perform the following until all available plaintext is processed:
+When end to the input is indicated,
+this operation MUST perform the following until all consumable plaintext bytes are processed:
 
-- If there are exactly enough plaintext bytes available to create one regular frame,
+- If there are exactly enough consumable plaintext bytes to create one regular frame,
+  such that creating a regular frame processes all consumable bytes,
   then this operation MUST [construct either a final frame or regular frame](#construct-a-frame)
   with the remaining plaintext.
-- If there are enough input plaintext bytes available to create a new regular frame
-  with some plaintext left over,
+- If there are enough input plaintext bytes consumable to create a new regular frame,
+  such that creating a regular frame does not processes all consumable bytes,
   then this operation MUST [construct a regular frame](#construct-a-frame)
-  using the available plaintext.
-- If there are not enough input plaintext bytes available to create a new regular frame,
+  using the consumable plaintext bytes.
+- If there are not enough input consumable plaintext bytes to create a new regular frame,
   then this operation MUST [construct a final frame](#construct-a-frame)
 
-If an end to the input has been indicated, there is no more available plaintext to process,
+If an end to the input has been indicated, there are no more consumable plaintext bytes to process,
 and a final frame has not yet been constructed,
 this operation MUST [construct an empty final frame](#construct-a-frame).
 
@@ -298,7 +299,7 @@ with the following inputs:
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length).
 - The cipherkey is the derived data key
-- The plaintext is the next subsequence of available plaintext bytes that have not yet been encrypted.
+- The plaintext is the next subsequence of consumable plaintext bytes that have not yet been encrypted.
   - For a regular frame the length of this plaintext subsequence MUST equal the frame length.
   - For a final frame this MUST be the remaining plaintext bytes which have not yet been encrypted,
     whose length MUST be equal to or less than the frame length.

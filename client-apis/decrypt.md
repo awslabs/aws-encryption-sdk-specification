@@ -165,10 +165,10 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 
 - Output MUST NOT be released until otherwise indicated.
 - If all bytes have been provided and this operation
-  is unable to complete the above steps with the available encrypted message bytes,
+  is unable to complete the above steps with the consumable encrypted message bytes,
   this operation MUST halt and indicate a failure to the caller.
 - If this operation successfully completes the above steps
-  but there are available bytes which are intended to be decrypted,
+  but there are consumable bytes which are intended to be decrypted,
   this operation MUST fail.
 
 ### Parse the header
@@ -176,11 +176,11 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 Given encrypted message bytes, this operation MUST process those bytes sequentially,
 deserializing those bytes according to the [message format](../data-format/message.md).
 
-This operation MUST attempt to deserialize all available encrypted message bytes until it has
+This operation MUST attempt to deserialize all consumable encrypted message bytes until it has
 successfully deserialized a valid [message header](../data-format/message-header.md).
 
-This operation MUST wait if it doesn't have enough encrypted message bytes available to
-deserialize the next field of the message header until enough input bytes become available or
+This operation MUST wait if it doesn't have enough consumable encrypted message bytes to
+deserialize the next field of the message header until enough consumable input bytes become or
 the caller indicates an end to the encrypted message.
 
 Until the [header is verified](#verify-the-header), this operation MUST NOT
@@ -254,9 +254,9 @@ Once the message header is successfully parsed, the next sequential bytes
 MUST be deserialized according to the [message body spec](../data-format/message-body.md).
 
 While there MAY still be message body left to deserialize and decrypt,
-this operation MUST either wait for more of the encrypted message to become available,
+this operation MUST either wait for more of the encrypted message bytes to become consumable,
 wait for the an end to the encrypted message to be indicated,
-or to deserialize and/or decrypt the available bytes.
+or to deserialize and/or decrypt the consumable bytes.
 
 If deserializing [framed data](../data-format/message-body.md#framed-data),
 this operation MUST use the first 4 bytes of a frame to determine if the frame
@@ -332,9 +332,9 @@ this operation MUST verify the message footer using the specified signature algo
 After deserializing the body, this operation MUST deserialize the next encrypted message bytes
 as the [message footer](../data-format/message-footer.md).
 
-If there are not enough available bytes to deserialize the message footer and
+If there are not enough consumable bytes to deserialize the message footer and
 the caller has not yet indicated an end to the encrypted message,
-this operation MUST wait for enough bytes to become available or for the caller
+this operation MUST wait for enough bytes to become consumable or for the caller
 to indicate an end to the encrypted message.
 
 Once the message footer is deserialized, this operation MUST use the
