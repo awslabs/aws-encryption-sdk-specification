@@ -52,7 +52,7 @@ we can't have any confidence that it will do what we want.
 Examples of recording
 the requirements before development
 include test-driven development
-and specification by example.
+and [specification by example](https://en.wikipedia.org/wiki/Specification_by_example).
 
 ### Motivation
 
@@ -94,11 +94,12 @@ in other implementations,
 then along this dimension
 these implementations are not inter-operable.
 
-For customers this means
-as we design features,
-they will be better understood
-and as they develop over time they should trend
-towards a consistent idea.
+Well understood features
+trend towards consistent ideas
+as they change over time.
+This benefits customers
+because it produces better
+and more stable implementations and documentation.
 
 ## Easy to use/Hard to misuse
 
@@ -190,9 +191,8 @@ independent of the value of new features.
 
 ### Summary
 
-To verify that code is correct
-there are three stages
-in which incorrectness can be identified.
+Correctness can be evaluated
+at different stages construction.
 
 1. Development
 
@@ -248,11 +248,13 @@ and for our customers using the ESDK.
 ### Motivation
 
 The ESDK's priority is to
-create interfaces that can be correct by construction.
-This means that issues MUST
-be detected as early as possible.
+create interfaces that are correct by construction.
+Our priority in identifying incorrectness MUST be
+1. Development
+1. Initialization
+1. Use
 
-This early detection of errors
+Early detection of errors
 helps us deliver correct code to customers
 but it also helps customers build
 systems that have steady state stability.
