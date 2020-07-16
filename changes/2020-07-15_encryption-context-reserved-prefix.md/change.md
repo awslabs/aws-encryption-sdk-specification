@@ -7,11 +7,11 @@
 
 This serves as a reference of all features that this change affects.
 
-| Feature                                                                                                                                         |
-| ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Structures](https://github.com/awslabs/aws-encryption-sdk-specification/blob/2eb5b5fd81a1e8d57655efa3f73573b689e8cd42/framework/structures.md) |
-| [Encrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/2eb5b5fd81a1e8d57655efa3f73573b689e8cd42/client-apis/encrypt.md)     |
-| [Define encryption context reserved prefix](https://github.com/awslabs/aws-encryption-sdk-specification/issues/23)                              |
+| Feature                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------ |
+| [Structures](../../framework/structures.md)                                                                        |
+| [Encrypt](../../client-apis/encrypt.md)                                                                            |
+| [Define encryption context reserved prefix](https://github.com/awslabs/aws-encryption-sdk-specification/issues/23) |
 
 ## Affected Specifications
 
