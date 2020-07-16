@@ -16,7 +16,7 @@
 ## Overview
 
 The AWS Encryption SDK MAY provide APIs that enable streamed [encryption](encrypt.md)
-and [decryption](decrypt.md)
+and [decryption](decrypt.md).
 Streaming is a framework for making bytes available to be processed
 by an operation sequentially and over time,
 and for outputting the result of that processing
@@ -36,8 +36,8 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 
 In the scope of an operation, bytes are considered available if
 the operation has not yet processed those bytes
-and those bytes are intended to be processed,
-this intention being expressed through the specific streaming interface.
+and those bytes are intended to be processed.
+This intention is expressed through the specific streaming interface.
 
 For example, in a framework where a customer is requesting output bytes from an operation
 and that operation must read from some source in order to produce bytes,
@@ -49,7 +49,7 @@ until they have been consumed from the source.
 
 In a framework where a customer is sending input bytes to an operation
 and that operation must write those bytes to some sink,
-the bytes recieved from the customer are considered available and MUST be processed.
+the bytes received from the customer are considered available and MUST be processed.
 Here the customer is expressing intent to process their supplied bytes.
 
 ### Release
@@ -78,9 +78,9 @@ up until an end was indicated or the operation is able to determine
 that the bytes made available represent the full input.
 
 The [encrypt](encrypt.md) operation is unable to determine whether it has processed the entire
-input on it's own, and thus MUST NOT complete until an end to the input is indicated.
+input on its own, and thus MUST NOT complete until an end to the input is indicated.
 
-If an operation is able to determine that is has recieved the full input without an end being
+If an operation is able to determine that is has received the full input without an end being
 indicated, the operation MUST fail if more bytes become available.
 
 ## Outputs
@@ -93,7 +93,7 @@ This means that:
 - There MUST be a mechanism to indicate that the entire output has been released,
   or whether more bytes MAY be released in the future.
 
-These mechanisms are used to allow the operation output processed bytes in parts, over time.
+These mechanisms are used to allow the operation output to process bytes in parts, over time.
 
 The bytes that represent the entire output to the operation are the bytes that were released
 up until an end was indicated.
@@ -108,4 +108,4 @@ for bytes to be made available to the operation
 and for bytes to be released by the operation.
 
 The behavior of the operation specifies how the operation processes available bytes,
-and specifies when processed bytes can be released.
+and specifies when processed bytes MAY be released.
