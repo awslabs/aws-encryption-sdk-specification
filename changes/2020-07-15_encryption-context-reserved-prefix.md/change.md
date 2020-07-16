@@ -100,7 +100,7 @@ By itself this change SHOULD NOT have any security implications.
 There is still a very slight chance
 this change will break an existing use case.
 This change will be released under a new major version of each implementation,
-and it will at least be possible if difficult
+and it will at least be possible, if difficult,
 for any affected users to migrate to using a different key field.
 
 ## Guide-level/Reference-level Explanation
