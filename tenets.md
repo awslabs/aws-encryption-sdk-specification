@@ -358,7 +358,7 @@ to help drive home the intention.
 Functions need parameters to know what actions to take.
 Sometimes these parameters should have defaults.
 A parameter that has a default
-will take a specified value even if no value is passed.
+will take a specific value if no value is passed.
 
 This simplifies using the function
 because callers do not need
