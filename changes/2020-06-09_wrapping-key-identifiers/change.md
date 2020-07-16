@@ -94,9 +94,9 @@ This change SHOULD NOT have any operational implications.
 
 Key namespace and key name are configuration values that determine the behavior of a keyring.
 
-Provider ID and key provider info are values that identify the keyring configuration
+Key provider ID and key provider info are values that identify the keyring configuration
 that can fulfill the keyring's decryption contract.
-The keyring attaches these values to the encrypted data key ciphertext.
+The keyring attaches these values to a data key ciphertext to form an encrypted data key.
 
 ## Reference-level Explanation
 
