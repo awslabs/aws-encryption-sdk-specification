@@ -51,9 +51,6 @@ Plaintext or associated data is considered authenticated if the associated
 [authentication tag](../data-format/message-body.md#authentication-tag) is successfully checked
 as defined by the algorithm suite indicated in the message header.
 
-Authenticated data has the property that only those with access to the plaintext data key
-can create a message with authenticated data.
-
 This operation MUST NOT release any unauthenticated plaintext or unauthenticated associated data.
 
 ### Signed Data
@@ -61,10 +58,6 @@ This operation MUST NOT release any unauthenticated plaintext or unauthenticated
 Plaintext and associated data is considered signed if the associated [message signature](../data-format/message-footer.md)
 is successfully verified using the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
 of the algorithm suite indicated in the message header.
-
-Signed data has the property that only those who have access to wrap the plaintext data key
-(i.e. convert a plaintext data key into some [ciphertext](../framework/structures.md#ciphertext))
-can create a message with signed plaintext and associated data.
 
 ## Input
 
@@ -90,14 +83,7 @@ Each key in the encrypted data key list is an encrypted version of the single pl
 The encryption context is the additional authenticated data that was used during encryption.
 The algorithm suite ID refers to the algorithm suite used to encrypt the message and is required to decrypt the encrypted message.
 
-This input MAY be streamed to this operation.
-This means that bytes are made available to this operation sequentially and over time,
-and that an end to the input is eventually indicated.
-This means that:
-
-- There MUST be a mechanism for input bytes to become available to be processed.
-- There MUST be a mechanism to indicate that there are no more input bytes,
-  or whether more bytes MAY be made available in the future.
+This input MAY be [streamed](streaming.md) to this operation.
 
 If an implementation requires holding the entire encrypted message in memory in order to perform this operation,
 that implementation SHOULD NOT provide an API that allows the caller to stream the encrypted message.
@@ -132,14 +118,10 @@ The client SHOULD return as an output:
 
 The decrypted data.
 
-This operation MAY stream the plaintext.
-This means that output bytes are released sequentially and over time,
-and that an end to the output is eventually indicated.
-This means that:
+This operation MAY [stream](streaming.md) the plaintext as output.
 
-- There MUST be a mechanism for output bytes to be released
-- There MUST be a mechanism to indicate that the entire output has been released,
-  or whether more bytes MAY be released in the future.
+If an implementation requires holding the entire encrypted message in memory in order to perform this operation,
+that implementation SHOULD NOT provide an API that allows the caller to stream the encrypted message.
 
 ### Encryption Context
 
@@ -176,17 +158,17 @@ The Decrypt operation is divided into several distinct steps:
 This operation MUST perform all the above steps unless otherwise specified,
 and it MUST perform them in the above order.
 
-If the input encrypted message is not being streamed to this operation,
+If the input encrypted message is not being [streamed](streaming.md) to this operation,
 all output MUST NOT be released until after these steps complete successfully.
 
-If the input encrypted message is being streamed to this operation:
+If the input encrypted message is being [streamed](streaming.md) to this operation:
 
 - Output MUST NOT be released until otherwise indicated.
 - If all bytes have been provided and this operation
   is unable to complete the above steps with the available encrypted message bytes,
   this operation MUST halt and indicate a failure to the caller.
 - If this operation successfully completes the above steps
-  but there are available bytes which have not been processed,
+  but there are available bytes which are intended to be decrypted,
   this operation MUST fail.
 
 ### Parse the header
@@ -252,7 +234,7 @@ to decrypt with the following inputs:
 
 If this tag verification fails, this operation MUST immediately halt and fail.
 
-If the input encrypted message is being streamed to this operation:
+If the input encrypted message is being [streamed](streaming.md) to this operation:
 
 - This operation SHOULD release the parsed [encryption context](#encryption-context),
   [algorithm suite ID](#algorithm-suite-id),
@@ -331,7 +313,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
 If this decryption fails, this operation MUST immediately halt and fail.
 This operation MUST NOT release any unauthenticated plaintext.
 
-If the input encrypted message is being streamed to this operation:
+If the input encrypted message is being [streamed](streaming.md) to this operation:
 
 - This operation SHOULD release the plaintext as soon as tag verification succeeds.
   However, if this operation is using an algorithm suite with a signature algorithm,
@@ -371,16 +353,7 @@ If this verification is not successful, this operation MUST immediately halt and
 
 ## Security Considerations
 
-Authenticated data has the property that only those with access to the plaintext data key
-can create a message with authenticated data.
-
-All plaintext and associated data released by this operation MUST be authenticated.
-
-Signed data has the property that only those who have access to wrap the plaintext data key
-(i.e. convert a plaintext data key into some [ciphertext](../framework/structures.md#ciphertext))
-can create a message with signed plaintext and associated data.
-
-If this operation is streaming output to the caller
+If this operation is [streaming](streaming.md) output to the caller
 and is decrypting messages created with an algorithm suite including a signature algorithm,
 any released plaintext MUST NOT be considered signed data until this operation finishes
 successfully.

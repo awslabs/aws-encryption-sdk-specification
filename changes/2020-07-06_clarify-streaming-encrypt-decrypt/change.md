@@ -33,18 +33,11 @@ Plaintext or associated data is considered authenticated if the associated
 [authentication tag](../data-format/message-body.md#authentication-tag) is successfully checked
 as defined by the algorithm suite indicated in the message header.
 
-Authenticated data has the property that only those with access to the plaintext data key
-can create a message with authenticated data.
-
 ### Signed Data
 
 Plaintext and associated data is considered signed if the associated [message signature](../data-format/message-footer.md)
 is successfully verified using the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
 of the algorithm suite indicated in the message header.
-
-Signed data has the property that only those who have access to wrap the plaintext data key
-(i.e. convert a plaintext data key into some [ciphertext](../framework/structures.md#ciphertext))
-can create a message with signed plaintext and associated data.
 
 ## Summary
 

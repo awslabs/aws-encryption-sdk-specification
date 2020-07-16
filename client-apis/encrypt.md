@@ -66,14 +66,7 @@ and MUST be ignored.
 The plaintext to encrypt.
 This MUST be a sequence of bytes.
 
-This input MAY be streamed to this operation.
-This means that bytes are made available to this operation sequentially and over time,
-and that an end to the input is eventually indicated.
-This means that:
-
-- There MUST be a mechanism for input bytes to become available to be processed.
-- There MUST be a mechanism to indicate that there are no more input bytes,
-  or whether more bytes MAY be made available in the future.
+This input MAY be [streamed](streaming.md) to this operation.
 
 If an implementation requires holding the input entire plaintext in memory in order to perform this operation,
 that implementation SHOULD NOT provide an API that allows this input to be streamed.
@@ -121,14 +114,7 @@ encrypted according to the [operation specified below](#operation).
 This MUST be a sequence of bytes
 and conform to the [message format specification](../data-format/message.md).
 
-This operation MAY stream the encrypted message.
-This means that output bytes are released sequentially and over time,
-and that an end to the output is eventually indicated.
-This means that:
-
-- There MUST be a mechanism for output bytes to be released
-- There MUST be a mechanism to indicate that the entire output has been released,
-  or whether more bytes MAY be released in the future.
+This operation MAY [stream](streaming.md) the encrypted message.
 
 If an implementation requires holding the entire input plaintext in memory in order to perform this operation,
 that implementation SHOULD NOT provide an API that allows this output to be streamed.
@@ -246,7 +232,7 @@ The encrypted message outputted by this operation MUST have a message header equ
 to the message header calculated in this step.
 
 If the algorithm suite contains a signature algorithm and
-this operation is streaming the encrypted message output to the caller,
+this operation is [streaming](streaming.md) the encrypted message output to the caller,
 this operation MUST input the serialized header to the signature algorithm as soon as it is serialized,
 such that the serialized header isn't required to remain in memory to complete
 the [signature calculation](#signature-calculation).
@@ -256,41 +242,27 @@ the [signature calculation](#signature-calculation).
 The encrypted message outputted by this operation MUST have a message body equal
 to the message body calculated in this step.
 
-While there MAY still be plaintext left to encrypt,
-this operation MUST either wait for more plaintext to become available,
-wait for an end to the plaintext to be indicated,
-or perform encryption on the available plaintext to construct frames
-which make up the message body.
-
-Frames MUST be constructed sequentially such that the concatenation of their decryption
-in [sequence number](#.../data-format/message-body.md#sequence-number)
-order is equal to the input plaintext which has been encrypted so far.
-
-If more input plaintext MAY become available
-and there are not enough input plaintext bytes available to create a new
-[regular frame](#../data-format/message-body.md#regular-frame),
-then this operation MUST wait until either enough plaintext bytes become available
-or the caller indicates an end to the plaintext.
-
-If more input plaintext MAY become available
-and there is enough plaintext available to construct a new regular frame,
-then this operation MUST [construct a regular frame](#construct-a-frame)
-with the available plaintext.
-
-If more input plaintext MUST NOT become available
-and there are exactly enough plaintext bytes available to create one regular frame,
-then this operation MUST [construct either a final frame or regular frame](#construct-a-frame)
-with the remaining plaintext.
-If they construct a regular frame, they MUST also construct an empty final frame.
-
-If more input plaintext MUST NOT become available
-and there are not enough input plaintext bytes available to create a new regular frame,
-then this operation MUST [construct a final frame](#construct-a-frame)
-with the remaining plaintext.
-
 If [Plaintext Length Bound](#plaintext-length-bound) was specified on input
-and this operation determines that the plaintext being encrypted has a length greater than this value,
+and this operation determines at any time that the plaintext being encrypted
+has a length greater than this value,
 this operation MUST immediately fail.
+
+Before it is indicated that no more plaintext will be available,
+this operation MUST process as much of the available bytes as possible
+by [constructing regular frames](#construct-a-frame).
+
+When it is indicated that no more plaintext will be available,
+this operation MUST perform the following until all available plaintext is processed:
+
+- If there are enough input plaintext bytes available to create a new regular frame,
+  then this operation MUST [construct a regular frame](#construct-a-frame).
+  using the available plaintext.
+- If there are exactly enough plaintext bytes available to create one regular frame,
+  then this operation MUST [construct either a final frame or regular frame](#construct-a-frame)
+  with the remaining plaintext.
+  If they construct a regular frame, they MUST also construct an empty final frame.
+- If there are not enough input plaintext bytes available to create a new regular frame,
+  then this operation MUST [construct a final frame](#construct-a-frame)
 
 ### Construct a frame
 
@@ -340,7 +312,7 @@ Once the entire frame is serialized,
 the serialized frame MAY be released.
 
 If the algorithm suite contains a signature algorithm and
-this operation is streaming the encrypted message output to the caller,
+this operation is [streaming](streaming.md) the encrypted message output to the caller,
 this operation MUST input the serialized frame to the signature algorithm as soon as it is serialized,
 such that the serialized frame isn't required to remain in memory to complete
 the [signature calculation](#signature-calculation).
