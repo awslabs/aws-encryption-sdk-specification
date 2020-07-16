@@ -77,9 +77,12 @@ that depends on the `max plaintext length` of an Encryption Materials Request.
 Suppose the caching CMM passes a `max plaintext length` value of `N`
 to its underlying CMM's Get Encryption Materials operation,
 and caches the materials that it receives.
-If a later Get Encryption Materials operation fetches those materials from the cache,
-but has a `max plaintext length` value that exceeds `N`,
-then the caching CMM returns those materials unsafely.
+This signals to the underlying CMM that it intends to use the materials
+to _only_ encrypt up to `N` bytes.
+If a later Get Encryption Materials operation has a `max plaintext length` greater than `N`,
+and if the caching CMM returns the cached materials,
+then the user may use the materials to encrypt _more_ than `N` bytes.
+The caching CMM violates its prior intent, which is unsafe.
 
 It is therefore important that the caching CMM
 carefully selects the `max plaintext length` parameter to pass to its underlying CMM.
