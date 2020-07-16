@@ -7,10 +7,10 @@
 
 This serves as a reference of all features that this change affects.
 
-| Feature                                                                                                                                               |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Multi-Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/31b0534c4259aad365f048b73231545583389c67/framework/multi-keyring.md) |
-| [Multi-Keyring Generator](https://github.com/awslabs/aws-encryption-sdk-specification/issues/114)                                                     |
+| Feature                                                                                           |
+| ------------------------------------------------------------------------------------------------- |
+| [Multi-Keyring](../../framework/multi-keyring.md)                                                 |
+| [Multi-Keyring Generator](https://github.com/awslabs/aws-encryption-sdk-specification/issues/114) |
 
 ## Affected Specifications
 
