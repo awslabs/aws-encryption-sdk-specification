@@ -51,7 +51,7 @@ Clarify language in OnEncrypt and OnDecrypt to require failure, instead of the v
 ## Out of Scope
 
 - All keyrings aside from the Raw RSA Keyring
-- The manner in which the Raw RSA Keyring is build/constructed/instantiated
+- The manner in which the Raw RSA Keyring is initialized
 - How to determine if a pair of keys match
 
 ## Motivation
