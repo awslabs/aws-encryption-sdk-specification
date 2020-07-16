@@ -124,13 +124,6 @@ Users SHOULD use the encryption context to store:
 
 Users MUST NOT use the encryption context to store secret data.
 
-The encryption context MUST reserve the following key fields for use by the AWS Encryption SDK:
-
-- `aws-crypto-public-key` (See [the Default CMM spec](default-cmm.md) for its use)
-
-The encryption context SHOULD reserve any key field with the prefix `aws` for use by AWS KMS and
-other AWS services.
-
 ### Encryption Materials
 
 #### Implementations
