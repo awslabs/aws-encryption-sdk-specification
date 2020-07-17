@@ -58,9 +58,9 @@ Other projects that have
 informed how we approached this
 in no particular order
 
-* https://www.ietf.org/standards/rfcs/
-* https://github.com/rust-lang/rfcs
-* https://www.python.org/dev/peps/
+- https://www.ietf.org/standards/rfcs/
+- https://github.com/rust-lang/rfcs
+- https://www.python.org/dev/peps/
 
 ### Motivation
 
