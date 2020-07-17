@@ -3,9 +3,9 @@
 
 # AWS Encryption SDK Specification's tenets
 
-# Definitions
+## Definitions
 
-**Conventions used in this document**
+### Conventions used in this document
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -53,6 +53,14 @@ Examples of recording
 the requirements before development
 include test-driven development
 and [specification by example](https://en.wikipedia.org/wiki/Specification_by_example).
+
+Other projects that have
+informed how we approached this
+in no particular order
+
+* https://www.ietf.org/standards/rfcs/
+* https://github.com/rust-lang/rfcs
+* https://www.python.org/dev/peps/
 
 ### Motivation
 
@@ -206,7 +214,7 @@ at different stages of construction.
 1. Initialization
 
    At runtime when components are configured,
-   instantiated, or created
+   initialized, or created
    not all combinations are correct.
 
 1. Use
@@ -249,7 +257,8 @@ and for our customers using the ESDK.
 
 The ESDK's priority is to
 create interfaces that are correct by construction.
-Our priority in identifying incorrectness MUST be
+Our priority in evaluating correctness
+and communicating incorrectness MUST be
 
 1. Development
 1. Initialization
@@ -281,13 +290,16 @@ A single component that satisfies
 multiple conflicting requirements
 may be complete and expressive,
 but it is also confusing
-and is not [hard to misuse](#hard-to-misuse).
+and is [easy to misuse](#hard-to-misuse).
 
 Assembled components
 should do one thing well.
 Leaving the determination of
 what requirement is being satisfied
 to dynamic runtime behavior is suboptimal.
+It is more difficult for customers
+to reason about correct behavior
+that can change between calls.
 
 ## Clear Inputs
 
@@ -364,6 +376,13 @@ This simplifies using the function
 because callers do not need
 to select a value.
 
+Sensible Defaults are defaults
+that are optimal in the majority of use cases.
+If a default is optimal in all use cases,
+then it dominates all other options.
+These kinds of dominant options
+SHOULD NOT be configurable at all.
+
 An example is the principle of least surprise.
 Customers MUST have the freedom to configure
 but SHOULD NOT need extensive domain understanding
@@ -387,13 +406,6 @@ that are needed lowers the barrier to entry.
 Sensible Defaults should be selected
 where possible.
 
-Sensible Defaults are defaults
-that are optimal in the majority of use cases.
-If a default is optimal in all use cases,
-then it dominates all other options.
-These kinds of dominant options
-SHOULD NOT be configurable at all.
-
 Given the relationship between encrypt and decrypt,
 options are preferred on encrypt.
 Once a message has been encrypted,
@@ -407,12 +419,17 @@ they SHOULD NOT have defaults
 and SHOULD be set at encryption time.
 Because if these defaults need to change
 the ESDK would no longer be backwards compatible.
+Sensible defaults MAY change
+but MUST NOT change in ways
+that break backwards compatibility.
 
-A example of this
-is the padding for wrapping the data key
+A example of a correctness option
+that MUST NOT have a default value
+is the [padding scheme](framework/raw-rsa-keyring.md#padding-scheme)
+for wrapping the data key
 in the raw RSA keyring.
-The padding value is not stored
-and MUST be configured for decrypt.
+The padding scheme is not stored
+and MUST be configured to the same value for decrypt.
 There will generally be an optimal security answer
 at any given point in time.
 
