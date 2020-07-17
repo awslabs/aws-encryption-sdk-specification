@@ -34,7 +34,7 @@ to be able to process arbitrarily large inputs with a finite amount of working m
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
 in this document are to be interpreted as described in [RFC2119](https://tools.ietf.org/html/rfc2119).
 
-### Available Bytes
+### Consumable Bytes
 
 In the scope of an operation, bytes are considered consumable if:
 
@@ -62,11 +62,11 @@ Bytes are considered consumable if:
 
 ### Release
 
-An operation releases processed bytes when those bytes are outputted by the operation.
+An operation releases bytes when those bytes are outputted by the operation.
 
 If bytes are processed by an operation, that does not imply that the operation is allowed to
-release those bytes.
-The decrypt and encrypt operations specify when processed bytes MAY be released,
+release any result of that processing.
+The decrypt and encrypt operations specify when output bytes MAY be released,
 when they SHOULD be released,
 and when they MUST NOT be released.
 
@@ -91,8 +91,7 @@ In order to support streaming, the operation MUST produce some output within a s
 This means that:
 
 - There MUST be a mechanism for output bytes to be released
-- There MUST be a mechanism to indicate that the entire output has been released,
-  or whether more bytes MAY be released in the future.
+- There MUST be a mechanism to indicate that the entire output has been released.
 
 These mechanisms are used to allow the operation to produce output bytes in parts, over time.
 
