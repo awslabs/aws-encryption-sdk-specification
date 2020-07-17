@@ -74,7 +74,7 @@ This change SHOULD NOT have any security implications.
 ## Operational Implications
 
 This change will improve behavioral consistency between Raw AES Keyring implications.
-This should improve customer experience and reduce support engagements.
+This should improve the customer experience and reduce support engagements.
 
 ## Guide-level Explanation
 
