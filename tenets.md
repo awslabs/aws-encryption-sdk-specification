@@ -24,7 +24,7 @@ and make a case for them.
 
 # Priorities
 
-When weighing up difficult trade-offs
+When weighing difficult trade-offs
 our ordered set of priorities are:
 
 1. Security
