@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
+
+- 0.4.0
+
+  - [Specify behavior for RawAESKeyring for invalid input EC](../changes/2020-07-15_specify-behavior-for-raw-aes-keyring-for-invalid-EC/change.md)
 
 - 0.3.0
 
@@ -54,23 +58,9 @@ Galois/Counter Mode (GCM) Specification: [NIST Special Publication 800-38D](http
 
 On keyring initialization, the following inputs are REQUIRED:
 
-- [Key Namespace](#key-namespace)
-- [Key Name](#key-name)
+- [Key Namespace](./keyring-interface.md#key-namespace)
+- [Key Name](./keyring-interface.md#key-name)
 - [Wrapping Key](#wrapping-key)
-
-### Key Namespace
-
-A UTF-8 encoded value that, together with the [key name](#key-name), identifies a particular [wrapping key](#wrapping-key).
-
-The raw AES keyring MUST NOT accept a key namespace of "aws-kms".
-
-This value is also used for bookkeeping purposes.
-
-### Key Name
-
-A UTF-8 encoded value that, together with the [key namespace](#key-namespace), identifies a particular [wrapping key](#wrapping-key).
-
-This value is also used for bookkeeping purposes.
 
 ### Wrapping Key
 
@@ -91,16 +81,16 @@ This structure is a sequence of bytes in big-endian format to be used as the
 The following table describes the fields that form the raw AES keyring key provider information.
 The bytes are appended in the order shown.
 
-| Field                     | Length (bytes)                  | Interpreted as      |
-| ------------------------- | ------------------------------- | ------------------- |
-| Key Name                  | length of [Key Name](#key-name) | UTF-8 encoded bytes |
-| Authentication Tag Length | 4                               | UInt32              |
-| IV Length                 | 4                               | UInt32              |
-| IV                        | [IV Length](#iv-length)         | Bytes               |
+| Field                     | Length (bytes)                                        | Interpreted as      |
+| ------------------------- | ----------------------------------------------------- | ------------------- |
+| Key Name                  | length of [Key Name](./keyring-interface.md#key-name) | UTF-8 encoded bytes |
+| Authentication Tag Length | 4                                                     | UInt32              |
+| IV Length                 | 4                                                     | UInt32              |
+| IV                        | [IV Length](#iv-length)                               | Bytes               |
 
 #### Key Name
 
-The [Key Name](#key-name) of this keyring.
+The [Key Name](./keyring-interface.md#key-name) of this keyring.
 
 #### Authentication Tag Length
 
@@ -152,11 +142,14 @@ on encrypt MUST generate a random plaintext data key and set it on the [encrypti
 The keyring MUST encrypt the plaintext data key in the [encryption materials](structures.md#encryption-materials)
 using AES-GCM.
 
+The keyring MUST attempt to serialize the [encryption materials'](structures.md#encryption-materials)
+[encryption context](structures.md#encryption-context-1) in the same format as the serialization of
+[message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
+If the keyring cannot serialize the encryption context, On Encrypt MUST fail.
+
 The keyring must use AES-GCM with the following specifics:
 
-- it uses the [encryption context](structures.md#encryption-context-1) in the encryption materials
-  as the additional authenticated data (AAD)
-- the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
+- it uses the serialized [encryption context](structures.md#encryption-context-1) as the additional authenticated data (AAD)
 - it uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key
 - it uses a randomly generated IV of 12 bytes
 - it uses a authentication tag bit length of 128
@@ -164,7 +157,7 @@ The keyring must use AES-GCM with the following specifics:
 Based on the ciphertext output of the AES-GCM decryption,
 the keyring MUST construct an [encrypted data key](structures.md#encrypted-data-key) with the following specifics:
 
-- the [key provider ID](structures.md#key-provider-id) is this keyring's [key namespace](#key-namespace)
+- the [key provider ID](structures.md#key-provider-id) is this keyring's [key namespace](./keyring-interface.md#key-namespace)
 - the [key provider information](structures.md#key-provider-information) is serialized as the
   [raw AES keyring key provider information](#key-provider-information)
 - the [ciphertext](structures.md#ciphertext) is serialized as the
@@ -180,20 +173,25 @@ On encrypt MUST output the modified [encryption materials](structures.md#encrypt
 On decrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
 
+The keyring MUST attempt to serialize the [decryption materials'](structures.md#decryption-materials)
+[encryption context](structures.md#encryption-context-1) in the same format as the serialization of
+[message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
+If the keyring cannot serialize the encryption context, On Decrypt MUST fail.
+
 The keyring MUST perform the following actions on each [encrypted data key](structures.md#encrypted-data-key)
 in the input encrypted data key list, serially, until it successfully decrypts one.
 
 For each [encrypted data key](structures.md#encrypted-data-key),
 the keyring MUST first attempt to deserialize the [serialized ciphertext](#ciphertext)
 to obtain the [encrypted key](#encrypted-key) and [authentication tag](#authentication-tag), and
-deserialize the [serialized key provider info](#key-provider-information) to obtain the [key name](#key-name),
+deserialize the [serialized key provider info](#key-provider-information) to obtain the [key name](./keyring-interface.md#key-name),
 [IV](#iv), [IV length](#iv-length), and [authentication tag length](#authentication-tag-length).
 
 The keyring MUST attempt to decrypt the encrypted data key if and only if the following is true:
 
 - the [ciphertext](#ciphertext) and [key provider information](#key-provider-information) are successfully deserialized.
-- the key name obtained from the encrypted data key's key provider information has a value equal to this keyring's [key name](#key-name).
-- the key provider ID of the encrypted data key has a value equal to this keyring's [key namespace](#key-namespace).
+- the key name obtained from the encrypted data key's key provider information has a value equal to this keyring's [key name](./keyring-interface.md#key-name).
+- the key provider ID of the encrypted data key has a value equal to this keyring's [key namespace](./keyring-interface.md#key-namespace).
 - the [IV length](#iv-length) obtained from the encrypted data key's key provider information has a value equal to 12.
 - the [authentication tag length](#authentication-tag-length) obtained from the key provider information has a value equal to 128.
 
@@ -203,8 +201,7 @@ If decrypting, the keyring MUST use AES-GCM with the following specifics:
 - it uses the [authentication tag](#authentication-tag) obtained from deserialization as the AES-GCM input authentication tag.
 - it uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key.
 - it uses the [IV](#iv) obtained from deserialization as the AES-GCM IV.
-- it uses the encryption context from the [decryption materials](structures.md#decryption-materials) as the AES-GCM AAD.
-- the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
+- it uses the serialized [encryption context](structures.md#encryption-context-1) as the AES-GCM AAD.
 
 If a decryption succeeds, this keyring MUST
 add the resulting plaintext data key to the decryption materials and return the modified materials.
