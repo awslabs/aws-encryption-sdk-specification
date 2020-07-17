@@ -152,8 +152,8 @@ without periodic eviction,
 a TTL-expired entry could remain in the cache indefinitely
 if no user makes any Get Cache Entry or Put Cache Entry call
 after the entry enters the cache.
-The change does not mandate period eviction because
-concurrency is complex to implement in some programming languages and runtimes.
+The change does not mandate periodic eviction because
+concurrency is complex to implement.
 
 This change specifies that the local CMC
 evicts entries in least recently used (LRU) order.
