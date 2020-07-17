@@ -40,7 +40,7 @@ in this document are to be interpreted as described in
 
 Before this change,
 the specification of the Cryptographic Materials Cache (CMC) interface
-gives a only brief explanation of the local CMC:
+gave a only brief explanation of the local CMC:
 
 > The local CMC is a configurable, in-memory, least recently used (LRU) cache.
 > It provides non-blocking, locking, cache entries per cache identifier.
