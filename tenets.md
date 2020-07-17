@@ -214,7 +214,8 @@ at different stages of construction.
    At runtime when the configured components
    are used dynamically
    during steady state operation,
-   not all inputs are correct.
+   not all inputs are correct
+   for every operation.
 
 The AWS Encryption SDK (ESDK) is a component
 that customers use to achieve their security requirements.
