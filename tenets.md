@@ -365,7 +365,7 @@ because callers do not need
 to select a value.
 
 An example is the principle of least surprise.
-Customers MUST have the freedom configure,
+Customers MUST have the freedom to configure
 but SHOULD NOT need extensive domain understanding
 to get started.
 
