@@ -47,6 +47,13 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ### Get Encryption Materials
 
+This operation will add a key-value pair
+to the encryption context included in the request
+using the key `aws-crypto-public-key`.
+If the encryption context included in the request
+already contains the `aws-crypto-public-key` key,
+this operation MUST fail rather than overwrite the associated value.
+
 - If the encryption materials request does not contain an algorithm suite,
   the algorithm suite with algorithm suite ID [03 78 (hex)](algorithm-suites.md#supported-algorithm-suites)
   MUST be added as the algorithm suite in the encryption materials returned.
