@@ -5,15 +5,24 @@
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+### Changelog
+
+- 0.2.0
+  - [Clarify Caching Cryptographic Materials Manager Initialization Parameters](../changes/2020-07-15_clarify-caching-cmm-init-params/change.md)
+- 0.1.0-preview
+  - Initial record
 
 ## Implementations
 
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/cache.h)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/caching.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/caching/CachingCryptoMaterialsManager.java)
-- [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/caching-materials-manager-node/src/caching_materials_manager_node.ts)
-- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/caching-materials-manager-browser/src/caching_materials_manager_browser.ts)
+| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                                                  |
+| ---------- | -------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C          | 0.2.0                                  | 0.1.0                     | [cache.h](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/cache.h)                                                                                                |
+| NodeJS     | 0.2.0                                  | 0.1.0                     | [caching_materials_manager_node.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/caching-materials-manager-node/src/caching_materials_manager_node.ts)          |
+| Browser JS | 0.2.0                                  | 0.1.0                     | [caching_materials_manager_browser.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/caching-materials-manager-browser/src/caching_materials_manager_browser.ts) |
+| Python     | 0.2.0                                  | 1.3.0                     | [materials_managers/caching.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/caching.py)                                              |
+| Java       | 0.2.0                                  | 1.3.0                     | [CachingCryptoMaterialsManager.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/caching/CachingCryptoMaterialsManager.java)           |
 
 ## Overview
 
@@ -30,11 +39,15 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Initialization
 
-On caching CMM initialization, a caching CMM MUST define the following:
+On caching CMM initialization,
+the caller MUST provide the following values:
 
 - [Underlying Cryptographic Materials Cache (CMC)](#underlying-cryptographic-materials-cache)
 - [Underlying Cryptographic Materials Manager (CMM)](#underlying-cryptographic-materials-manager)
 - [Cache Limit TTL](#cache-limit-ttl)
+
+Additionally, the caching CMM MUST define the following:
+
 - [Partition ID](#partition-id)
 - [Limit Bytes](#limit-bytes)
 - [Limit Messages](#limit-messages)
