@@ -86,7 +86,7 @@ We want to be able to describe
 how the ESDK works independently of the implementation.
 Clever or unique features in an implementation
 are an opportunity for bugs.
-They also work against inter-operability,
+They also work against inter-operability
 because a unique behavior in one implementation
 may be relied on by customers.
 If this behavior does not exist
