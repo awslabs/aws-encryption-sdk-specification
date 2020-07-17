@@ -65,7 +65,10 @@ The plaintext to encrypt.
 
 See [encryption context](../framework/structures.md#encryption-context).
 
-The encryption context MUST NOT contain an entry with a [reserved key value](../framework/structures.md#encryption-context).
+The prefix `aws-crypto-` is reserved for internal use by the AWS Encryption SDK;
+see the [the Default CMM spec](default-cmm.md) for one such use.
+If the input encryption context contains any entries with a key beginning with this prefix,
+the encryption operation MUST fail.
 
 ### CMM
 
