@@ -117,9 +117,9 @@ a keyring creates one or more "decryption artifacts",
 sometimes called "encrypted data keys",
 that are included in the resulting encrypted message.
 On decryption,
-a keyring consumes a decryption artifact
+a keyring consumes decryption artifacts
 and fulfills a set of requirements
-by using the decryption artifact
+by using these decryption artifacts
 to obtain the plaintext data key.
 This set of requirements is what we call the "decryption contract."
 
