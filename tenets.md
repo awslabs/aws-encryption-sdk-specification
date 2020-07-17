@@ -89,7 +89,7 @@ to keep us accountable.
 
 This alignment goes beyond just
 the inter-operability of the message format.
-We document the ESDK as a single library.
+We document the AWS Encryption SDK (ESDK) as a single library.
 We want to be able to describe
 how the ESDK works independently of the implementation.
 Clever or unique features in an implementation
