@@ -391,7 +391,7 @@ Sensible Defaults are defaults
 that are optimal in the majority of use cases.
 If a default is optimal in all use cases,
 then it dominates all other options.
-These kinds of dominate options
+These kinds of dominant options
 SHOULD NOT be configurable at all.
 
 Given the relationship between encrypt and decrypt,
