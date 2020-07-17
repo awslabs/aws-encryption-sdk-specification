@@ -78,8 +78,8 @@ between security and usability.
 
 ## Security Implications
 
-Removing this flexibility might help identify potential security issues,
-as customers might discover when upgrading their ESDK version
+Removing this flexibility might help identify potential security issues.
+For example, when upgrading their version of the ESDK, customers might discover
 that data keys are not being generated as intended.
 Correcting this will in turn provide the opportunity
 to improve their security postures
