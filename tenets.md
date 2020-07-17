@@ -55,8 +55,8 @@ include test-driven development
 and [specification by example](https://en.wikipedia.org/wiki/Specification_by_example).
 
 Other projects that have
-informed how we approached this
-in no particular order
+informed how we approached this,
+in no particular order:
 
 - https://www.ietf.org/standards/rfcs/
 - https://github.com/rust-lang/rfcs
