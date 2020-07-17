@@ -71,9 +71,9 @@ The separation helps to draw a distinction between the abstract CMC interface
 and concrete types of CMCs,
 which currently includes both the local CMC
 and the null CMC (in some implementations).
-(This pattern of separation can also be seen
+This pattern of separation can also be seen
 in the specification of the CMM interface and its implementations,
-the default CMM and the caching CMM.)
+the default CMM and the caching CMM.
 
 Since the caching CMM requires some CMC implementation to work,
 and because the local CMC is a simple type of CMC
@@ -102,13 +102,13 @@ We also mandate that the local CMC must accept any non-negative value
 so that in addition to typical use cases (for entry capacity at least 2),
 a user can simulate a null cache (by using entry capacity 0)
 or a "debouncing" cache (by using entry capacity 1).
-(By "debouncing" cache,
+By "debouncing" cache,
 we mean one that caches materials
-upon consecutive cache requests for those materials.)
+upon consecutive cache requests for those materials.
 Although these are not necessarily common use cases,
 they are natural generalizations of the local CMC,
-and so without evidence to the contrary
-we have decided that it is worth supporting.
+and so without evidence to the contrary,
+we have decided that they are worth supporting.
 Because the null cache is a special case of the local CMC as defined above,
 it is also unnecessary to individually specify the null CMC as its own entity,
 which in turn reduces specification and implementation effort.
@@ -137,7 +137,7 @@ we turn our attention to when and how the local CMC evicts entries.
 
 This change mandates that the local CMC evicts some TTL-expired entries
 on every Get Cache Entry and Put Cache Entry operation,
-and also that the it evicts any additional entries as necessary
+and also that it evicts any additional entries as necessary
 to not exceed the entry capacity
 on every Put Cache Entry operation.
 This "lazy eviction" is sufficient to ensure that the local CMC
