@@ -47,10 +47,10 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ### Get Encryption Materials
 
-This operation will add a key-value pair 
+This operation will add a key-value pair
 to the encryption context included in the request
 using the key `aws-crypto-public-key`.
-If the encryption context included in the request 
+If the encryption context included in the request
 already contains the `aws-crypto-public-key` key,
 this operation MUST fail rather than overwrite the associated value.
 
