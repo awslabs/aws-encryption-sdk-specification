@@ -52,24 +52,10 @@ RSA Implementation Specification: [RFC 3447](https://tools.ietf.org/html/rfc8017
 
 On keyring initialization, the following inputs are REQUIRED:
 
-- [Key Namespace](#key-namespace)
-- [Key Name](#key-name)
+- [Key Namespace](./keyring-interface.md#key-namespace)
+- [Key Name](./keyring-interface.md#key-name)
 - [Padding Scheme](#padding-scheme)
 - [Public Key](#public-key) and/or [Private Key](#private-key)
-
-### Key Namespace
-
-A UTF-8 encoded value that namespaces this keyring.
-
-The raw RSA keyring MUST NOT accept a key namespace of "aws-kms".
-
-This value is also used for bookkeeping purposes.
-
-### Key Name
-
-A UTF-8 encoded value that names this keyring.
-
-This value is also used for bookkeeping purposes.
 
 ### Padding Scheme
 
