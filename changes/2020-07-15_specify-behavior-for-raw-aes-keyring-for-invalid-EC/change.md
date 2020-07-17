@@ -30,8 +30,8 @@ This serves as a reference for all implementations that this change affects.
 
 ## Definitions
 
-- "serialize", "serialization", and "serializability" all refer to
-  [message header serialization of AAD key value pairs](../../data-format/message-header.md#key-value-pairs)
+"serialize", "serialization", and "serializability" all refer to
+[message header serialization of AAD key value pairs](../../data-format/message-header.md#key-value-pairs)
 
 ### Conventions used in this document
 
