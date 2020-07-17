@@ -26,9 +26,9 @@ This serves as a reference for all implementations that this change affects.
 | Language   | Repository                                                                            |
 | ---------- | ------------------------------------------------------------------------------------- |
 | C          | [aws-encryption-sdk-c](https://github.com/aws/aws-encryption-sdk-c)                   |
-| Java       | [aws-encryption-sdk-c](https://github.com/aws/aws-encryption-sdk-java)                |
+| Java       | [aws-encryption-sdk-java](https://github.com/aws/aws-encryption-sdk-java)             |
 | Javascript | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-javascript) |
-| Python     | [aws-encryption-sdk-javascript](https://github.com/aws/aws-encryption-sdk-python)     |
+| Python     | [aws-encryption-sdk-python](https://github.com/aws/aws-encryption-sdk-python)         |
 
 ## Definitions
 
@@ -52,11 +52,12 @@ the first two bytes of the Base64 encoding of a valid message are also simple to
 
 ## Drawbacks
 
-This feature technically means the version value
-cannot be incremented beyond the hex value `40`,
+If the version value ever advances beyond the hex value `40`,
+it will not be possible to catch this error for all supported versions
 since `41` would then conflict with the Base64-encoded value for `1`.
-This does not seem worth worrying about
-given how rarely we intended to change the version, however.
+This is acceptable given it is a best-effort guard,
+and also extremely unlikely
+given how rarely we intended to change the version.
 
 ## Security Implications
 
