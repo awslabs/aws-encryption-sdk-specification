@@ -63,9 +63,11 @@ This change SHOULD NOT have any security implications.
 
 ## Operational Implications
 
-This change should have positive operational impact,
-as it should reduce the number of support engagements with customers
-necessary to help diagnose failures due to this root cause.
+This change should have positive operational impact
+because it removes ambiguity on a common failure mode,
+reducing potential for customer confusion
+and increasing the likelihood that customers can
+diagnose this root cause without needing to contact us.
 
 ## Guide-level Explanation
 
