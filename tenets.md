@@ -18,7 +18,7 @@ as a large living design document.
 These tenets are the "motivating force"
 from which we derive the ESDK design.
 
-We're always open to new ones,
+We're always open to new ones
 if you can think of better ones
 and make a case for them.
 
