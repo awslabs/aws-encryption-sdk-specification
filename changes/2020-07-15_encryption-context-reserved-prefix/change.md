@@ -10,6 +10,7 @@ This serves as a reference of all features that this change affects.
 | Feature                                                                                                            |
 | ------------------------------------------------------------------------------------------------------------------ |
 | [Structures](../../framework/structures.md)                                                                        |
+| [Default CMM](../../framework/default-cmm.md)                                                                      |
 | [Encrypt](../../client-apis/encrypt.md)                                                                            |
 | [Define encryption context reserved prefix](https://github.com/awslabs/aws-encryption-sdk-specification/issues/23) |
 
@@ -17,10 +18,11 @@ This serves as a reference of all features that this change affects.
 
 This serves as a reference of all specification documents that this change affects.
 
-| Specification                               |
-| ------------------------------------------- |
-| [Structures](../../framework/structures.md) |
-| [Encrypt](../../client-apis/encrypt.md)     |
+| Specification                                 |
+| --------------------------------------------- |
+| [Structures](../../framework/structures.md)   |
+| [Default CMM](../../framework/default-cmm.md) |
+| [Encrypt](../../client-apis/encrypt.md)       |
 
 ## Affected Implementations
 
@@ -111,3 +113,10 @@ referring to reserved key fields SHALL be removed.
 The encrypt operation specification will be changed to fail
 if provided an encryption context containing a key field
 that begins with the reserved prefix `aws-crypto-`.
+
+Finally, the default CMM Get Encryption Materials operation
+will specify that if the encryption context included in the request
+already contains the `aws-crypto-public-key` key field
+it MUST fail.
+This is to ensure this key is not overwritten
+in any uses of the CMM that do not go through the top-level encrypt operation.
