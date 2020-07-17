@@ -220,7 +220,7 @@ at different stages of construction.
 The AWS Encryption SDK (ESDK) is a component
 that customers use to achieve their security requirements.
 If the ESDK is not correct,
-then it is impossible for customers
+it is more difficult for customers
 to reason about their security requirements.
 
 Given a component that operates correctly,
