@@ -275,7 +275,7 @@ how the implementation satisfies the requirements.
 
 Being able to easily compose the ESDK parts
 to satisfy all of your requirements is not enough.
-We expect that the complete list of requirements
+We expect a complete list of requirements
 to have conflicting security needs for different types of data.
 A single component that satisfies
 multiple conflicting requirements
