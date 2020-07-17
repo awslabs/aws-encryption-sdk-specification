@@ -44,7 +44,8 @@ implementations SHOULD detect this and provide a more specific error message.
 
 ## Motivation
 
-The message format is a binary format, but it is a common mistake for users to attempt decryption on the Base64 encoding of this data instead.
+The message format is a binary format
+but users commonly attempt to decrypt the Base64 encoding of this data.
 Because the first two bytes of the message format have a very limited set of possible values
 (currently they are in fact fixed),
 the first two bytes of the Base64 encoding of a valid message are also simple to recognize.
