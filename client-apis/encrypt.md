@@ -146,7 +146,6 @@ This output MAY be satisfied by outputting a [parsed header](#parsed-header) con
 
 A collection of deserialized fields of the [encrypted message's](#encrypted-message) header.
 
-
 ## Behavior
 
 The Encrypt operation is divided into several distinct steps:
