@@ -38,8 +38,8 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 
 In the scope of an operation, bytes are considered consumable if:
 
-- The operation has not yet processed those bytes,
-- The operation has access to those bytes,
+- The operation has not yet processed those bytes.
+- The operation has access to those bytes.
 - Those bytes are intended to be processed.
   This intention is expressed through the specific streaming interface.
 
@@ -90,7 +90,7 @@ In order to support streaming, the operation MUST produce some output within a s
 
 This means that:
 
-- There MUST be a mechanism for output bytes to be released
+- There MUST be a mechanism for output bytes to be released.
 - There MUST be a mechanism to indicate that the entire output has been released.
 
 These mechanisms are used to allow the operation to produce output bytes in parts, over time.

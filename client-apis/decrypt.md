@@ -213,7 +213,8 @@ The data key used as input for all decryption described below is a data key deri
 included in the [decryption materials](../framework/structures.md#decryption-materials).
 The algorithm used to derive a data key from the plaintext data key MUST be
 the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-algorithm) included in the
-[algorithm suite](../framework/algorithm-suites.md) defined above.
+[algorithm suite](../framework/algorithm-suites.md) associated with
+the returned decryption materials.
 This document refers to the output of the key derivation algorithm as the derived data key.
 Note that if the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
 then the derived data key is the same as the plaintext data key.

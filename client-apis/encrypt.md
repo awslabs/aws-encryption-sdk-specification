@@ -247,11 +247,11 @@ and this operation determines at any time that the plaintext being encrypted
 has a length greater than this value,
 this operation MUST immediately fail.
 
-Before and end to the input is indicated,
+Before the end of the input is indicated,
 this operation MUST process as much of the consumable bytes as possible
 by [constructing regular frames](#construct-a-frame).
 
-When end to the input is indicated,
+When the end of the input is indicated,
 this operation MUST perform the following until all consumable plaintext bytes are processed:
 
 - If there are exactly enough consumable plaintext bytes to create one regular frame,
