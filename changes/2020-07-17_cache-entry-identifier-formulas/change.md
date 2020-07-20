@@ -88,7 +88,7 @@ See [Reference-level Explanation](#reference-level-explanation).
 Each of the cache entry identifier formulas includes a serialized encryption context,
 as defined in the
 [Key Value Pairs section of the Message Header Data Format specification](../../data-format/message-header.md#key-value-pairs).
-In the following appendix sections we use `SerializeEncryptionContext`
+In the following sections we use `SerializeEncryptionContext`
 to denote the function that,
 given an encryption context,
 returns the serialization of the encryption context.
