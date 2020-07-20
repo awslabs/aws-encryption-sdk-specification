@@ -17,6 +17,16 @@
 
   - Initial record
 
+### Changelog
+
+- 0.2.0
+
+  - [Detect Base64-encoded Messages](../changes/2020-07-13_detect-base64-encoded-messages/change.md)
+
+- 0.1.0-preview
+
+  - Initial record
+
 ## Implementations
 
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_decrypt.c)
@@ -87,6 +97,26 @@ This input MAY be [streamed](streaming.md) to this operation.
 
 If an implementation requires holding the entire encrypted message in memory in order to perform this operation,
 that implementation SHOULD NOT provide an API that allows the caller to stream the encrypted message.
+
+#### Encrypted Message Format
+
+The message format is a binary format, but it is a common mistake for users to attempt decryption on the Base64 encoding of this data instead.
+Because the first two bytes of the message format have a very limited set of possible values
+(currently they are in fact fixed),
+the first two bytes of the Base64 encoding of a valid message are also simple to recognize.
+
+To make diagnosing this mistake easier, implementations SHOULD detect the first two bytes of the Base64 encoding of any supported message [versions](../data-format/message-header.md#version-1)
+and [types](../data-format/message-header.md#type)
+and fail with a more specific error message.
+In particular, the hex values to detect for the current set of versions and types are:
+
+| Version and type (hex) | Base64 encoding (ascii) | Base64 encoding (hex) |
+| ---------------------- | ----------------------- | --------------------- |
+| 01 80                  | A Y ...                 | 41 59 ...             |
+
+Note that the bytes that follow the initial two in the Base64 encoding
+partially depend on subsequent bytes in the binary message format
+and hence are not as predictable.
 
 ### Cryptographic Materials Manager
 

@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.3.1
 
 ### Changelog
+
+- 0.3.1
+
+  - [Clarify failure language when only one key is defined](https://github.com/awslabs/aws-encryption-sdk-specification/issues/91)
 
 - 0.3.0
 
@@ -52,24 +56,10 @@ RSA Implementation Specification: [RFC 3447](https://tools.ietf.org/html/rfc8017
 
 On keyring initialization, the following inputs are REQUIRED:
 
-- [Key Namespace](#key-namespace)
-- [Key Name](#key-name)
+- [Key Namespace](./keyring-interface.md#key-namespace)
+- [Key Name](./keyring-interface.md#key-name)
 - [Padding Scheme](#padding-scheme)
 - [Public Key](#public-key) and/or [Private Key](#private-key)
-
-### Key Namespace
-
-A UTF-8 encoded value that namespaces this keyring.
-
-The raw RSA keyring MUST NOT accept a key namespace of "aws-kms".
-
-This value is also used for bookkeeping purposes.
-
-### Key Name
-
-A UTF-8 encoded value that names this keyring.
-
-This value is also used for bookkeeping purposes.
 
 ### Padding Scheme
 
@@ -113,7 +103,7 @@ The private key SHOULD contain all Chinese Remainder Theorem (CRT) components (p
 
 ### OnEncrypt
 
-OnEncrypt MUST NOT succeed if this keyring does not have a specified [public key](#public-key).
+OnEncrypt MUST fail if this keyring does not have a specified [public key](#public-key).
 
 OnEncrypt MUST take [encryption materials](structures.md#encryption-materials) as input.
 
@@ -139,7 +129,7 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 
 ### OnDecrypt
 
-OnDecrypt MUST NOT succeed if this keyring does not have a specified [private key](#private-key).
+OnDecrypt MUST fail if this keyring does not have a specified [private key](#private-key).
 The keyring MUST NOT derive a private key from a specified [public key](#public-key)
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
