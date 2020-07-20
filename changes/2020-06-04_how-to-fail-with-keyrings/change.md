@@ -137,7 +137,7 @@ This set of requirements is what we call the "decryption contract."
   using one or more decryption artifacts.
 
 - **creating the decryption artifact** :
-  The process of creating a decryption artifact
+  The process of creating one or more decryption artifacts
   intended for a component with a specific decryption contract.
 
 - **fulfilling the decryption contract** :
