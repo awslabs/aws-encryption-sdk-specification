@@ -5,9 +5,13 @@
 
 ## Version
 
-0.1.0
+0.2.0
 
 ### Changelog
+
+- 0.2.0
+
+  - Add [Example Templates](#example-templates) section
 
 - 0.1.0
 
@@ -50,3 +54,50 @@ in this document are to be interpreted as described in
   - ex: Raw keyring examples generate wrapping keys as part of the example.
     These examples MUST contain guidance that
     in production those keys SHOULD be managed by an HSM.
+
+### Example Templates
+
+Each example is defined by a [template](./templates).
+Templates MUST include sufficient code to clearly demonstrate
+how to implement an example.
+This code MAY be in any language.
+
+Each template MUST contain the following sections:
+
+1. Header :
+   This is a detailed description
+   that independently describes the purpose of the example
+   and what it describes.
+   It includes any links to supporting documentation.
+
+   - Implementations MUST include this text verbatim
+     at the top of the file,
+     adjusted appropriately for language comment syntax.
+
+1. Summary :
+   One-sentence summary of the header.
+
+   - Implementations MUST include this text verbatim
+     in the documentation for the example entry point
+     function/method/etc,
+     adjusted appropriately for language comment syntax.
+
+1. Inputs :
+   List of inputs that the example entry point MUST accept,
+   with an accompanying description.
+
+   - Implementations MUST provide all of these inputs in CI
+     as part of their testing framework.
+   - Implementations MUST name their inputs to match the naming of
+     the input in the template.
+   - Implementations MUST use the description text verbatim,
+     adjusted appropriately for language comment syntax.
+
+1. Steps :
+   List of steps that define the example.
+
+- Implementations MUST include every step.
+- Implementations MUST include any comments verbatim,
+  adjusted appropriately for language comment syntax.
+- Implementations MAY alter the order of steps
+  if another order is more appropriate for that language.
