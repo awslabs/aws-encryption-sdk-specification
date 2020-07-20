@@ -173,7 +173,7 @@ in order to compute the cache entry identifier (also known as the cache key).
 
 Each of the cache entry identifier formulas includes a serialized encryption context,
 as defined in the
-[Key Value Pairs section of the Message Header Data Format specification](../../data-format/message-header.md#key-value-pairs).
+[Key Value Pairs specification](../../data-format/message-header.md#key-value-pairs).
 In the following appendix sections we use `SerializeEncryptionContext`
 to denote the function that,
 given an encryption context,
@@ -182,7 +182,7 @@ returns the serialization of the encryption context.
 Some of the cache entry identifier formulas include
 the two-byte algorithm suite ID for the algorithm suite in a materials request.
 The algorithm suite IDs are defined in the
-[Supported Algorithm Suites section of the Algorithm Suites specification](../../framework/algorithm-suites.md#supported-algorithm-suites).
+[Supported Algorithm Suites specification](../../framework/algorithm-suites.md#supported-algorithm-suites).
 In the following appendix sections we use `AlgorithmSuiteId`
 to the denote the function that,
 given an algorithm suite as specified in a materials request,
@@ -237,7 +237,6 @@ ENTRY_ID = SHA512(
 When the caching CMM receives a Decrypt Materials request,
 it MUST calculate the cache entry identifier as
 the SHA-512 hash of the concatenation of the following byte strings,
-
 in the order listed:
 
 1.  The SHA-512 hash of the caching CMM’s Partition ID
