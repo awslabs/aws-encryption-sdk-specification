@@ -73,25 +73,13 @@ and vice versa MAY be any reversible operation, though we expect that most will 
 
 ##### Key Provider ID
 
-A UTF-8 encoded value related to the key provider that encrypted this data key.
-
-This value usually represents the namespace of the key provider defined wrapping key
-used to encrypt the plaintext data key.
-
-For example, [encrypted data keys](#encrypted-data-key) encrypted by the [AWS KMS Keyring](kms-keyring.md)
-have the value of "aws-kms" in this field.
-
-This value MUST NOT be "aws-kms" unless this encrypted data key was produced by the [AWS KMS Keyring](kms-keyring.md).
+The [key provider ID](keyring-interface.md#key-provider-id) value
+for the keyring that wrote this encrypted data key.
 
 ##### Key Provider Information
 
-Information related to the key provider.
-Its structure and meaning is specified by the key provider that encrypted this data key.
-
-This is usually a UTF-8 encoded value.
-This value is usually the name of a key provider defined wrapping key that is used to encrypt the plaintext data key.
-However, the [raw AES keyring](raw-aes-keyring.md) defines a specific structure for the key provider information
-that includes more information.
+The [key provider info](keyring-interface.md#key-provider-info) value
+for the keyring that wrote this encrypted data key.
 
 ##### Ciphertext
 
@@ -123,13 +111,6 @@ Users SHOULD use the encryption context to store:
 - data that is useful in logging and tracking, such as data about the file type, purpose, or ownership.
 
 Users MUST NOT use the encryption context to store secret data.
-
-The encryption context MUST reserve the following key fields for use by the AWS Encryption SDK:
-
-- `aws-crypto-public-key` (See [the Default CMM spec](default-cmm.md) for its use)
-
-The encryption context SHOULD reserve any key field with the prefix `aws` for use by AWS KMS and
-other AWS services.
 
 ### Encryption Materials
 
