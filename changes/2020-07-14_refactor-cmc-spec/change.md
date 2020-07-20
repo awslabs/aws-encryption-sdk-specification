@@ -203,7 +203,8 @@ instead sets the entry capacity to 2.
 The AWS Encryption SDK provides a build-in local Cryptographic Materials Cache (local CMC),
 which implements the CMC interface.
 The local CMC is an in-memory, least recently used (LRU) cache.
-It provides non-blocking, locking, cache entries per cache identifier.
+It provides atomic access to [cache entries](cryptographic-materials-cache.md#cache-entry)
+per [cache identifier](cryptographic-materials-cache.md#cache-identifier).
 
 When initializing the local CMC,
 the user MUST provide an _entry capacity_ value,
