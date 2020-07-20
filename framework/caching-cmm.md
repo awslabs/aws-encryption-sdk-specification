@@ -242,7 +242,7 @@ in the order listed:
 1.  The SHA-512 hash of the caching CMM’s Partition ID
 2.  The two-byte algorithm suite ID corresponding to the algorithm suite in the request
 3.  The concatenation of the lexicographically-sorted SHA-512 hashes of the serialized encrypted data keys,
-    where serialization is as defined in the Message Header Encrypted Data Key Entries specification.
+    where serialization is as defined in the [Encrypted Data Key Entries specification](../../data-format/message-header.md#encrypted-data-key-entries).
 4.  A sentinel field of 512 zero bits (or equivalently, 64 null bytes), indicating the end of the key hashes
 5.  The SHA-512 hash of the serialized encryption context
 
