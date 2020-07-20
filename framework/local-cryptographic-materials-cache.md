@@ -26,7 +26,7 @@ The local Cryptographic Materials Cache (local CMC)
 is a built-in implementation of the [CMC interface](cryptographic-materials-cache.md)
 provided by the AWS Encryption SDK.
 The local CMC is a configurable, in-memory, least recently used (LRU) cache.
-It provides non-blocking, locking, [cache entries](cryptographic-materials-cache.md#cache-entry)
+It provides atomic access to [cache entries](cryptographic-materials-cache.md#cache-entry)
 per [cache identifier](cryptographic-materials-cache.md#cache-identifier).
 
 ## Definitions
@@ -42,12 +42,12 @@ Each cache entry has a time-to-live (TTL) field
 that represents a point in time at which the cache entry MUST be considered invalid.
 After a cache entry's TTL has elapsed,
 we say that the entry is _TTL-expired_,
-and the local CMC MUST NOT return the entry to any user.
+and the local CMC MUST NOT return the entry to any caller.
 
 ## Initialization
 
 On initialization of the local CMC,
-the user MUST provide the following:
+the caller MUST provide the following:
 
 - [Entry Capacity](#entry-capacity)
 
@@ -75,7 +75,8 @@ for TTL-expired entries to evict.
 ### Put Cache Entry
 
 When calling the Put Cache Entry operation,
-the user MUST provide a time-to-live (TTL) value.
+the caller MUST provide a time delta value,
+which the local CMC uses to derive the cache entry's time-to-live (TTL) value.
 The local CMC MUST NOT return any TTL-expired entry.
 
 When performing a Put Cache Entry operation,
