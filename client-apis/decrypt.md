@@ -353,7 +353,7 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
 - If this operation is using an algorithm suite with a signature algorithm,
-  this opeartion MUST NOT release any plaintext decrypted from a final frame until
+  this operation MUST NOT release any plaintext decrypted from a final frame until
   [signature verification](#verify-the-signature) succeeds.
   If this operation is using an algorithm suite without a signature algorithm,
   this operation SHOULD release the plaintext as soon as tag verification succeeds.

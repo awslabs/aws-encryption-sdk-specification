@@ -230,7 +230,7 @@ with the following specifics.
 
 The serialized bytes MUST NOT be released until the entire message header has been serialized
 If this operation is streaming the encrypted message and
-once the entire message header has been serialized,
+the entire message header has been serialized,
 the serialized message header SHOULD be released.
 
 The encrypted message outputted by this operation MUST have a message header equal
@@ -320,7 +320,7 @@ This operation MUST serialize a regular frame or final frame with the following 
 
 The above serialized bytes MUST NOT be released until the entire frame has been serialized.
 If this operation is streaming the encrypted message and
-once the entire frame has been serialized,
+the entire frame has been serialized,
 the serialized frame SHOULD be released.
 
 If the algorithm suite contains a signature algorithm and
