@@ -25,7 +25,7 @@ in this document are to be interpreted as described in
 ## Header
 
 ```python
-# This examples shows how to configure and use a raw RSA keyring using a pre-loaded RSA keypair.
+# This example shows how to configure and use a raw RSA keyring using a pre-loaded RSA keypair.
 #
 # If your RSA key is in PEM or DER format,
 # see the ``keyring/raw_rsa/private_key_only_from_pem`` example.
