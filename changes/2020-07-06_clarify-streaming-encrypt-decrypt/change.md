@@ -163,7 +163,7 @@ at what step in the operation you are in,
 and the result of various calculations.
 
 Additionally, we use similar conditions to specify when the output of the operation MUST NOT
-or SHOULD  be released.
+or SHOULD be released.
 
 This change SHOULD be agnostic to streaming interface implementations.
 Any streaming interface which is capable of moving bytes over time from one place to another,
