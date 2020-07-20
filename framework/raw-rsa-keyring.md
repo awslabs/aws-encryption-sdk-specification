@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.3.1
 
 ### Changelog
+
+- 0.3.1
+
+  - [Clarify failure language when only one key is defined](https://github.com/awslabs/aws-encryption-sdk-specification/issues/91)
 
 - 0.3.0
 
@@ -99,7 +103,7 @@ The private key SHOULD contain all Chinese Remainder Theorem (CRT) components (p
 
 ### OnEncrypt
 
-OnEncrypt MUST NOT succeed if this keyring does not have a specified [public key](#public-key).
+OnEncrypt MUST fail if this keyring does not have a specified [public key](#public-key).
 
 OnEncrypt MUST take [encryption materials](structures.md#encryption-materials) as input.
 
@@ -125,7 +129,7 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 
 ### OnDecrypt
 
-OnDecrypt MUST NOT succeed if this keyring does not have a specified [private key](#private-key).
+OnDecrypt MUST fail if this keyring does not have a specified [private key](#private-key).
 The keyring MUST NOT derive a private key from a specified [public key](#public-key)
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and

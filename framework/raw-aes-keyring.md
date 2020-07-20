@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
+
+- 0.4.0
+
+  - [Specify behavior for RawAESKeyring for invalid input EC](../changes/2020-07-15_specify-behavior-for-raw-aes-keyring-for-invalid-EC/change.md)
 
 - 0.3.0
 
@@ -138,11 +142,14 @@ on encrypt MUST generate a random plaintext data key and set it on the [encrypti
 The keyring MUST encrypt the plaintext data key in the [encryption materials](structures.md#encryption-materials)
 using AES-GCM.
 
+The keyring MUST attempt to serialize the [encryption materials'](structures.md#encryption-materials)
+[encryption context](structures.md#encryption-context-1) in the same format as the serialization of
+[message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
+If the keyring cannot serialize the encryption context, On Encrypt MUST fail.
+
 The keyring must use AES-GCM with the following specifics:
 
-- it uses the [encryption context](structures.md#encryption-context-1) in the encryption materials
-  as the additional authenticated data (AAD)
-- the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
+- it uses the serialized [encryption context](structures.md#encryption-context-1) as the additional authenticated data (AAD)
 - it uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key
 - it uses a randomly generated IV of 12 bytes
 - it uses a authentication tag bit length of 128
@@ -165,6 +172,11 @@ On encrypt MUST output the modified [encryption materials](structures.md#encrypt
 
 On decrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
+
+The keyring MUST attempt to serialize the [decryption materials'](structures.md#decryption-materials)
+[encryption context](structures.md#encryption-context-1) in the same format as the serialization of
+[message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
+If the keyring cannot serialize the encryption context, On Decrypt MUST fail.
 
 The keyring MUST perform the following actions on each [encrypted data key](structures.md#encrypted-data-key)
 in the input encrypted data key list, serially, until it successfully decrypts one.
@@ -189,8 +201,7 @@ If decrypting, the keyring MUST use AES-GCM with the following specifics:
 - it uses the [authentication tag](#authentication-tag) obtained from deserialization as the AES-GCM input authentication tag.
 - it uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key.
 - it uses the [IV](#iv) obtained from deserialization as the AES-GCM IV.
-- it uses the encryption context from the [decryption materials](structures.md#decryption-materials) as the AES-GCM AAD.
-- the AAD is serialized in the same format as the serialization of [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
+- it uses the serialized [encryption context](structures.md#encryption-context-1) as the AES-GCM AAD.
 
 If a decryption succeeds, this keyring MUST
 add the resulting plaintext data key to the decryption materials and return the modified materials.
