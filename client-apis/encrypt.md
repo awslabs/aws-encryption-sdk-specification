@@ -108,7 +108,13 @@ greater than this value.
 
 This behavior MUST output the following if the behavior is successful:
 
-- [encrypted message](#encrypted-message)
+- [Encrypted Message](#encrypted-message)
+- [Encryption Context](#encryption-context)
+- [Algorithm Suite](#algorithm-suite)
+
+The client SHOULD return as an output:
+
+- [Parsed Header](#parsed-header)
 
 ### Encrypted Message
 
@@ -121,6 +127,25 @@ This operation MAY [stream](streaming.md) the encrypted message.
 
 If an implementation requires holding the entire input plaintext in memory in order to perform this operation,
 that implementation SHOULD NOT provide an API that allows this output to be streamed.
+
+### Encryption Context
+
+The [encryption context](../framework/structures.md#encryption-context) that is used as
+additional authenticated data during the encryption of the input [plaintext](#plaintext).
+
+This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
+
+### Algorithm Suite
+
+The [algorithm suite](../framework/algorithm-suites.md) that is used to encrypt
+the input [plaintext](#plaintext).
+
+This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
+
+### Parsed Header
+
+A collection of deserialized fields of the [encrypted message's](#encrypted-message) header.
+
 
 ## Behavior
 

@@ -139,6 +139,7 @@ The client MUST return as output to this operation:
 
 - [Plaintext](#plaintext)
 - [Encryption Context](#encryption-context)
+- [Algorithm Suite](#algorithm-suite)
 
 The client SHOULD return as an output:
 
@@ -346,17 +347,15 @@ This operation MUST NOT release any unauthenticated plaintext.
 
 If the input encrypted message is being [streamed](streaming.md) to this operation:
 
-- This operation SHOULD release plaintext decrypted from unframed data or regular frames
-  as soon as tag verification succeeds.
-  However, if this operation is using an algorithm suite with a signature algorithm,
-  all released plaintext MUST NOT be considered signed data until
-  this operation successfully completes.
-  See [security considerations](#security-considerations) below.
+- If this operation is using an algorithm suite without a signature algorithm,
+  plaintext SHOULD be released as soon as the above calculation, including tag verification,
+  succeeds.
 - If this operation is using an algorithm suite with a signature algorithm,
-  this operation MUST NOT release any plaintext decrypted from a final frame until
-  [signature verification](#verify-the-signature) succeeds.
-  If this operation is using an algorithm suite without a signature algorithm,
-  this operation SHOULD release the plaintext as soon as tag verification succeeds.
+  all plaintext decrypted from regular frames SHOULD be released as soon as the above calculation,
+  including tag verification, succeeds.
+  Any plaintext decrypted from [unframed data](../data-format/message-body.md#un-framed-data) or
+  a final frame MUST NOT be released until [signature verification](#verify-the-signature)
+  successfully completes.
 - This operation SHOULD input the serialized frame to the signature algorithm as soon as it is deserialized,
   such that the serialized frame isn't required to remain in memory to complete
   the [signature verification](#verify-the-signature).
