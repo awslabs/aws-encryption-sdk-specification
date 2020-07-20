@@ -134,14 +134,14 @@ This set of requirements is what we call the "decryption contract."
 - **decryption contract** :
   A set of requirements that MUST be met
   to obtain decryption materials
-  using a decryption artifact.
+  using one or more decryption artifacts.
 
 - **creating the decryption artifact** :
   The process of creating a decryption artifact
   intended for a component with a specific decryption contract.
 
 - **fulfilling the decryption contract** :
-  The process of taking a decryption artifact
+  The process of taking one or more decryption artifacts
   and using it to meet the requirements of
   a decryption contract
   in order to obtain the plaintext data key.
@@ -157,7 +157,7 @@ using one or more decryption artifacts.
 
 ### How to Fail
 
-In encryption,
+On encryption,
 if a keyring is unable or unwilling to
 create all of its required decryption artifacts,
 that keyring MUST fail.
