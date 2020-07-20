@@ -118,7 +118,7 @@ we note that it is dangerous for cryptographic materials to remain in the cache
 for longer than necessary,
 since doing so increases the temporal attack surface.
 This change therefore mandates that
-the local CMC associate a time-to-live (TTL) control to each cache entry,
+the local CMC associates a time-to-live (TTL) control to each cache entry,
 and never returns a cache entry that is _expired_ with respect to its TTL value
 (via a Get Cache Entry operation).
 Existing local CMC implementations already implement this.
@@ -194,9 +194,8 @@ This change SHOULD NOT have any security implications.
 ## Operational Implications
 
 This change will break any customer
-who relies on the local CMC behavior in the AWS Encryption SDK for C that,
-if the customer attempt to set an entry capacity of less than 2,
-instead sets the entry capacity to 2.
+who relies on the local CMC behavior in the AWS Encryption SDK for C
+if the customer attempts to set an entry capacity less than 2.
 
 ## Guide-level Explanation
 
