@@ -8,8 +8,8 @@ Implementations of this example MUST follow the rules defined in
 
 ## Implementations
 
-- [Python (DEV)]()
-- [Java (DEV)]()
+- [Python (DEV)](https://github.com/aws/aws-encryption-sdk-python/blob/keyring/examples/src/onestep_unsigned.py)
+- [Java (DEV)](https://github.com/aws/aws-encryption-sdk-java/blob/keyring/src/examples/java/com/amazonaws/crypto/examples/OneStepUnsigned.java)
 
 ## Definitions
 
