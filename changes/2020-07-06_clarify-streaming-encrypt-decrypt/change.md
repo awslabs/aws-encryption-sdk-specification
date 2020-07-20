@@ -39,6 +39,49 @@ Plaintext and associated data is considered signed if the associated [message si
 is successfully verified using the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
 of the algorithm suite indicated in the message header.
 
+### Consumable Bytes
+
+In the scope of an operation, bytes are considered consumable if:
+
+- The operation has not yet processed those bytes.
+- The operation has access to those bytes.
+- Those bytes are intended to be processed.
+  This intention is expressed through the specific streaming interface.
+
+For example, in a framework where a customer is sending input bytes to an operation
+and that operation must write the output bytes to some sink,
+the input bytes received from the customer are considered consumable.
+Here the customer is expressing intent to process their supplied bytes.
+
+For a framework where a customer is requesting output bytes from an operation
+and that operation must read from some source in order to produce bytes,
+this is slightly more complicated.
+Bytes are considered consumable if:
+
+- Those bytes have not yet been processed.
+- Those bytes are able to be read by the operation from the source.
+- Those bytes are required to be processed in order for the operation
+  to release the output requested by the customer.
+  Here the customer expresses intent for the operation to process
+  whatever the operation needs to consume to produce its complete output
+
+### Release
+
+An operation releases bytes when the operation intends those bytes to be considered output.
+
+For example, in a framework where a customer is sending input bytes to an operation
+and that operation must write the output bytes to some sink,
+bytes are considered released once the operation writes those bytes into the sink.
+
+For a framework where a customer is requesting output bytes from an operation
+and that operation must read from some source in order to produce bytes,
+bytes are considered released once those bytes are available to be read by the customer.
+
+If bytes are processed by an operation, that does not imply that the operation is allowed to
+release any result of that processing.
+The decrypt and encrypt operations specify when output bytes MUST NOT be released
+and when they SHOULD be released.
+
 ## Summary
 
 We specify how to perform encryption and decryption in
@@ -79,7 +122,8 @@ however it does clarify important concepts around the release
 of authenticated and signed data for the decrypt streaming use case.
 
 The Decrypt operation MUST NOT release any unauthenticated data.
-However, in the case of streaming messages with signatures,
+
+In the case of streaming messages with signatures,
 any plaintext released by the Decrypt operation MUST NOT be
 considered signed data until the operation completes and succeeds.
 
@@ -105,17 +149,21 @@ bytes to be read or written sequentially, over time.
 With this framing, the things the encrypt and decrypt operations care about are:
 
 - Can any more data be read or written?
-- What data is currently available to me?
+- What data is currently consumable?
 - What data can I release?
 
+To do this we precisely define what we mean by [consume](#consumable-bytes) and [release](#release),
+as well as the overall framework for thinking about streaming in a new streaming document.
+
 In the context of the encrypt or decrypt operation, we specify the conditions
-for when the operation MAY or MUST perform some processing.
-These conditions include how many input bytes are available,
-whether more bytes MAY be available,
+for when the operation MUST perform some processing.
+These conditions include how many input bytes are consumable,
+whether more bytes MAY be consumable,
 at what step in the operation you are in,
 and the result of various calculations.
 
-Additionally, we use similar conditions to specify when the output of the operation MAY be released.
+Additionally, we use similar conditions to specify when the output of the operation MUST NOT
+or SHOULD  be released.
 
 This change SHOULD be agnostic to streaming interface implementations.
 Any streaming interface which is capable of moving bytes over time from one place to another,
@@ -166,8 +214,6 @@ as that would defeat the point of streaming.
 Thus, the plaintext needs to go somewhere other than memory.
 Because this is a client-side library, we MUST give it to the customer.
 
-In the case of any decryption failure,
-the operation MUST zero out any available but unreleaed plaintext.
 The customer MUST understand that all released plaintext cannot be considered signed data
 until the operation completes and succeeds.
 The customer MUST discard any released plaintext if the operation fails, and MUST roll back

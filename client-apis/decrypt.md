@@ -259,6 +259,11 @@ this operation MUST either wait for more of the encrypted message bytes to becom
 wait for the an end to the encrypted message to be indicated,
 or to deserialize and/or decrypt the consumable bytes.
 
+The [content type](../data-format/message-header.md#content-type) field parsed from the
+message header above determines whether these bytes MUST be deserialized as
+[framed data](../data-format/message-body.md#framed-data) or
+[un-framed data](../data-format/message-body.md#un-framed-data).
+
 If deserializing [framed data](../data-format/message-body.md#framed-data),
 this operation MUST use the first 4 bytes of a frame to determine if the frame
 MUST be deserialized as a [final frame](../data-format/message-body.md#final-frame)
@@ -272,11 +277,6 @@ and the following bytes according to the [regular frame spec](../data-format/mes
 If deserializing a [final frame](../data-format/message-body.md#final-frame),
 this operation MUST ensure that the length of the encrypted content field is
 less than or equal to the frame length deserialized in the message header.
-
-The [content type](../data-format/message-header.md#content-type) field parsed from the
-message header above determines whether these bytes MUST be deserialized as
-[framed data](../data-format/message-body.md#framed-data) or
-[un-framed data](../data-format/message-body.md#un-framed-data).
 
 Once at least a single frame is deserialized (or the entire body in the un-framed case),
 this operation MUST decrypt and authenticate the frame (or body) using the
@@ -304,7 +304,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
     otherwise.
 - The IV is the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
-  padded to the [IV length](../data-format/message-header.md#iv-length).
+  padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
 - The cipherkey is the derived data key
 - The ciphertext is the [encrypted content](../data-format/message-body.md#encrypted-content).
 - the tag is the value serialized in the
@@ -316,14 +316,20 @@ This operation MUST NOT release any unauthenticated plaintext.
 
 If the input encrypted message is being [streamed](streaming.md) to this operation:
 
-- This operation SHOULD release the plaintext as soon as tag verification succeeds.
+- This operation SHOULD release plaintext decrypted from unframed data or regular frames
+  as soon as tag verification succeeds.
   However, if this operation is using an algorithm suite with a signature algorithm,
   all released plaintext MUST NOT be considered signed data until
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
+- If this operation is using an algorithm suite with a signature algorithm,
+  this opeartion MUST NOT release any plaintext decrypted from a final frame until
+  [signature verification](#verify-the-signature) succeeds.
+  If this operation is using an algorithm suite without a signature algorithm,
+  this operation SHOULD release the plaintext as soon as tag verification succeeds.
 - This operation SHOULD input the serialized frame to the signature algorithm as soon as it is deserialized,
   such that the serialized frame isn't required to remain in memory to complete
-  the [signature calculation](#signature-calculation).
+  the [signature verification](#verify-the-signature).
 
 ### Verify the signature
 

@@ -220,13 +220,15 @@ With the authentication tag calculated, this operation MUST serialize the
 [message header authentication](../data-format/message-header.md#header-authentication)
 with the following specifics.
 
-- [IV](../data-format/message-header.md#iv): MUST have a value of 0,
-  padded to the [IV length](../data-format/message-header.md#iv-length).
+- [IV](../data-format/message-header.md#iv): MUST have the value of the IV used in the calculation above,
+  padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
 - [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
   of the authentication tag calculated above.
 
-Once the entire message header has been authenticated and serialized,
-the serialized message header MAY be released.
+The serialized bytes MUST NOT be released until the entire message header has been serialized
+If this operation is streaming the encrypted message and
+once the entire message header has been serialized,
+the serialized message header SHOULD be released.
 
 The encrypted message outputted by this operation MUST have a message header equal
 to the message header calculated in this step.
@@ -313,8 +315,10 @@ This operation MUST serialize a regular frame or final frame with the following 
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag
   outputted when calculating the encrypted content above.
 
-Once the entire frame is serialized,
-the serialized frame MAY be released.
+The above serialized bytes MUST NOT be released until the entire frame has been serialized.
+If this operation is streaming the encrypted message and
+once the entire frame has been serialized,
+the serialized frame SHOULD be released.
 
 If the algorithm suite contains a signature algorithm and
 this operation is [streaming](streaming.md) the encrypted message output to the caller,
@@ -342,8 +346,10 @@ This operation MUST then serialize a message footer with the following specifics
   output of the calculation above.
 - [Signature](../data-format/message-footer.md#signature): MUST be the output of the calculation above.
 
-Once the entire message is signed and the message footer is serialized,
-the serialized message footer MAY be released.
+The above serialized bytes MUST NOT be released until the entire message footer has been serialized.
+Once the entire message footer has been serialized,
+this operation MUST release any previously unreleased serialized bytes from previous steps
+and MUST release the message footer.
 
 The encrypted message outputted by this operation MUST have a message footer equal
 to the message footer calculated in this step.

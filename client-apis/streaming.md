@@ -44,7 +44,7 @@ In the scope of an operation, bytes are considered consumable if:
   This intention is expressed through the specific streaming interface.
 
 For example, in a framework where a customer is sending input bytes to an operation
-and that operation must write those bytes to some sink,
+and that operation must write the output bytes to some sink,
 the input bytes received from the customer are considered consumable.
 Here the customer is expressing intent to process their supplied bytes.
 
@@ -62,13 +62,20 @@ Bytes are considered consumable if:
 
 ### Release
 
-An operation releases bytes when those bytes are outputted by the operation.
+An operation releases bytes when the operation intends those bytes to be considered output.
+
+For example, in a framework where a customer is sending input bytes to an operation
+and that operation must write the output bytes to some sink,
+bytes are considered released once the operation writes those bytes into the sink.
+
+For a framework where a customer is requesting output bytes from an operation
+and that operation must read from some source in order to produce bytes,
+bytes are considered released once those bytes are available to be read by the customer.
 
 If bytes are processed by an operation, that does not imply that the operation is allowed to
 release any result of that processing.
-The decrypt and encrypt operations specify when output bytes MAY be released,
-when they SHOULD be released,
-and when they MUST NOT be released.
+The decrypt and encrypt operations specify when output bytes MUST NOT be released
+and when they SHOULD be released.
 
 ## Inputs
 
@@ -108,4 +115,4 @@ for bytes to be made consumable to the operation
 and for bytes to be released by the operation.
 
 The behavior of the operation specifies how the operation processes consumable bytes,
-and specifies when processed bytes MAY be released.
+and specifies when processed bytes MUST NOT and SHOULD be released.
