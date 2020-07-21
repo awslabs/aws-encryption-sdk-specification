@@ -164,13 +164,11 @@ in the order listed:
 As a formula:
 
 ```
+EDK_HASHES = [SHA512(SerializeEncryptedDataKey(key)) for key in decryptMaterialsRequest.encryptedDataKeys]
 ENTRY_ID = SHA512(
     SHA512(cachingCMM.partitionId)
     + AlgorithmSuiteId(decryptMaterialsRequest.algorithmSuite)
-    + CONCATENATE(SORTED(
-        SHA512(SerializeEncryptedDataKey(encryptedDataKey))
-        for encryptedDataKey in decryptMaterialsRequest.encryptedDataKeys
-    ))
+    + CONCATENATE(SORTED(EDK_HASHES))
     + PADDING_OF_512_ZERO_BITS
     + SHA512(SerializeEncryptionContext(decryptMaterialsRequest.encryptionContext))
 )
