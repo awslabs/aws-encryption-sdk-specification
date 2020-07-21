@@ -46,7 +46,7 @@ the caller MUST provide the following values:
 - [Underlying Cryptographic Materials Manager (CMM)](#underlying-cryptographic-materials-manager)
 - [Cache Limit TTL](#cache-limit-ttl)
 
-Additionally, the caching CMM MUST define the following:
+Additionally, the caching CMM MUST optionally accept the following:
 
 - [Partition ID](#partition-id)
 - [Limit Bytes](#limit-bytes)
