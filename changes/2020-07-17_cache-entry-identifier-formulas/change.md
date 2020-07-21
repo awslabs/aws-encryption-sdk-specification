@@ -37,7 +37,8 @@ in this document are to be interpreted as described in
 ## Summary
 
 The [caching Cryptographic Materials Manager (caching CMM)](../../framework/caching-cmm.md)
-computes identifiers for each cache entry it places into its underlying Cryptographic Materials Cache (CMC).
+computes [identifiers](../../framework/cryptographic-materials-cache.md#cache-identifier)
+for each cache entry it places into its underlying Cryptographic Materials Cache (CMC).
 Existing caching CMM implementations agree on the set of formulas
 they use to compute these identifiers,
 and this change adds those formulas to the specification.
