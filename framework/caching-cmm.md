@@ -43,10 +43,18 @@ On caching CMM initialization,
 the caller MUST provide the following values:
 
 - [Underlying Cryptographic Materials Cache (CMC)](#underlying-cryptographic-materials-cache)
-- [Underlying Cryptographic Materials Manager (CMM)](#underlying-cryptographic-materials-manager)
 - [Cache Limit TTL](#cache-limit-ttl)
 
-Additionally, the caching CMM MUST optionally accept the following:
+Additionally, the caller MUST provide one of the following values:
+
+- [Underlying Cryptographic Materials Manager (CMM)](#underlying-cryptographic-materials-manager)
+- [Keyring](keyring-interface.md)
+
+If the caller provides a keyring,
+then the caching CMM MUST set its underlying CMM
+to a [default CMM](../../framework/default-cmm.md) that wraps the keyring.
+
+Finally, the caching CMM MUST optionally accept the following values:
 
 - [Partition ID](#partition-id)
 - [Limit Bytes](#limit-bytes)

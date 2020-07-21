@@ -75,6 +75,12 @@ so in practice this is not an issue.
 ## Guide- and Reference-level Explanation
 
 When initializing a caching CMM, the caller MUST provide
-an [underlying CMC](../../framework/caching-cmm.md#underlying-cryptographic-materials-cache),
-an [underlying CMM](../../framework/caching-cmm.md#underlying-cryptographic-materials-manager),
+an [underlying CMC](../../framework/caching-cmm.md#underlying-cryptographic-materials-cache)
 and a [TTL](../../framework/caching-cmm.md#cache-limit-ttl).
+
+The caller MUST either provide
+an [underlying CMM](../../framework/caching-cmm.md#underlying-cryptographic-materials-manager)
+or a [keyring](../../framework/keyring-interface.md).
+If the caller provides a keyring,
+then the caching CMM MUST set its underlying CMM
+to a [default CMM](../../framework/default-cmm.md) that wraps the keyring.
