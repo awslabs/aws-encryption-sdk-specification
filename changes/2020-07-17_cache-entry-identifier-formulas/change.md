@@ -110,7 +110,7 @@ then the cache entry identifier MUST be calculated
 as the SHA-512 hash of the concatenation of the following byte strings,
 in the order listed:
 
-1. The SHA-512 hash of the caching CMM’s Partition ID
+1. The SHA-512 hash of a UTF-8 encoding of the caching CMM’s Partition ID
 2. One null byte (`0x00`)
 3. The SHA-512 hash of the serialized encryption context
 
@@ -118,7 +118,7 @@ As a formula:
 
 ```
 ENTRY_ID = SHA512(
-    SHA512(cachingCMM.partitionId)
+    SHA512(UTF8Encode(cachingCMM.partitionId))
     + 0x00
     + SHA512(SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext))
 )
@@ -131,7 +131,7 @@ then the cache entry identifier MUST be calculated
 as the SHA-512 hash of the concatenation of the following byte strings,
 in the order listed:
 
-1.  The SHA-512 hash of the caching CMM’s Partition ID
+1.  The SHA-512 hash of a UTF-8 encoding of the caching CMM’s Partition ID
 2.  One byte with value 1 (`0x01`)
 3.  The two-byte algorithm suite ID corresponding to the algorithm suite in the request
 4.  The SHA-512 hash of the serialized encryption context
@@ -140,7 +140,7 @@ As a formula:
 
 ```
 ENTRY_ID = SHA512(
-    SHA512(cachingCMM.partitionId)
+    SHA512(UTF8Encode(cachingCMM.partitionId))
     + 0x01
     + AlgorithmSuiteId(getEncryptionMaterialsRequest.algorithmSuite)
     + SHA512(SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext))
@@ -154,7 +154,7 @@ it MUST calculate the cache entry identifier as
 the SHA-512 hash of the concatenation of the following byte strings,
 in the order listed:
 
-1.  The SHA-512 hash of the caching CMM’s Partition ID
+1.  The SHA-512 hash of a UTF-8 encoding of the caching CMM’s Partition ID
 2.  The two-byte algorithm suite ID corresponding to the algorithm suite in the request
 3.  The concatenation of the lexicographically-sorted SHA-512 hashes of the serialized encrypted data keys,
     where serialization is as defined in the [Encrypted Data Key Entries specification](../../data-format/message-header.md#encrypted-data-key-entries).
@@ -166,7 +166,7 @@ As a formula:
 ```
 EDK_HASHES = [SHA512(SerializeEncryptedDataKey(key)) for key in decryptMaterialsRequest.encryptedDataKeys]
 ENTRY_ID = SHA512(
-    SHA512(cachingCMM.partitionId)
+    SHA512(UTF8Encode(cachingCMM.partitionId))
     + AlgorithmSuiteId(decryptMaterialsRequest.algorithmSuite)
     + CONCATENATE(SORTED(EDK_HASHES))
     + PADDING_OF_512_ZERO_BITS
