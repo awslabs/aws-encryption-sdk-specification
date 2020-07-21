@@ -127,7 +127,7 @@ the caching CMM MUST obtain the encryption materials by making a call to the und
 Otherwise, the caching CMM MUST attempt to find the [encryption materials](structures.md#encryption-materials)
 from the underlying [cryptographic materials cache (CMC)](#underlying-cryptographic-materials-cache).
 The caching CMM MUST use the formulas specified in [Appendix A](#appendix-a-cache-entry-identifier-formulas)
-in order to compute the cache entry identifier.
+in order to compute the [cache entry identifier](cryptographic-materials-cache.md#cache-identifier).
 
 If a cache entry is found, the caching CMM MUST return the encryption materials retrieved.
 If a cache entry is not found, the caching CMM MUST then attempt to obtain the encryption materials
@@ -147,7 +147,7 @@ the caching CMM MUST obtain the decryption materials by making a call to the und
 Otherwise, the caching CMM MUST attempt to find the [decryption materials](structures.md#decryption-materials)
 from the [underlying CMC](#underlying-cryptographic-materials-cache).
 The caching CMM MUST use the formulas specified in [Appendix A](#appendix-a-cache-entry-identifier-formulas)
-in order to compute the cache entry identifier.
+in order to compute the [cache entry identifier](cryptographic-materials-cache.md#cache-identifier).
 
 If a cache entry is found, the caching CMM MUST return the decryption materials retrieved.
 If a cache entry is not found or the cache entry is expired, the caching CMM MUST attempt to obtain the decryption materials
@@ -167,7 +167,7 @@ the caching CMM MUST NOT store the decryption materials in the underlying CMC.
 
 When accessing the underlying CMC,
 the caching CMM MUST use the formulas specified in this appendix
-in order to compute the cache entry identifier (also known as the cache key).
+in order to compute the [cache entry identifier](cryptographic-materials-cache.md#cache-identifier).
 
 ### Preliminaries
 
