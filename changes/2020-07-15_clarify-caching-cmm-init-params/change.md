@@ -83,4 +83,4 @@ an [underlying CMM](../../framework/caching-cmm.md#underlying-cryptographic-mate
 or a [keyring](../../framework/keyring-interface.md).
 If the caller provides a keyring,
 then the caching CMM MUST set its underlying CMM
-to a [default CMM](../../framework/default-cmm.md) that wraps the keyring.
+to a [default CMM](../../framework/default-cmm.md) initialized with the keyring.
