@@ -182,7 +182,7 @@ returns the serialization of the encryption context.
 Some of the cache entry identifier formulas include
 the two-byte algorithm suite ID for the algorithm suite in a materials request.
 The algorithm suite IDs are defined in the
-[Supported Algorithm Suites specification](../../framework/algorithm-suites.md#supported-algorithm-suites).
+[Supported Algorithm Suites specification](../framework/algorithm-suites.md#supported-algorithm-suites).
 In the following appendix sections we use `AlgorithmSuiteId`
 to the denote the function that,
 given an algorithm suite as specified in a materials request,
