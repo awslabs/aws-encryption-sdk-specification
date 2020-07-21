@@ -7,7 +7,7 @@
 
 0.1.0
 
-## Changelog
+### Changelog
 
 - 0.1.0
 

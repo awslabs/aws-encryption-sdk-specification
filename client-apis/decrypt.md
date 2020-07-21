@@ -5,19 +5,13 @@
 
 ## Version
 
-0.2.0
-
-## Changelog
-
-- 0.2.0
-
-  - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
-
-- 0.1.0-preview
-
-  - Initial record
+0.3.0
 
 ### Changelog
+
+- 0.3.0
+
+  - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
 
 - 0.2.0
 
