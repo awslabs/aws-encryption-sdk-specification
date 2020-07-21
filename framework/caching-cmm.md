@@ -11,6 +11,8 @@
 
 - 0.3.0
   - [Specify Cache Entry Identifier Formulas for Caching Cryptographic Materials Manager](../changes/2020-07-17_cache-entry-identifier-formulas/change.md)
+- 0.2.0
+  - [Clarify Caching Cryptographic Materials Manager Initialization Parameters](../changes/2020-07-15_clarify-caching-cmm-init-params/change.md)
 - 0.1.0-preview
   - Initial record
 
@@ -39,11 +41,23 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Initialization
 
-On caching CMM initialization, a caching CMM MUST define the following:
+On caching CMM initialization,
+the caller MUST provide the following values:
 
 - [Underlying Cryptographic Materials Cache (CMC)](#underlying-cryptographic-materials-cache)
-- [Underlying Cryptographic Materials Manager (CMM)](#underlying-cryptographic-materials-manager)
 - [Cache Limit TTL](#cache-limit-ttl)
+
+Additionally, the caller MUST provide one of the following values:
+
+- [Underlying Cryptographic Materials Manager (CMM)](#underlying-cryptographic-materials-manager)
+- [Keyring](keyring-interface.md)
+
+If the caller provides a keyring,
+then the caching CMM MUST set its underlying CMM
+to a [default CMM](../../framework/default-cmm.md) initialized with the keyring.
+
+Finally, the caching CMM MUST optionally accept the following values:
+
 - [Partition ID](#partition-id)
 - [Limit Bytes](#limit-bytes)
 - [Limit Messages](#limit-messages)
