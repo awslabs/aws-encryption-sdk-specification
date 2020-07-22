@@ -173,10 +173,6 @@ the caching CMM MUST add the decryption materials obtained from the underlying C
 If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF,
 the caching CMM MUST NOT store the decryption materials in the underlying CMC.
 
-## Security Considerations
-
-[TODO: What security properties can the caching CMM guarantee?]
-
 ## Appendix A: Cache Entry Identifier Formulas
 
 When accessing the underlying CMC,

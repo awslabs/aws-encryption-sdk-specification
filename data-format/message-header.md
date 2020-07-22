@@ -100,7 +100,7 @@ The purpose of the message ID is to:
 - protect against accidental reuse of a derived data key or the wearing out of derived data keys in
   the AWS Encryption SDK
 - uniquely identify the [message](message.md)
-- bind the message header to the [message body](message-body.md) [TODO "bind" wording]
+- bind the message header to the [message body](message-body.md)
 - provide a mechanism to securely reuse a data key with multiple messages
 
 #### AAD
@@ -148,7 +148,6 @@ This sequence MUST not contain duplicate entries.
 
 These entries MUST have entries sorted, by key,
 in ascending order according to UTF-8 encoded binary value.
-[TODO does the above informationrmation belong here or as part of encryption context?]
 
 The following table describes the fields that form each key value pair entry.
 The bytes are appended in the order shown.
@@ -271,16 +270,12 @@ The [algorithm suite](../framework/algorithm-suites.md) specified by the [Algori
 [determines how the value of this field is calculated](../client-apis/encrypt.md),
 and uses this value to [authenticate the contents of the header during decryption](../client-apis/decrypt.md).
 
-## Test Vectors
-
-[TODO](https://github.com/awslabs/aws-crypto-tools-test-vector-framework)
-
 ## Appendix
 
 ### Example Structure Definition
 
-Below is an example definition of the message header format described in this document.
-[TODO, to avoid confusion about ASN.1, how should we introduce this example?]
+Below is an example definition of the message header format described in this document,
+described in a "ASN.1-like" format.
 
 ```
 DEFINITIONS ::= BEGIN
@@ -360,7 +355,8 @@ Header          SEQUENCE (SIZE(2)) {
 
 ### Example Bytes
 
-The example below shows the raw bytes of an example header, in hexadecimal notation, followed by a description of what those bytes represent.
+The example below shows the raw bytes of an example header, in hexadecimal notation,
+followed by a description of what those bytes represent.
 
 ```
 01                                         Version (1.0)

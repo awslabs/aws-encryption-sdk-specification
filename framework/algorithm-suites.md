@@ -200,15 +200,7 @@ If the algorithm suite does not include a signature algorithm:
 
 Indicates which algorithm suite is the default algorithm suite for the AWS Encryption SDK.
 
-## Test Vectors
-
-[TODO](#https://github.com/awslabs/aws-crypto-tools-test-vector-framework)
-
 ## Security Considerations
-
-### Why is no salt used for HKDF?
-
-[TODO]
 
 ### Which algorithm suite should I use?
 
