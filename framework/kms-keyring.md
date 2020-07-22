@@ -386,11 +386,6 @@ These goals can be reduced to the following two requirements:
    that is an error and encryption MUST halt.
 1. On decrypt, the keyring MUST NOT halt decryption because of a failure to decrypt.
 
-## Security Considerations
-
-[TODO: What security properties are guaranteed by this keyring? Also, note how the security properties
-can vary drastically depending on key policies]
-
 ## Contributing Issues
 
 This is a record of issues that contributed to this specification.
