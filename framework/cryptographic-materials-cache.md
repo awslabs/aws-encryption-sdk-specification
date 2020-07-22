@@ -5,8 +5,12 @@
 
 ## Version
 
+0.3.0
+
 ### Changelog
 
+- 0.3.0
+  - [Return Nothing from Put Cache Entry in Cryptographic Materials Cache](../changes/2020-07-20_put-cache-entry-returns-nothing/change.md)
 - 0.2.0
   - [Refactor Cryptographic Materials Cache Specification](../changes/2020-07-14_refactor-cmc-spec/change.md)
 - 0.1.0-preview
@@ -88,6 +92,7 @@ The Cryptographic Materials Cache provides behaviours for putting cache entry, g
 
 Attempts to put a cache entry for the specified cache ID.
 If a cache entry for the given Cache ID does not exists in the cache, the CMC creates a new cache entry.
+This operation MUST NOT return the inserted cache entry.
 
 ### Get Cache Entry
 
