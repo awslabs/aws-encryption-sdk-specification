@@ -201,7 +201,7 @@ This operation MUST attempt to deserialize all consumable encrypted message byte
 successfully deserialized a valid [message header](../data-format/message-header.md).
 
 This operation MUST wait if it doesn't have enough consumable encrypted message bytes to
-deserialize the next field of the message header until enough consumable input bytes become available or
+deserialize the next field of the message header until enough input bytes become consumable or
 the caller indicates an end to the encrypted message.
 
 Until the [header is verified](#verify-the-header), this operation MUST NOT
