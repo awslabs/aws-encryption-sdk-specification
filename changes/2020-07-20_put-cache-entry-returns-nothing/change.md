@@ -38,7 +38,7 @@ The [Cryptographic Materials Cache (CMC)](../../framework/cryptographic-material
 does not specify whether or not the Put Cache Entry operation
 returns the cache entry that it inserts.
 Some implementations do and others do not.
-This change specifiies that the Put Cache Entry operation
+This change specifies that the Put Cache Entry operation
 MUST NOT return the cache entry that it inserts.
 
 ## Out of Scope
