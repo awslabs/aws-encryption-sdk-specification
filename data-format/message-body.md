@@ -191,10 +191,6 @@ It is used to authenticate the final frame.
 The authentication tag length MUST be equal to the authentication tag length of the algorithm suite
 specified by the [Algorithm Suite ID](message-header.md#algorithm-suite-id) field.
 
-## Test Vectors
-
-[TODO](https://github.com/awslabs/aws-crypto-tools-test-vector-framework)
-
 ## Example Usage
 
 The following section contains examples of the message body for [Non-Framed Data](#non-framed-data) and [Framed Data](#framed-data).
@@ -345,5 +341,3 @@ C051AD55 A437F6BC 139E9E55 6199FD60
 B66B6A5A 80FDB433 8A48D6A4 21CB
 811234FD 8D589683 51F6F39A 040B3E3B        Final Frame, Authentication Tag
 ```
-
-### TODO - ADD example for single frame

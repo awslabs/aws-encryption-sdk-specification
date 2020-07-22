@@ -157,12 +157,3 @@ If any decryption succeeds, this keyring MUST immediately return the input
 - The output of RSA decryption is set as the decryption material's plaintext data key.
 
 If no decryption succeeds, this keyring MUST NOT make any update to the decryption materials.
-
-## Security Considerations
-
-[TODO: What security properties does this keyring guarantee?]
-
-- multifactor RSA
-- The storage of the raw RSA keys in the local box
-- Does not write any information about what algorithm was used to wrap the data key.
-- Does not provide any authenticity.

@@ -207,12 +207,3 @@ If a decryption succeeds, this keyring MUST
 add the resulting plaintext data key to the decryption materials and return the modified materials.
 
 If no decryption succeeds, the decryption MUST NOT make any update to the decryption materials.
-
-## Security Considerations
-
-[TODO: What security properties are guaranteed by this keyring]
-
-- IV exhaustion/how many keys can we wrap this way?
-- wrapping key use; both how many times it is used to encrypt data keys and where/whether/how it is used elsewhere.
-- Does not write any information about what wrapping algorithm suite was used to wrap the data key.
-- Puts data that doesn't belong in the provider info, into the provider info

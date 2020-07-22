@@ -381,10 +381,6 @@ and MUST release the message footer.
 The encrypted message outputted by this operation MUST have a message footer equal
 to the message footer calculated in this step.
 
-## Security Considerations
-
-[TODO]
-
 ## Appendix
 
 ### Un-Framed Message Body Encryption
