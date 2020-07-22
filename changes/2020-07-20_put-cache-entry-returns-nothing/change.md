@@ -103,7 +103,7 @@ This change SHOULD NOT have any security implications.
 ## Operational Implications
 
 We MUST change the Java and Python implementations of Put Cache Entry
-do not return the inserted cache entry.
+to not return the inserted cache entry.
 
 ## Guide-level and Reference-level Explanation
 
