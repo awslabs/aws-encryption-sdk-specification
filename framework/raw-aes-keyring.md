@@ -95,13 +95,13 @@ The [Key Name](./keyring-interface.md#key-name) of this keyring.
 
 #### Authentication Tag Length
 
-The length, in bits, of the authentication tag outputted by the AES-GCM encryption.
+The length, in bits, of the authentication tag returned by the AES-GCM encryption.
 
 This value MUST be 128.
 
 #### IV Length
 
-The length, in bytes, of the initialization vector (IV) inputted into the AES-GCM encryption.
+The length, in bytes, of the initialization vector (IV) input into the AES-GCM encryption.
 
 This value MUST be 12.
 
@@ -125,11 +125,11 @@ The bytes are appended in the order shown.
 
 #### Encrypted Key
 
-The ciphertext outputted from the AES-GCM encryption of the plaintext data key.
+The ciphertext returned by the AES-GCM encryption of the plaintext data key.
 
 #### Authentication Tag
 
-The authentication tag outputted from the AES-GCM encryption.
+The authentication tag returned by the AES-GCM encryption.
 
 ## Operation
 

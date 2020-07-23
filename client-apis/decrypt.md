@@ -74,7 +74,7 @@ The client MUST require exactly one of the following types of inputs:
 ### Encrypted Message
 
 The encrypted message to decrypt.
-The encrypted message inputted MUST be a sequence of bytes in the
+The input encrypted message MUST be a sequence of bytes in the
 [message format](../data-format/message.md) specified by the AWS Encryption SDK.
 The encrypted message contains the list of [encrypted data keys](../data-format/message-header.md#encrypted-data-keys),
 [encryption context](../data-format/message-header.md#aad), if provided during encryption,
@@ -218,7 +218,7 @@ by calling [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) 
 
 The CMM used MUST be the input CMM, if supplied.
 If a CMM is not supplied as the input, the decrypt operation MUST construct a [default CMM](../framework/default-cmm.md)
-from the [keyring](../framework/keyring-interface.md) inputted.
+from the input [keyring](../framework/keyring-interface.md).
 
 The call to the CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) operation
 MUST be constructed as follows:
@@ -374,7 +374,7 @@ verify the encrypted message, with the following inputs:
 - The input to verify is the concatenation of the serialization of the
   [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md).
 
-Note that the message header and message body MAY have already been inputted during previous steps.
+Note that the message header and message body MAY have already been input during previous steps.
 
 If this verification is not successful, this operation MUST immediately halt and fail.
 

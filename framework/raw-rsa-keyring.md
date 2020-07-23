@@ -125,7 +125,7 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 - The encrypted data key list has a new encrypted data key added, constructed as follows:
   - the [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](#key-namespace).
   - the [key provider information](structures.md#key-provider-information) field is this keyring's [key name](#key-name).
-  - the [ciphertext](structures.md#ciphertext) field is the ciphertext outputted from
+  - the [ciphertext](structures.md#ciphertext) field is the ciphertext output by
     the RSA encryption of the plaintext data key.
 
 ### OnDecrypt
@@ -136,7 +136,7 @@ The keyring MUST NOT derive a private key from a specified [public key](#public-
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
 
-The keyring MUST attempt to decrypt the inputted encrypted data keys, in list order, until it successfully decrypts one.
+The keyring MUST attempt to decrypt the input encrypted data keys, in list order, until it successfully decrypts one.
 
 For each encrypted data key, the keyring MUST attempt to decrypt the encrypted data key into plaintext
 using RSA if and only if the following is true:

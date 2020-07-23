@@ -184,13 +184,13 @@ the keyring MUST NOT not update the [decryption materials](structures.md#decrypt
 ## Security Considerations
 
 Keyring implementations SHOULD provide integrity guarantees for the [encrypted data keys](structures.md#encrypted-data-key)
-it returns on [OnEncrypt](#onencrypt) such that tampered versions of those encrypted data keys,
-if inputted into [OnDecrypt](#ondecrypt), are overwhelmingly likely to cause a decryption failure
+they return on [OnEncrypt](#onencrypt) such that tampered versions of those encrypted data keys,
+if input into [OnDecrypt](#ondecrypt), are overwhelmingly likely to cause a decryption failure
 (i.e. the chance of a successful decryption in this case is negligible).
 
 Such integrity guarantees SHOULD include the integrity of the [encryption context](structures.md#encryption-context)
 such that, if the encryption context used as input to OnEncrypt to produce an encrypted data key is
-different than the encryption context inputted to OnDecrypt to decrypt that encrypted data key,
+different than the encryption context input to OnDecrypt to decrypt that encrypted data key,
 the decryption is overwhelmingly likely to fail.
 
 Users SHOULD use a keyring that protects wrapping keys and performs cryptographic operations within a secure boundary.
