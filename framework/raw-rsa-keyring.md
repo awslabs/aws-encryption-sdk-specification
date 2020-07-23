@@ -52,9 +52,10 @@ RSA (Rivest–Shamir–Adleman) is an asymmteric cryptographic cipher.
 
 RSA Implementation Specification: [RFC 3447](https://tools.ietf.org/html/rfc8017)
 
-## Inputs
+## Initialization
 
-On keyring initialization, the following inputs are REQUIRED:
+On keyring initialization,
+the caller MUST provide the following:
 
 - [Key Namespace](./keyring-interface.md#key-namespace)
 - [Key Name](./keyring-interface.md#key-name)
