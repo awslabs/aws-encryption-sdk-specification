@@ -164,7 +164,7 @@ The plaintext data key MUST:
 
 The plaintext data key SHOULD be stored as immutable data.
 
-The plaintext data key SHOULD offer an interface to zero the plaintext data key
+The plaintext data key SHOULD offer an interface to zero the plaintext data key.
 
 ##### Signing Key
 
@@ -198,11 +198,11 @@ This structure MAY include any of the following fields:
 
 ##### Algorithm Suite
 
-The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client-apis/decrypt.md)
+The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client-apis/decrypt.md).
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md)
+The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md).
 
 ##### Plaintext Data Key
 
@@ -217,7 +217,7 @@ The plaintext data key MUST:
 
 The plaintext data key SHOULD be stored as immutable data.
 
-The plaintext data key SHOULD offer an interface to zero the plaintext data key
+The plaintext data key SHOULD offer an interface to zero the plaintext data key.
 
 ##### Verification Key
 
