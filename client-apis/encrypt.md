@@ -43,7 +43,7 @@ this specification for encryption.
 The following inputs to this behavior are REQUIRED:
 
 - [Plaintext](#plaintext)
-- either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
+- Either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
 
 The following inputs to this behavior are OPTIONAL:
 
@@ -58,7 +58,7 @@ Implementations SHOULD ensure that a caller is not able to specify both a [plain
 with known length and a [Plaintext Length Bound](#plaintext-length-bound) by construction.
 If a caller is able to specify both an input [plaintext](#plaintext) with known length and
 a [Plaintext Length Bound](#plaintext-length-bound),
-[Plaintext Length Bound](#plaintext-length-bound) MUST NOT be used during the Encrypt operation
+the [Plaintext Length Bound](#plaintext-length-bound) MUST NOT be used during the Encrypt operation
 and MUST be ignored.
 
 ### Plaintext

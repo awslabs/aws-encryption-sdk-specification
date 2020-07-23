@@ -35,8 +35,9 @@
 
 This document describes the AWS Encryption SDK's (ESDK's) decrypt operation,
 used for decrypting a message that was previously encrypted by the ESDK.
-The ESDK provides a client to decrypt the inputted encrypted message
-and return the plaintext as output.
+
+Any client provided by the AWS Encryption SDK that performs decryption of encrypted messages MUST follow
+this specification for decryption.
 
 ## Definitions
 
