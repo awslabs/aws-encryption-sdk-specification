@@ -45,7 +45,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Initialization
 
-On defualt CMM initialization,
+On default CMM initialization,
 the caller MUST provide the following value:
 
 - [Keyring](#keyring)
@@ -120,7 +120,7 @@ Master key providers SHOULD NOT be included in any additional implementations.
 In place of requiring the caller to provide a [keyring](#keyring-interface.md)
 on initialization:
 
-On defualt CMM initialization,
+On default CMM initialization,
 the caller MUST provide the following value:
 
 - [Master Key Provider](#master-key-provider-interface.md)
