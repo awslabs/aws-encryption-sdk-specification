@@ -223,6 +223,8 @@ with the following specifics:
   [Customer Authenticated Encrypted Data](../data-format/message-header.md#supported-types)
 - [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST correspond to
   the [algorithm suite](../framework/algorithm-suites.md) used in this behavior
+- [Message ID](../data-format/message-header.md#message-id): The process used to generate
+  this identifier MUST use a good source of randomness to make the chance of duplicate identifiers negligible.
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
   in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
@@ -380,10 +382,6 @@ and MUST release the message footer.
 
 The encrypted message outputted by this operation MUST have a message footer equal
 to the message footer calculated in this step.
-
-## Security Considerations
-
-[TODO]
 
 ## Appendix
 

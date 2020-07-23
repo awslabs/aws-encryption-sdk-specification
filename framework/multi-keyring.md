@@ -118,9 +118,6 @@ still do not contain a plaintext data key:
 
 ## Security Considerations
 
-TODO: what security guarantees does this keyring have?
-(https://github.com/awslabs/aws-encryption-sdk-specification/issues/12)
-
 Users SHOULD examine the [keyrings](keyring-interface.md) they include in a multi-keyring to ensure
 that they understand what set of keyrings will be capable of obtaining the plaintext data key from
 the returned set of encrypted data keys.

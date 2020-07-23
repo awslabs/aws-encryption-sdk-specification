@@ -74,7 +74,7 @@ See [AWS Documentation](https://docs.aws.amazon.com/kms/latest/APIReference/API_
 
 An AWS KMS API for decrypting ciphertext previously encrypted by [GenerateDataKey](#aws-kms-generatedatakey) or [Encrypt](#aws-kms-encrypt).
 
-See [AWS Documenetation](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html).
+See [AWS Documentation](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html).
 
 ## Inputs
 
@@ -82,7 +82,7 @@ On keyring initialization, a keyring MUST define the following:
 
 - [Client Supplier](#client-supplier)
 
-On keyring initialization, a keyring MAY define the following:
+On keyring initialization, a keyring MUST optionally define the following:
 
 - [Key Names](#key-names)
 - [Generator](#generator)
@@ -183,7 +183,7 @@ OnEncrypt MUST not modify the [encryption materials](structures.md#encryption-ma
 and MUST fail.
 
 If the input [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key
-and this keyring has a [generator](#generator) defined, and onEncrypt MUST attempt to generate a new plaintext data key
+and this keyring has a [generator](#generator) defined, and OnEncrypt MUST attempt to generate a new plaintext data key
 and encrypt that data key by calling [AWS KMS GenerateDataKey](#aws-kms-generatedatakey).
 
 If an AWS region can be extracted from the [generator](#generator), then the [AWS KMS client](#aws-kms-client) that calls
@@ -385,11 +385,6 @@ These goals can be reduced to the following two requirements:
 1. On encrypt, if any configured CMK cannot be used,
    that is an error and encryption MUST halt.
 1. On decrypt, the keyring MUST NOT halt decryption because of a failure to decrypt.
-
-## Security Considerations
-
-[TODO: What security properties are guaranteed by this keyring? Also, note how the security properties
-can vary drastically depending on key policies]
 
 ## Contributing Issues
 
