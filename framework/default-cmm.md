@@ -125,7 +125,6 @@ the caller MUST provide the following value:
 
 - [Master Key Provider](#master-key-provider-interface.md)
 
-
 ### Get Encryption Materials (master key provider)
 
 In place of calling its keyring's [On Encrypt](keyring-interface.md#onencrypt) function:
