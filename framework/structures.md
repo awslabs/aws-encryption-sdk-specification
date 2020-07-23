@@ -112,13 +112,6 @@ Users SHOULD use the encryption context to store:
 
 Users MUST NOT use the encryption context to store secret data.
 
-The encryption context MUST reserve the following key fields for use by the AWS Encryption SDK:
-
-- `aws-crypto-public-key` (See [the Default CMM spec](default-cmm.md) for its use)
-
-The encryption context SHOULD reserve any key field with the prefix `aws` for use by AWS KMS and
-other AWS services.
-
 ### Encryption Materials
 
 #### Implementations
@@ -171,7 +164,7 @@ The plaintext data key MUST:
 
 The plaintext data key SHOULD be stored as immutable data.
 
-The plaintext data key SHOULD offer an interface to zero the plaintext data key
+The plaintext data key SHOULD offer an interface to zero the plaintext data key.
 
 ##### Signing Key
 
@@ -205,11 +198,11 @@ This structure MAY include any of the following fields:
 
 ##### Algorithm Suite
 
-The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client-apis/decrypt.md)
+The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client-apis/decrypt.md).
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md)
+The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md).
 
 ##### Plaintext Data Key
 
@@ -224,7 +217,7 @@ The plaintext data key MUST:
 
 The plaintext data key SHOULD be stored as immutable data.
 
-The plaintext data key SHOULD offer an interface to zero the plaintext data key
+The plaintext data key SHOULD offer an interface to zero the plaintext data key.
 
 ##### Verification Key
 

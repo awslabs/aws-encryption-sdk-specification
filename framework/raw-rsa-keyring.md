@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.3.1
 
 ### Changelog
+
+- 0.3.1
+
+  - [Clarify failure language when only one key is defined](https://github.com/awslabs/aws-encryption-sdk-specification/issues/91)
 
 - 0.3.0
 
@@ -48,9 +52,10 @@ RSA (Rivest–Shamir–Adleman) is an asymmteric cryptographic cipher.
 
 RSA Implementation Specification: [RFC 3447](https://tools.ietf.org/html/rfc8017)
 
-## Inputs
+## Initialization
 
-On keyring initialization, the following inputs are REQUIRED:
+On keyring initialization,
+the caller MUST provide the following:
 
 - [Key Namespace](./keyring-interface.md#key-namespace)
 - [Key Name](./keyring-interface.md#key-name)
@@ -99,7 +104,7 @@ The private key SHOULD contain all Chinese Remainder Theorem (CRT) components (p
 
 ### OnEncrypt
 
-OnEncrypt MUST NOT succeed if this keyring does not have a specified [public key](#public-key).
+OnEncrypt MUST fail if this keyring does not have a specified [public key](#public-key).
 
 OnEncrypt MUST take [encryption materials](structures.md#encryption-materials) as input.
 
@@ -125,7 +130,7 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 
 ### OnDecrypt
 
-OnDecrypt MUST NOT succeed if this keyring does not have a specified [private key](#private-key).
+OnDecrypt MUST fail if this keyring does not have a specified [private key](#private-key).
 The keyring MUST NOT derive a private key from a specified [public key](#public-key)
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
@@ -153,12 +158,3 @@ If any decryption succeeds, this keyring MUST immediately return the input
 - The output of RSA decryption is set as the decryption material's plaintext data key.
 
 If no decryption succeeds, this keyring MUST NOT make any update to the decryption materials.
-
-## Security Considerations
-
-[TODO: What security properties does this keyring guarantee?]
-
-- multifactor RSA
-- The storage of the raw RSA keys in the local box
-- Does not write any information about what algorithm was used to wrap the data key.
-- Does not provide any authenticity.
