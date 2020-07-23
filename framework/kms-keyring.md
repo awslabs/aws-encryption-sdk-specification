@@ -76,13 +76,15 @@ An AWS KMS API for decrypting ciphertext previously encrypted by [GenerateDataKe
 
 See [AWS Documenetation](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html).
 
-## Inputs
+## Initialization
 
-On keyring initialization, a keyring MUST define the following:
+On keyring initialization,
+the caller MUST provide the following:
 
 - [Client Supplier](#client-supplier)
 
-On keyring initialization, a keyring MAY define the following:
+On keyring initialization,
+the keyring MUST optionally accept the following:
 
 - [Key Names](#key-names)
 - [Generator](#generator)
