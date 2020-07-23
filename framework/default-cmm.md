@@ -43,6 +43,18 @@ It is used by default to wrap the key provider.
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
 in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
+## Initialization
+
+On defualt CMM initialization,
+the caller MUST provide the following value:
+
+- [Keyring](#keyring)
+
+### Keyring
+
+The [keyring](keyring-interface.md) this CMM uses to
+[retrieve encryption materials](#get-encryption-materials) or [decrypt materials](#decrypt-materials).
+
 ## Behaviors
 
 ### Get Encryption Materials
@@ -67,7 +79,8 @@ If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signat
   - The value MUST be the base64-encoded public verification key.
 
 On each call to Get Encryption Materials,
-the default CMM MUST make a call to the keyring's [On Encrypt](keyring-interface.md#onencrypt) function.
+the default CMM MUST make a call to its [keyring's](#keyring)
+[On Encrypt](keyring-interface.md#onencrypt) function.
 
 The default CMM MUST obtain the following from the response:
 
@@ -82,7 +95,8 @@ If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signat
 the default CMM MUST remove the verification key from the encryption context.
 
 On each call to Decrypt Materials,
-the default CMM MUST make a call to the keyring's [On Decrypt](keyring-interface.md#ondecrypt) function.
+the default CMM MUST make a call to its [keyring's](#keyring)
+[On Decrypt](keyring-interface.md#ondecrypt) function.
 
 The default CMM MUST obtain the following from the response:
 
@@ -101,11 +115,22 @@ using master key providers.
 This is a legacy specification.
 Master key providers SHOULD NOT be included in any additional implementations.
 
+### Initialization
+
+In place of requiring the caller to provide a [keyring](#keyring-interface.md)
+on initialization:
+
+On defualt CMM initialization,
+the caller MUST provide the following value:
+
+- [Master Key Provider](#master-key-provider-interface.md)
+
+
 ### Get Encryption Materials (master key provider)
 
-In place of calling a keyring's [On Encrypt](keyring-interface.md#onencrypt) function:
+In place of calling its keyring's [On Encrypt](keyring-interface.md#onencrypt) function:
 
-The default CMM MUST call the master key provider's
+The default CMM MUST call its master key provider's
 [Get Master Keys for Encryption](master-key-provider-interface.md#get-master-keys-for-encryption) function
 to obtain a list of master keys to use.
 
@@ -121,7 +146,7 @@ with the plaintext data key.
 
 ### Decrypt Materials (master key provider)
 
-In place of calling a keyring's [On Decrypt](keyring-interface.md#ondecrypt) function:
+In place of calling its keyring's [On Decrypt](keyring-interface.md#ondecrypt) function:
 
-The default CMM MUST call the master key provider's
+The default CMM MUST call its master key provider's
 [Decrypt Data Key](master-key-provider-interface.md#decrypt-data-key) function.
