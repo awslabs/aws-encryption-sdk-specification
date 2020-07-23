@@ -80,7 +80,7 @@ If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signat
 
 On each call to Get Encryption Materials,
 the default CMM MUST make a call to its [keyring's](#keyring)
-[On Encrypt](keyring-interface.md#onencrypt) function.
+[On Encrypt](keyring-interface.md#onencrypt) operation.
 
 The default CMM MUST obtain the following from the response:
 
@@ -96,7 +96,7 @@ the default CMM MUST remove the verification key from the encryption context.
 
 On each call to Decrypt Materials,
 the default CMM MUST make a call to its [keyring's](#keyring)
-[On Decrypt](keyring-interface.md#ondecrypt) function.
+[On Decrypt](keyring-interface.md#ondecrypt) operation.
 
 The default CMM MUST obtain the following from the response:
 
@@ -127,25 +127,25 @@ the caller MUST provide the following value:
 
 ### Get Encryption Materials (master key provider)
 
-In place of calling its keyring's [On Encrypt](keyring-interface.md#onencrypt) function:
+In place of calling its keyring's [On Encrypt](keyring-interface.md#onencrypt) operation:
 
 The default CMM MUST call its master key provider's
-[Get Master Keys for Encryption](master-key-provider-interface.md#get-master-keys-for-encryption) function
+[Get Master Keys for Encryption](master-key-provider-interface.md#get-master-keys-for-encryption) operation
 to obtain a list of master keys to use.
 
 If the master key provider does not identify which master key MUST generate the data key,
 the default CMM MUST use the first master key in the list for that purpose.
 The default CMM MUST generate the data key using this master key's
-[Generate Data Key](master-key-interface.md#generate-data-key) function.
+[Generate Data Key](master-key-interface.md#generate-data-key) operation.
 
 For each remaining master key,
 the default CMM MUST call the master key's
-[Encrypt Data Key](master-key-interface.md#encrypt-data-key) function
+[Encrypt Data Key](master-key-interface.md#encrypt-data-key) operation
 with the plaintext data key.
 
 ### Decrypt Materials (master key provider)
 
-In place of calling its keyring's [On Decrypt](keyring-interface.md#ondecrypt) function:
+In place of calling its keyring's [On Decrypt](keyring-interface.md#ondecrypt) operation:
 
 The default CMM MUST call its master key provider's
-[Decrypt Data Key](master-key-provider-interface.md#decrypt-data-key) function.
+[Decrypt Data Key](master-key-provider-interface.md#decrypt-data-key) operation.
