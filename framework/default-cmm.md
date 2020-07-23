@@ -117,7 +117,7 @@ Master key providers SHOULD NOT be included in any additional implementations.
 
 ### Initialization
 
-In place of requiring the caller to provide a [keyring](#keyring-interface.md)
+In place of requiring the caller to provide a [keyring](keyring-interface.md)
 on initialization:
 
 On default CMM initialization,
