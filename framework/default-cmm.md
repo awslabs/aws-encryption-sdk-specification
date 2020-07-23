@@ -53,7 +53,7 @@ the caller MUST provide the following value:
 ### Keyring
 
 The [keyring](keyring-interface.md) this CMM uses to
-[retrieve encryption materials](#get-encryption-materials) or [decrypt materials](#decrypt-materials).
+[get encryption materials](#get-encryption-materials) or [decrypt materials](#decrypt-materials).
 
 ## Behaviors
 
