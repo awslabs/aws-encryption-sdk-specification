@@ -74,7 +74,7 @@ See [AWS Documentation](https://docs.aws.amazon.com/kms/latest/APIReference/API_
 
 An AWS KMS API for decrypting ciphertext previously encrypted by [GenerateDataKey](#aws-kms-generatedatakey) or [Encrypt](#aws-kms-encrypt).
 
-See [AWS Documenetation](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html).
+See [AWS Documentation](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html).
 
 ## Initialization
 
@@ -185,7 +185,7 @@ OnEncrypt MUST not modify the [encryption materials](structures.md#encryption-ma
 and MUST fail.
 
 If the input [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key
-and this keyring has a [generator](#generator) defined, and onEncrypt MUST attempt to generate a new plaintext data key
+and this keyring has a [generator](#generator) defined, and OnEncrypt MUST attempt to generate a new plaintext data key
 and encrypt that data key by calling [AWS KMS GenerateDataKey](#aws-kms-generatedatakey).
 
 If an AWS region can be extracted from the [generator](#generator), then the [AWS KMS client](#aws-kms-client) that calls
