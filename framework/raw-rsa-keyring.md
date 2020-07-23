@@ -105,6 +105,7 @@ The private key SHOULD contain all Chinese Remainder Theorem (CRT) components (p
 ### OnEncrypt
 
 OnEncrypt MUST fail if this keyring does not have a specified [public key](#public-key).
+The keyring MUST NOT derive a public key from a specified [private key](#private-key)
 
 OnEncrypt MUST take [encryption materials](structures.md#encryption-materials) as input.
 
@@ -131,7 +132,6 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 ### OnDecrypt
 
 OnDecrypt MUST fail if this keyring does not have a specified [private key](#private-key).
-The keyring MUST NOT derive a private key from a specified [public key](#public-key)
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
