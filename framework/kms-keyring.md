@@ -245,7 +245,7 @@ constructed as follows:
   the input [encryption materials](structures.md#encryption-materials).
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
-If the call to [AWS KMS Encrypt](#aws-kms-encrypt) does not succeed OnEncrypt MUST fail.
+If the call to [AWS KMS Encrypt](#aws-kms-encrypt) does not succeed, OnEncrypt MUST fail.
 
 If the call succeeds, OnEncrypt MUST do the following with the response from [AWS KMS Encrypt](#aws-kms-encrypt):
 
@@ -264,7 +264,7 @@ OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) a
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
 
 The set of [encrypted data keys](structures.md#encrypted-data-key) that OnDecrypt MUST attempt
-to decrypt depends on if this keyring is a [discovery keyring](#is-discovery) or not.
+to decrypt depends on whether this keyring is a [discovery keyring](#is-discovery) or not.
 
 If this keyring is a [discovery keyring](#is-discovery), OnDecrypt MUST attempt to decrypt every
 [encrypted data key](structures.md#encrypted-data-key) in the input encrypted data key list
@@ -294,7 +294,7 @@ When calling [AWS KMS Decrypt](#aws-kms-decrypt), the keyring MUST call with a r
   the input [decryption materials](structures.md#decryption-materials).
 - `GrantTokens`: this keyring's [grant tokens](#grant-tokens)
 
-If the call to [AWS KMS Decrypt](#aws-kms-decrypt) does not succeed OnDecrypt MUST continue and attempt to
+If the call to [AWS KMS Decrypt](#aws-kms-decrypt) does not succeed, OnDecrypt MUST continue and attempt to
 decrypt the remaining [encrypted data keys](structures.md#encrypted-data-key).
 
 If the `KeyId` field in the response from [AWS KMS Decrypt](#aws-kms-decrypt) does not have a value equal to
@@ -306,7 +306,7 @@ If the call to [AWS KMS Decrypt](#aws-kms-decrypt) succeeds OnDecrypt MUST verif
 - verify that the `KeyId` field has a value equal to the [encrypted data key's key provider info](structures.md#key-provider-information).
 - verify that the `Plaintext` is of a length that fits the [algorithm suite](algorithm-suites.md) given in the decryption materials.
 
-If any of the above are not true, OnDecrpyt MUST NOT update the [decryption materials](structures.md#decryption-materials)
+If any of the above are not true, OnDecrypt MUST NOT update the [decryption materials](structures.md#decryption-materials)
 and MUST fail.
 
 If the response is successfully verified, OnDecrypt MUST do the following with the response:
@@ -368,7 +368,7 @@ On decrypt, the user provides resources that _attempt_ to do that decryption.
 
 This is an asymmetric relationship with very different implications on failure.
 If the keyring encounters a problem on encrypt,
-it cannot fully honor the decryption requirements and so MUST halt message encryption.
+it cannot fully honor the decryption requirements and MUST halt message encryption.
 
 However, on decrypt the keyring is not creating anything.
 It is instead attempting to satisfy the requirements that were set on encryption.

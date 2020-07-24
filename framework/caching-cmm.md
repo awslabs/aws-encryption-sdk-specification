@@ -94,9 +94,9 @@ The Partition ID MUST NOT be changed after initialization.
 ### Limit Bytes
 
 The maximum number of bytes that MAY be encrypted by a single data key.
-It is interpreted as Uint64.
+It is interpreted as UInt64.
 If this parameter is not set, the caching CMM MUST set it to a value no more than 2^63-1.
-This paramter is set as an additional security thresholds to ensure that,
+This parameter is set as an additional security thresholds to ensure that
 the data keys expire and are refreshed periodically.
 
 ### Limit Messages
@@ -104,7 +104,7 @@ the data keys expire and are refreshed periodically.
 The maximum number of messages that MAY be encrypted by a single data key.
 It is interpreted as Uint64.
 If this parameter is not set, the caching CMM MUST set it to 2^32.
-This paramter is set as an additional security thresholds to ensure that,
+This parameter is set as an additional security thresholds to ensure that
 the data keys expire and are refreshed periodically.
 
 The caching CMM MUST provide a structure as defined below,
@@ -144,7 +144,7 @@ The caching CMM MUST use the formulas specified in [Appendix A](#appendix-a-cach
 in order to compute the [cache entry identifier](cryptographic-materials-cache.md#cache-identifier).
 
 If a cache entry is found, the caching CMM MUST return the encryption materials retrieved.
-If a cache entry is not found, the caching CMM MUST then attempt to obtain the encryption materials
+If a cache entry is not found or the cache entry is expired, the caching CMM MUST then attempt to obtain the encryption materials
 by making a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials).
 
 If the [algorithm suite](algorithm-suites.md) requested does not contain an [Identity KDF](algorithm-suites.md#identity-kdf),

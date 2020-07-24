@@ -9,8 +9,8 @@
 
 ## Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/MasterKeyProvider.java)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/key_providers/base.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/MasterKeyProvider.java)
 
 ## Overview
 
@@ -43,12 +43,12 @@ as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
 ### Terms
 
-- Provider ID : A value that identifies a master key provider.
+- Provider ID: A value that identifies a master key provider.
   This concept is equivalent to "key namespace" for Keyrings.
-- Key ID : A value that identifies a master key
+- Key ID: A value that identifies a master key
   within the context of a master key provider.
   This concept is equivalent to "key name" for Keyrings.
-- Provider Info : The value that is written to a serialized encrypted data key
+- Provider Info: The value that is written to a serialized encrypted data key
   that identifies a master key within the context of a master key provider.
   This MUST always be equal to the master key's key ID
   with the exception of the raw AES master key.
