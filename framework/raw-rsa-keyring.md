@@ -114,7 +114,7 @@ OnEncrypt MUST generate a random plaintext data key and set it on the [encryptio
 
 The keyring MUST attempt to encrypt the plaintext data key in the
 [encryption materials](structures.md#encryption-materials) using RSA.
-The keyring performs RSA encryption with the following specifics:
+The keyring performs [RSA encryption](#rsa) with the following specifics:
 
 - This keyring's [public key](#public-key) is the RSA public key.
 - This keyring's [padding scheme](#supported-padding-schemes) is the RSA padding scheme.
