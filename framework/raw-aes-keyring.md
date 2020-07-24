@@ -56,7 +56,8 @@ Galois/Counter Mode (GCM) Specification: [NIST Special Publication 800-38D](http
 
 ## Initialization
 
-On keyring initialization, the following inputs are REQUIRED:
+On keyring initialization,
+the caller MUST provide the following:
 
 - [Key Namespace](./keyring-interface.md#key-namespace)
 - [Key Name](./keyring-interface.md#key-name)
