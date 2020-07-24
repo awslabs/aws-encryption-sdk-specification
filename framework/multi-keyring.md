@@ -97,7 +97,7 @@ Otherwise, OnDecrypt MUST attempt to decrypt the [encrypted data keys](structure
 in the input [decryption materials](structures.md#decryption-materials) using its
 [child keyrings](#child-keyrings) and, if it is specified, its [generator keyring](#generator-keyring).
 It MUST attempt to decrypt using these keyrings until it either succeeds in decryption,
-or it has no more child keyrings or a generator keyring to attempt decryption with.
+or it has attempted to decrypt using all its child keyrings and, if it is specified, its generator keyring.
 If a generator keyring is specified, it MUST be used first.
 
 For each [keyring](keyring-interface.md) to be used for decryption,
