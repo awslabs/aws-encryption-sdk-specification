@@ -79,10 +79,10 @@ does not include a plaintext data key, OnEncrypt MUST fail.
 
 Next, for each [keyring](keyring-interface.md) in this keyring's list of [child keyrings](#child-keyrings),
 the keyring MUST call [OnEncrypt](keyring-interface.md#onencrypt).
-The [encryption materials](structures.md#encryption-materials) inputted into OnEncrypt is the
+The [encryption materials](structures.md#encryption-materials) input into OnEncrypt are the
 input encryption materials if this is the first OnEncrypt call.
-If this is not the first OnEncrypt call, the encryption materials inputted is the encryption materials
-outputted by the previous OnEncrypt call.
+If this is not the first OnEncrypt call, the encryption materials input into OnEncrypt are the encryption materials
+output by the previous OnEncrypt call.
 If the child keyring's [OnEncrypt](keyring-interface.md#onencrypt) fails, this OnEncrypt MUST also fail.
 
 If all previous [OnEncrypt](keyring-interface.md#onencrypt) calls succeeded, this keyring MUST return
