@@ -180,7 +180,7 @@ as the serialization of the [message header AAD key value pairs](../data-format/
 If the keyring cannot serialize the encryption context, OnDecrypt MUST fail.
 
 The keyring MUST perform the following actions on each [encrypted data key](structures.md#encrypted-data-key)
-in the inputted encrypted data key list, serially, until it successfully decrypts one.
+in the input encrypted data key list, serially, until it successfully decrypts one.
 
 For each [encrypted data key](structures.md#encrypted-data-key),
 the keyring MUST first attempt to deserialize the [serialized ciphertext](#ciphertext)
