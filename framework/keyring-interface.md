@@ -51,7 +51,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 A configuration value for a keyring
 that identifies the grouping or categorization
-for the wrapping keys that keyring can access.
+for the wrapping keys that the keyring can access.
 
 The key namespace MUST be a string value.
 
@@ -167,9 +167,9 @@ If the encryption materials do contain a plaintext data key, OnDecrypt MUST NOT 
 If the [decryption materials](structures.md#decryption-materials) do not include a plaintext data key,
 OnDecrypt MAY decrypt a data key.
 
-Decrypt Data Key MAY modify the following fields in the [decryption materials](structures.md#decryption-materials):
+The decrypt data key MAY modify the following fields in the [decryption materials](structures.md#decryption-materials):
 
-- [plaintext data key](structures.md#plaintext-data-key-1)
+- [Plaintext data key](structures.md#plaintext-data-key-1)
 
 To perform this behavior, the keyring attempts to retrieve a plaintext data key from the input list
 of [encrypted data keys](structures.md#encrypted-data-key).
@@ -178,7 +178,7 @@ If the keyring is able to succesfully get at least one plaintext data key from a
 and the [decryption materials](structures.md#decryption-materials) still do not include a plaintext data key,
 it SHOULD set one resulting plaintext data key on the [decryption materials](structures.md#decryption-materials).
 
-If the keyring is unable to get any plaintext data key using the input [encrypted data keys](structures.md#encrypted-data-key)
+If the keyring is unable to get any plaintext data key using the input [encrypted data keys](structures.md#encrypted-data-key),
 the keyring MUST NOT not update the [decryption materials](structures.md#decryption-materials).
 
 ## Security Considerations
@@ -188,8 +188,8 @@ it returns on [OnEncrypt](#onencrypt) such that tampered versions of those encry
 if inputted into [OnDecrypt](#ondecrypt), are overwhelmingly likely to cause a decryption failure
 (i.e. the chance of a successful decryption in this case is negligible).
 
-Such integrity guarantees SHOULD include the integrity of the [encryption context](structures.md#encryption-context)
-such that, if the encryption context used as input to OnEncrypt to produce an encrypted data key is
+Such integrity guarantees SHOULD include the integrity of the [encryption context](structures.md#encryption-context).
+such that, if the encryption context is used as input to OnEncrypt to produce an encrypted data key that is
 different than the encryption context inputted to OnDecrypt to decrypt that encrypted data key,
 the decryption is overwhelmingly likely to fail.
 
@@ -219,7 +219,7 @@ The following keyrings are compatible with the referenced [master key providers]
 
 ### Why should I use Keyrings instead of Master Key Providers and Master Keys?
 
-Keyrings provide a simplified architecture over master keys and master key providers;
+Keyrings provide a simplified architecture over master keys and master key providers.
 The keyring combines the similar responsibilities of master keys and master key providers into one concept,
 as well as removes all key management logic from [cryptographic materials managers](cmm-interface.md).
 

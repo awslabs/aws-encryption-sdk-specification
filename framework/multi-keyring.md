@@ -94,20 +94,20 @@ If the input [decryption materials](structures.md#decryption-materials) contains
 OnDecrypt MUST immediately return the unmodified decryption materials.
 
 Otherwise, OnDecrypt MUST attempt to decrypt the [encrypted data keys](structures.md#encrypted-data-keys-1)
-in the input [decryption materials](structures.md#decryption-materials) using it's
-[child keyrings](#child-keyrings) and, if it is specified, [generator keyring](#generator-keyring).
+in the input [decryption materials](structures.md#decryption-materials) using its
+[child keyrings](#child-keyrings) and, if it is specified, its [generator keyring](#generator-keyring).
 It MUST attempt to decrypt using these keyrings until it either succeeds in decryption,
-or it has no more child keyrings or generator keyring to attempt decryption with.
+or it has no more child keyrings or a generator keyring to attempt decryption with.
 If a generator keyring is specified, it MUST be used first.
 
 For each [keyring](keyring-interface.md) to be used for decryption,
 the multi-keyring MUST call that keyring's [OnDecrypt](keyring-interface.md#ondecrypt) using
-the unmodified [decryption materials](structures.md#decryption-materials) and input
-[encrypted data key](structures.md#encrypted-data-key) list as input.
+the unmodified [decryption materials](structures.md#decryption-materials) and the inputted
+[encrypted data key](structures.md#encrypted-data-key) list.
 If [OnDecrypt](keyring-interface.md#ondecrypt) returns [decryption materials](structures.md#decryption-materials)
 containing a plaintext data key, the keyring MUST immediately return the modified decryption materials.
 
-If, after calling [OnDecrypt](keyring-interface.md#ondecrypt) on every one of this keyring's [child keyrings](#child-keyrings)
+If, after calling [OnDecrypt](keyring-interface.md#ondecrypt) on every [child keyring](#child-keyrings)
 (and possibly the [generator keyring](#generator-keyring)), the [decryption materials](structures.md#decryption-materials)
 still do not contain a plaintext data key:
 
@@ -130,7 +130,7 @@ Multi-keyrings will produce a set of [encrypted data keys](structures.md#encrypt
 that is capable of producing encrypted data keys.
 
 As such, any [keyring](keyring-interface.md) that is capable of obtaining the plaintext data key from
-[encrypted data keys](structures.md#encrypted-data-key) produced by one of the sub keyrings,
+[encrypted data keys](structures.md#encrypted-data-key) produced by one of the sub-keyrings,
 by definition, is capable of obtaining the plaintext data key for the set of encrypted data keys
 the multi-keyring produces on [OnEncrypt](keyring-interface.md#onencrypt).
 
@@ -138,4 +138,4 @@ In typical cases, most [keyrings](keyring-interface.md) are defined such that th
 decrypting the encrypted data keys they produce.
 As such, when including such [keyrings](keyring-interface.md),
 the multi-keyring will produce a set of [encrypted data keys](structures.md#encrypted-data-keys)
-such that any one of the sub keyrings is capable of obtaining the plaintext data key.
+such that any one of the sub-keyrings is capable of obtaining the plaintext data key.
