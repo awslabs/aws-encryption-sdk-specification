@@ -102,7 +102,7 @@ If a generator keyring is specified, it MUST be used first.
 
 For each [keyring](keyring-interface.md) to be used for decryption,
 the multi-keyring MUST call that keyring's [OnDecrypt](keyring-interface.md#ondecrypt) using
-the unmodified [decryption materials](structures.md#decryption-materials) and the inputted
+the unmodified [decryption materials](structures.md#decryption-materials) and the input
 [encrypted data key](structures.md#encrypted-data-key) list.
 If [OnDecrypt](keyring-interface.md#ondecrypt) returns [decryption materials](structures.md#decryption-materials)
 containing a plaintext data key, the keyring MUST immediately return the modified decryption materials.
