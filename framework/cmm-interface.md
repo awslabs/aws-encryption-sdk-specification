@@ -69,7 +69,7 @@ The encryption request MAY include the following:
 
 - [Algorithm Suite](algorithm-suites.md)
 - Max Plaintext Length
-  - This value represent the maximum length of the plaintext to be encrypted
+  - This value represents the maximum length of the plaintext to be encrypted
     using the returned materials.
     The length of the plaintext to be encrypted MUST not be larger than this value.
 

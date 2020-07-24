@@ -86,12 +86,12 @@ It provides non-blocking, locking, [cache entries](#cache-entry) per [cache iden
 
 ## Behaviors
 
-The Cryptographic Materials Cache provides behaviours for putting cache entry, getting cache entry and deleting cache entries.
+The Cryptographic Materials Cache provides behaviours for putting cache entries, getting cache entries and deleting cache entries.
 
 ### Put Cache Entry
 
 Attempts to put a cache entry for the specified cache ID.
-If a cache entry for the given Cache ID does not exists in the cache, the CMC creates a new cache entry.
+If a cache entry for the given cache ID does not exists in the cache, the CMC creates a new cache entry.
 This operation MUST NOT return the inserted cache entry.
 
 ### Get Cache Entry
