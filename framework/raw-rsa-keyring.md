@@ -126,7 +126,7 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 - The encrypted data key list has a new encrypted data key added, constructed as follows:
   - the [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](#key-namespace).
   - the [key provider information](structures.md#key-provider-information) field is this keyring's [key name](#key-name).
-  - the [ciphertext](structures.md#ciphertext) field is the ciphertext output by
+  - The [ciphertext](structures.md#ciphertext) field is the ciphertext output by
     the RSA encryption of the plaintext data key.
 
 ### OnDecrypt
