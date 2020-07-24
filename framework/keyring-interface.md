@@ -188,7 +188,7 @@ it returns on [OnEncrypt](#onencrypt) such that tampered versions of those encry
 if inputted into [OnDecrypt](#ondecrypt), are overwhelmingly likely to cause a decryption failure
 (i.e. the chance of a successful decryption in this case is negligible).
 
-Such integrity guarantees SHOULD include the integrity of the [encryption context](structures.md#encryption-context).
+Such integrity guarantees SHOULD include the integrity of the [encryption context](structures.md#encryption-context)
 such that, if the encryption context is used as input to OnEncrypt to produce an encrypted data key that is
 different than the encryption context inputted to OnDecrypt to decrypt that encrypted data key,
 the decryption is overwhelmingly likely to fail.
