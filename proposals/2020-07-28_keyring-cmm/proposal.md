@@ -59,8 +59,11 @@ that customers SHOULD use.
 ## Motivation
 
 Prior to this change, the Default CMM serves two purposes.
-First, it provides a base implementation of a CMM that uses a
-keyring or master key provider to ensure valid materials.
+First, it provides a base implementation of a CMM that:
+
+- Uses a keyring or master key provider to provide valid materials.
+- Handles providing the signature key and verification key with the materials.
+
 Second, it serves as a safe default that can be used for most use cases.
 
 While there is currently no conflict in these purposes,
@@ -72,7 +75,9 @@ One way to address this would be to directly add the new desired behavior
 to the current Default CMM implementation,
 however this makes our provided CMMs less composable.
 Keeping the CMM composable is important because it allows users to assert desired properties
-[by construction](../../tenets.md#correct-by-construction).
+[by construction](https://github.com/awslabs/aws-encryption-sdk-specification/blob/2ec7674c304c408c2a32d412e834939c73f68d80/tenets.md#correct-by-construction).
+Additionally this approach would not allow customers to opt out of this new behavior if
+it is not desirable for their use case.
 Because it is important to retain this base implementation,
 we should define a CMM whose sole purpose is to be this base implementation.
 We will call this CMM implementation the Keyring CMM.
@@ -124,7 +129,9 @@ or compose a CMM using the AWS Encryption SDK's provided CMM implementations
 The Default CMM is a specific configuration of a
 CMM implementation provided by the AWS Encryption SDK.
 
-The specific CMM configuration describes a safe default that serves most use cases.
+The specific CMM configuration describes a
+[safe default](https://github.com/awslabs/aws-encryption-sdk-specification/blob/2ec7674c304c408c2a32d412e834939c73f68d80/tenets.md#sensible-defaults)
+that serves most use cases.
 
 The CMM configuration defined by the Default CMM is the [Keyring CMM](#keyring-cmm) as is
 (The Keyring CMM provides no additional options other than specifying an underlying Keyring).
@@ -171,15 +178,19 @@ SHOULD compose with the Master Key Provider CMM.
 
 ### Default CMM
 
-On initialization it MUST accept:
+On initialization, the caller MUST provide exactly one of the following:
 
-- an underlying [Keyring](../../framework/keyring-interface.md)
+- [Keyring](../../framework/keyring-interface.md)
+- If this AWS Encryption SDK implementations provides a [Master Key Provider CMM](#master-key-provider-cmm),
+  a [Master Key Provider](../../framework/master-key-provider-interface.md)
 
-It MUST NOT take any additional configuration.
+The Default CMM MUST NOT accept any additional configuration.
 
 It MUST construct a CMM in the following manner:
 
-- Initialize a [Keyring CMM](#keyring-cmm) with the configured underlying Keyring
+- If a keyring was supplied, initialize a [Keyring CMM](#keyring-cmm) with the provided keyring.
+- If a master key provider was supplied, initialize a [Master Key Provider CMM](#keyring-cmm)
+  with the provided master key provider.
 
 This CMM MUST NOT offer any additional features beyond the composed CMM created
 above.
