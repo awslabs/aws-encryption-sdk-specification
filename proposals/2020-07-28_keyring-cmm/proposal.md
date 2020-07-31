@@ -42,7 +42,7 @@ in this document are to be interpreted as described in
 
 ## Summary
 
-The Default CMM is an implementation of the CMM interface that serves a majority of use cases,
+The Default Cryptographic Materials Manager (CMM) is an implementation of the CMM interface that serves a majority of use cases,
 using [keyrings](../../framework/keyring-interface.md) or
 [master key providers](../../framework/master-key-provider-interface.md) to get and
 decrypt materials.
@@ -134,10 +134,10 @@ The specific CMM configuration describes a
 that serves most use cases.
 
 The CMM configuration defined by the Default CMM is the [Keyring CMM](#keyring-cmm) as is
-(The Keyring CMM provides no additional options other than specifying an underlying Keyring).
+(the Keyring CMM provides no additional options other than specifying an underlying keyring).
 
 As the AWS Encryption SDK provides more CMM implementations that would benefit default use cases,
-we expect to update the Default CMM to a configuration which composes such CMMs together provide
+we expect to update the Default CMM to a configuration which composes such CMMs together in order to provide
 useful properties.
 Any update to the composition defined by Default CMM SHOULD be backwards compatable.
 
@@ -181,7 +181,7 @@ SHOULD compose with the Master Key Provider CMM.
 On initialization, the caller MUST provide exactly one of the following:
 
 - [Keyring](../../framework/keyring-interface.md)
-- If this AWS Encryption SDK implementations provides a [Master Key Provider CMM](#master-key-provider-cmm),
+- If this AWS Encryption SDK implementation provides a [Master Key Provider CMM](#master-key-provider-cmm),
   a [Master Key Provider](../../framework/master-key-provider-interface.md)
 
 The Default CMM MUST NOT accept any additional configuration.
@@ -204,6 +204,6 @@ Default CMM prior to this change.
 
 ### Master Key Provider CMM
 
-The specification of the Master Key Provider CMM MUST be the specification of
-the Default CMM, except describing use of a master key provider instead of a keyring
+The specification of the Master Key Provider CMM MUST be the specification of the Default CMM,
+except describing the use of a master key provider instead of a keyring
 where appropriate.
