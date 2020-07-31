@@ -23,7 +23,7 @@ in this document are to be interpreted as described in
 
 ## Header
 
-```python
+```
 # This example shows how to use the one-step encrypt and decrypt APIs.
 #
 # In this example, we use an AWS KMS customer master key (CMK),
@@ -34,7 +34,7 @@ in this document are to be interpreted as described in
 
 ## Summary
 
-```python
+```
 # Demonstrate an encrypt/decrypt cycle using the one-step encrypt/decrypt APIs.
 ```
 
@@ -49,7 +49,7 @@ in this document are to be interpreted as described in
 
 1. Define encryption context.
 
-   ```python
+   ```
    # Prepare your encryption context.
    # Remember that your encryption context is NOT SECRET.
    # https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/concepts.html#encryption-context
@@ -64,51 +64,43 @@ in this document are to be interpreted as described in
 
 1. Create keyring.
 
-   ```python
+   ```
    # Create the keyring that determines how your data keys are protected.
-   keyring = AwsKmsKeyring(generator_key_id=aws_kms_cmk)
    ```
 
 1. Encrypt plaintext data.
 
-   ```python
+   ```
    # Encrypt your plaintext data.
-   ciphertext, _encrypt_header = aws_encryption_sdk.encrypt(
-       source=source_plaintext, encryption_context=encryption_context, keyring=keyring
-   )
    ```
 
 1. Compare ciphertext to plaintext.
 
-   ```python
+   ```
    # Demonstrate that the ciphertext and plaintext are different.
-   assert ciphertext != source_plaintext
    ```
 
 1. Decrypt encrypted data.
 
-   ```python
+   ```
    # Decrypt your encrypted data using the same keyring you used on encrypt.
    #
    # You do not need to specify the encryption context on decrypt
    # because the header of the encrypted message includes the encryption context.
-   decrypted, decrypt_header = aws_encryption_sdk.decrypt(source=ciphertext, keyring=keyring)
    ```
 
 1. Compare the decrypted plaintext and original plaintext.
 
-   ```python
+   ```
    # Demonstrate that the decrypted plaintext is identical to the original plaintext.
-   assert decrypted == source_plaintext
    ```
 
 1. Verify the encryption context.
 
-   ```python
+   ```
    # Verify that the encryption context used in the decrypt operation includes
    # the encryption context that you specified when encrypting.
    # The AWS Encryption SDK can add pairs, so don't require an exact match.
    #
    # In production, always use a meaningful encryption context.
-   assert set(encryption_context.items()) <= set(decrypt_header.encryption_context.items())
    ```

@@ -23,7 +23,7 @@ in this document are to be interpreted as described in
 
 ## Header
 
-```python
+```
 # This example shows how to use the streaming encrypt and decrypt APIs on data in memory.
 #
 # One benefit of using the streaming API is that
@@ -37,7 +37,7 @@ in this document are to be interpreted as described in
 
 ## Summary
 
-```python
+```
 # Demonstrate an encrypt/decrypt cycle using the streaming encrypt/decrypt APIs in-memory.
 ```
 
@@ -52,7 +52,7 @@ in this document are to be interpreted as described in
 
 1. Define encryption context.
 
-   ```python
+   ```
    # Prepare your encryption context.
    # Remember that your encryption context is NOT SECRET.
    # https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/concepts.html#encryption-context
@@ -67,65 +67,47 @@ in this document are to be interpreted as described in
 
 1. Create keyring.
 
-   ```python
+   ```
    # Create the keyring that determines how your data keys are protected.
-   keyring = AwsKmsKeyring(generator_key_id=aws_kms_cmk)
    ```
 
 1. Encrypt plaintext data.
 
-   ```python
-   ciphertext = io.BytesIO()
+   ```
+   # Create a plaintext stream from the source plaintext.
+   ```
 
-   # The streaming API provides a context manager.
-   # You can read from it just as you read from a file.
-   with aws_encryption_sdk.stream(
-       mode="encrypt", source=source_plaintext, encryption_context=encryption_context, keyring=keyring
-   ) as encryptor:
-       # Iterate through the segments in the context manager
-       # and write the results to the ciphertext.
-       for segment in encryptor:
-           ciphertext.write(segment)
+   ```
+   # Use the streaming encryption API to encrypt the plaintext.
    ```
 
 1. Compare ciphertext to plaintext.
 
-   ```python
+   ```
    # Demonstrate that the ciphertext and plaintext are different.
-   assert ciphertext.getvalue() != source_plaintext
    ```
 
 1. Decrypt encrypted data,
    verifying the encryption context before decrypting body.
 
-   ```python
-   # Reset the ciphertext stream position so that we can read from the beginning.
-   ciphertext.seek(0)
-
-   # Decrypt your encrypted data using the same keyring you used on encrypt.
+   ```
+   # Open a decryption stream to decrypt the encrypted message.
    #
-   # You do not need to specify the encryption context on decrypt
-   # because the header of the encrypted message includes the encryption context.
-   decrypted = io.BytesIO()
-   with aws_encryption_sdk.stream(mode="decrypt", source=ciphertext, keyring=keyring) as decryptor:
-       # Check the encryption context in the header before we start decrypting.
-       #
-       # Verify that the encryption context used in the decrypt operation includes
-       # the encryption context that you specified when encrypting.
-       # The AWS Encryption SDK can add pairs, so don't require an exact match.
-       #
-       # In production, always use a meaningful encryption context.
-       assert set(encryption_context.items()) <= set(decryptor.header.encryption_context.items())
-
-       # Now that we are more confident that we will decrypt the right message,
-       # we can start decrypting.
-       for segment in decryptor:
-           decrypted.write(segment)
+   # Before decrypting the plaintext,
+   # check the encryption context in the header.
+   #
+   # Verify that the encryption context used in the decrypt operation includes
+   # the encryption context that you specified when encrypting.
+   # The AWS Encryption SDK can add pairs, so don't require an exact match.
+   #
+   # In production, always use a meaningful encryption context.
+   #
+   # Now that we are more confident that we will decrypt the right message,
+   # we can start decrypting.
    ```
 
 1. Compare the decrypted plaintext and original plaintext.
 
-   ```python
+   ```
    # Demonstrate that the decrypted plaintext is identical to the original plaintext.
-   assert decrypted.getvalue() == source_plaintext
    ```
