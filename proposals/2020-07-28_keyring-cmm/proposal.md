@@ -115,7 +115,7 @@ This change MUST maintain behavior for customers who are using a Default CMM.
 
 This change defines the [Keyring CMM](#keyring-cmm) and
 the [Master Key Provider CMM](#master-key-provider-cmm)
-as base CMM implementations that can be used "as is" or composed with other CMM.
+as base CMM implementations that can be used "as is" or composed with other CMMs.
 
 This change also defines a [Default CMM](#default-cmm) as a specific configuration of a CMM
 that the AWS Encryption SDK provides as a safe default.
