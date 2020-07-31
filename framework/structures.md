@@ -52,10 +52,10 @@ Structures defined in this document:
 
 #### Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/EncryptedDataKey.java)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/structures.py)
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/edk.h)
 - [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/encrypted_data_key.ts)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/structures.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/EncryptedDataKey.java)
 
 #### Structure
 
@@ -88,17 +88,17 @@ An opaque value from which an appropriate key provider can obtain the plaintext 
 Some key provider MUST be capable of deterministically obtaining the plaintext key from the ciphertext.
 
 Most commonly this is an encrypted form of the plaintext data key.
-Alternatively it could be the public input to a KDF that derives the plaintext data key or
+Alternatively, it could be the public input to a KDF that derives the plaintext data key or
 an identifier into a key store that will return the plaintext data key.
 
 ### Encryption Context
 
 #### Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/EncryptionContextSerializer.java)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/internal/formatting/encryption_context.py)
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/enc_ctx.h)
 - [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/types.ts)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/internal/formatting/encryption_context.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/EncryptionContextSerializer.java)
 
 #### Structure
 
@@ -107,8 +107,8 @@ It is used during [encryption](../client-apis/encrypt.md) and [decryption](../cl
 
 Users SHOULD use the encryption context to store:
 
-- non-secret data that MUST remain associated with the [message](../data-format/message.md) ciphertext.
-- data that is useful in logging and tracking, such as data about the file type, purpose, or ownership.
+- Non-secret data that MUST remain associated with the [message](../data-format/message.md) ciphertext.
+- Data that is useful in logging and tracking, such as data about the file type, purpose, or ownership.
 
 Users MUST NOT use the encryption context to store secret data.
 
@@ -145,7 +145,7 @@ A list of the [encrypted data keys](#encrypted-data-key) that correspond to the 
 The [ciphertext](#ciphertext) of each encrypted data key in this list MUST be an opaque form of the
 plaintext data key from this set of encryption materials.
 
-If the plaintext data key is not included on this set of encryption materials, this list MUST be empty.
+If the plaintext data key is not included in this set of encryption materials, this list MUST be empty.
 
 ##### Encryption Context
 
@@ -157,14 +157,14 @@ A data key to be used as input for [encryption](../client-apis/encrypt.md).
 
 The plaintext data key MUST:
 
-- fit the specification for the [key derivation algorithm](algorithm-suites.md#key-derivation-algorithm)
+- Fit the specification for the [key derivation algorithm](algorithm-suites.md#key-derivation-algorithm)
   included in this decryption material's [algorithm suite](#algorithm-suite).
-- consist of cryptographically secure (pseudo-)random bits.
-- be kept secret.
+- Consist of cryptographically secure (pseudo-)random bits.
+- Be kept secret.
 
 The plaintext data key SHOULD be stored as immutable data.
 
-The plaintext data key SHOULD offer an interface to zero the plaintext data key
+The plaintext data key SHOULD offer an interface to zero the plaintext data key.
 
 ##### Signing Key
 
@@ -198,11 +198,11 @@ This structure MAY include any of the following fields:
 
 ##### Algorithm Suite
 
-The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client-apis/decrypt.md)
+The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client-apis/decrypt.md).
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md)
+The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md).
 
 ##### Plaintext Data Key
 
@@ -210,14 +210,14 @@ The data key to be used as input for [decryption](../client-apis/decrypt.md).
 
 The plaintext data key MUST:
 
-- fit the specification for the [encryption algorithm](algorithm-suites.md#encryption-algorithm)
+- Fit the specification for the [encryption algorithm](algorithm-suites.md#encryption-algorithm)
   included in this decryption material's [algorithm suite](#algorithm-suite-1).
-- consist of cryptographically secure (pseudo-)random bits.
-- be kept secret.
+- Consist of cryptographically secure (pseudo-)random bits.
+- Be kept secret.
 
 The plaintext data key SHOULD be stored as immutable data.
 
-The plaintext data key SHOULD offer an interface to zero the plaintext data key
+The plaintext data key SHOULD offer an interface to zero the plaintext data key.
 
 ##### Verification Key
 

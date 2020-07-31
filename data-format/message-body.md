@@ -10,9 +10,9 @@ See [Message Version](message.md#version).
 ## Implementations
 
 - [C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/include/aws/cryptosdk/private/framefmt.h)
+- [JavaScript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/types.ts)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/structures.py)
 - [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/ContentType.java)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/types.ts)
 
 ## Overview
 
@@ -87,7 +87,7 @@ Note:
 
 #### Regular Frame
 
-All frames except the [Final Frame](#final-frame) are Regular Frames.
+All frames except the [Final Frame](#final-frame) are "Regular Frames".
 
 The following describes the fields that form the Regular Frame Body Structure.  
 The bytes are appended in the order shown.
@@ -132,9 +132,13 @@ The final frame MUST be the last frame.
 The length of the plaintext to be encrypted in the Final Frame MUST be
 greater than or equal to 0 and less than or equal to the [Frame Length](message-header.md#frame-length).
 
-- When the length of the Plaintext is not an exact multiple of the Frame Length, any remaining data is encrypted into the Final Frame.
-- When the length of the Plaintext is an exact multiple of the Frame Length (including if it is equal to the frame length), the Final Frame encrypted content length SHOULD be equal to the frame length but MAY be 0.
-- When the length of the Plaintext is less than the Frame Length, the body MUST contain exactly one frame and that frame MUST be a Final Frame.
+- When the length of the Plaintext is not an exact multiple of the Frame Length,
+  any remaining data is encrypted into the Final Frame.
+- When the length of the Plaintext is an exact multiple of the Frame Length
+  (including if it is equal to the frame length),
+  the Final Frame encrypted content length SHOULD be equal to the frame length but MAY be 0.
+- When the length of the Plaintext is less than the Frame Length,
+  the body MUST contain exactly one frame and that frame MUST be a Final Frame.
 
 For example, in the case that the length of the Plaintext is equal to the Frame Length, there are two acceptable cases:
 
@@ -190,10 +194,6 @@ The authentication value for the final frame.
 It is used to authenticate the final frame.  
 The authentication tag length MUST be equal to the authentication tag length of the algorithm suite
 specified by the [Algorithm Suite ID](message-header.md#algorithm-suite-id) field.
-
-## Test Vectors
-
-[TODO](https://github.com/awslabs/aws-crypto-tools-test-vector-framework)
 
 ## Example Usage
 
@@ -345,5 +345,3 @@ C051AD55 A437F6BC 139E9E55 6199FD60
 B66B6A5A 80FDB433 8A48D6A4 21CB
 811234FD 8D589683 51F6F39A 040B3E3B        Final Frame, Authentication Tag
 ```
-
-### TODO - ADD example for single frame

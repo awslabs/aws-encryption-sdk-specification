@@ -43,7 +43,7 @@ this specification for encryption.
 The following inputs to this behavior are REQUIRED:
 
 - [Plaintext](#plaintext)
-- either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
+- Either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
 
 The following inputs to this behavior are OPTIONAL:
 
@@ -58,7 +58,7 @@ Implementations SHOULD ensure that a caller is not able to specify both a [plain
 with known length and a [Plaintext Length Bound](#plaintext-length-bound) by construction.
 If a caller is able to specify both an input [plaintext](#plaintext) with known length and
 a [Plaintext Length Bound](#plaintext-length-bound),
-[Plaintext Length Bound](#plaintext-length-bound) MUST NOT be used during the Encrypt operation
+the [Plaintext Length Bound](#plaintext-length-bound) MUST NOT be used during the Encrypt operation
 and MUST be ignored.
 
 ### Plaintext
@@ -223,6 +223,8 @@ with the following specifics:
   [Customer Authenticated Encrypted Data](../data-format/message-header.md#supported-types)
 - [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST correspond to
   the [algorithm suite](../framework/algorithm-suites.md) used in this behavior
+- [Message ID](../data-format/message-header.md#message-id): The process used to generate
+  this identifier MUST use a good source of randomness to make the chance of duplicate identifiers negligible.
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
   in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
@@ -257,7 +259,7 @@ If this operation is streaming the encrypted message and
 the entire message header has been serialized,
 the serialized message header SHOULD be released.
 
-The encrypted message outputted by this operation MUST have a message header equal
+The encrypted message output by this operation MUST have a message header equal
 to the message header calculated in this step.
 
 If the algorithm suite contains a signature algorithm and
@@ -268,7 +270,7 @@ the [signature calculation](#signature-calculation).
 
 ## Construct the body
 
-The encrypted message outputted by this operation MUST have a message body equal
+The encrypted message output by this operation MUST have a message body equal
 to the message body calculated in this step.
 
 If [Plaintext Length Bound](#plaintext-length-bound) was specified on input
@@ -340,7 +342,7 @@ This operation MUST serialize a regular frame or final frame with the following 
 - [IV](../data-format/message-body.md#iv): MUST be the IV used when calculating the encrypted content above
 - [Encrypted Content](../data-format/message-body.md#encrypted-content): MUST be the encrypted content calculated above.
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag
-  outputted when calculating the encrypted content above.
+  output when calculating the encrypted content above.
 
 The above serialized bytes MUST NOT be released until the entire frame has been serialized.
 If this operation is streaming the encrypted message and
@@ -365,7 +367,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
 - the signature key is the [signing key](../framework/structures.md#signing-key) in the [encryption materials](../framework/structures.md#encryption-materials)
 - the input to sign is the concatenation of the serialization of the [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md)
 
-Note that the message header and message body MAY have already been inputted during previous steps.
+Note that the message header and message body MAY have already been input during previous steps.
 
 This operation MUST then serialize a message footer with the following specifics:
 
@@ -378,12 +380,8 @@ Once the entire message footer has been serialized,
 this operation MUST release any previously unreleased serialized bytes from previous steps
 and MUST release the message footer.
 
-The encrypted message outputted by this operation MUST have a message footer equal
+The encrypted message output by this operation MUST have a message footer equal
 to the message footer calculated in this step.
-
-## Security Considerations
-
-[TODO]
 
 ## Appendix
 
@@ -403,4 +401,4 @@ the [message body](../data-format/message-body.md) was serialized with the follo
   - The IV is the [IV](../data-format/message-body.md#iv) specified above.
   - The cipherkey is the derived data key
   - The plaintext is the input [plaintext](#plaintext)
-- [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag outputted by the above encryption.
+- [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag returned by the above encryption.

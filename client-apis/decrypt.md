@@ -23,12 +23,6 @@
 
 ## Implementations
 
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_decrypt.c)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/DecryptionHandler.java)
-- [JSNode](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/decrypt-node/src/decrypt.ts)
-- [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/decrypt-browser/src/decrypt.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py)
-
 | Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                 |
 | ---------- | -------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | C          | 0.2.0                                  | 0.1.0                     | [session_decrypt.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_decrypt.c)                                                          |
@@ -39,8 +33,11 @@
 
 ## Overview
 
-This document describes the operation of decrypting the encrypted message previously received from an encrypt call to the AWS Encryption SDK.
-The AWS Encryption SDK provides a client to decrypt the inputted encrypted message, and returns as the output the plaintext.
+This document describes the AWS Encryption SDK's (ESDK's) decrypt operation,
+used for decrypting a message that was previously encrypted by the ESDK.
+
+Any client provided by the AWS Encryption SDK that performs decryption of encrypted messages MUST follow
+this specification for decryption.
 
 ## Definitions
 
@@ -69,7 +66,7 @@ The client MUST require the following as inputs to this operation:
 
 - [Encrypted Message](#encrypted-message)
 
-The client MUST require exactly one of the following type of inputs:
+The client MUST require exactly one of the following types of inputs:
 
 - [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md)
 - [Keyring](../framework/keyring-interface.md)
@@ -77,7 +74,7 @@ The client MUST require exactly one of the following type of inputs:
 ### Encrypted Message
 
 The encrypted message to decrypt.
-The encrypted message inputted MUST be a sequence of bytes in the
+The input encrypted message MUST be a sequence of bytes in the
 [message format](../data-format/message.md) specified by the AWS Encryption SDK.
 The encrypted message contains the list of [encrypted data keys](../data-format/message-header.md#encrypted-data-keys),
 [encryption context](../data-format/message-header.md#aad), if provided during encryption,
@@ -205,7 +202,7 @@ This operation MUST attempt to deserialize all consumable encrypted message byte
 successfully deserialized a valid [message header](../data-format/message-header.md).
 
 This operation MUST wait if it doesn't have enough consumable encrypted message bytes to
-deserialize the next field of the message header until enough consumable input bytes become or
+deserialize the next field of the message header until enough input bytes become consumable or
 the caller indicates an end to the encrypted message.
 
 Until the [header is verified](#verify-the-header), this operation MUST NOT
@@ -221,7 +218,7 @@ by calling [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) 
 
 The CMM used MUST be the input CMM, if supplied.
 If a CMM is not supplied as the input, the decrypt operation MUST construct a [default CMM](../framework/default-cmm.md)
-from the [keyring](../framework/keyring-interface.md) inputted.
+from the input [keyring](../framework/keyring-interface.md).
 
 The call to the CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) operation
 MUST be constructed as follows:
@@ -232,7 +229,7 @@ MUST be constructed as follows:
   [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id)
   from the message header.
 - Encrypted Data Keys: This is the parsed [encrypted data keys](../data-format/message-header#encrypted-data-keys)
-  from the message hedaer.
+  from the message header.
 
 The data key used as input for all decryption described below is a data key derived from the plaintext data key
 included in the [decryption materials](../framework/structures.md#decryption-materials).
@@ -281,7 +278,7 @@ MUST be deserialized according to the [message body spec](../data-format/message
 
 While there MAY still be message body left to deserialize and decrypt,
 this operation MUST either wait for more of the encrypted message bytes to become consumable,
-wait for the an end to the encrypted message to be indicated,
+wait for the end to the encrypted message to be indicated,
 or to deserialize and/or decrypt the consumable bytes.
 
 The [content type](../data-format/message-header.md#content-type) field parsed from the
@@ -369,7 +366,7 @@ to indicate an end to the encrypted message.
 
 Once the message footer is deserialized, this operation MUST use the
 [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
-from the [algorithm suite](../frameowkr/algorithm-suites.md) in the decryption materials to
+from the [algorithm suite](../framework/algorithm-suites.md) in the decryption materials to
 verify the encrypted message, with the following inputs:
 
 - The verification key is the [verification key](../framework/structures.md#verification-key)
@@ -377,7 +374,7 @@ verify the encrypted message, with the following inputs:
 - The input to verify is the concatenation of the serialization of the
   [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md).
 
-Note that the message header and message body MAY have already been inputted during previous steps.
+Note that the message header and message body MAY have already been input during previous steps.
 
 If this verification is not successful, this operation MUST immediately halt and fail.
 

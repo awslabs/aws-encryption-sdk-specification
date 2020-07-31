@@ -52,9 +52,10 @@ RSA (Rivest–Shamir–Adleman) is an asymmteric cryptographic cipher.
 
 RSA Implementation Specification: [RFC 3447](https://tools.ietf.org/html/rfc8017)
 
-## Inputs
+## Initialization
 
-On keyring initialization, the following inputs are REQUIRED:
+On keyring initialization,
+the caller MUST provide the following:
 
 - [Key Namespace](./keyring-interface.md#key-namespace)
 - [Key Name](./keyring-interface.md#key-name)
@@ -104,65 +105,56 @@ The private key SHOULD contain all Chinese Remainder Theorem (CRT) components (p
 ### OnEncrypt
 
 OnEncrypt MUST fail if this keyring does not have a specified [public key](#public-key).
+The keyring MUST NOT derive a public key from a specified [private key](#private-key)
 
 OnEncrypt MUST take [encryption materials](structures.md#encryption-materials) as input.
 
 If the [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key,
-on encrypt MUST generate a random plaintext data key and set it on the [encryption materials](structures.md#encryption-materials).
+OnEncrypt MUST generate a random plaintext data key and set it on the [encryption materials](structures.md#encryption-materials).
 
 The keyring MUST attempt to encrypt the plaintext data key in the
 [encryption materials](structures.md#encryption-materials) using RSA.
-The keyring performs RSA with the following specifics:
+The keyring performs [RSA encryption](#rsa) with the following specifics:
 
-- this keyring's [public key](#public-key) is the RSA public key
-- this keyring's [padding scheme](#supported-padding-schemes) is the RSA padding scheme.
-- the plaintext data key is the plaintext input to RSA encryption.
+- This keyring's [public key](#public-key) is the RSA public key.
+- This keyring's [padding scheme](#supported-padding-schemes) is the RSA padding scheme.
+- The plaintext data key is the plaintext input to RSA encryption.
 
 If RSA encryption was successful, OnEncrypt MUST return the input
 [encryption materials](structures.md#encryption-materials), modified in the following ways:
 
 - The encrypted data key list has a new encrypted data key added, constructed as follows:
-  - the [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](#key-namespace).
-  - the [key provider information](structures.md#key-provider-information) field is this keyring's [key name](#key-name).
-  - the [ciphertext](structures.md#ciphertext) field is the ciphertext outputted from
+  - The [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](#key-namespace).
+  - The [key provider information](structures.md#key-provider-information) field is this keyring's [key name](#key-name).
+  - The [ciphertext](structures.md#ciphertext) field is the ciphertext output by
     the RSA encryption of the plaintext data key.
 
 ### OnDecrypt
 
 OnDecrypt MUST fail if this keyring does not have a specified [private key](#private-key).
-The keyring MUST NOT derive a private key from a specified [public key](#public-key)
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
 
-The keyring MUST attempt to decrypt the inputted encrypted data keys, in list order, until it successfully decrypts one.
+The keyring MUST attempt to decrypt the input encrypted data keys, in list order, until it successfully decrypts one.
 
 For each encrypted data key, the keyring MUST attempt to decrypt the encrypted data key into plaintext
 using RSA if and only if the following is true:
 
-- the encrypted data key's [key provider information](structures.md#key-provider-information)
+- The encrypted data key's [key provider information](structures.md#key-provider-information).
   has a value equal to this keyring's [key name](#key-name).
-- the encrypted data key's [key provider ID](structures.md#key-provider-id) has a value equal to
+- The encrypted data key's [key provider ID](structures.md#key-provider-id) has a value equal to
   this keyring's [key namespace](#key-namespace).
 
 The keyring performs RSA decryption with the following specifics:
 
-- this keyring's [private key](#private-key) is the RSA private key
-- this keyring's [padding scheme](#supported-padding-schemes) is the RSA padding scheme.
-- an encrypted data key's [ciphertext](structures.md#ciphertext) is the input ciphertext to RSA decryption.
+- This keyring's [private key](#private-key) is the RSA private key.
+- This keyring's [padding scheme](#supported-padding-schemes) is the RSA padding scheme.
+- An encrypted data key's [ciphertext](structures.md#ciphertext) is the input ciphertext to RSA decryption.
 
 If any decryption succeeds, this keyring MUST immediately return the input
 [decryption materials](structures.md#decryption-materials), modified in the following ways:
 
 - The output of RSA decryption is set as the decryption material's plaintext data key.
 
-If no decryption succeeds, this keyring MUST NOT make any update to the decryption materials.
-
-## Security Considerations
-
-[TODO: What security properties does this keyring guarantee?]
-
-- multifactor RSA
-- The storage of the raw RSA keys in the local box
-- Does not write any information about what algorithm was used to wrap the data key.
-- Does not provide any authenticity.
+If no decryption succeeds, this keyring MUST NOT make any update to the decryption materials and MUST fail.

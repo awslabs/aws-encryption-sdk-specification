@@ -10,9 +10,9 @@ See [Message Version](message.md#version).
 ## Implementations
 
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/cipher.c)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/Utils.java)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/aad_factory.ts)
+- [JavaScript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/aad_factory.ts)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/internal/formatting/encryption_context.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/Utils.java)
 
 ## Overview
 
@@ -65,7 +65,3 @@ More specifically, depending on the [content type](message-header.md#content-typ
   - For the [final frame](message-body.md#final-frame), this value MUST be greater than or equal to
     0 and less than or equal to the value of the [frame length](message-header.md#frame-length)
     field in the message header.
-
-## Security Considerations
-
-[TODO]
