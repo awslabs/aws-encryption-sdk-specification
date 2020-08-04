@@ -54,7 +54,7 @@ Additionally, the caller MUST provide one of the following values:
 
 If the caller provides a keyring,
 then the caching CMM MUST set its underlying CMM
-to a [default CMM](../../framework/default-cmm.md) initialized with the keyring.
+to a [default CMM](default-cmm.md) initialized with the keyring.
 
 Finally, the caching CMM MUST optionally accept the following values:
 
