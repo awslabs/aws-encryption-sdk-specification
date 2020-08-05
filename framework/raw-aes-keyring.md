@@ -207,4 +207,6 @@ If decrypting, the keyring MUST use AES-GCM with the following specifics:
 If a decryption succeeds, this keyring MUST
 add the resulting plaintext data key to the decryption materials and return the modified materials.
 
-If no decryption succeeds, the decryption MUST NOT make any update to the decryption materials and MUST fail.
+If no decryption succeeds,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
