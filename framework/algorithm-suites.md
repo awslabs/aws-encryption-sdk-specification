@@ -101,7 +101,10 @@ ECDSA-Sig-Value ::= SEQUENCE {
 ## Supported Algorithm Suites
 
 The following table includes the algorithm suites supported by the AWS Encryption SDK.
-The values for each field of each algorithm suite is specified below. The Algorithm Suite ID MUST NOT be `00 00`.
+The values for each field of each algorithm suite is specified below. 
+The value `00 00` is reserved
+and MUST NOT be used
+as an Algorithm Suite ID in the future.
 
 | Algorithm Suite ID (hex) | Encryption Algorithm | Encryption Algorithm Mode | Encryption Key Length (bits) | IV Length (bytes) | Authentication Tag Length (bytes) | Key Derivation Algorithm | Key Derivation Input Length (bits) | Signature Algorithm          | Is Default |
 | ------------------------ | -------------------- | ------------------------- | ---------------------------- | ----------------- | --------------------------------- | ------------------------ | ---------------------------------- | ---------------------------- | ---------- |
