@@ -104,7 +104,7 @@ Thus, we need to make sure that we provide CMM implementations that can be compo
 to produce the desired default behaviors:
 
 - Provide valid materials using a keyring or master key provider as input.
-- Use a sensisble default if the algorithm suite is unspecified on encryption.
+- Use a sensible default if the algorithm suite is unspecified on encryption.
 
 We can do this by providing two different CMM implementations that each tackle one of the
 above requirements:
