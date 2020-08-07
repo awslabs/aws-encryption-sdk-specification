@@ -113,8 +113,6 @@ it MUST output the modified [encryption materials](structures.md#encryption-mate
 
 If the keyring did not attempt any of the above behaviors, it MUST fail
 and it MUST NOT modify the [encryption materials](structures.md#encryption-materials).
-In failing, it MUST provide the failure message
-`No action taken by keyring on encrypt.`
 
 #### Generate Data Key
 
@@ -163,13 +161,15 @@ MAY modify it with the following behavior:
 
 - [Decrypt data key](#decrypt-data-key)
 
+If the decryption materials already contain a plaintext data key,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
+
 If this keyring attempted the above behavior, and succeeded, it MUST output the modified [decryption materials](structures.md#decryption-materials).
 
 If the keyring did not attempt the above behavior,
 the keyring MUST fail
 and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
-In failing, it MUST provide the failure message
-`No action take by keyring on decrypt.`
 
 #### Decrypt Data Key
 
