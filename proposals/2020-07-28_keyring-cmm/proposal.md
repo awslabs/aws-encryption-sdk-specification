@@ -5,7 +5,7 @@
 
 ## Affected Features
 
-This serves as a reference of all features that this change affects.
+This serves as a reference of all features that this proposal affects.
 
 | Feature                                       |
 | --------------------------------------------- |
@@ -13,7 +13,7 @@ This serves as a reference of all features that this change affects.
 
 ## Affected Specifications
 
-This serves as a reference of all specification documents that this change affects.
+This serves as a reference of all specification documents that this proposal affects.
 
 | Specification                                 |
 | --------------------------------------------- |
@@ -21,7 +21,7 @@ This serves as a reference of all specification documents that this change affec
 
 ## Affected Implementations
 
-This serves as a reference for all implementations that this change affects.
+This serves as a reference for all implementations that this proposal affects.
 
 | Language   | Repository                                                                            |
 | ---------- | ------------------------------------------------------------------------------------- |
@@ -47,77 +47,103 @@ using [keyrings](../../framework/keyring-interface.md) or
 [master key providers](../../framework/master-key-provider-interface.md) to get and
 decrypt materials.
 
-This change proposes that we instead define that implementation under new names,
-Keyring CMM and Master Key Provider CMM,
-and define the Default CMM to be the specific composition of one or more CMMs
-that customers SHOULD use.
+This document proposes that we split that implementation into new CMMs,
+a Keyring CMM and Set Unspecified Request Values CMM,
+and define the Default CMM to be a specific composition of those CMMs
+that uses default values.
 
 ## Out of Scope
 
-- The behavior of any existing CMMs implementations.
+- Updating the behavior of any existing CMMs implementations.
 
 ## Motivation
 
-Prior to this change, the Default CMM serves two purposes.
-First, it provides a base implementation of a CMM that:
+Prior to this proposal, the Default CMM served three purposes.
 
-- Uses a keyring or master key provider to provide valid materials.
-- Handles providing the signature key and verification key with the materials.
+First, it provided a base implementation of a CMM that performed the necessary functions
+required to provide valid encryption or decryption materials:
 
-Second, it serves as a safe default that can be used for most use cases.
+- It provided encrypted data keys and the plaintext data key for encryption materials,
+  and decrypted the plaintext data key from encrypted data keys to provide decryption materials.
+  This is done using a keyring or master key provider.
+- It handled providing the signature key and verification key with the materials.
+
+Second, it defined what algorithm suite to use if the customer did not specify one for encryption.
+
+Third, it served as a
+[sensible default](https://github.com/awslabs/aws-encryption-sdk-specification/blob/2ec7674c304c408c2a32d412e834939c73f68d80/tenets.md#sensible-defaults)
+CMM implementation that served most use cases.
+This default CMM implementation describes the default set of behavior as well as default
+configuration options for encryption and decryption.
 
 While there is currently no conflict in these purposes,
 this might not always be true.
 In the future we might want to update the behavior customers get when they choose some "default"
 CMM option.
 
-One way to address this would be to directly add the new desired behavior
-to the current Default CMM implementation,
-however this makes our provided CMMs less composable.
-Keeping the CMM composable is important because it allows users to assert desired properties
+However, we also want to retain a pure base implementation of the CMM in order to keep
+our provided CMMs composable.
+Keeping the CMM composable is important because it allows customers to assert desired properties
 [by construction](https://github.com/awslabs/aws-encryption-sdk-specification/blob/2ec7674c304c408c2a32d412e834939c73f68d80/tenets.md#correct-by-construction).
-Additionally this approach would not allow customers to opt out of this new behavior if
-it is not desirable for their use case.
-Because it is important to retain this base implementation,
-we should define a CMM whose sole purpose is to be this base implementation.
-We will call this CMM implementation the Keyring CMM.
-For implementations which need to support master key provider, we will also define a
-Master Key Provider CMM.
+By keeping our CMMs composable, we make it easy for customers to compose
+CMMs that opt out of specific default behaviors which might not be useful for their use case,
+or reuse specific default behaviors in compositions with other CMMs.
 
-Similar to how we define a set of algorithm suites and define a default algorithm suite,
-we should similarly have a set of provided CMM implementations
-and a Default CMM which represents a particular configuration of one of those CMMs
-(possibly composed with other CMMs).
-We will define that the Default CMM is "the Keyring CMM".
-Just as an example, if we wanted to provide caching as a default behavior,
-the Default CMM could be defined as "the Caching CMM configured with a Keyring CMM."
-By defining the default in this way, we have greater flexibility to update the default
-CMM that customers use in the future without losing the composability of these implementations.
+Thus we redefine what the Default CMM means.
+Instead of having the Default CMM describe some implementation that implements the CMM interface,
+we instead define it as a specific composition of provided CMM implementations
+that express desired default behaviors and configurations.
+We need to provide an easy way for users to choose our default CMM behaviors
+such that if they use this default CMM
+they know that they are always using what the AWS Encryption SDK recommends as a
+[sensible default](https://github.com/awslabs/aws-encryption-sdk-specification/blob/2ec7674c304c408c2a32d412e834939c73f68d80/tenets.md#sensible-defaults)
+for all aspects of encryption and decryption.
+This proposal calls this specific implementation the [Default CMM](#default-cmm).
 
-Such a default MUST NOT allow any options other than the keyring to be configured in order
-to allow us to more easily maintain backwards compatability with possible Default CMM updates.
+Thus, we need to make sure that we provide CMM implementations that can be composed together
+to produce the desired default behaviors:
+
+- Provide valid materials using a keyring or master key provider as input.
+- Use a sensisble default if the algorithm suite is unspecified on encryption.
+
+We can do this by providing two different CMM implementations that each tackle one of the
+above requirements:
+
+- A stand alone CMM implementation that is only concerned with providing
+  valid materials using a keyring or master key provider.
+  This proposal calls this the [Keyring CMM](#keyring-cmm) or [Master Key Provider CMM](#master-key-provider-cmm).
+- A CMM implementation that wraps another CMM and sets unspecified values in the
+  Get Encryption Materials request to a particular value.
+  This proposal calls this the [Set Unspecified Request Values CMM](#set-unspecified-request-values-cmm).
+
+While the latter implementation might seem to be so simple it doesn't need to be its own CMM,
+it is necessary in order to be able to express the Default CMM as a specific composition
+while still keeping the Keyring CMM implementation simple and focused.
 
 ## Drawbacks
 
-This change SHOULD NOT have any drawbacks.
+This proposal SHOULD NOT have any drawbacks.
 
 ## Security Implications
 
-This change SHOULD NOT have any security implications.
+This proposal SHOULD NOT have any security implications.
 
 ## Operational Implications
 
-This change SHOULD NOT have any operational implications.
+This proposal SHOULD NOT have any operational implications.
 
-This change MUST maintain behavior for customers who are using a Default CMM.
+This proposal MUST maintain behavior for customers who are using a Default CMM.
 
 ## Guide-level Explanation
 
-This change defines the [Keyring CMM](#keyring-cmm) and
+This proposal defines the [Keyring CMM](#keyring-cmm) and
 the [Master Key Provider CMM](#master-key-provider-cmm)
 as base CMM implementations that can be used "as is" or composed with other CMMs.
 
-This change also defines a [Default CMM](#default-cmm) as a specific configuration of a CMM
+This proposal also defines a [Set Unspecified Request Values CMM](#set-unspecified-request-values-cmm)
+as a CMM implementation that can wrap others in order to default the algorithm suite used to a specific value.
+
+This proposal also defines a [Default CMM](#default-cmm) as a specific composition of CMMs
 that the AWS Encryption SDK provides as a safe default.
 
 Customers SHOULD either use the [Default CMM](#default-cmm)
@@ -127,19 +153,17 @@ or compose a CMM using the AWS Encryption SDK's provided CMM implementations
 ### Default CMM
 
 The Default CMM is a specific configuration of a
-CMM implementation provided by the AWS Encryption SDK.
+CMM implementation provided by the AWS Encryption SDK that takes a keyring as input.
 
-The specific CMM configuration describes a
-[safe default](https://github.com/awslabs/aws-encryption-sdk-specification/blob/2ec7674c304c408c2a32d412e834939c73f68d80/tenets.md#sensible-defaults)
-that serves most use cases.
+The specific CMM configuration describes the set of CMM behaviors and configuration options
+that the AWS Encryption SDK recomends as a sensible default.
 
-The CMM configuration defined by the Default CMM is the [Keyring CMM](#keyring-cmm) as is
-(the Keyring CMM provides no additional options other than specifying an underlying keyring).
+The behavior we define as default is the behavior of the Default CMM prior to this proposal.
 
-As the AWS Encryption SDK provides more CMM implementations that would benefit default use cases,
+As the AWS Encryption SDK provides more CMM implementations in the future that would benefit default use cases,
 we expect to update the Default CMM to a configuration which composes such CMMs together in order to provide
 useful properties.
-Any update to the composition defined by Default CMM SHOULD be backwards compatable.
+Any update to the composition defined by Default CMM MUST be backwards compatable.
 
 To ensure that its use is correct by construction,
 the instantiation of the Default CMM MUST NOT take any options
@@ -152,10 +176,34 @@ The Keyring CMM is a base CMM implementation that
 and [decrypts materials](../../framework/cmm-interface.md#decrypt-materials)
 through use of a [keyring](../../framework/keyring-interface.md) configured on instantiation.
 
+It requires an algorithm suite to be set in the Get Encryption Materials Request.
+
 Any desired CMM implementation that intends to use keyrings to ensure valid materials SHOULD
 compose with the Keyring CMM.
 
-### Master Key Provider CMM
+### Set Unspecified Request Values CMM
+
+The Set Unspecified Request Values CMM is a CMM implementation that wraps another CMM implementation
+and sets unspecified parameters in the Get Encryption Materials Request to a particular vaule.
+
+On initialization, it accepts an Underlying CMM and Algorithm Suite as input.
+
+On Get Encryption Materials, it forwards the Get Encryption Materials Request to the Underlying CMM,
+setting the algorithm suite in the request to the input Algorithm Suite if unspecified.
+
+On Decrypt Materials, it forwards the Decryption Materials Request to the Underlying CMM.
+
+### Legacy
+
+Implementations that supported creating Default CMMs with master key providers prior to this proposal
+MUST also support providing a Default CMM composition that takes in a master key provider as input.
+Any such provided Default CMM MUST use a [Master Key Provider CMM](#master-key-provider-cmm)
+instead of a Keyring CMM.
+
+Implementations that never supported creating Default CMMs with master key providers MUST NOT
+provide a Default CMM that takes a master key provider as input.
+
+#### Master Key Provider CMM
 
 Any implementation that previously supported
 [master key providers](../../framework/master-key-provider-interface.md)
@@ -178,19 +226,15 @@ SHOULD compose with the Master Key Provider CMM.
 
 ### Default CMM
 
-On initialization, the caller MUST provide exactly one of the following:
-
-- [Keyring](../../framework/keyring-interface.md)
-- If this AWS Encryption SDK implementation provides a [Master Key Provider CMM](#master-key-provider-cmm),
-  a [Master Key Provider](../../framework/master-key-provider-interface.md)
+On initialization, the caller MUST provide a [Keyring](../../framework/keyring-interface.md).
 
 The Default CMM MUST NOT accept any additional configuration.
 
 It MUST construct a CMM in the following manner:
 
-- If a keyring was supplied, initialize a [Keyring CMM](#keyring-cmm) with the provided keyring.
-- If a master key provider was supplied, initialize a [Master Key Provider CMM](#keyring-cmm)
-  with the provided master key provider.
+- Initialize a [Set Unspecified Request Values CMM](#set-unspecified-request-values-cmm-2) with the following:
+  - The Algorithm Suite ID is the [default Algorithm Suite ID](../../framework/algorithm-suites.md).
+  - The Underling CMM is a [Keyring CMM](#keyring-cmm-2) initialized with the provided keyring.
 
 This CMM MUST NOT offer any additional features beyond the composed CMM created
 above.
@@ -200,10 +244,50 @@ Functionality exposed by the AWS Encryption SDK MUST NOT require the Default CMM
 ### Keyring CMM
 
 The specification of the Keyring CMM MUST be the specification of the
-Default CMM prior to this change.
+Default CMM prior to this proposal, with the following addition:
 
-### Master Key Provider CMM
+- During Get Encryption Materials, if the Get Encryption Materials Request does not contain
+  an algorithm suite, this CMM MUST fail.
 
-The specification of the Master Key Provider CMM MUST be the specification of the Default CMM,
-except describing the use of a master key provider instead of a keyring
-where appropriate.
+### Set Unspecified Request Values CMM
+
+On initialization, the caller MUST provide the following:
+
+- [Underlying CMM](../../framework/cmm-interface.md)
+- [Algorithm Suite ID](../../framework/algorithm-suites.md)
+
+On Get Encryption Materials, this CMM MUST check whether the Get Encryption Materials Request
+contains an algorithm suite.
+
+If it does, this CMM MUST pass the Get Encryption Materials Request to the Underlying CMM,
+and output any failure or materials from that Underlying CMM to the caller.
+
+If it does not, this CMM MUST call Get Encryption Materials on the Underlying CMM,
+with the following Get Encryption Materials Request:
+
+- Algorithm Suite is the Algorithm Suite ID initialized with this CMM.
+- Every other value matches the value in the Get Encryption Materials Request for this call.
+
+This CMM MUST output the result of Get Encryption Materials back to the caller.
+
+On Decrypt Materials, this CMM MUST pass the Decrypt Materials Request to the Underlying CMM,
+and output any failure or materials from that Underlying CMM to the caller.
+
+### Legacy
+
+Implementations that supported creating Default CMMs with master key providers prior to this proposal
+MUST also support a Default CMM that takes in a master key provider as input.
+Any such provided Default CMM MUST return the same composition as the Default CMM that takes a keyring as input,
+except it uses [Master Key Provider CMM](#master-key-provider-cmm-2) instead of a Keyring CMM.
+
+Implementations that never supported creating Default CMMs with master key providers MUST NOT
+have a Default CMM that accepts a master key provider on input.
+
+#### Master Key Provider CMM
+
+The specification of the Master Key Provider CMM MUST be the specification of the
+[legacy Default CMM behavior](https://github.com/awslabs/aws-encryption-sdk-specification/blob/7fb97330a55492592635f05553d66d5e0161a847/framework/default-cmm.md#legacy),
+with the following change:
+
+- On Get Encryption Materials, if the Get Encryption Materials Request does not contain an algorithm suite,
+  the CMM MUST fail.
