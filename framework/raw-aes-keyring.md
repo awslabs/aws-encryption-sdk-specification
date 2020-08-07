@@ -5,9 +5,13 @@
 
 ## Version
 
-0.4.0
+0.4.1
 
 ### Changelog
+
+- 0.4.1
+
+  - Clarify [keyring failure on decrypt](../changes/2020-06-04_how-to-fail-with-keyrings/change.md)
 
 - 0.4.0
 
@@ -173,6 +177,10 @@ OnEncrypt MUST output the modified [encryption materials](structures.md#encrypti
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
+
+If the decryption materials already contain a plaintext data key,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
 
 The keyring MUST attempt to serialize the [decryption materials'](structures.md#decryption-materials)
 [encryption context](structures.md#encryption-context-1) in the same format

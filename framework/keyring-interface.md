@@ -11,8 +11,8 @@
 
 - 0.2.3
 
-  - Fix stated behavior if doing nothing
-    as defined in [how to fail](../changes/2020-06-04_how-to-fail-with-keyrings/change.md).
+  - Fix stated behavior if the keyring takes no action
+    to conform with [how to fail](../changes/2020-06-04_how-to-fail-with-keyrings/change.md).
 
 - 0.2.2
 

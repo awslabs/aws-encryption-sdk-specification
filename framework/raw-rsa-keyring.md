@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.1
+0.3.2
 
 ### Changelog
+
+- 0.3.2
+
+  - Clarify [keyring failure on decrypt](../changes/2020-06-04_how-to-fail-with-keyrings/change.md)
 
 - 0.3.1
 
@@ -135,6 +139,10 @@ OnDecrypt MUST fail if this keyring does not have a specified [private key](#pri
 
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
+
+If the decryption materials already contain a plaintext data key,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
 
 The keyring MUST attempt to decrypt the input encrypted data keys, in list order, until it successfully decrypts one.
 
