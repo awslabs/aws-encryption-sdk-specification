@@ -106,8 +106,7 @@ The encryption materials returned MUST include the following:
 - [Encryption Context](structures.md#encryption-context)
   - The CMM MAY modify the encryption context.
 
-If the algorithm suite is present in the encryption materials request,
-and it contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
+If the algorithm suite returned contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
 then the encryption materials returned MUST include a [signing key](structures.md#signing-key).
 
 The CMM MUST ensure that the encryption materials returned are valid.
@@ -116,8 +115,7 @@ The CMM MUST ensure that the encryption materials returned are valid.
 - The value of the plaintext data key MUST be non-NULL.
 - The plaintext data key length MUST be equal to the [key derivation input length](algorithm-suites.md#key-derivation-input-length).
 - The encrypted data keys list MUST contain at least one encrypted data key.
-- If the algorithm suite is present in the encryption materials request,
-  and it contains a signing algorithm,
+- If the algorithm suite returned contains a signing algorithm,
   then the encryption materials returned MUST include the generated signing key.
 
 #### Decrypt Materials
