@@ -5,9 +5,14 @@
 
 ## Version
 
-0.2.2
+0.2.3
 
 ### Changelog
+
+- 0.2.3
+
+  - Fix stated behavior if the keyring takes no action
+    to conform with [how to fail](../changes/2020-06-04_how-to-fail-with-keyrings/change.md).
 
 - 0.2.2
 
@@ -106,8 +111,8 @@ and MAY modify it with any of the following behaviors:
 If this keyring attempted any of the above behaviors, and successfully completed those behaviors,
 it MUST output the modified [encryption materials](structures.md#encryption-materials).
 
-If the keyring did not attempt any of the above behaviors, it MUST output the
-[encryption materials](structures.md#encryption-materials) unmodified.
+If the keyring did not attempt any of the above behaviors, it MUST fail
+and it MUST NOT modify the [encryption materials](structures.md#encryption-materials).
 
 #### Generate Data Key
 
@@ -156,10 +161,15 @@ MAY modify it with the following behavior:
 
 - [Decrypt data key](#decrypt-data-key)
 
+If the decryption materials already contain a plaintext data key,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
+
 If this keyring attempted the above behavior, and succeeded, it MUST output the modified [decryption materials](structures.md#decryption-materials).
 
 If the keyring did not attempt the above behavior,
-the keyring MUST output the [decryption materials](structures.md#decryption-materials) unmodified.
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
 
 #### Decrypt Data Key
 

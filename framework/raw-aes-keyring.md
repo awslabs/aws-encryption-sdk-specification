@@ -5,9 +5,13 @@
 
 ## Version
 
-0.4.0
+0.4.1
 
 ### Changelog
+
+- 0.4.1
+
+  - Clarify [keyring failure on decrypt](../changes/2020-06-04_how-to-fail-with-keyrings/change.md)
 
 - 0.4.0
 
@@ -174,6 +178,10 @@ OnEncrypt MUST output the modified [encryption materials](structures.md#encrypti
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
 
+If the decryption materials already contain a plaintext data key,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
+
 The keyring MUST attempt to serialize the [decryption materials'](structures.md#decryption-materials)
 [encryption context](structures.md#encryption-context-1) in the same format
 as the serialization of the [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
@@ -207,4 +215,6 @@ If decrypting, the keyring MUST use AES-GCM with the following specifics:
 If a decryption succeeds, this keyring MUST
 add the resulting plaintext data key to the decryption materials and return the modified materials.
 
-If no decryption succeeds, the decryption MUST NOT make any update to the decryption materials and MUST fail.
+If no decryption succeeds,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
