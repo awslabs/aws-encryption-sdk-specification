@@ -18,6 +18,9 @@ This serves as a reference of all specification documents that this change affec
 | Specification                                             |
 | --------------------------------------------------------- |
 | [Keyring Interface](../../framework/keyring-interface.md) |
+| [Raw AES Keyring](../../framework/raw-aes-keyring.md)     |
+| [Raw RSA Keyring](../../framework/raw-rsa-keyring.md)     |
+| [Multi-Keyring](../../framework/multi-keyring.md)         |
 
 ## Affected Implementations
 

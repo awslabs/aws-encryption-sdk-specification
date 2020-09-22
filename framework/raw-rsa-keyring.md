@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.1
+0.3.2
 
 ### Changelog
+
+- 0.3.2
+
+  - Clarify [keyring failure on decrypt](../changes/2020-06-04_how-to-fail-with-keyrings/change.md)
 
 - 0.3.1
 
@@ -105,7 +109,7 @@ The private key SHOULD contain all Chinese Remainder Theorem (CRT) components (p
 ### OnEncrypt
 
 OnEncrypt MUST fail if this keyring does not have a specified [public key](#public-key).
-The keyring MUST NOT derive a public key from a specified [private key](#private-key)
+The keyring MUST NOT derive a public key from a specified [private key](#private-key).
 
 OnEncrypt MUST take [encryption materials](structures.md#encryption-materials) as input.
 
@@ -136,6 +140,10 @@ OnDecrypt MUST fail if this keyring does not have a specified [private key](#pri
 OnDecrypt MUST take [decryption materials](structures.md#decryption-materials) and
 a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
 
+If the decryption materials already contain a plaintext data key,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
+
 The keyring MUST attempt to decrypt the input encrypted data keys, in list order, until it successfully decrypts one.
 
 For each encrypted data key, the keyring MUST attempt to decrypt the encrypted data key into plaintext
@@ -157,4 +165,6 @@ If any decryption succeeds, this keyring MUST immediately return the input
 
 - The output of RSA decryption is set as the decryption material's plaintext data key.
 
-If no decryption succeeds, this keyring MUST NOT make any update to the decryption materials and MUST fail.
+If no decryption succeeds,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).

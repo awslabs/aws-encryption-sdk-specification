@@ -5,7 +5,17 @@
 
 ## Version
 
-0.1.0-preview
+0.1.1
+
+## Changelog
+
+- 0.1.1
+
+  - Clarify [keyring failure on decrypt](../changes/2020-06-04_how-to-fail-with-keyrings/change.md)
+
+- 0.1.0-preview
+
+  - Initial record
 
 ## Implementations
 
@@ -90,8 +100,9 @@ the [encryption materials](structures.md#encryption-materials) returned by the l
 
 ### OnDecrypt
 
-If the input [decryption materials](structures.md#decryption-materials) contains a plaintext data key,
-OnDecrypt MUST immediately return the unmodified decryption materials.
+If the decryption materials already contain a plaintext data key,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
 
 Otherwise, OnDecrypt MUST attempt to decrypt the [encrypted data keys](structures.md#encrypted-data-keys-1)
 in the input [decryption materials](structures.md#decryption-materials) using its
