@@ -68,8 +68,10 @@ The encryption materials request MUST include the following:
 The encryption request MAY include the following:
 
 - [Algorithm Suite](algorithm-suites.md)
-- [Plaintext Length](../client-apis/encrypt.md#plaintext-length)
-  - The length of the plaintext to be encrypted MUST not be larger than this value.
+- Max Plaintext Length
+  - This value represents the maximum length of the plaintext to be encrypted
+    using the returned materials.
+    The length of the plaintext to be encrypted MUST not be larger than this value.
 
 #### Decrypt Materials Request
 

@@ -9,8 +9,8 @@
 
 ## Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/MasterKey.java)
 - [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/key_providers/base.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/MasterKey.java)
 
 ## Overview
 
@@ -58,7 +58,7 @@ A master key MUST supply itself and MUST NOT supply any other master keys.
 
 Inputs and outputs are the same as for [master key providers](./master-key-provider-interface.md).
 
-A master key SHOULD attempt to decrypt data key using itself.
+A master key SHOULD attempt to decrypt a data key using itself.
 
 A master key MUST not attempt to use any other master keys.
 

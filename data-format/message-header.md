@@ -9,10 +9,10 @@ See [Message Version](message.md#version).
 
 ## Implementations
 
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextHeaders.java)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/structures.py)
 - [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/header.c)
-- [Javascript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/types.ts)
+- [JavaScript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/types.ts)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/structures.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextHeaders.java)
 
 ## Overview
 
@@ -20,9 +20,9 @@ The message header is a component of the [message](message.md).
 
 The purpose of the message header is to define the authenticated metadata required for decryption of the [message body](message-body.md#encrypted-content), including:
 
-- the format of the [message](message.md) and [message body](message-body.md)
-- the encrypted data keys needed for decryption of the [message body encrypted content](message-body.md#encrypted-content)
-- the [encryption context](../framework/structures.md#encryption-context)
+- The format of the [message](message.md) and [message body](message-body.md)
+- The encrypted data keys needed for decryption of the [message body encrypted content](message-body.md#encrypted-content)
+- The [encryption context](../framework/structures.md#encryption-context)
 
 ## Definitions
 
@@ -97,11 +97,11 @@ the chance of duplicate IDs negligible.
 
 The purpose of the message ID is to:
 
-- protect against accidental reuse of a derived data key or the wearing out of derived data keys in
+- Protect against accidental reuse of a derived data key or the wearing out of derived data keys in
   the AWS Encryption SDK
-- uniquely identify the [message](message.md)
-- bind the message header to the [message body](message-body.md) [TODO "bind" wording]
-- provide a mechanism to securely reuse a data key with multiple messages
+- Uniquely identify the [message](message.md)
+- Bind the message header to the [message body](message-body.md)
+- Provide a mechanism to securely reuse a data key with multiple messages
 
 #### AAD
 
@@ -125,7 +125,8 @@ When the [encryption context](../framework/structures.md#encryption-context) is 
 ##### Key Value Pairs
 
 The encoding of the key-value pairs of the [encryption context](../framework/structures.md#encryption-context).
-When the [encryption context](../framework/structures.md#encryption-context) is empty, this field MUST NOT be included in the [AAD](#aad).
+When the [encryption context](../framework/structures.md#encryption-context) is empty,
+this field MUST NOT be included in the [AAD](#aad).
 
 The following table describes the fields that form the Key Value Pairs.
 The bytes are appended in the order shown.
@@ -144,11 +145,10 @@ The value of this field MUST be greater than 0.
 
 A sequence of one or more key-value pair entries.
 
-This sequence MUST not contain duplicate entries.
+This sequence MUST NOT contain duplicate entries.
 
 These entries MUST have entries sorted, by key,
-in ascending order according to UTF-8 encoded binary value.
-[TODO does the above informationrmation belong here or as part of encryption context?]
+in ascending order according to the UTF-8 encoded binary value.
 
 The following table describes the fields that form each key value pair entry.
 The bytes are appended in the order shown.
@@ -246,7 +246,7 @@ This value MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-
 #### Frame Length
 
 The length of the [encrypted content](message-body.md#encrypted-content) within each [regular frame](message-body.md#regular-frame) of framed content.
-When the [content type](#Content-Type) is non-framed the value of this field MUST be 0.
+When the [content type](#Content-Type) is non-framed, the value of this field MUST be 0.
 
 ### Header Authentication
 
@@ -255,10 +255,10 @@ The header authentication contains fields used for authentication of the [header
 The following table describes the fields that form the header authentication.
 The bytes are appended in the order shown.
 
-| Field                                     | Length, in bytes                                                                                                                                                                        | Interpreted as |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| [IV](#iv)                                 | Variable. Determined by the IV length value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.                | Bytes          |
-| [Authentication Tag](#authentication-tag) | Variable. Determined by the authentication tag bytes value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
+| Field                                     | Length, in bytes                                                                                                                                                                              | Interpreted as |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| [IV](#iv)                                 | Variable. Determined by the IV length value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.                      | Bytes          |
+| [Authentication Tag](#authentication-tag) | Variable. Determined by the byte value of the authentication tag of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
 
 #### IV
 
@@ -271,16 +271,12 @@ The [algorithm suite](../framework/algorithm-suites.md) specified by the [Algori
 [determines how the value of this field is calculated](../client-apis/encrypt.md),
 and uses this value to [authenticate the contents of the header during decryption](../client-apis/decrypt.md).
 
-## Test Vectors
-
-[TODO](https://github.com/awslabs/aws-crypto-tools-test-vector-framework)
-
 ## Appendix
 
 ### Example Structure Definition
 
-Below is an example definition of the message header format described in this document.
-[TODO, to avoid confusion about ASN.1, how should we introduce this example?]
+Below is an example definition of the message header format described in this document,
+described in a "ASN.1-like" format.
 
 ```
 DEFINITIONS ::= BEGIN
@@ -360,7 +356,8 @@ Header          SEQUENCE (SIZE(2)) {
 
 ### Example Bytes
 
-The example below shows the raw bytes of an example header, in hexadecimal notation, followed by a description of what those bytes represent.
+The example below shows the raw bytes of an example header, in hexadecimal notation,
+followed by a description of what those bytes represent.
 
 ```
 01                                         Version (1.0)

@@ -10,10 +10,10 @@
 ## Implementations
 
 - [C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/cipher.c)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/identifiers.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/CryptoAlgorithm.java)
 - [NodeJS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/node_algorithms.ts)
 - [Browser JS](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/web_crypto_algorithms.ts)
+- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/identifiers.py)
+- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/CryptoAlgorithm.java)
 
 ## Overview
 
@@ -102,6 +102,9 @@ ECDSA-Sig-Value ::= SEQUENCE {
 
 The following table includes the algorithm suites supported by the AWS Encryption SDK.
 The values for each field of each algorithm suite is specified below.
+The value `00 00` is reserved
+and MUST NOT be used
+as an Algorithm Suite ID in the future.
 
 | Algorithm Suite ID (hex) | Encryption Algorithm | Encryption Algorithm Mode | Encryption Key Length (bits) | IV Length (bytes) | Authentication Tag Length (bytes) | Key Derivation Algorithm | Key Derivation Input Length (bits) | Signature Algorithm          | Is Default |
 | ------------------------ | -------------------- | ------------------------- | ---------------------------- | ----------------- | --------------------------------- | ------------------------ | ---------------------------------- | ---------------------------- | ---------- |
@@ -200,15 +203,7 @@ If the algorithm suite does not include a signature algorithm:
 
 Indicates which algorithm suite is the default algorithm suite for the AWS Encryption SDK.
 
-## Test Vectors
-
-[TODO](#https://github.com/awslabs/aws-crypto-tools-test-vector-framework)
-
 ## Security Considerations
-
-### Why is no salt used for HKDF?
-
-[TODO]
 
 ### Which algorithm suite should I use?
 

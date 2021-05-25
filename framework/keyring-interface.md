@@ -5,9 +5,18 @@
 
 ## Version
 
-0.2.1
+0.2.3
 
 ### Changelog
+
+- 0.2.3
+
+  - Fix stated behavior if the keyring takes no action
+    to conform with [how to fail](../changes/2020-06-04_how-to-fail-with-keyrings/change.md).
+
+- 0.2.2
+
+  - [Define wrapping key identifier terms](../changes/2020-06-09_wrapping-key-identifiers/change.md)
 
 - 0.2.1
 
@@ -43,6 +52,45 @@ The keyring interface specified in this document describes the interface all key
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
 in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
+### key namespace
+
+A configuration value for a keyring
+that identifies the grouping or categorization
+for the wrapping keys that the keyring can access.
+
+The key namespace MUST be a string value.
+
+### key name
+
+A configuration value for a keyring
+that identifies a single wrapping key
+within a key namespace.
+
+The key name MUST be a string value.
+
+### key provider ID
+
+An output value returned by a keyring on encrypt
+as part of an encrypted data key structure
+that identifies the grouping or categorization
+for a keyring that can fulfill this decryption contract.
+
+The key provider ID MUST be a binary value
+and SHOULD be equal to a UTF-8 encoding of the key namespace.
+
+This value MUST NOT be "aws-kms"
+unless this encrypted data key was produced by the [AWS KMS Keyring](kms-keyring.md).
+
+### key provider info
+
+An output value returned by a keyring on encrypt
+as part of an encrypted data key structure
+that provides necessary information for a keyring
+to fulfill this decryption contract.
+
+The key provider info MUST be a binary value
+and SHOULD be equal to a UTF-8 encoding of the key name.
+
 ## Supported Keyrings
 
 - [AWS KMS Keyring](kms-keyring.md)
@@ -63,8 +111,8 @@ and MAY modify it with any of the following behaviors:
 If this keyring attempted any of the above behaviors, and successfully completed those behaviors,
 it MUST output the modified [encryption materials](structures.md#encryption-materials).
 
-If the keyring did not attempt any of the above behaviors, it MUST output the
-[encryption materials](structures.md#encryption-materials) unmodified.
+If the keyring did not attempt any of the above behaviors, it MUST fail
+and it MUST NOT modify the [encryption materials](structures.md#encryption-materials).
 
 #### Generate Data Key
 
@@ -113,10 +161,15 @@ MAY modify it with the following behavior:
 
 - [Decrypt data key](#decrypt-data-key)
 
+If the decryption materials already contain a plaintext data key,
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
+
 If this keyring attempted the above behavior, and succeeded, it MUST output the modified [decryption materials](structures.md#decryption-materials).
 
 If the keyring did not attempt the above behavior,
-the keyring MUST output the [decryption materials](structures.md#decryption-materials) unmodified.
+the keyring MUST fail
+and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
 
 #### Decrypt Data Key
 
@@ -124,9 +177,9 @@ If the encryption materials do contain a plaintext data key, OnDecrypt MUST NOT 
 If the [decryption materials](structures.md#decryption-materials) do not include a plaintext data key,
 OnDecrypt MAY decrypt a data key.
 
-Decrypt Data Key MAY modify the following fields in the [decryption materials](structures.md#decryption-materials):
+The decrypt data key MAY modify the following fields in the [decryption materials](structures.md#decryption-materials):
 
-- [plaintext data key](structures.md#plaintext-data-key-1)
+- [Plaintext data key](structures.md#plaintext-data-key-1)
 
 To perform this behavior, the keyring attempts to retrieve a plaintext data key from the input list
 of [encrypted data keys](structures.md#encrypted-data-key).
@@ -135,19 +188,19 @@ If the keyring is able to succesfully get at least one plaintext data key from a
 and the [decryption materials](structures.md#decryption-materials) still do not include a plaintext data key,
 it SHOULD set one resulting plaintext data key on the [decryption materials](structures.md#decryption-materials).
 
-If the keyring is unable to get any plaintext data key using the input [encrypted data keys](structures.md#encrypted-data-key)
+If the keyring is unable to get any plaintext data key using the input [encrypted data keys](structures.md#encrypted-data-key),
 the keyring MUST NOT not update the [decryption materials](structures.md#decryption-materials).
 
 ## Security Considerations
 
 Keyring implementations SHOULD provide integrity guarantees for the [encrypted data keys](structures.md#encrypted-data-key)
-it returns on [OnEncrypt](#onencrypt) such that tampered versions of those encrypted data keys,
-if inputted into [OnDecrypt](#ondecrypt), are overwhelmingly likely to cause a decryption failure
+they return on [OnEncrypt](#onencrypt) such that tampered versions of those encrypted data keys,
+if input into [OnDecrypt](#ondecrypt), are overwhelmingly likely to cause a decryption failure
 (i.e. the chance of a successful decryption in this case is negligible).
 
 Such integrity guarantees SHOULD include the integrity of the [encryption context](structures.md#encryption-context)
 such that, if the encryption context used as input to OnEncrypt to produce an encrypted data key is
-different than the encryption context inputted to OnDecrypt to decrypt that encrypted data key,
+different than the encryption context input to OnDecrypt to decrypt that encrypted data key,
 the decryption is overwhelmingly likely to fail.
 
 Users SHOULD use a keyring that protects wrapping keys and performs cryptographic operations within a secure boundary.
@@ -176,7 +229,7 @@ The following keyrings are compatible with the referenced [master key providers]
 
 ### Why should I use Keyrings instead of Master Key Providers and Master Keys?
 
-Keyrings provide a simplified architecture over master keys and master key providers;
+Keyrings provide a simplified architecture over master keys and master key providers.
 The keyring combines the similar responsibilities of master keys and master key providers into one concept,
 as well as removes all key management logic from [cryptographic materials managers](cmm-interface.md).
 
