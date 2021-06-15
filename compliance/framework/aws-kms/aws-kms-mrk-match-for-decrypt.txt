@@ -1,0 +1,110 @@
+
+
+
+
+AWS Crypto Tools                                            . Amazon AWS
+                                                              Amazon AWS
+                                                             3 June 2021
+
+
+                     aws-kms-mrk-match-for-decrypt
+                     aws-kms-mrk-match-for-decrypt
+
+Abstract
+
+   The aws-kms-mrk-match-for-decrypt specification for the AWS
+   Encryption SDK.
+
+Table of Contents
+
+   1.  Conventions and Definitions
+   2.  AWS KMS MRK Match for Decrypt
+     2.1.  Version
+       2.1.1.  Changelog
+     2.2.  Implementations
+     2.3.  Overview
+     2.4.  Definitions
+       2.4.1.  Conventions used in this document
+     2.5.  Implementation
+   3.  Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here
+
+2.  AWS KMS MRK Match for Decrypt
+
+2.1.  Version
+
+   0.2.2
+
+2.1.1.  Changelog
+
+   *  0.2.2
+
+      -  Initial record
+
+2.2.  Implementations
+
+   | Language | Confirmed Compatible with Spec Version | Minimum Version
+   Confirmed | Implementation | | ----- | ------------------------- |
+   ----------------- | --------- |
+
+2.3.  Overview
+
+   Since the AWS Encryption SDK stores the AWS KMS key ARN in the
+   encrypted data key of the message format an AWS KMS component needs
+   to be able to evaluate if a configured ARN matches a stored ARN.
+   This is especially important for multi-Region keys because the match
+   does not need to be exact.
+
+2.4.  Definitions
+
+2.4.1.  Conventions used in this document
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119
+   (https://tools.ietf.org/html/rfc2119).
+
+2.5.  Implementation
+
+   The caller MUST provide:
+
+   *  2 AWS KMS key identifier
+
+   If both identifiers are identical, this function MUST return "true".
+   Otherwise if either input is not identified as a multi-Region key
+   (aws-kms-key-arn.md#identifying-an-aws-kms-multi-region-key), then
+   this function MUST return "false".  Otherwise if both inputs are
+   identified as a multi-Region keys (aws-kms-key-arn.md#identifying-an-
+   aws-kms-multi-region-key), this function MUST return the result of
+   comparing the "partition", "service", "accountId", "resourceType",
+   and "resource" parts of both ARN inputs.  NOTE: The "region" part is
+   intentionally omitted.
+
+3.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+Acknowledgments
+
+Author's Address
+
+   Amazon AWS
+   Amazon AWS
+
+   Email: cryptools+rfc@amazon.com

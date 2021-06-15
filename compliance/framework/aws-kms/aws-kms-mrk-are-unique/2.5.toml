@@ -1,0 +1,48 @@
+target = "compliance/framework/aws-kms/aws-kms-mrk-are-unique.txt#2.5"
+
+# 2.5.  Implementation
+#
+# The caller MUST provide:
+# 
+# *  A list of AWS KMS key identifiers
+# 
+# If the list does not contain any multi-Region keys (aws-kms-key-
+# arn.md#identifying-an-aws-kms-multi-region-key) this function MUST
+# exit successfully.
+# 
+# If there are zero duplicate resource ids between the multi-region
+# keys, this function MUST exit successfully
+# 
+# If any duplicate multi-region resource ids exist, this function MUST
+# yield an error that includes all identifiers with duplicate resource
+# ids not only the first duplicate found.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The caller MUST provide:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the list does not contain any multi-Region keys (aws-kms-key-
+arn.md#identifying-an-aws-kms-multi-region-key) this function MUST
+exit successfully.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If there are zero duplicate resource ids between the multi-region
+keys, this function MUST exit successfully
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If any duplicate multi-region resource ids exist, this function MUST
+yield an error that includes all identifiers with duplicate resource
+ids not only the first duplicate found.
+'''
+

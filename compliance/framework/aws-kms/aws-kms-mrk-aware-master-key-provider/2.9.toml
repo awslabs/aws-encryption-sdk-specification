@@ -1,0 +1,106 @@
+target = "compliance/framework/aws-kms/aws-kms-mrk-aware-master-key-provider.txt#2.9"
+
+# 2.9.  Decrypt Data Key
+#
+# The input MUST be the same as the Master Key Provider Decrypt Data
+# Key (../master-key-provider-interface.md#decrypt-data-key) interface.
+# 
+# The set of encrypted data keys MUST first be filtered to match this
+# master key's configuration.  To match the encrypted data key's
+# provider ID MUST exactly match the value "aws-kms".  Additionally
+# each provider info MUST be a valid AWS KMS ARN (aws-kms-key-arn.md#a-
+# valid-aws-kms-arn) with a resource type of "key".
+# 
+# For each encrypted data key in the filtered set, one at a time, the
+# master key provider MUST call Get Master Key (aws-kms-mrk-aware-
+# master-key-provider.md#get-master-key) with the encrypted data key's
+# provider info as the AWS KMS key ARN.  It MUST call Decrypt Data Key
+# (aws-kms-mrk-aware-master-key.md#decrypt-data-key) on this master key
+# with the input algorithm, this single encrypted data key, and the
+# input encryption context.  If this attempt results in an error, then
+# these errors MUST be collected.  If the decrypt data key call is
+# successful, then this function MUST return this result and not
+# attempt to decrypt any more encrypted data keys.
+# 
+# If all the input encrypted data keys have been processed then this
+# function MUST yield an error that includes all the collected errors.
+# 
+# The output MUST be the same as the Master Key Provider Decrypt Data
+# Key (../master-key-provider-interface.md#decrypt-data-key) interface.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The input MUST be the same as the Master Key Provider Decrypt Data
+Key (../master-key-provider-interface.md#decrypt-data-key) interface.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The set of encrypted data keys MUST first be filtered to match this
+master key's configuration.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+To match the encrypted data key's
+provider ID MUST exactly match the value "aws-kms".
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Additionally
+each provider info MUST be a valid AWS KMS ARN (aws-kms-key-arn.md#a-
+valid-aws-kms-arn) with a resource type of "key".
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+For each encrypted data key in the filtered set, one at a time, the
+master key provider MUST call Get Master Key (aws-kms-mrk-aware-
+master-key-provider.md#get-master-key) with the encrypted data key's
+provider info as the AWS KMS key ARN.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+It MUST call Decrypt Data Key
+(aws-kms-mrk-aware-master-key.md#decrypt-data-key) on this master key
+with the input algorithm, this single encrypted data key, and the
+input encryption context.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If this attempt results in an error, then
+these errors MUST be collected.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the decrypt data key call is
+successful, then this function MUST return this result and not
+attempt to decrypt any more encrypted data keys.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If all the input encrypted data keys have been processed then this
+function MUST yield an error that includes all the collected errors.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The output MUST be the same as the Master Key Provider Decrypt Data
+Key (../master-key-provider-interface.md#decrypt-data-key) interface.
+'''
+

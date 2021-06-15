@@ -9,3 +9,6 @@
 # JetBrains IDE artifacts
 .idea/
 venv/
+/.history
+/framework/aws-kms/.refcache
+/.refcache

@@ -1,0 +1,63 @@
+target = "compliance/framework/aws-kms/aws-kms-mrk-aware-master-key.txt#2.11"
+
+# 2.11.  Encrypt Data Key
+#
+# The inputs MUST be the same as the Master Key Encrypt Data Key
+# (../master-key-interface.md#encrypt-data-key) interface.  The master
+# key MUST use the configured AWS KMS client to make an AWS KMS Encrypt
+# (https://docs.aws.amazon.com/kms/latest/APIReference/
+# API_Encrypt.html) request constructed as follows:
+# 
+# *  "KeyId": The configured AWS KMS key identifier.
+# 
+# *  "PlaintextDataKey": The plaintext data key obtained from the
+#    input.
+# 
+# *  "EncryptionContext": the encryption context included in the input.
+# 
+# *  "GrantTokens": The configured grant tokens.
+# 
+# The AWS KMS Encrypt response MUST contain a valid "KeyId".  The
+# response's cipher text blob MUST be used as the "ciphertext" for the
+# encrypted data key.
+# 
+# The output MUST be the same as the Master Key Encrypt Data Key
+# (../master-key-interface.md#encrypt-data-key) interface.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The inputs MUST be the same as the Master Key Encrypt Data Key
+(../master-key-interface.md#encrypt-data-key) interface.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The master
+key MUST use the configured AWS KMS client to make an AWS KMS Encrypt
+(https://docs.aws.amazon.com/kms/latest/APIReference/
+API_Encrypt.html) request constructed as follows:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The AWS KMS Encrypt response MUST contain a valid "KeyId".
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The
+response's cipher text blob MUST be used as the "ciphertext" for the
+encrypted data key.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The output MUST be the same as the Master Key Encrypt Data Key
+(../master-key-interface.md#encrypt-data-key) interface.
+'''
+
