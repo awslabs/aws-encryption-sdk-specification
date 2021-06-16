@@ -1,0 +1,42 @@
+target = "compliance/framework/aws-kms/aws-kms-mrk-aware-symmetric-keyring.txt#2.6"
+
+# 2.6.  Initialization
+#
+# On initialization the caller MUST provide:
+# 
+# *  An AWS KMS key identifier
+# 
+# *  An AWS KMS SDK client
+# 
+# *  An optional list of Grant Tokens
+# 
+# The AWS KMS key identifier MUST NOT be null or empty.  The AWS KMS
+# key identifier MUST be a valid identifier (aws-kms-key-arn.md#a-
+# valid-aws-kms-identifier).  The AWS KMS SDK client MUST NOT be null.
+
+[[spec]]
+level = "MUST"
+quote = '''
+On initialization the caller MUST provide:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The AWS KMS key identifier MUST NOT be null or empty.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The AWS KMS
+key identifier MUST be a valid identifier (aws-kms-key-arn.md#a-
+valid-aws-kms-identifier).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The AWS KMS SDK client MUST NOT be null.
+'''
+

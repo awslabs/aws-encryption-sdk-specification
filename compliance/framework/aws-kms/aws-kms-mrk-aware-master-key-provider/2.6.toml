@@ -1,0 +1,102 @@
+target = "compliance/framework/aws-kms/aws-kms-mrk-aware-master-key-provider.txt#2.6"
+
+# 2.6.  Initialization
+#
+# On initialization the caller MUST provide:
+# 
+# *  An indicator of either strict or discovery mode e.g an.
+#    "isDiscovery" boolean
+# 
+# *  A list of AWS KMS key identifiers, the list may be empty
+# 
+# *  An optional list of AWS KMS grant tokens
+# 
+# *  A method that can take a region string and return an AWS KMS
+#    client e.g. a regional client supplier
+# 
+# *  An optional discovery filter that is an AWS partition and a set of
+#    AWS accounts
+# 
+# *  An optional discovery MRK Region string
+# 
+# The key id list MUST NOT be empty or null in strict mode.  The key id
+# list MUST NOT contain any null or empty string values.  All AWS KMS
+# key identifiers are be passed to Assert AWS KMS MRK are unique (aws-
+# kms-mrk-are-unique.md#Implementation) and the function MUST return
+# success.  A discovery filter MUST NOT be configured in strict mode.
+# A default MRK Region MUST NOT be configured in strict mode.  In
+# discovery mode if a default MRK Region is not configured the AWS SDK
+# Default Region MUST be used.  If an AWS SDK Default Region can not be
+# obtained initialization MUST fail.
+# 
+# The key id list MUST be empty in discovery mode.  The regional client
+# supplier MUST be defined in discovery mode.
+
+[[spec]]
+level = "MUST"
+quote = '''
+On initialization the caller MUST provide:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The key id list MUST NOT be empty or null in strict mode.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The key id
+list MUST NOT contain any null or empty string values.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+All AWS KMS
+key identifiers are be passed to Assert AWS KMS MRK are unique (aws-
+kms-mrk-are-unique.md#Implementation) and the function MUST return
+success.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+A discovery filter MUST NOT be configured in strict mode.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+A default MRK Region MUST NOT be configured in strict mode.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+In
+discovery mode if a default MRK Region is not configured the AWS SDK
+Default Region MUST be used.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If an AWS SDK Default Region can not be
+obtained initialization MUST fail.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The key id list MUST be empty in discovery mode.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The regional client
+supplier MUST be defined in discovery mode.
+'''
+

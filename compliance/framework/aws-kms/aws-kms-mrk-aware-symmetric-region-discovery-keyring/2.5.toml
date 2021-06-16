@@ -1,0 +1,14 @@
+target = "compliance/framework/aws-kms/aws-kms-mrk-aware-symmetric-region-discovery-keyring.txt#2.5"
+
+# 2.5.  Interface
+#
+# MUST implement that AWS Encryption SDK Keyring interface (../keyring-
+# interface.md#interface)
+
+[[spec]]
+level = "MUST"
+quote = '''
+MUST implement that AWS Encryption SDK Keyring interface (../keyring-
+interface.md#interface)
+'''
+
