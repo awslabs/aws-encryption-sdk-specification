@@ -31,7 +31,7 @@ const fileSettings = {
     complianceConfig: standardComplianceParams,
   },
   ".java:": {
-    conditionRemove: /(\*\/)|(\/\*)|(@DisplayName\(\")|(\"\))/g,
+    conditionRemove: /(\*\/)|(\/\*)|(@DisplayName\(\")|(\"\))|(\")|(\"\))/g,
     complianceConfig: standardComplianceParams,
   },
   ".py:": {
