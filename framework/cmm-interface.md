@@ -106,9 +106,8 @@ The encryption materials returned MUST include the following:
 - [Encryption Context](structures.md#encryption-context)
   - The CMM MAY modify the encryption context.
 
-If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm):
-
-- The CMM MUST include a [signing key](structures.md#signing-key).
+If the algorithm suite returned contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
+then the encryption materials returned MUST include a [signing key](structures.md#signing-key).
 
 The CMM MUST ensure that the encryption materials returned are valid.
 
@@ -116,7 +115,8 @@ The CMM MUST ensure that the encryption materials returned are valid.
 - The value of the plaintext data key MUST be non-NULL.
 - The plaintext data key length MUST be equal to the [key derivation input length](algorithm-suites.md#key-derivation-input-length).
 - The encrypted data keys list MUST contain at least one encrypted data key.
-- If the algorithm suite contains a signing algorithm, the encryption materials returned MUST include the generated signing key.
+- If the algorithm suite returned contains a signing algorithm,
+  then the encryption materials returned MUST include the generated signing key.
 
 #### Decrypt Materials
 
@@ -130,7 +130,7 @@ The decryption materials returned MUST include the following:
   - The CMM MAY modify the encryption context.
   - The operations made on the encryption context on the Get Encryption Materials call SHOULD be inverted on the Decrypt Materials call.
 - [Algorithm Suite](algorithm-suites.md)
-  - If the decrypt materials request contains an algorithm suite, the decryption materials returned SHOULD contain the same algorithm suite.
+  - The decryption materials returned SHOULD contain the same algorithm suite as the decrypt materials request.
 
 If the algorithm suite obtained from the decryption request contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
 the decryption materials MUST include the [signature verification key](structures.md#verification-key).
