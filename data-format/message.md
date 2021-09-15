@@ -5,7 +5,10 @@
 
 ## Version
 
-0.1.0-preview
+0.2.0
+
+Note: This is the version of the message specification,
+not the message format.
 
 ## Overview
 

@@ -73,9 +73,6 @@ function extract(filePath) {
   // Convert the markdown file from RFC XML
   execSync(["kramdown-rfc2629", markdownSpecFile, ">", xmlRfcFile].join(" "), {stdio: 'inherit'});
 
-  // Convert the RFC XML to a ietf rfc
-  execSync(["xml2rfc", "-P", xmlRfcFile, "-o", complianceSpec].join(" "), {stdio: 'inherit'});
-
   // An existing spec may exists, clean up first
   try {
     // This will throw if the directory does not exist
@@ -89,6 +86,9 @@ function extract(filePath) {
 
   // make sure the compliance directory exists
   mkdirSync(complianceDir, { recursive: true });
+
+  // Convert the RFC XML to a ietf rfc
+  execSync(["xml2rfc", "-P", xmlRfcFile, "-o", complianceSpec].join(" "), {stdio: 'inherit'});
 
   const args = ["duvet", "extract", `${complianceSpec}`, "-o", "compliance"];
   // extract the specification

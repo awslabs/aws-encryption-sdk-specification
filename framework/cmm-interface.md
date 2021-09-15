@@ -5,7 +5,7 @@
 
 ## Version
 
-0.2.0
+0.3.0
 
 ### Changelog
 
@@ -64,6 +64,7 @@ The encryption materials request MUST include the following:
 
 - [Encryption Context](structures.md#encryption-context)
   - The encryption context provided MAY be empty.
+- [Commitment Policy](../client-apis/client.md#commitment-policy)
 
 The encryption request MAY include the following:
 

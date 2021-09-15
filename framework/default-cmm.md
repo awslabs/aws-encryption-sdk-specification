@@ -5,7 +5,7 @@
 
 ## Version
 
-0.2.1
+0.3.0
 
 ### Changelog
 
@@ -60,18 +60,24 @@ The [keyring](keyring-interface.md) this CMM uses to
 ### Get Encryption Materials
 
 This operation will add a key-value pair
-to the encryption context included in the request
+to the encryption context included in the [encryption materials request](cmm-interface.md#encryption-materials-request)
 using the key `aws-crypto-public-key`.
-If the encryption context included in the request
+Adding the key `aws-crypto-public-key` SHOULD be done to a copy of the encryption context
+so that the caller's encryption context is not mutated.
+If the encryption context included in the [encryption materials request](cmm-interface.md#encryption-materials-request)
 already contains the `aws-crypto-public-key` key,
 this operation MUST fail rather than overwrite the associated value.
 
-- If the encryption materials request does not contain an algorithm suite,
-  the algorithm suite with algorithm suite ID [03 78 (hex)](algorithm-suites.md#supported-algorithm-suites)
+- If the [encryption materials request](cmm-interface.md#encryption-materials-request) does not contain an algorithm suite,
+  the default algorithm suite for the [commitment policy](../client-apis/client.md#commitment-policy) on the request
   MUST be added as the algorithm suite in the encryption materials returned.
-- If the encryption materials request does contain an algorithm suite, the encryption materials returned MUST contain the same algorithm suite.
+- If the [encryption materials request](cmm-interface.md#encryption-materials-request) does contain an algorithm suite,
+  the request MUST fail if the algorithm suite is not supported by the [commitment policy](../client-apis/client.md#commitment-policy) on the request.
+- If the [encryption materials request](cmm-interface.md#encryption-materials-request) does contain an algorithm suite,
+  the encryption materials returned MUST contain the same algorithm suite.
 
-If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm), the default CMM MUST:
+If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
+the default CMM MUST:
 
 - Generate a [signing key](structures.md#signing-key)
 - Add the following key-value pair to the [encryption context](structures.md#encryption-context):
@@ -87,7 +93,7 @@ The default CMM MUST obtain the following from the response:
 - Plaintext Data Key
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
 
-The values obtained above MUST be included in the encryption materials returned.
+The values obtained above MUST be included in the [encryption materials](structures.md#encryption-materials) returned.
 
 ### Decrypt Materials
 

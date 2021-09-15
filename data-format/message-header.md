@@ -33,7 +33,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Structure
 
-The message header is a sequence of bytes in big-endian format.
+The message header is a sequence of bytes that MUST be in big-endian format.
 The following table describes the fields that form the header.
 The bytes are appended in the order shown.
 
@@ -44,12 +44,14 @@ The bytes are appended in the order shown.
 
 ### Header Body
 
-The following table describes the fields that form the header body.
+#### Header Body Version 1.0
+
+The following table describes the fields that form the Version 1.0 header body.
 The bytes are appended in the order shown.
 
 | Field                                       | Length (bytes)                                                                    | Interpreted as                                                                                |
 | ------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [Version](#version)                         | 1                                                                                 | See [Supported Versions](#supported-versions)                                                 |
+| [Version](#version)                         | 1                                                                                 | See [Supported Versions](#supported-versions) (MUST be `01` in version 1.0 Headers)           |
 | [Type](#type)                               | 1                                                                                 | See [Supported Types](#supported-types)                                                       |
 | [Algorithm Suite ID](#algorithm-suite-id)   | 2                                                                                 | See [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) |
 | [Message ID](#message-id)                   | 16                                                                                | Bytes                                                                                         |
@@ -60,21 +62,38 @@ The bytes are appended in the order shown.
 | [IV Length](#iv-length)                     | 1                                                                                 | UInt8                                                                                         |
 | [Frame Length](#frame-length)               | 4                                                                                 | UInt32                                                                                        |
 
+#### Header Body Version 2.0
+
+The following table describes the fields that form the Version 2.0 header body.
+The bytes are appended in the order shown.
+
+| Field                                         | Length (bytes)                                                                    | Interpreted as                                                                                |
+| --------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [Version](#version)                           | 1                                                                                 | See [Supported Versions](#supported-versions) (MUST be `02` in version 2.0 Headers)           |
+| [Algorithm Suite ID](#algorithm-suite-id)     | 2                                                                                 | See [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) |
+| [Message ID](#message-id)                     | 16                                                                                | Bytes                                                                                         |
+| [AAD](#aad)                                   | Variable. [Self-describing](#aad).                                                | [AAD](#aad)                                                                                   |
+| [Encrypted Data Keys](#encrypted-data-keys)   | Variable. Determined by the number of encrypted data keys and the length of each. | [Encrypted Data Keys](#encrypted-data-keys)                                                   |
+| [Content Type](#content-type)                 | 1                                                                                 | See [Supported Types](#supported-content-types)                                               |
+| [Frame Length](#frame-length)                 | 4                                                                                 | UInt32                                                                                        |
+| [Algorithm Suite Data](#algorithm-suite-data) | Variable. Determined by the Algorithm Suite ID                                    | See [Algorithm Suite Data](../framework/algorithm-suites.md#algorithm-suite-data)             |
+
 #### Version
 
 The version of the message format.
-The value (hex) of this field MUST be a value that exists in the following table:
+The version (hex) of this field MUST be a value that exists in the following table:
 
 ##### Supported Versions
 
 | Value (hex) | Version |
 | ----------- | ------- |
 | 01          | 1.0     |
+| 02          | 2.0     |
 
 #### Type
 
 The type of the message format.
-The value (hex) of this field MUST be a value that exists in the following table:
+The type (hex) of this field MUST be a value that exists in the following table:
 
 ##### Supported Types
 
@@ -90,7 +109,7 @@ The value (hex) of this field MUST be a value that exists in the
 
 #### Message ID
 
-A value that MUST uniquely identify the [message](message.md).
+A Message ID MUST uniquely identify the [message](message.md).
 While implementations cannot guarantee complete uniqueness,
 implementations MUST use a good source of randomness when generating messages IDs in order to make
 the chance of duplicate IDs negligible.
@@ -232,10 +251,16 @@ The value (hex) of this field MUST be a value that exists in the following table
 | 01          | [Non-Framed](message-body.md#non-framed-data) |
 | 02          | [Framed](message-body.md#framed-data)         |
 
+### Algorithm Suite Data
+
+A variable length byte sequence interpreted according to the algorithm suite.
+The length of the suite data field MUST be equal to the [Algorithm Suite Data Length](../framework/algorithm-suites.md#algorithm-suite-data-length) value
+of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.
+
 #### Reserved
 
-A reserved sequence of 4 bytes.
-The value (hex) of this field MUST be `00 00 00 00`.
+A reserved sequence of 4 bytes
+that MUST have the value (hex) of `00 00 00 00`.
 
 #### IV Length
 
@@ -252,12 +277,23 @@ When the [content type](#Content-Type) is non-framed, the value of this field MU
 
 The header authentication contains fields used for authentication of the [header body](#header-body).
 
+#### Header Authentication Version 1.0
+
 The following table describes the fields that form the header authentication.
 The bytes are appended in the order shown.
 
 | Field                                     | Length, in bytes                                                                                                                                                                              | Interpreted as |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | [IV](#iv)                                 | Variable. Determined by the IV length value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.                      | Bytes          |
+| [Authentication Tag](#authentication-tag) | Variable. Determined by the byte value of the authentication tag of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
+
+#### Header Authentication Version 2.0
+
+The following table describes the fields that form the header authentication.
+The bytes are appended in the order shown.
+
+| Field                                     | Length, in bytes                                                                                                                                                                              | Interpreted as |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | [Authentication Tag](#authentication-tag) | Variable. Determined by the byte value of the authentication tag of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
 
 #### IV

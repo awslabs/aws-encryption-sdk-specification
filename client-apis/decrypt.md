@@ -5,7 +5,7 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
 
@@ -210,6 +210,10 @@ release any parsed information from the header.
 
 ### Get the decryption materials
 
+If the parsed [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id)
+is not supported by the [commitment policy](client.md#commitment-policy)
+configured in the [client](client.md) decrypt MUST yield an error.
+
 To verify the message header and decrypt the message body,
 a set of valid decryption materials is required.
 
@@ -233,7 +237,15 @@ MUST be constructed as follows:
 
 The data key used as input for all decryption described below is a data key derived from the plaintext data key
 included in the [decryption materials](../framework/structures.md#decryption-materials).
-The algorithm used to derive a data key from the plaintext data key MUST be
+The algorithm suite used as input for all decryption described below is a algorithm suite
+included in the [decryption materials](../framework/structures.md#decryption-materials).
+If the algorithm suite is not supported by the [commitment policy](client.md#commitment-policy)
+configured in the [client](client.md) decrypt MUST yield an error.
+If the [algorithm suite](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) supports [key commitment](../framework/algorithm-suites.md#key-commitment)
+then the [commit key](../framework/algorithm-suites.md#commit-key) MUST be derived from the plaintext data key
+using the [commit key derivation](../framework/algorithm-suites.md#algorithm-suites-commit-key-derivation-settings).
+The derived commit key MUST equal the commit key stored in the message header.
+The algorithm suite used to derive a data key from the plaintext data key MUST be
 the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-algorithm) included in the
 [algorithm suite](../framework/algorithm-suites.md) associated with
 the returned decryption materials.

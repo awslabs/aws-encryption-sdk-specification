@@ -5,7 +5,7 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
 
@@ -45,7 +45,7 @@ The following inputs to this behavior are REQUIRED:
 - [Plaintext](#plaintext)
 - Either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
 
-The following inputs to this behavior are OPTIONAL:
+The following inputs to this behavior MUST be OPTIONAL:
 
 - [Algorithm Suite](#algorithm-suite)
 - [Encryption Context](#encryption-context)
@@ -95,7 +95,8 @@ The [algorithm suite](#algorithm-suite.md) that SHOULD be used for encryption.
 ### Frame Length
 
 The [frame length](../data-format/message-header.md#frame-length) to use for [framed data](../data-format/message-body.md).
-This value MUST NOT exceed the value 2^32 - 1.
+This value MUST be greater than 0 and MUST NOT exceed the value 2^32 - 1.
+This value MUST default to 4096 bytes.
 
 ### Plaintext Length Bound
 
@@ -156,8 +157,8 @@ The Encrypt operation is divided into several distinct steps:
 - [Construct the signature](#construct-the-signature)
   - If the [encryption materials gathered](#get-the-encryption-materials) has a algorithm suite
     including a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
-    this operation MUST perform this step.
-    Otherwise this operation MUST NOT perform this step.
+    the encrypt operation MUST perform this step.
+    Otherwise the encrypt operation MUST NOT perform this step.
 
 This operation MUST perform all the above steps unless otherwise specified,
 and it MUST perform them in the above order.
@@ -169,6 +170,10 @@ MUST NOT be added to the output message.
 If any of these steps fails, this operation MUST halt and indicate a failure to the caller.
 
 ### Get the encryption materials
+
+If an [input algorithm suite](#algorithm-suite) is provided
+that is not supported by the [commitment policy](client.md#commitment-policy)
+configured in the [client](client.md) encrypt MUST yield an error.
 
 To construct the [encrypted message](#encrypted-message),
 some fields MUST be constructed using information obtained
@@ -184,6 +189,7 @@ on that CMM MUST be constructed as follows:
 
 - Encryption Context: If provided, this is the [input encryption context](#encryption-context).
   Otherwise, this is an empty encryption context.
+- Commitment Policy: The [commitment policy](client.md#commitment-policy) configured in the [client](client.md) exposing this encrypt function.
 - Algorithm Suite: If provided, this is the [input algorithm suite](#algorithm-suite).
   Otherwise, this field is not included.
 - Max Plaintext Length: If the [input plaintext](#plaintext) has known length,
@@ -197,6 +203,8 @@ MUST be the algorithm suite in the [encryption materials](../framework/structure
 returned from the [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) call.
 Note that the algorithm suite in the retrieved encryption materials MAY be different
 from the [input algorithm suite](#algorithm-suite).
+If this [algorithm suite](../framework/algorithm-suites.md) is not supported by the [commitment policy](client.md#commitment-policy)
+configured in the [client](client.md) encrypt MUST yield an error.
 
 The data key used as input for all encryption described below is a data key derived from the plaintext data key
 included in the [encryption materials](../framework/structures.md#encryption-materials).
@@ -214,8 +222,30 @@ default to.
 
 ### Construct the header
 
-Before encrypting input plaintext, this operation MUST serialize the [message header body](../data-format/message-header.md)
-with the following specifics:
+Before encrypting input plaintext,
+this operation MUST serialize the [message header body](../data-format/message-header.md).
+The [message format version](../data-format/message-header.md#supported-versions) MUST be associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites).
+
+If the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 2.0
+then the [message header body](../data-format/message-header.md#header-body-version-1-0) MUST be serialized with the following specifics:
+
+- [Version](../data-format/message-header.md#version-1): MUST have a value corresponding to
+  [2.0](../data-format/message-header.md#supported-versions)
+- [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST correspond to
+  the [algorithm suite](../framework/algorithm-suites.md) used in this behavior
+- [Message ID](../data-format/message-header.md#message-id): The process used to generate
+  this identifier MUST use a good source of randomness to make the chance of duplicate identifiers negligible.
+- [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
+  in the [encryption materials](../framework/structures.md#encryption-materials)
+- [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
+  [encrypted data keys](../framework/structures.md#encrypted-data-keys) in the [encryption materials](../framework/structures.md#encryption-materials)
+- [Content Type](../data-format/message-header.md#content-type): MUST be [02](../data-format/message-header.md#supported-content-types)
+- [Frame Length](../data-format/message-header.md#frame-length): MUST be the value of the frame size determined above.
+- [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data): MUST be the value of the [commit key](../framework/algorithm-suites.md#commit-key)
+  derived according to the [algorithm suites commit key derivation settings](../framework/algorithm-suites.md#algorithm-suites-commit-key-derivation-settings).
+
+If the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 1.0
+then the [message header body](../data-format/message-header.md#header-body-version-1-0) MUST be serialized with the following specifics:
 
 - [Version](../data-format/message-header.md#version-1): MUST have a value corresponding to
   [1.0](../data-format/message-header.md#supported-versions)
@@ -245,9 +275,15 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
 - The cipherkey is the derived data key
 - The plaintext is an empty byte array
 
-With the authentication tag calculated, this operation MUST serialize the
-[message header authentication](../data-format/message-header.md#header-authentication)
-with the following specifics.
+With the authentication tag calculated,
+if the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 2.0,
+this operation MUST serialize the [message header authentication](../data-format/message-header.md#header-authentication-version-2-0) with the following specifics:
+
+- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
+  of the authentication tag calculated above.
+
+If the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 1.0
+this operation MUST serialize the [message header authentication](../data-format/message-header.md#header-authentication-version-1-0) with the following specifics:
 
 - [IV](../data-format/message-header.md#iv): MUST have the value of the IV used in the calculation above,
   padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
