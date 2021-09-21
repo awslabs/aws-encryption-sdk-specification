@@ -31,8 +31,14 @@ because anything a client encrypts can be decrypted by the same client.
 ## Initialization
 
 On client initialization,
-the caller MUST have the option to provide a [commitment policy](#commitment-policy).
+the caller MUST have the option to provide a:
+
+- [commitment policy](#commitment-policy)
+- [maximum number of encrypted data keys](#maximum-number-of-encrypted-data-keys)
+
 If no [commitment policy](#commitment-policy) is provided the default MUST be [REQUIRE_ENCRYPT_REQUIRE_DECRYPT](../framework/algorithm-suites.md#require_encrypt_require_decrypt).
+If no [maximum number of encrypted data keys](#maximum-number-of-encrypted-data-keys) is provided
+the default MUST result in no limit on the number of encrypted data keys (aside from the limit imposed by the [message format](../format/message-header.md)).
 
 Once a [commitment policy](#commitment-policy) has been set it SHOULD be immutable.
 
@@ -50,6 +56,12 @@ The AWS Encryption SDK MUST provide the following commitment policies:
 - FORBID_ENCRYPT_ALLOW_DECRYPT
 - REQUIRE_ENCRYPT_ALLOW_DECRYPT
 - REQUIRE_ENCRYPT_REQUIRE_DECRYPT
+
+### Maximum Number Of Encrypted Data Keys
+
+A AWS Encryption SDK message can contain multiple encrypted data keys.
+This is the maximum number of encrypted data keys that the client will attempt to unwrap.
+Callers MUST have a way to disable this limit.
 
 #### FORBID_ENCRYPT_ALLOW_DECRYPT
 

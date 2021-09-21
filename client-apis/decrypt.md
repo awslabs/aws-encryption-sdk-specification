@@ -209,6 +209,12 @@ deserializing those bytes according to the [message format](../data-format/messa
 This operation MUST attempt to deserialize all consumable encrypted message bytes until it has
 successfully deserialized a valid [message header](../data-format/message-header.md).
 
+If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys)
+deserialized from the [message header](../data-format/message-header.md)
+is greater than the [maximum number of encrypted data keys](client.md#maximum-number-of-encrypted-data-keys) configured in the [client](client.md),
+then as soon as that can be determined during deserializing
+decrypt MUST process no more bytes and yield an error.
+
 This operation MUST wait if it doesn't have enough consumable encrypted message bytes to
 deserialize the next field of the message header until enough input bytes become consumable or
 the caller indicates an end to the encrypted message.

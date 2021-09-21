@@ -205,6 +205,8 @@ Note that the algorithm suite in the retrieved encryption materials MAY be diffe
 from the [input algorithm suite](#algorithm-suite).
 If this [algorithm suite](../framework/algorithm-suites.md) is not supported by the [commitment policy](client.md#commitment-policy)
 configured in the [client](client.md) encrypt MUST yield an error.
+If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys) on the [encryption materials](../framework/structures.md#encryption-materials)
+is greater than the [maximum number of encrypted data keys](client.md#maximum-number-of-encrypted-data-keys) configured in the [client](client.md) encrypt MUST yield an error.
 
 The data key used as input for all encryption described below is a data key derived from the plaintext data key
 included in the [encryption materials](../framework/structures.md#encryption-materials).
