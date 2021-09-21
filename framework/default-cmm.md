@@ -9,6 +9,10 @@
 
 ### Changelog
 
+- 0.3.0
+
+  - Clarify handling of the `aws-crypto-public-key` encryption context key.
+
 - 0.2.1
 
   - [Record how the default CMM uses master key providers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/98)
@@ -98,7 +102,14 @@ The values obtained above MUST be included in the [encryption materials](structu
 ### Decrypt Materials
 
 If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
-the default CMM MUST remove the verification key from the encryption context.
+the default CMM MUST extract the verification key
+from the encryption context under the reserved `aws-crypto-public-key` key.
+If this key is not present in the encryption context, the operation MUST fail
+without returning any decryption materials.
+
+If the algorithm suite does not contain a [signing algorithm](algorithm-suites.md#signature-algorithm),
+but the encryption context includes the reserved `aws-crypto-public-key` key,
+the operation MUST fail without returning any decryption materials.
 
 On each call to Decrypt Materials,
 the default CMM MUST make a call to its [keyring's](#keyring)

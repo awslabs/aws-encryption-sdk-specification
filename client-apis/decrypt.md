@@ -9,6 +9,10 @@
 
 ### Changelog
 
+- 0.4.0
+
+  - Add unsigned streaming decryption option
+
 - 0.3.0
 
   - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
@@ -192,6 +196,10 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 - If this operation successfully completes the above steps
   but there are consumable bytes which are intended to be decrypted,
   this operation MUST fail.
+- The ESDK MUST provide a configuration option that causes the decryption operation
+  to fail immediately after parsing the header if a signed algorithm suite is used.
+  This can be used to ensure that data not yet [verified as signed data](#security-considerations)
+  is never released early.
 
 ### Parse the header
 

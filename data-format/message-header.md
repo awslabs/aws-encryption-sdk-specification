@@ -5,7 +5,17 @@
 
 ## Version
 
-See [Message Version](message.md#version).
+0.1.1
+
+### Changelog
+
+- 0.1.1
+
+  - Include `aws-crypto-public-key` encryption context key.
+
+- 0.1.0-preview
+
+  - Initial record
 
 ## Implementations
 
@@ -126,6 +136,10 @@ The purpose of the message ID is to:
 
 The Additional Authenticated Data (AAD) for the header.
 This AAD is an encoding of the [encryption context](../framework/structures.md#encryption-context).
+
+When algorithms with signing are used,
+the encryption context MUST contain the key-value pair {`aws-crypto-public-key`, `Qtxt`},
+where `Qtxt` is the base64-encoded serialized form of the [signature verification key](../framework/algorithm-suites.md#ecdsa).
 
 The following table describes the fields that form the AAD.
 The bytes are appended in the order shown.
