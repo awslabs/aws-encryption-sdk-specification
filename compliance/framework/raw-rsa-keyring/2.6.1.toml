@@ -1,0 +1,92 @@
+target = "compliance/framework/raw-rsa-keyring.txt#2.6.1"
+
+# 2.6.1.  OnEncrypt
+#
+# OnEncrypt MUST fail if this keyring does not have a specified public
+# key (Section 2.5.2).  The keyring MUST NOT derive a public key from a
+# specified private key (Section 2.5.3).
+# 
+# OnEncrypt MUST take encryption materials (structures.md#encryption-
+# materials) as input.
+# 
+# If the encryption materials (structures.md#encryption-materials) do
+# not contain a plaintext data key, OnEncrypt MUST generate a random
+# plaintext data key and set it on the encryption materials
+# (structures.md#encryption-materials).
+# 
+# The keyring MUST attempt to encrypt the plaintext data key in the
+# encryption materials (structures.md#encryption-materials) using RSA.
+# The keyring performs RSA encryption (Section 2.4.2) with the
+# following specifics:
+# 
+# *  This keyring's public key (Section 2.5.2) is the RSA public key.
+# 
+# *  This keyring's padding scheme (Section 2.5.1.1) is the RSA padding
+#    scheme.
+# 
+# *  The plaintext data key is the plaintext input to RSA encryption.
+# 
+# If RSA encryption was successful, OnEncrypt MUST return the input
+# encryption materials (structures.md#encryption-materials), modified
+# in the following ways:
+# 
+# *  The encrypted data key list has a new encrypted data key added,
+#    constructed as follows:
+# 
+#    -  The key provider ID (structures.md#key-provider-id) field is
+#       this keyring's key namespace (keyring-interface.md#key-
+#       namespace).
+# 
+#    -  The key provider information (structures.md#key-provider-
+#       information) field is this keyring's key name (keyring-
+#       interface.md#key-name).
+# 
+#    -  The ciphertext (structures.md#ciphertext) field is the
+#       ciphertext output by the RSA encryption of the plaintext data
+#       key.
+
+[[spec]]
+level = "MUST"
+quote = '''
+OnEncrypt MUST fail if this keyring does not have a specified public
+key (Section 2.5.2).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The keyring MUST NOT derive a public key from a
+specified private key (Section 2.5.3).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+OnEncrypt MUST take encryption materials (structures.md#encryption-
+materials) as input.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the encryption materials (structures.md#encryption-materials) do
+not contain a plaintext data key, OnEncrypt MUST generate a random
+plaintext data key and set it on the encryption materials
+(structures.md#encryption-materials).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The keyring MUST attempt to encrypt the plaintext data key in the
+encryption materials (structures.md#encryption-materials) using RSA.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If RSA encryption was successful, OnEncrypt MUST return the input
+encryption materials (structures.md#encryption-materials), modified
+in the following ways:
+'''
+

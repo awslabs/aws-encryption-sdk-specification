@@ -1,0 +1,27 @@
+target = "compliance/client-apis/decrypt.txt#2.5"
+
+# 2.5.  Input
+#
+# The client MUST require the following as inputs to this operation:
+# 
+# *  Encrypted Message (Section 2.5.1)
+# 
+# The client MUST require exactly one of the following types of inputs:
+# 
+# *  Cryptographic Materials Manager (CMM) (../framework/cmm-
+#    interface.md)
+# 
+# *  Keyring (../framework/keyring-interface.md)
+
+[[spec]]
+level = "MUST"
+quote = '''
+The client MUST require the following as inputs to this operation:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The client MUST require exactly one of the following types of inputs:
+'''
+

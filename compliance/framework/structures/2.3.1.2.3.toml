@@ -1,0 +1,22 @@
+target = "compliance/framework/structures.txt#2.3.1.2.3"
+
+# 2.3.1.2.3.  Ciphertext
+#
+# An opaque value from which an appropriate key provider can obtain the
+# plaintext data key.
+# 
+# Some key provider MUST be capable of deterministically obtaining the
+# plaintext key from the ciphertext.
+# 
+# Most commonly this is an encrypted form of the plaintext data key.
+# Alternatively, it could be the public input to a KDF that derives the
+# plaintext data key or an identifier into a key store that will return
+# the plaintext data key.
+
+[[spec]]
+level = "MUST"
+quote = '''
+Some key provider MUST be capable of deterministically obtaining the
+plaintext key from the ciphertext.
+'''
+

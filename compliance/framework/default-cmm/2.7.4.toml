@@ -1,0 +1,17 @@
+target = "compliance/framework/default-cmm.txt#2.7.4"
+
+# 2.7.4.  Decrypt Materials (master key provider)
+#
+# In place of calling its keyring's On Decrypt (keyring-
+# interface.md#ondecrypt) operation:
+# 
+# The default CMM MUST call its master key provider's Decrypt Data Key
+# (master-key-provider-interface.md#decrypt-data-key) operation.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The default CMM MUST call its master key provider's Decrypt Data Key
+(master-key-provider-interface.md#decrypt-data-key) operation.
+'''
+

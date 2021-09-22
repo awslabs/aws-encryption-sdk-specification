@@ -1,0 +1,22 @@
+target = "compliance/framework/master-key-provider-interface.txt#2.3.1"
+
+# 2.3.1.  Legacy
+#
+# This is a legacy specification.  Master key providers SHOULD NOT be
+# included in any additional implementations.  Any new implementations
+# MUST include Keyrings (./keyring-interface.md) instead.
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+Master key providers SHOULD NOT be
+included in any additional implementations.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Any new implementations
+MUST include Keyrings (./keyring-interface.md) instead.
+'''
+

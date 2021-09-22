@@ -1,0 +1,25 @@
+target = "compliance/framework/structures.txt#2.3.3.2"
+
+# 2.3.3.2.  Structure
+#
+# Encryption materials are a structure containing materials needed for
+# encryption (../client-apis/encrypt.md).  This structure MAY include
+# any of the following fields:
+# 
+# *  Algorithm Suite (Section 2.3.3.2.1)
+# 
+# *  Encrypted Data Keys (Section 2.3.3.2.2)
+# 
+# *  Encryption Context (Section 2.3.3.2.3)
+# 
+# *  Plaintext Data Key (Section 2.3.3.2.4)
+# 
+# *  Signing Key (Section 2.3.3.2.5)
+
+[[spec]]
+level = "MAY"
+quote = '''
+This structure MAY include
+any of the following fields:
+'''
+

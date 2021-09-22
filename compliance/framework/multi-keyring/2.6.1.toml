@@ -1,0 +1,39 @@
+target = "compliance/framework/multi-keyring.txt#2.6.1"
+
+# 2.6.1.  Generator Keyring
+#
+# A keyring (keyring-interface.md) that can generate data keys
+# (keyring-interface.md#generate-data-key).
+# 
+# This keyring MUST implement the Generate Data Key (keyring-
+# interface.md#generate-data-key) behavior during OnEncrypt (keyring-
+# interface.md#onencrypt).  This means that this keyring MUST return
+# encryption materials (structures.md#encryption-materials) containing
+# a plaintext data key on OnEncrypt (keyring-interface.md#onencrypt).
+# 
+# If the list of child keyrings (Section 2.6.2) is empty, a generator
+# keyring (Section 2.6.1) MUST be defined for the keyring.
+
+[[spec]]
+level = "MUST"
+quote = '''
+This keyring MUST implement the Generate Data Key (keyring-
+interface.md#generate-data-key) behavior during OnEncrypt (keyring-
+interface.md#onencrypt).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+This means that this keyring MUST return
+encryption materials (structures.md#encryption-materials) containing
+a plaintext data key on OnEncrypt (keyring-interface.md#onencrypt).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the list of child keyrings (Section 2.6.2) is empty, a generator
+keyring (Section 2.6.1) MUST be defined for the keyring.
+'''
+

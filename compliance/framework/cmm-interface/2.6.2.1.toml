@@ -1,0 +1,164 @@
+target = "compliance/framework/cmm-interface.txt#2.6.2.1"
+
+# 2.6.2.1.  Get Encryption Materials
+#
+# When the CMM gets an encryption materials request (Section 2.6.1.1),
+# it MUST return encryption materials (structures.md#encryption-
+# materials) appropriate for the request.
+# 
+# The encryption materials returned MUST include the following:
+# 
+# *  Algorithm Suite (algorithm-suites.md)
+# 
+#    -  If the encryption materials request contains an algorithm
+#       suite, the encryption materials returned SHOULD contain the
+#       same algorithm suite.
+# 
+# *  Plaintext Data Key
+# 
+# *  Encrypted Data Keys (structures.md#encrypted-data-keys)
+# 
+#    -  Every encrypted data key in this list MUST correspond to the
+#       above plaintext data key.
+# 
+# *  Encryption Context (structures.md#encryption-context)
+# 
+#    -  The CMM MAY modify the encryption context.
+# 
+# If the algorithm suite contains a signing algorithm (algorithm-
+# suites.md#signature-algorithm):
+# 
+# *  The CMM MUST include a signing key (structures.md#signing-key).
+# 
+# *  The CMM SHOULD also add a key-value pair using the reserved key
+#    "aws-crypto-public-key" to the encryption context.  If it does,
+#    the mapped value SHOULD be the signature verification key
+#    corresponding to the signing key.
+# 
+# If the algorithm suite does not contain a signing algorithm
+# (algorithm-suites.md#signature-algorithm):
+# 
+# *  The CMM SHOULD NOT add a key-value pair using the reserved key
+#    "aws-crypto-public-key" to the encryption context.
+# 
+# The CMM MUST ensure that the encryption materials returned are valid.
+# 
+# *  The encryption materials returned MUST follow the specification
+#    for encryption-materials (structures.md#encryption-materials).
+# 
+# *  The value of the plaintext data key MUST be non-NULL.
+# 
+# *  The plaintext data key length MUST be equal to the key derivation
+#    input length (algorithm-suites.md#key-derivation-input-length).
+# 
+# *  The encrypted data keys list MUST contain at least one encrypted
+#    data key.
+# 
+# *  If the algorithm suite contains a signing algorithm, the
+#    encryption materials returned MUST include the generated signing
+#    key.
+
+[[spec]]
+level = "MUST"
+quote = '''
+When the CMM gets an encryption materials request (Section 2.6.1.1),
+it MUST return encryption materials (structures.md#encryption-
+materials) appropriate for the request.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The encryption materials returned MUST include the following:
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+-  If the encryption materials request contains an algorithm
+suite, the encryption materials returned SHOULD contain the
+same algorithm suite.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+-  Every encrypted data key in this list MUST correspond to the
+above plaintext data key.
+'''
+
+[[spec]]
+level = "MAY"
+quote = '''
+-  The CMM MAY modify the encryption context.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The CMM MUST include a signing key (structures.md#signing-key).
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+*  The CMM SHOULD also add a key-value pair using the reserved key
+"aws-crypto-public-key" to the encryption context.
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+If it does,
+the mapped value SHOULD be the signature verification key
+corresponding to the signing key.
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+*  The CMM SHOULD NOT add a key-value pair using the reserved key
+"aws-crypto-public-key" to the encryption context.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The CMM MUST ensure that the encryption materials returned are valid.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The encryption materials returned MUST follow the specification
+for encryption-materials (structures.md#encryption-materials).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The value of the plaintext data key MUST be non-NULL.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The plaintext data key length MUST be equal to the key derivation
+input length (algorithm-suites.md#key-derivation-input-length).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The encrypted data keys list MUST contain at least one encrypted
+data key.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  If the algorithm suite contains a signing algorithm, the
+encryption materials returned MUST include the generated signing
+key.
+'''
+

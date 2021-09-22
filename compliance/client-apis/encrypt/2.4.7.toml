@@ -1,0 +1,17 @@
+target = "compliance/client-apis/encrypt.txt#2.4.7"
+
+# 2.4.7.  Plaintext Length Bound
+#
+# A bound on the length of Section 2.4.1 with an unknown length to
+# encrypt.
+# 
+# If this input is provided, this operation MUST NOT encrypt a
+# plaintext with length greater than this value.
+
+[[spec]]
+level = "MUST"
+quote = '''
+If this input is provided, this operation MUST NOT encrypt a
+plaintext with length greater than this value.
+'''
+

@@ -1,0 +1,34 @@
+target = "compliance/data-format/message-header.txt#2.5.1.7.2"
+
+# 2.5.1.7.2.  Key Value Pairs
+#
+# The encoding of the key-value pairs of the encryption context
+# (../framework/structures.md#encryption-context).  When the encryption
+# context (../framework/structures.md#encryption-context) is empty,
+# this field MUST NOT be included in the Section 2.5.1.7.
+# 
+# The following table describes the fields that form the Key Value
+# Pairs.  The bytes are appended in the order shown.
+# 
+#   +==================+=========================+==================+
+#   | Field            | Length (bytes)          | Interpreted as   |
+#   +==================+=========================+==================+
+#   | Key Value Pair   | 2                       | UInt16           |
+#   | Count (Section   |                         |                  |
+#   | 2.5.1.7.2.1)     |                         |                  |
+#   +------------------+-------------------------+------------------+
+#   | Key Value Pair   | Variable.  Determined   | Key Value Pair   |
+#   | Entries (Section | by the count and length | Entries (Section |
+#   | 2.5.1.7.2.2)     | of each key-value pair. | 2.5.1.7.2.2)     |
+#   +------------------+-------------------------+------------------+
+# 
+#                                Table 7
+
+[[spec]]
+level = "MUST"
+quote = '''
+When the encryption
+context (../framework/structures.md#encryption-context) is empty,
+this field MUST NOT be included in the Section 2.5.1.7.
+'''
+

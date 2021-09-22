@@ -1,0 +1,57 @@
+target = "compliance/framework/master-key-provider-interface.txt#2.5.2"
+
+# 2.5.2.  Get Master Keys For Encryption
+#
+# This interface provides a way for a master key provider to indicate
+# which master keys SHOULD be used for encryption.
+# 
+# Inputs to this interface MUST include the encryption context.
+# 
+# Inputs MAY include the plaintext body and plaintext size.
+# 
+# The output of this interface MUST include a list of all master keys
+# that SHOULD be used for encryption.
+# 
+# The output of this interface MUST indicate which one of those master
+# keys MUST be used to generate the data key.
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+This interface provides a way for a master key provider to indicate
+which master keys SHOULD be used for encryption.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Inputs to this interface MUST include the encryption context.
+'''
+
+[[spec]]
+level = "MAY"
+quote = '''
+Inputs MAY include the plaintext body and plaintext size.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The output of this interface MUST include a list of all master keys
+that SHOULD be used for encryption.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The output of this interface MUST indicate which one of those master
+keys MUST be used to generate the data key.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The output of this interface MUST indicate which one of those master
+keys MUST be used to generate the data key.
+'''
+

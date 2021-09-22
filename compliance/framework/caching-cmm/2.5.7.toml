@@ -1,0 +1,34 @@
+target = "compliance/framework/caching-cmm.txt#2.5.7"
+
+# 2.5.7.  Usage Stats
+#
+# The usage stats contains two fields:
+# 
+# *  Messages Encrypted (Section 2.5.7.1)
+# 
+# *  Bytes Encrypted (Section 2.5.7.2)
+# 
+# When the caching CMM stores encryption materials into the
+# cryptographic materials cache, the caching CMM MUST set the initial
+# usage stats for the cache entry.
+# 
+# When the caching CMM obtains encryption materials from the
+# cryptographic materials cache, the caching CMM MUST update the usage
+# stats for the cache entry retrieved.
+
+[[spec]]
+level = "MUST"
+quote = '''
+When the caching CMM stores encryption materials into the
+cryptographic materials cache, the caching CMM MUST set the initial
+usage stats for the cache entry.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+When the caching CMM obtains encryption materials from the
+cryptographic materials cache, the caching CMM MUST update the usage
+stats for the cache entry retrieved.
+'''
+

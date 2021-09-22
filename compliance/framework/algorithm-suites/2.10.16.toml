@@ -1,0 +1,14 @@
+target = "compliance/framework/algorithm-suites.txt#2.10.16"
+
+# 2.10.16.  Algorithm Suite Data Length
+#
+# Then length of the algorithm suite data (Section 2.10.15).  The field
+# is always present in message format 2.0, but its length and contents
+# are determined by the algorithm suite.  The field MAY be length 0.
+
+[[spec]]
+level = "MAY"
+quote = '''
+The field MAY be length 0.
+'''
+

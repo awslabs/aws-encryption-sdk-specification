@@ -1,0 +1,18 @@
+target = "compliance/data-format/message-body.txt#2.5.2.1.3"
+
+# 2.5.2.1.3.  Encrypted Content
+#
+# The encrypted data for each frame, as returned by the The length of
+# the encrypted content of a Regular Frame MUST be equal to the Frame
+# Length.encryption algorithm (../framework/algorithm-
+# suites.md#encryption-algorithm).
+
+[[spec]]
+level = "MUST"
+quote = '''
+The encrypted data for each frame, as returned by the The length of
+the encrypted content of a Regular Frame MUST be equal to the Frame
+Length.encryption algorithm (../framework/algorithm-
+suites.md#encryption-algorithm).
+'''
+

@@ -1,0 +1,14 @@
+target = "compliance/data-format/message-header.txt#2.5.1.9"
+
+# 2.5.1.9.  Encrypted Data Key Count
+#
+# The number of encrypted data keys.  This value MUST be greater than
+# 0.
+
+[[spec]]
+level = "MUST"
+quote = '''
+This value MUST be greater than
+0.
+'''
+

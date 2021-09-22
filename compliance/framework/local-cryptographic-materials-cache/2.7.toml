@@ -1,0 +1,26 @@
+target = "compliance/framework/local-cryptographic-materials-cache.txt#2.7"
+
+# 2.7.  Pruning
+#
+# To prune TTL-expired cache entries, the local CMC MUST evict all TTL-
+# expired entries among the "N" least recently used entries, where "N"
+# is the Entry Pruning Tail Size (Section 2.5.2).
+# 
+# The local CMC SHOULD also periodically evict all TTL-expired entries
+# among the "N" least recently used entries.
+
+[[spec]]
+level = "MUST"
+quote = '''
+To prune TTL-expired cache entries, the local CMC MUST evict all TTL-
+expired entries among the "N" least recently used entries, where "N"
+is the Entry Pruning Tail Size (Section 2.5.2).
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+The local CMC SHOULD also periodically evict all TTL-expired entries
+among the "N" least recently used entries.
+'''
+

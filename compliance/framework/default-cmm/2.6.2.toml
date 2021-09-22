@@ -1,0 +1,74 @@
+target = "compliance/framework/default-cmm.txt#2.6.2"
+
+# 2.6.2.  Decrypt Materials
+#
+# If the algorithm suite contains a signing algorithm (algorithm-
+# suites.md#signature-algorithm), the default CMM MUST extract the
+# verification key from the encryption context under the reserved "aws-
+# crypto-public-key" key.  If this key is not present in the encryption
+# context, the operation MUST fail without returning any decryption
+# materials.
+# 
+# If the algorithm suite does not contain a signing algorithm
+# (algorithm-suites.md#signature-algorithm), but the encryption context
+# includes the reserved "aws-crypto-public-key" key, the operation MUST
+# fail without returning any decryption materials.
+# 
+# On each call to Decrypt Materials, the default CMM MUST make a call
+# to its keyring's (Section 2.5.1) On Decrypt (keyring-
+# interface.md#ondecrypt) operation.
+# 
+# The default CMM MUST obtain the following from the response:
+# 
+# *  Plaintext Data Key
+# 
+# The values obtained above MUST be included in the decrypt materials
+# returned.
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the algorithm suite contains a signing algorithm (algorithm-
+suites.md#signature-algorithm), the default CMM MUST extract the
+verification key from the encryption context under the reserved "aws-
+crypto-public-key" key.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If this key is not present in the encryption
+context, the operation MUST fail without returning any decryption
+materials.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the algorithm suite does not contain a signing algorithm
+(algorithm-suites.md#signature-algorithm), but the encryption context
+includes the reserved "aws-crypto-public-key" key, the operation MUST
+fail without returning any decryption materials.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+On each call to Decrypt Materials, the default CMM MUST make a call
+to its keyring's (Section 2.5.1) On Decrypt (keyring-
+interface.md#ondecrypt) operation.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The default CMM MUST obtain the following from the response:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The values obtained above MUST be included in the decrypt materials
+returned.
+'''
+

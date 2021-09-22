@@ -1,0 +1,37 @@
+target = "compliance/framework/structures.txt#2.3.3.2.5"
+
+# 2.3.3.2.5.  Signing Key
+#
+# The key to be used as the signing key for signature verification
+# during encryption (../client-apis/encrypt.md).
+# 
+# The signing key MUST fit the specification described by the signature
+# algorithm (algorithm-suites.md#signature-algorithm) included in this
+# encryption material's algorithm suite (Section 2.3.3.2.1).  If the
+# algorithm suite does not contain a signing algorithm, the signing key
+# MUST NOT be present.
+# 
+# The value of this key MUST be kept secret.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The signing key MUST fit the specification described by the signature
+algorithm (algorithm-suites.md#signature-algorithm) included in this
+encryption material's algorithm suite (Section 2.3.3.2.1).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the
+algorithm suite does not contain a signing algorithm, the signing key
+MUST NOT be present.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The value of this key MUST be kept secret.
+'''
+

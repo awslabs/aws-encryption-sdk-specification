@@ -1,0 +1,36 @@
+target = "compliance/framework/algorithm-suites.txt#2.4.4"
+
+# 2.4.4.  Identity KDF
+#
+# The identity key derivation function (Identity KDF) is a key
+# derivation algorithm.
+# 
+# The Identity KDF MUST take a byte sequence as input, and MUST return
+# the input, unchanged, as output.
+# 
+# If included in the algorithm suite, the algorithm suite's encryption
+# key length MUST equal the algorithm suite's key derivation input
+# length (Section 2.10.8).
+
+[[spec]]
+level = "MUST"
+quote = '''
+The Identity KDF MUST take a byte sequence as input, and MUST return
+the input, unchanged, as output.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The Identity KDF MUST take a byte sequence as input, and MUST return
+the input, unchanged, as output.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If included in the algorithm suite, the algorithm suite's encryption
+key length MUST equal the algorithm suite's key derivation input
+length (Section 2.10.8).
+'''
+

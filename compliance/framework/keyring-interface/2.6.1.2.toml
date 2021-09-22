@@ -1,0 +1,57 @@
+target = "compliance/framework/keyring-interface.txt#2.6.1.2"
+
+# 2.6.1.2.  Encrypt Data Key
+#
+# If the encryption materials (structures.md#encryption-materials)
+# contain a plaintext data key, OnEncrypt MAY encrypt a data key.  If
+# the encryption materials do not contain a plaintext data key,
+# OnEncrypt MUST NOT encrypt a data key.
+# 
+# Encrypt Data Key MAY modify the following fields in the encryption
+# materials (structures.md#encryption-materials):
+# 
+# *  encrypted data keys (structures.md#encrypted-data-keys)
+# 
+# To perform this behavior, the keyring creates one or more encrypted
+# data keys (structures.md#encrypted-data-key) using the plaintext data
+# key from the encryption materials (structures.md#encryption-
+# materials) as input, and appends the encrypted data keys
+# (structures.md#encrypted-data-key) to the encrypted data key list in
+# the encryption materials (structures.md#encryption-materials).
+# 
+# The encrypted data keys (structures.md#encrypted-data-key) produced
+# by this keyring MUST have ciphertexts (structures.md#ciphertext) that
+# can be decrypted to the plaintext data key in the encryption
+# materials (structures.md#encryption-materials).
+
+[[spec]]
+level = "MAY"
+quote = '''
+If the encryption materials (structures.md#encryption-materials)
+contain a plaintext data key, OnEncrypt MAY encrypt a data key.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If
+the encryption materials do not contain a plaintext data key,
+OnEncrypt MUST NOT encrypt a data key.
+'''
+
+[[spec]]
+level = "MAY"
+quote = '''
+Encrypt Data Key MAY modify the following fields in the encryption
+materials (structures.md#encryption-materials):
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The encrypted data keys (structures.md#encrypted-data-key) produced
+by this keyring MUST have ciphertexts (structures.md#ciphertext) that
+can be decrypted to the plaintext data key in the encryption
+materials (structures.md#encryption-materials).
+'''
+

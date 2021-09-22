@@ -1,0 +1,17 @@
+target = "compliance/framework/cryptographic-materials-cache.txt#2.7.2"
+
+# 2.7.2.  Get Cache Entry
+#
+# Attempts to get a cache entry for the specified cache ID.  The CMC
+# MUST validate that the cache entry is valid prior to returning the
+# cache entry.  A successful call to Get Entry returns the cache entry
+# (Section 2.5.2) and an unsuccessful call returns a cache miss.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The CMC
+MUST validate that the cache entry is valid prior to returning the
+cache entry.
+'''
+

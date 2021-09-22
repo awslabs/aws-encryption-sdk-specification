@@ -1,0 +1,227 @@
+target = "compliance/framework/kms-keyring.txt#2.7.2"
+
+# 2.7.2.  OnDecrypt
+#
+# OnDecrypt MUST take decryption materials (structures.md#decryption-
+# materials) and a list of encrypted data keys
+# (structures.md#encrypted-data-key) as input.
+# 
+# The set of encrypted data keys (structures.md#encrypted-data-key)
+# that OnDecrypt MUST attempt to decrypt depends on whether this
+# keyring is a discovery keyring (Section 2.6.1) or not.
+# 
+# If this keyring is a discovery keyring (Section 2.6.1), OnDecrypt
+# MUST attempt to decrypt every encrypted data key
+# (structures.md#encrypted-data-key) in the input encrypted data key
+# list with the following condition, until it successfully decrypts
+# one:
+# 
+# *  the key provider ID (structures.md#key-provider-id) field has the
+#    value "aws-kms"
+# 
+# Otherwise, OnDecrypt MUST attempt to decrypt each input encrypted
+# data key (structures.md#encrypted-data-key) in the input encrypted
+# data key list with the following conditions, until it successfully
+# decrypts one:
+# 
+# *  the key provider ID (structures.md#key-provider-id) field has the
+#    value "aws-kms"
+# 
+# *  the key provider info (structures.md#key-provider-information) has
+#    a value equal to one of the ARNs in this keyring's key names
+#    (Section 2.5.2) or the Section 2.5.3.
+# 
+# To attempt to decrypt a particular encrypted data key
+# (structures.md#encrypted-data-key), OnDecrypt MUST call AWS KMS
+# Decrypt (Section 2.4.4).
+# 
+# For each AWS KMS Decrypt (Section 2.4.4) call, an AWS region MUST be
+# extracted from the encrypted data key (structures.md#encrypted-data-
+# key)'s key provider info (structures.md#key-provider-information).
+# The AWS KMS Keyring MUST call AWS KMS Decrypt (Section 2.4.4) using
+# the client supplied by the client supplier (Section 2.5.1), given the
+# region as input.
+# 
+# If the client supplier does not provide any client for the given
+# region for this Decrypt call, OnDecrypt MUST skip that particular
+# encrypted data key (structures.md#encrypted-data-key).
+# 
+# When calling AWS KMS Decrypt (Section 2.4.4), the keyring MUST call
+# with a request constructed as follows:
+# 
+# *  "CiphertextBlob": the encrypted data key ciphertext
+#    (structures.md#ciphertext).
+# 
+# *  "EncryptionContext": the encryption context
+#    (structures.md#encryption-context) included in the input
+#    decryption materials (structures.md#decryption-materials).
+# 
+# *  "GrantTokens": this keyring's grant tokens (Section 2.5.4)
+# 
+# If the call to AWS KMS Decrypt (Section 2.4.4) does not succeed,
+# OnDecrypt MUST continue and attempt to decrypt the remaining
+# encrypted data keys (structures.md#encrypted-data-key).
+# 
+# If the "KeyId" field in the response from AWS KMS Decrypt
+# (Section 2.4.4) does not have a value equal to the encrypted data
+# key's key provider info (structures.md#key-provider-information),
+# then OnDecrypt MUST fail.
+# 
+# If the call to AWS KMS Decrypt (Section 2.4.4) succeeds OnDecrypt
+# MUST verify the following:
+# 
+# *  verify that the "KeyId" field has a value equal to the encrypted
+#    data key's key provider info (structures.md#key-provider-
+#    information).
+# 
+# *  verify that the "Plaintext" is of a length that fits the algorithm
+#    suite (algorithm-suites.md) given in the decryption materials.
+# 
+# If any of the above are not true, OnDecrypt MUST NOT update the
+# decryption materials (structures.md#decryption-materials) and MUST
+# fail.
+# 
+# If the response is successfully verified, OnDecrypt MUST do the
+# following with the response:
+# 
+# *  set the plaintext data key on the decryption materials
+#    (structures.md#decryption-materials) as the response "Plaintext".
+# 
+# *  immediately return the modified decryption materials
+#    (structures.md#decryption-materials).
+# 
+# If OnDecrypt fails to successfully decrypt any encrypted data key
+# (structures.md#encrypted-data-key), then OnDecrypt MUST output the
+# unmodified input decryption materials (structures.md#decryption-
+# materials).
+
+[[spec]]
+level = "MUST"
+quote = '''
+OnDecrypt MUST take decryption materials (structures.md#decryption-
+materials) and a list of encrypted data keys
+(structures.md#encrypted-data-key) as input.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The set of encrypted data keys (structures.md#encrypted-data-key)
+that OnDecrypt MUST attempt to decrypt depends on whether this
+keyring is a discovery keyring (Section 2.6.1) or not.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If this keyring is a discovery keyring (Section 2.6.1), OnDecrypt
+MUST attempt to decrypt every encrypted data key
+(structures.md#encrypted-data-key) in the input encrypted data key
+list with the following condition, until it successfully decrypts
+one:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Otherwise, OnDecrypt MUST attempt to decrypt each input encrypted
+data key (structures.md#encrypted-data-key) in the input encrypted
+data key list with the following conditions, until it successfully
+decrypts one:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+To attempt to decrypt a particular encrypted data key
+(structures.md#encrypted-data-key), OnDecrypt MUST call AWS KMS
+Decrypt (Section 2.4.4).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+For each AWS KMS Decrypt (Section 2.4.4) call, an AWS region MUST be
+extracted from the encrypted data key (structures.md#encrypted-data-
+key)'s key provider info (structures.md#key-provider-information).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The AWS KMS Keyring MUST call AWS KMS Decrypt (Section 2.4.4) using
+the client supplied by the client supplier (Section 2.5.1), given the
+region as input.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the client supplier does not provide any client for the given
+region for this Decrypt call, OnDecrypt MUST skip that particular
+encrypted data key (structures.md#encrypted-data-key).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+When calling AWS KMS Decrypt (Section 2.4.4), the keyring MUST call
+with a request constructed as follows:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the call to AWS KMS Decrypt (Section 2.4.4) does not succeed,
+OnDecrypt MUST continue and attempt to decrypt the remaining
+encrypted data keys (structures.md#encrypted-data-key).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the "KeyId" field in the response from AWS KMS Decrypt
+(Section 2.4.4) does not have a value equal to the encrypted data
+key's key provider info (structures.md#key-provider-information),
+then OnDecrypt MUST fail.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the call to AWS KMS Decrypt (Section 2.4.4) succeeds OnDecrypt
+MUST verify the following:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If any of the above are not true, OnDecrypt MUST NOT update the
+decryption materials (structures.md#decryption-materials) and MUST
+fail.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If any of the above are not true, OnDecrypt MUST NOT update the
+decryption materials (structures.md#decryption-materials) and MUST
+fail.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the response is successfully verified, OnDecrypt MUST do the
+following with the response:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If OnDecrypt fails to successfully decrypt any encrypted data key
+(structures.md#encrypted-data-key), then OnDecrypt MUST output the
+unmodified input decryption materials (structures.md#decryption-
+materials).
+'''
+

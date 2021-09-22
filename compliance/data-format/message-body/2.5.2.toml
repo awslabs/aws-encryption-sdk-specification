@@ -1,0 +1,35 @@
+target = "compliance/data-format/message-body.txt#2.5.2"
+
+# 2.5.2.  Framed Data
+#
+# Framed data is a sequence of bytes divided into equal-length parts
+# called frames.  Each frame is encrypted separately with a unique
+# There are two kinds of frames:Section 2.5.1.1 and body authentication
+# tag (Section 2.5.1.4).
+# 
+# *  Regular Frame (Section 2.5.2.1)
+# 
+# *  Final Frame (Section 2.5.2.2)
+# 
+# Note:
+# 
+# *  The total bytes allowed in a single frame MUST be less than or
+#    equal to "2^32 - 1".
+# 
+# *  The number of frames in a single message MUST be less than or
+#    equal to "2^32 - 1".
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The total bytes allowed in a single frame MUST be less than or
+equal to "2^32 - 1".
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The number of frames in a single message MUST be less than or
+equal to "2^32 - 1".
+'''
+

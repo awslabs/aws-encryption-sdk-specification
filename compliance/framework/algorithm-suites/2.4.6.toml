@@ -1,0 +1,40 @@
+target = "compliance/framework/algorithm-suites.txt#2.4.6"
+
+# 2.4.6.  ECDSA
+#
+# Specification: ANS X9.62-2005 (Not available publicly, but the
+# specification for ECDSA is replicated in SEC 1 version 2.0
+# (https://www.secg.org/sec1-v2.pdf).  Information about obtaining
+# copies of ANS X9.62 is available at http://www.x9.org.)
+# 
+# The Elliptic Curve Digital Signature Algorithm (ECDSA) is a signature
+# algorithm.
+# 
+# If specified to use ECDSA, the AWS Encryption SDK MUST use ECDSA with
+# the following specifics:
+# 
+# *  The elliptic curve is specified by the algorithm suite.  The
+#    specific curves are defined in Digital Signature Standard (DSS)
+#    (FIPS PUB 186-4) (https://nvlpubs.nist.gov/nistpubs/FIPS/
+#    NIST.FIPS.186-4.pdf).
+# 
+# *  The hash function is specified by the algorithm suite.
+# 
+# *  When included in the message (../data-format/message.md), the
+#    output signature value is encoded using the ANS.1 structure
+#    "ECDSA-Sig-Value" defined in section C.5 of Sec 1 version 2.0
+#    (http://www.secg.org/sec1-v2.pdf):
+# 
+# "ECDSA-Sig-Value ::= SEQUENCE { r INTEGER, s INTEGER }"
+# 
+# *  If serialized, the binary form of the verification key is equal to
+#    the elliptic curve point Q compressed according to section 2.3.3
+#    of SEC 1 version 2.0 (http://www.secg.org/sec1-v2.pdf).
+
+[[spec]]
+level = "MUST"
+quote = '''
+If specified to use ECDSA, the AWS Encryption SDK MUST use ECDSA with
+the following specifics:
+'''
+

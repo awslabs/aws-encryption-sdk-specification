@@ -1,0 +1,28 @@
+target = "compliance/client-apis/decrypt.txt#2.6"
+
+# 2.6.  Output
+#
+# The client MUST return as output to this operation:
+# 
+# *  Section 2.6.1
+# 
+# *  Encryption Context (Section 2.6.2)
+# 
+# *  Algorithm Suite (Section 2.6.3)
+# 
+# The client SHOULD return as an output:
+# 
+# *  Parsed Header (Section 2.6.4)
+
+[[spec]]
+level = "MUST"
+quote = '''
+The client MUST return as output to this operation:
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+The client SHOULD return as an output:
+'''
+

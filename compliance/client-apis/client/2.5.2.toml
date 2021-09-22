@@ -1,0 +1,16 @@
+target = "compliance/client-apis/client.txt#2.5.2"
+
+# 2.5.2.  Decrypt
+#
+# The AWS Encryption SDK Client MUST provide an decrypt
+# (./decrypt.md#input) function that will honor the client's configured
+# commitment policy (Section 2.4.1).
+
+[[spec]]
+level = "MUST"
+quote = '''
+The AWS Encryption SDK Client MUST provide an decrypt
+(./decrypt.md#input) function that will honor the client's configured
+commitment policy (Section 2.4.1).
+'''
+

@@ -1,0 +1,16 @@
+target = "compliance/data-format/message-header.txt#2.5.1.7.1"
+
+# 2.5.1.7.1.  Key Value Pairs Length
+#
+# The length of the Key Value Pairs (Section 2.5.1.7.2) field in bytes.
+# 
+# When the encryption context (../framework/structures.md#encryption-
+# context) is empty, the value of this field MUST be 0.
+
+[[spec]]
+level = "MUST"
+quote = '''
+When the encryption context (../framework/structures.md#encryption-
+context) is empty, the value of this field MUST be 0.
+'''
+

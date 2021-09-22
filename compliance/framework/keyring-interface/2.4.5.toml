@@ -1,0 +1,18 @@
+target = "compliance/framework/keyring-interface.txt#2.4.5"
+
+# 2.4.5.  key provider info
+#
+# An output value returned by a keyring on encrypt as part of an
+# encrypted data key structure that provides necessary information for
+# a keyring to fulfill this decryption contract.
+# 
+# The key provider info MUST be a binary value and SHOULD be equal to a
+# UTF-8 encoding of the key name.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The key provider info MUST be a binary value and SHOULD be equal to a
+UTF-8 encoding of the key name.
+'''
+

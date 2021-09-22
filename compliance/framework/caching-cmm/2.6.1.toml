@@ -1,0 +1,92 @@
+target = "compliance/framework/caching-cmm.txt#2.6.1"
+
+# 2.6.1.  Get Encryption Materials
+#
+# If the algorithm suite (algorithm-suites.md) requested contains a
+# Identity KDF (algorithm-suites.md#identity-kdf), the caching CMM MUST
+# obtain the encryption materials by making a call to the underlying
+# CMM's Get Encryption Materials (cmm-interface.md#get-encryption-
+# materials) function.
+# 
+# Otherwise, the caching CMM MUST attempt to find the encryption
+# materials (structures.md#encryption-materials) from the underlying
+# cryptographic materials cache (CMC) (Section 2.5.1).  The caching CMM
+# MUST use the formulas specified in Appendix A (Section 2.7) in order
+# to compute the cache entry identifier (cryptographic-materials-
+# cache.md#cache-identifier).
+# 
+# If a cache entry is found, the caching CMM MUST return the encryption
+# materials retrieved.  If a cache entry is not found or the cache
+# entry is expired, the caching CMM MUST then attempt to obtain the
+# encryption materials by making a call to the underlying CMM's Get
+# Encryption Materials (cmm-interface.md#get-encryption-materials).
+# 
+# If the algorithm suite (algorithm-suites.md) requested does not
+# contain an Identity KDF (algorithm-suites.md#identity-kdf), the
+# caching CMM MUST add the encryption materials obtained from the
+# underlying CMM into the underlying CMC.
+# 
+# If the algorithm suite (algorithm-suites.md) requested contains an
+# Identity KDF, the caching CMM MUST NOT store the encryption materials
+# in the underlying CMC.
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the algorithm suite (algorithm-suites.md) requested contains a
+Identity KDF (algorithm-suites.md#identity-kdf), the caching CMM MUST
+obtain the encryption materials by making a call to the underlying
+CMM's Get Encryption Materials (cmm-interface.md#get-encryption-
+materials) function.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Otherwise, the caching CMM MUST attempt to find the encryption
+materials (structures.md#encryption-materials) from the underlying
+cryptographic materials cache (CMC) (Section 2.5.1).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The caching CMM
+MUST use the formulas specified in Appendix A (Section 2.7) in order
+to compute the cache entry identifier (cryptographic-materials-
+cache.md#cache-identifier).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If a cache entry is found, the caching CMM MUST return the encryption
+materials retrieved.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If a cache entry is not found or the cache
+entry is expired, the caching CMM MUST then attempt to obtain the
+encryption materials by making a call to the underlying CMM's Get
+Encryption Materials (cmm-interface.md#get-encryption-materials).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the algorithm suite (algorithm-suites.md) requested does not
+contain an Identity KDF (algorithm-suites.md#identity-kdf), the
+caching CMM MUST add the encryption materials obtained from the
+underlying CMM into the underlying CMC.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the algorithm suite (algorithm-suites.md) requested contains an
+Identity KDF, the caching CMM MUST NOT store the encryption materials
+in the underlying CMC.
+'''
+

@@ -1,0 +1,15 @@
+target = "compliance/framework/keyring-interface.txt#2.4.3"
+
+# 2.4.3.  key name
+#
+# A configuration value for a keyring that identifies a single wrapping
+# key within a key namespace.
+# 
+# The key name MUST be a string value.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The key name MUST be a string value.
+'''
+

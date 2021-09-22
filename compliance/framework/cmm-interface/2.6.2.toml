@@ -1,0 +1,16 @@
+target = "compliance/framework/cmm-interface.txt#2.6.2"
+
+# 2.6.2.  Behaviors
+#
+# The CMM Interface MUST support the following behaviors:
+# 
+# *  Get Encryption Materials (Section 2.6.2.1)
+# 
+# *  Decrypt Materials (Section 2.6.2.2)
+
+[[spec]]
+level = "MUST"
+quote = '''
+The CMM Interface MUST support the following behaviors:
+'''
+

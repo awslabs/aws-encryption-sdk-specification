@@ -1,0 +1,39 @@
+target = "compliance/data-format/message-header.txt#2.5.1.7"
+
+# 2.5.1.7.  AAD
+#
+# The Additional Authenticated Data (AAD) for the header.  This AAD is
+# an encoding of the encryption context (../framework/
+# structures.md#encryption-context).
+# 
+# When algorithms with signing are used, the encryption context MUST
+# contain the key-value pair {"aws-crypto-public-key", "Qtxt"}, where
+# "Qtxt" is the base64-encoded serialized form of the signature
+# verification key (../framework/algorithm-suites.md#ecdsa).
+# 
+# The following table describes the fields that form the AAD.  The
+# bytes are appended in the order shown.
+# 
+#  +=================+==============================+================+
+#  | Field           | Length (bytes)               | Interpreted as |
+#  +=================+==============================+================+
+#  | Key Value Pairs | 2                            | UInt16         |
+#  | Length (Section |                              |                |
+#  | 2.5.1.7.1)      |                              |                |
+#  +-----------------+------------------------------+----------------+
+#  | Key Value Pairs | Variable.  Determined by the | Key Value      |
+#  | (Section        | value of Key Value Pairs     | Pairs (Section |
+#  | 2.5.1.7.2)      | Length (Section 2.5.1.7.1).  | 2.5.1.7.2)     |
+#  +-----------------+------------------------------+----------------+
+# 
+#                                Table 6
+
+[[spec]]
+level = "MUST"
+quote = '''
+When algorithms with signing are used, the encryption context MUST
+contain the key-value pair {"aws-crypto-public-key", "Qtxt"}, where
+"Qtxt" is the base64-encoded serialized form of the signature
+verification key (../framework/algorithm-suites.md#ecdsa).
+'''
+

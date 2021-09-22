@@ -1,0 +1,74 @@
+target = "compliance/client-apis/encrypt.txt#2.4"
+
+# 2.4.  Input
+#
+# The following inputs to this behavior are REQUIRED:
+# 
+# *  Section 2.4.1
+# 
+# *  Either a Cryptographic Materials Manager (CMM) (../framework/cmm-
+#    interface.md) or a Keyring (../framework/keyring-interface.md)
+# 
+# The following inputs to this behavior MUST be OPTIONAL:
+# 
+# *  Algorithm Suite (Section 2.4.5)
+# 
+# *  Encryption Context (Section 2.4.2)
+# 
+# *  Frame Length (Section 2.4.6)
+# 
+# If the input Section 2.4.1 is of unknown length, the caller MAY also
+# input a Plaintext Length Bound (Section 2.4.7).
+# 
+# Implementations SHOULD ensure that a caller is not able to specify
+# both a Section 2.4.1 with known length and a Plaintext Length Bound
+# (Section 2.4.7) by construction.  If a caller is able to specify both
+# an input Section 2.4.1 with known length and a Plaintext Length Bound
+# (Section 2.4.7), the Plaintext Length Bound (Section 2.4.7) MUST NOT
+# be used during the Encrypt operation and MUST be ignored.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The following inputs to this behavior are REQUIRED:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The following inputs to this behavior MUST be OPTIONAL:
+'''
+
+[[spec]]
+level = "MAY"
+quote = '''
+If the input Section 2.4.1 is of unknown length, the caller MAY also
+input a Plaintext Length Bound (Section 2.4.7).
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+Implementations SHOULD ensure that a caller is not able to specify
+both a Section 2.4.1 with known length and a Plaintext Length Bound
+(Section 2.4.7) by construction.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If a caller is able to specify both
+an input Section 2.4.1 with known length and a Plaintext Length Bound
+(Section 2.4.7), the Plaintext Length Bound (Section 2.4.7) MUST NOT
+be used during the Encrypt operation and MUST be ignored.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If a caller is able to specify both
+an input Section 2.4.1 with known length and a Plaintext Length Bound
+(Section 2.4.7), the Plaintext Length Bound (Section 2.4.7) MUST NOT
+be used during the Encrypt operation and MUST be ignored.
+'''
+

@@ -1,0 +1,23 @@
+target = "compliance/framework/local-cryptographic-materials-cache.txt#2.4.2"
+
+# 2.4.2.  Time-to-live (TTL)
+#
+# Each cache entry has a time-to-live (TTL) field that represents a
+# point in time at which the cache entry MUST be considered invalid.
+# After a cache entry's TTL has elapsed, we say that the entry is _TTL-
+# expired_, and the local CMC MUST NOT return the entry to any caller.
+
+[[spec]]
+level = "MUST"
+quote = '''
+Each cache entry has a time-to-live (TTL) field that represents a
+point in time at which the cache entry MUST be considered invalid.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+After a cache entry's TTL has elapsed, we say that the entry is _TTL-
+expired_, and the local CMC MUST NOT return the entry to any caller.
+'''
+

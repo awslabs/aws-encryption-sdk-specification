@@ -1,0 +1,30 @@
+target = "compliance/client-apis/encrypt.txt#2.5"
+
+# 2.5.  Output
+#
+# This behavior MUST output the following if the behavior is
+# successful:
+# 
+# *  Encrypted Message (Section 2.5.1)
+# 
+# *  Encryption Context (Section 2.4.2)
+# 
+# *  Algorithm Suite (Section 2.4.5)
+# 
+# The client SHOULD return as an output:
+# 
+# *  Parsed Header (Section 2.5.4)
+
+[[spec]]
+level = "MUST"
+quote = '''
+This behavior MUST output the following if the behavior is
+successful:
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+The client SHOULD return as an output:
+'''
+

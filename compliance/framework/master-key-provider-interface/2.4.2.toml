@@ -1,0 +1,25 @@
+target = "compliance/framework/master-key-provider-interface.txt#2.4.2"
+
+# 2.4.2.  Terms
+#
+# *  Provider ID: A value that identifies a master key provider.  This
+#    concept is equivalent to "key namespace" for Keyrings.
+# 
+# *  Key ID: A value that identifies a master key within the context of
+#    a master key provider.  This concept is equivalent to "key name"
+#    for Keyrings.
+# 
+# *  Provider Info: The value that is written to a serialized encrypted
+#    data key that identifies a master key within the context of a
+#    master key provider.  This MUST always be equal to the master
+#    key's key ID with the exception of the raw AES master key.  For a
+#    detailed description of this exception, see the Raw AES Keyring
+#    specification (./raw-aes-keyring.md).
+
+[[spec]]
+level = "MUST"
+quote = '''
+This MUST always be equal to the master
+key's key ID with the exception of the raw AES master key.
+'''
+

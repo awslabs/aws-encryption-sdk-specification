@@ -1,0 +1,23 @@
+target = "compliance/framework/structures.txt#2.3.4.2"
+
+# 2.3.4.2.  Structure
+#
+# Decryption materials are a structure containing materials needed for
+# decryption (../client-apis/decrypt.md).  This structure MAY include
+# any of the following fields:
+# 
+# *  Algorithm Suite (Section 2.3.4.2.1)
+# 
+# *  Encryption Context (Section 2.3.4.2.2)
+# 
+# *  Plaintext Data Key (Section 2.3.4.2.3)
+# 
+# *  Verification Key (Section 2.3.4.2.4)
+
+[[spec]]
+level = "MAY"
+quote = '''
+This structure MAY include
+any of the following fields:
+'''
+

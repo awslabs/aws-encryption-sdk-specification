@@ -1,0 +1,16 @@
+target = "compliance/framework/cryptographic-materials-cache.txt#2.7.1"
+
+# 2.7.1.  Put Cache Entry
+#
+# Attempts to put a cache entry for the specified cache ID.  If a cache
+# entry for the given cache ID does not exists in the cache, the CMC
+# creates a new cache entry.  This operation MUST NOT return the
+# inserted cache entry.
+
+[[spec]]
+level = "MUST"
+quote = '''
+This operation MUST NOT return the
+inserted cache entry.
+'''
+

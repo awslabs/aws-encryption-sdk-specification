@@ -1,0 +1,49 @@
+target = "compliance/framework/kms-keyring.txt#2.8.3"
+
+# 2.8.3.  Why OnEncrypt and OnDecrypt are different
+#
+# On encrypt, the user describes their intent for the requirements to
+# decrypt the resulting message.  Because of this, the keyring MUST
+# create encryption materials that satisfy those requirements.
+# 
+# On decrypt, the user provides resources that _attempt_ to do that
+# decryption.
+# 
+# This is an asymmetric relationship with very different implications
+# on failure.  If the keyring encounters a problem on encrypt, it
+# cannot fully honor the decryption requirements and MUST halt message
+# encryption.
+# 
+# However, on decrypt the keyring is not creating anything.  It is
+# instead attempting to satisfy the requirements that were set on
+# encryption.  If the keyring cannot satisfy those requirements it MUST
+# NOT halt message decryption.
+# 
+# No keyring can know if it is the last keyring to attempt decryption.
+# If all keyrings are exhausted and none of them were able to decrypt
+# an encrypted data key then the cryptographic materials manager that
+# managed those keyrings halts message decryption.  (See Default
+# Cryptographic Materials Manager (./default-cmm.md))
+
+[[spec]]
+level = "MUST"
+quote = '''
+Because of this, the keyring MUST
+create encryption materials that satisfy those requirements.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the keyring encounters a problem on encrypt, it
+cannot fully honor the decryption requirements and MUST halt message
+encryption.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the keyring cannot satisfy those requirements it MUST
+NOT halt message decryption.
+'''
+

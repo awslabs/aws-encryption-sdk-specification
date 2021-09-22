@@ -1,0 +1,34 @@
+target = "compliance/framework/kms-keyring.txt#2.8.1"
+
+# 2.8.1.  OnEncrypt Goal
+#
+# When a user configures an AWS KMS keyring with key names and uses
+# that keyring to encrypt a message, they are stating their intent that
+# they need each one of those CMKs to be able to independently decrypt
+# the resulting encrypted message.
+# 
+# For example, if a user configures an AWS KMS keyring with CMKs A, B,
+# and C and uses that keyring to encrypt a message, then that user
+# expects three things to be true:
+# 
+# 1.  CMK A can decrypt the encrypted message.
+# 
+# 2.  CMK B can decrypt the encrypted message.
+# 
+# 3.  CMK C can decrypt the encrypted message.
+# 
+# If any of these are not true of the resulting encrypted message, the
+# keyring has failed to honor the user's intent.
+# 
+# In order to accomplish this, the AWS KMS keyring MUST contribute
+# three encrypted data keys to the encryption materials: one from CMK
+# A, one from CMK B, and one from CMK C.
+
+[[spec]]
+level = "MUST"
+quote = '''
+In order to accomplish this, the AWS KMS keyring MUST contribute
+three encrypted data keys to the encryption materials: one from CMK
+A, one from CMK B, and one from CMK C.
+'''
+

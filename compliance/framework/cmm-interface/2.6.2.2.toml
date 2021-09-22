@@ -1,0 +1,139 @@
+target = "compliance/framework/cmm-interface.txt#2.6.2.2"
+
+# 2.6.2.2.  Decrypt Materials
+#
+# When the CMM gets a decrypt materials request (Section 2.6.1.2), it
+# MUST return decryption materials (structures.md#decryption-materials)
+# appropriate for the request.
+# 
+# If the requested algorithm suite does not include a signing algorithm
+# but the encryption context includes the reserved "aws-crypto-public-
+# key" key, the operation SHOULD fail.  Likewise, if the requested
+# algorithm suite includes a signing algorithm but the encryption
+# context does not include the reserved "aws-crypto-public-key" key,
+# the operation SHOULD fail.
+# 
+# The decryption materials returned MUST include the following:
+# 
+# *  Plaintext Data Key
+# 
+# *  Encryption Context (structures.md#encryption-context)
+# 
+#    -  The CMM MAY modify the encryption context.
+# 
+#    -  The operations made on the encryption context on the Get
+#       Encryption Materials call SHOULD be inverted on the Decrypt
+#       Materials call.
+# 
+# *  Algorithm Suite (algorithm-suites.md)
+# 
+#    -  If the decrypt materials request contains an algorithm suite,
+#       the decryption materials returned SHOULD contain the same
+#       algorithm suite.
+# 
+# If the algorithm suite obtained from the decryption request contains
+# a signing algorithm (algorithm-suites.md#signature-algorithm), the
+# decryption materials MUST include the signature verification key
+# (structures.md#verification-key).
+# 
+# The CMM MUST ensure that the decryption materials returned are valid.
+# 
+# *  The decryption materials returned MUST follow the specification
+#    for decryption-materials (structures.md#decryption-materials).
+# 
+# *  The value of the plaintext data key MUST be non-NULL.
+# 
+# *  The plaintext data key returned MUST correspond with at least one
+#    of the encrypted data keys.
+# 
+#    -  The is typically done by constructing a CMM that uses keyrings/
+#       master keys.
+
+[[spec]]
+level = "MUST"
+quote = '''
+When the CMM gets a decrypt materials request (Section 2.6.1.2), it
+MUST return decryption materials (structures.md#decryption-materials)
+appropriate for the request.
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+If the requested algorithm suite does not include a signing algorithm
+but the encryption context includes the reserved "aws-crypto-public-
+key" key, the operation SHOULD fail.
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+Likewise, if the requested
+algorithm suite includes a signing algorithm but the encryption
+context does not include the reserved "aws-crypto-public-key" key,
+the operation SHOULD fail.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The decryption materials returned MUST include the following:
+'''
+
+[[spec]]
+level = "MAY"
+quote = '''
+-  The CMM MAY modify the encryption context.
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+-  The operations made on the encryption context on the Get
+Encryption Materials call SHOULD be inverted on the Decrypt
+Materials call.
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+-  If the decrypt materials request contains an algorithm suite,
+the decryption materials returned SHOULD contain the same
+algorithm suite.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the algorithm suite obtained from the decryption request contains
+a signing algorithm (algorithm-suites.md#signature-algorithm), the
+decryption materials MUST include the signature verification key
+(structures.md#verification-key).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The CMM MUST ensure that the decryption materials returned are valid.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The decryption materials returned MUST follow the specification
+for decryption-materials (structures.md#decryption-materials).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The value of the plaintext data key MUST be non-NULL.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  The plaintext data key returned MUST correspond with at least one
+of the encrypted data keys.
+'''
+

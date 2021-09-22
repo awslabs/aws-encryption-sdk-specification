@@ -1,0 +1,37 @@
+target = "compliance/framework/kms-keyring.txt#2.5.2"
+
+# 2.5.2.  Key Names
+#
+# A list of strings identifying the AWS KMS customer master keys (CMKs)
+# (https://docs.aws.amazon.com/kms/latest/developerguide/
+# concepts.html#key-id) that the AWS KMS keyring uses to encrypt and
+# decrypt data keys.
+# 
+# The AWS KMS keyring accepts any value for a key name that is accepted
+# by AWS KMS as a key identifer
+# (https://docs.aws.amazon.com/kms/latest/developerguide/
+# concepts.html#key-id).  The AWS KMS keyring does not validate any
+# value for a key name and passes this information to AWS KMS.
+# 
+# Note that only key names in the key ARN format
+# (https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-
+# namespaces.html#arn-syntax-kms) are used for decryption because
+# encrypted data keys constructed by the AWS KMS keyring always store
+# the ID of the CMK used to encrypt it in the key ARN format and
+# Section 2.7.2 checks the key name against that value before
+# attempting decryption.
+# 
+# The AWS KMS caller MUST have kms:Encrypt
+# (https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-
+# permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
+# permission for each AWS KMS CMK specified in the key names.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The AWS KMS caller MUST have kms:Encrypt
+(https://docs.aws.amazon.com/kms/latest/developerguide/kms-api-
+permissions-reference.html#AWS-KMS-API-Operations-and-Permissions)
+permission for each AWS KMS CMK specified in the key names.
+'''
+

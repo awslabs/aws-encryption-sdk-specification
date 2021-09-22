@@ -1,0 +1,19 @@
+target = "compliance/client-apis/encrypt.txt#2.3"
+
+# 2.3.  Overview
+#
+# This document describes the behavior by which a plaintext is
+# encrypted and serialized into a message (../data-format/message.md).
+# 
+# Any client provided by the AWS Encryption SDK that performs
+# encryption of caller plaintext MUST follow this specification for
+# encryption.
+
+[[spec]]
+level = "MUST"
+quote = '''
+Any client provided by the AWS Encryption SDK that performs
+encryption of caller plaintext MUST follow this specification for
+encryption.
+'''
+

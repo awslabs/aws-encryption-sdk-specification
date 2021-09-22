@@ -1,0 +1,38 @@
+target = "compliance/framework/structures.txt#2.3.2.2"
+
+# 2.3.2.2.  Structure
+#
+# The encryption context is a key-value mapping of arbitrary, non-
+# secret, UTF-8 encoded strings.  It is used during encryption
+# (../client-apis/encrypt.md) and decryption (../client-apis/
+# decrypt.md) to provide additional authenticated data (AAD).
+# 
+# Users SHOULD use the encryption context to store:
+# 
+# *  Non-secret data that MUST remain associated with the message
+#    (../data-format/message.md) ciphertext.
+# 
+# *  Data that is useful in logging and tracking, such as data about
+#    the file type, purpose, or ownership.
+# 
+# Users MUST NOT use the encryption context to store secret data.
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+Users SHOULD use the encryption context to store:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  Non-secret data that MUST remain associated with the message
+(../data-format/message.md) ciphertext.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Users MUST NOT use the encryption context to store secret data.
+'''
+

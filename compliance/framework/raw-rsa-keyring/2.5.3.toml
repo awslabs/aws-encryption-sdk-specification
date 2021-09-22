@@ -1,0 +1,38 @@
+target = "compliance/framework/raw-rsa-keyring.txt#2.5.3"
+
+# 2.5.3.  Private Key
+#
+# The RSA private key used by this keyring to decrypt data keys.
+# 
+# The private key MUST follow the RSA specification for private keys
+# (Section 2.4.2).  The raw RSA keyring SHOULD support loading PEM
+# encoded PKCS #8 PrivateKeyInfo structures
+# (https://tools.ietf.org/html/rfc5958#section-2) as private keys.  The
+# private key SHOULD contain all Chinese Remainder Theorem (CRT)
+# components (public exponent, prime factors, CRT exponents, and CRT
+# coefficient).
+
+[[spec]]
+level = "MUST"
+quote = '''
+The private key MUST follow the RSA specification for private keys
+(Section 2.4.2).
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+The raw RSA keyring SHOULD support loading PEM
+encoded PKCS #8 PrivateKeyInfo structures
+(https://tools.ietf.org/html/rfc5958#section-2) as private keys.
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+The
+private key SHOULD contain all Chinese Remainder Theorem (CRT)
+components (public exponent, prime factors, CRT exponents, and CRT
+coefficient).
+'''
+

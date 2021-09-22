@@ -1,0 +1,73 @@
+target = "compliance/framework/keyring-interface.txt#2.6.1.1"
+
+# 2.6.1.1.  Generate Data Key
+#
+# If the encryption materials (structures.md#encryption-materials) do
+# not contain a plaintext data key, OnEncrypt MAY generate a data key.
+# If the encryption materials contain a plaintext data key, OnEncrypt
+# MUST NOT generate a data key.
+# 
+# Generate Data Key MAY modify the following fields in the encryption
+# materials (structures.md#encryption-materials):
+# 
+# *  plaintext data key (structures.md#plaintext-data-key)
+# 
+# To perform this behavior, the keyring generates a plaintext data key
+# (structures.md#plaintext-data-key) and sets the resulting plaintext
+# data key on the encryption materials (structures.md#encryption-
+# materials).
+# 
+# The length of the output plaintext data key MUST be equal to the KDF
+# input length of the algorithm suite (algorithm-suites.md) specified
+# in the encryption materials (structures.md#encryption-materials).
+# The value of the plaintext data key MUST consist of cryptographically
+# secure (pseudo-)random bits.
+# 
+# Note: If the keyring successfully performs this behavior, this means
+# that the keyring MAY then perform the Encrypt Data Key
+# (Section 2.6.1.2) behavior.
+
+[[spec]]
+level = "MAY"
+quote = '''
+If the encryption materials (structures.md#encryption-materials) do
+not contain a plaintext data key, OnEncrypt MAY generate a data key.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the encryption materials contain a plaintext data key, OnEncrypt
+MUST NOT generate a data key.
+'''
+
+[[spec]]
+level = "MAY"
+quote = '''
+Generate Data Key MAY modify the following fields in the encryption
+materials (structures.md#encryption-materials):
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The length of the output plaintext data key MUST be equal to the KDF
+input length of the algorithm suite (algorithm-suites.md) specified
+in the encryption materials (structures.md#encryption-materials).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The value of the plaintext data key MUST consist of cryptographically
+secure (pseudo-)random bits.
+'''
+
+[[spec]]
+level = "MAY"
+quote = '''
+Note: If the keyring successfully performs this behavior, this means
+that the keyring MAY then perform the Encrypt Data Key
+(Section 2.6.1.2) behavior.
+'''
+

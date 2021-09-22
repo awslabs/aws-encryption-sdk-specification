@@ -1,0 +1,14 @@
+target = "compliance/data-format/message-body.txt#2.5.1.1"
+
+# 2.5.1.1.  IV
+#
+# The initialization vector to use with the encryption algorithm.  The
+# IV MUST be a unique IV within the message.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The
+IV MUST be a unique IV within the message.
+'''
+

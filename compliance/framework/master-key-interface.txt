@@ -1,0 +1,169 @@
+
+
+
+
+AWS Crypto Tools                                            . Amazon AWS
+                                                              Amazon AWS
+                                                       21 September 2021
+
+
+                          master-key-interface
+                          master-key-interface
+
+Abstract
+
+   The master-key-interface specification for the AWS Encryption SDK.
+
+Table of Contents
+
+   1.  Conventions and Definitions
+   2.  Master Key Interface
+     2.1.  Version
+     2.2.  Implementations
+     2.3.  Overview
+       2.3.1.  Legacy
+       2.3.2.  Consistency
+     2.4.  Definitions
+       2.4.1.  Conventions used in this document
+     2.5.  Interface
+       2.5.1.  Get Master Key
+       2.5.2.  Get Master Keys For Encryption
+       2.5.3.  Decrypt Data Key
+       2.5.4.  Generate Data Key
+       2.5.5.  Encrypt Data Key
+   3.  Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here
+
+2.  Master Key Interface
+
+2.1.  Version
+
+   0.1.0-preview
+
+2.2.  Implementations
+
+   *  Python (https://github.com/aws/aws-encryption-sdk-
+      python/blob/master/src/aws_encryption_sdk/key_providers/base.py)
+
+   *  Java (https://github.com/aws/aws-encryption-sdk-
+      java/blob/master/src/main/java/com/amazonaws/encryptionsdk/
+      MasterKey.java)
+
+2.3.  Overview
+
+   Master keys are master key providers that only provide themselves.
+   They also support generating and encrypting data keys.
+
+2.3.1.  Legacy
+
+   This is a legacy specification.  Master keys SHOULD NOT be included
+   in any additional implementations.  Any new implementations MUST
+   include Keyrings (./keyring-interface.md) instead.
+
+2.3.2.  Consistency
+
+   This specification defines the common behavior between the two
+   implementations that determine the REQUIRED functionality.
+
+   Other specifics of behavior and API vary between the two
+   implementations.
+
+2.4.  Definitions
+
+2.4.1.  Conventions used in this document
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119
+   (https://tools.ietf.org/html/rfc2119).
+
+2.5.  Interface
+
+2.5.1.  Get Master Key
+
+   Inputs and outputs are the same as for master key providers
+   (./master-key-provider-interface.md).
+
+   A master key MUST supply itself and MUST NOT supply any other master
+   keys.
+
+2.5.2.  Get Master Keys For Encryption
+
+   Inputs and outputs are the same as for master key providers
+   (./master-key-provider-interface.md).
+
+   A master key MUST supply itself and MUST NOT supply any other master
+   keys.
+
+2.5.3.  Decrypt Data Key
+
+   Inputs and outputs are the same as for master key providers
+   (./master-key-provider-interface.md).
+
+   A master key SHOULD attempt to decrypt a data key using itself.
+
+   A master key MUST not attempt to use any other master keys.
+
+2.5.4.  Generate Data Key
+
+   This interface is used to generate and encrypt a data key.
+
+   The master key MUST generate a data key and MUST then encrypt that
+   data key.
+
+   Inputs to this interface MUST include the algorithm suite and the
+   encryption context.
+
+   The output of this interface MUST include the plaintext data key, the
+   data key encrypted under the master key, and information that can
+   identify which master key was used to generate and encrypt the data
+   key.
+
+   If the master key cannot generate or encrypt the data key, the call
+   MUST result in an error.
+
+2.5.5.  Encrypt Data Key
+
+   This interface is used to encrypt a data key.
+
+   The master key MUST encrypt the data key.
+
+   Inputs to this interface MUST include the algorithm suite, the
+   encryption context, the encrypted data key, and information that can
+   identify which master key was used to encrypt the data key.
+
+   The output of this interface MUST include a value that this master
+   key can use to obtain the plaintext data key.  Most commonly, this
+   will be the result of an encryption operation.
+
+   If the master key cannot encrypt the data key, the call MUST result
+   in an error.
+
+3.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+Acknowledgments
+
+Author's Address
+
+   Amazon AWS
+   Amazon AWS
+
+   Email: cryptools+rfc@amazon.com

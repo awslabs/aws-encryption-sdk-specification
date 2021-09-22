@@ -1,0 +1,16 @@
+target = "compliance/framework/default-cmm.txt#2.7"
+
+# 2.7.  Legacy Behavior : Master Key Providers
+#
+# For implementations that support master key providers (master-key-
+# provider-interface.md), the default CMM MUST support generating,
+# encrypting, and decrypting data keys using master key providers.
+
+[[spec]]
+level = "MUST"
+quote = '''
+For implementations that support master key providers (master-key-
+provider-interface.md), the default CMM MUST support generating,
+encrypting, and decrypting data keys using master key providers.
+'''
+

@@ -1,0 +1,42 @@
+target = "compliance/framework/structures.txt#2.3.4.2.2"
+
+# 2.3.4.2.2.  Encryption Context
+#
+# The encryption context (Section 2.3.2) associated with this
+# decryption (../client-apis/decrypt.md).
+# 
+# If a decryption materials (Section 2.3.4) contains a verification key
+# (Section 2.3.4.2.4), the encryption context (Section 2.3.2) SHOULD
+# include the reserved key "aws-crypto-public-key".  The mapped value
+# from the reserved key "aws-crypto-public-key" SHOULD be the signature
+# verification key stored on the decryption materials (Section 2.3.4).
+# If a decryption materials (Section 2.3.4) does not contain a
+# verification key (Section 2.3.4.2.4), the encryption context
+# (Section 2.3.2) SHOULD NOT include the reserved key "aws-crypto-
+# public-key".
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+If a decryption materials (Section 2.3.4) contains a verification key
+(Section 2.3.4.2.4), the encryption context (Section 2.3.2) SHOULD
+include the reserved key "aws-crypto-public-key".
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+The mapped value
+from the reserved key "aws-crypto-public-key" SHOULD be the signature
+verification key stored on the decryption materials (Section 2.3.4).
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+If a decryption materials (Section 2.3.4) does not contain a
+verification key (Section 2.3.4.2.4), the encryption context
+(Section 2.3.2) SHOULD NOT include the reserved key "aws-crypto-
+public-key".
+'''
+

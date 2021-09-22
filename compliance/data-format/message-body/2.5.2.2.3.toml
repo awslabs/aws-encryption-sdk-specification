@@ -1,0 +1,25 @@
+target = "compliance/data-format/message-body.txt#2.5.2.2.3"
+
+# 2.5.2.2.3.  IV
+#
+# The initialization vector for the final frame.  The IV MUST be a
+# unique IV within the message.  The IV length MUST be equal to the IV
+# length of the algorithm suite (../framework/algorithm-suites.md) that
+# generated the message.  Note: This IV is different from the Header IV
+# (message-header.md#iv).
+
+[[spec]]
+level = "MUST"
+quote = '''
+The IV MUST be a
+unique IV within the message.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The IV length MUST be equal to the IV
+length of the algorithm suite (../framework/algorithm-suites.md) that
+generated the message.
+'''
+

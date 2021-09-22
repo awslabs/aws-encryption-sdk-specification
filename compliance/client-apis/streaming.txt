@@ -1,0 +1,200 @@
+
+
+
+
+AWS Crypto Tools                                            . Amazon AWS
+                                                              Amazon AWS
+                                                       21 September 2021
+
+
+                               streaming
+                               streaming
+
+Abstract
+
+   The streaming specification for the AWS Encryption SDK.
+
+Table of Contents
+
+   1.  Conventions and Definitions
+   2.  Streaming
+     2.1.  Version
+       2.1.1.  Changelog
+     2.2.  Overview
+     2.3.  Definitions
+       2.3.1.  Conventions used in this document
+       2.3.2.  Consumable Bytes
+       2.3.3.  Release
+     2.4.  Inputs
+     2.5.  Outputs
+     2.6.  Behavior
+   3.  Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here
+
+2.  Streaming
+
+2.1.  Version
+
+   0.1.0
+
+2.1.1.  Changelog
+
+   *  0.1.0
+
+      -  Clarify Streaming Encrypt and Decrypt (../changes/2020-07-
+         06_clarify-streaming-encrypt-decrypt/change.md)
+
+2.2.  Overview
+
+   The AWS Encryption SDK MAY provide APIs that enable streamed
+   encryption (encrypt.md) and decryption (decrypt.md).  Streaming is a
+   framework for making bytes available to be processed by an operation
+   sequentially and over time, and for outputting the result of that
+   processing sequentially and over time.
+
+   If an implementation requires holding the entire input in memory in
+   order to perform the operation, that implementation SHOULD NOT
+   provide an API that allows the caller to stream the operation.  APIs
+   that support streaming of the encrypt or decrypt operation SHOULD
+   allow customers to be able to process arbitrarily large inputs with a
+   finite amount of working memory.
+
+2.3.  Definitions
+
+2.3.1.  Conventions used in this document
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC2119
+   (https://tools.ietf.org/html/rfc2119).
+
+2.3.2.  Consumable Bytes
+
+   In the scope of an operation, bytes are considered consumable if:
+
+   *  The operation has not yet processed those bytes.
+
+   *  The operation has access to those bytes.
+
+   *  Those bytes are intended to be processed.  This intention is
+      expressed through the specific streaming interface.
+
+   For example, in a framework where a customer is sending input bytes
+   to an operation and that operation must write the output bytes to
+   some sink, the input bytes received from the customer are considered
+   consumable.  Here the customer is expressing intent to process their
+   supplied bytes.
+
+   For a framework where a customer is requesting output bytes from an
+   operation and that operation must read from some source in order to
+   produce bytes, this is slightly more complicated.  Bytes are
+   considered consumable if:
+
+   *  Those bytes have not yet been processed.
+
+   *  Those bytes are able to be read by the operation from the source.
+
+   *  Those bytes are required to be processed in order for the
+      operation to release the output requested by the customer.  Here
+      the customer expresses intent for the operation to process
+      whatever the operation needs to consume to produce its complete
+      output
+
+2.3.3.  Release
+
+   An operation releases bytes when the operation intends those bytes to
+   be considered output.
+
+   For example, in a framework where a customer is sending input bytes
+   to an operation and that operation must write the output bytes to
+   some sink, bytes are considered released once the operation writes
+   those bytes into the sink.
+
+   For a framework where a customer is requesting output bytes from an
+   operation and that operation must read from some source in order to
+   produce bytes, bytes are considered released once those bytes are
+   available to be read by the customer.
+
+   If bytes are processed by an operation, that does not imply that the
+   operation is allowed to release any result of that processing.  The
+   decrypt and encrypt operations specify when output bytes MUST NOT be
+   released and when they SHOULD be released.
+
+2.4.  Inputs
+
+   In order to support streaming, the operation MUST accept some input
+   within a streaming framework.
+
+   This means that:
+
+   *  There MUST be a mechanism for input bytes to become consumable.
+
+   *  There MUST be a mechanism to indicate that there are no more input
+      bytes.
+
+   These mechanisms are used to allow the operation to process input
+   bytes in parts, over time.
+
+   The bytes that represent the entire input to the operation are the
+   bytes that the customer intended to be processed.
+
+2.5.  Outputs
+
+   In order to support streaming, the operation MUST produce some output
+   within a streaming framework.
+
+   This means that:
+
+   *  There MUST be a mechanism for output bytes to be released.
+
+   *  There MUST be a mechanism to indicate that the entire output has
+      been released.
+
+   These mechanisms are used to allow the operation to produce output
+   bytes in parts, over time.
+
+   The bytes that represent the entire output to the operation are the
+   bytes that were released up until an end was indicated.
+
+   Operations MUST NOT indicate completion or success until an end to
+   the output has been indicated.
+
+2.6.  Behavior
+
+   By using the mechanisms for Section 2.4 and Section 2.5, some actor
+   expresses intent through a streaming interface for bytes to be made
+   consumable to the operation and for bytes to be released by the
+   operation.
+
+   The behavior of the operation specifies how the operation processes
+   consumable bytes, and specifies when processed bytes MUST NOT and
+   SHOULD be released.
+
+3.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+Acknowledgments
+
+Author's Address
+
+   Amazon AWS
+   Amazon AWS
+
+   Email: cryptools+rfc@amazon.com

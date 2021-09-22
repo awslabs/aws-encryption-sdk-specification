@@ -1,0 +1,30 @@
+target = "compliance/data-format/message-footer.txt#2.5.2"
+
+# 2.5.2.  Signature
+#
+# The This signature MUST be calculated over both the The signature
+# (../framework/algorithm-suites.md#signature-algorithm) used to
+# authenticate the message.message header (message-header.md) and the
+# message body (message-body.md), in the order of
+# serialization.algorithm suite (../framework/algorithm-suites.md)
+# specified by the Algorithm Suite ID (../framework/algorithm-
+# suites.md#algorithm-suite-id) field determines how the value of this
+# field is calculated (../client-apis/encrypt.md), and uses this value
+# to authenticate the contents of the header and body during decryption
+# (../client-apis/decrypt.md).
+
+[[spec]]
+level = "MUST"
+quote = '''
+The This signature MUST be calculated over both the The signature
+(../framework/algorithm-suites.md#signature-algorithm) used to
+authenticate the message.message header (message-header.md) and the
+message body (message-body.md), in the order of
+serialization.algorithm suite (../framework/algorithm-suites.md)
+specified by the Algorithm Suite ID (../framework/algorithm-
+suites.md#algorithm-suite-id) field determines how the value of this
+field is calculated (../client-apis/encrypt.md), and uses this value
+to authenticate the contents of the header and body during decryption
+(../client-apis/decrypt.md).
+'''
+

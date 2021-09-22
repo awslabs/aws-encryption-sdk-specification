@@ -1,0 +1,46 @@
+target = "compliance/data-format/message-header.txt#2.5.1.7.2.2"
+
+# 2.5.1.7.2.2.  Key Value Pair Entries
+#
+# A sequence of one or more key-value pair entries.
+# 
+# This sequence MUST NOT contain duplicate entries.
+# 
+# These entries MUST have entries sorted, by key, in ascending order
+# according to the UTF-8 encoded binary value.
+# 
+# The following table describes the fields that form each key value
+# pair entry.  The bytes are appended in the order shown.
+# 
+# +========+=========================================+================+
+# | Field  | Length (bytes)                          | Interpreted    |
+# |        |                                         | as             |
+# +========+=========================================+================+
+# | Key    | 2                                       | UInt16         |
+# | Length |                                         |                |
+# +--------+-----------------------------------------+----------------+
+# | Key    | Variable.  Equal to the value specified | UTF-8 encoded  |
+# |        | in the previous 2 bytes (Key Length).   | bytes          |
+# +--------+-----------------------------------------+----------------+
+# | Value  | 2                                       | UInt16         |
+# | Length |                                         |                |
+# +--------+-----------------------------------------+----------------+
+# | Value  | Variable.  Equal to the value specified | UTF-8 encoded  |
+# |        | in the previous 2 bytes (Value Length). | bytes          |
+# +--------+-----------------------------------------+----------------+
+# 
+#                                Table 8
+
+[[spec]]
+level = "MUST"
+quote = '''
+This sequence MUST NOT contain duplicate entries.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+These entries MUST have entries sorted, by key, in ascending order
+according to the UTF-8 encoded binary value.
+'''
+

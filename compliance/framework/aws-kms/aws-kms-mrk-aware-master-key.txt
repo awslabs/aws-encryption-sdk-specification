@@ -4,7 +4,7 @@
 
 AWS Crypto Tools                                            . Amazon AWS
                                                               Amazon AWS
-                                                             3 June 2021
+                                                       21 September 2021
 
 
                       aws-kms-mrk-aware-master-key

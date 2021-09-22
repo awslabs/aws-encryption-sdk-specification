@@ -1,0 +1,119 @@
+target = "compliance/framework/raw-aes-keyring.txt#2.7.1"
+
+# 2.7.1.  OnEncrypt
+#
+# OnEncrypt MUST take encryption materials (structures.md#encryption-
+# materials) as input.
+# 
+# If the encryption materials (structures.md#encryption-materials) do
+# not contain a plaintext data key, OnEncrypt MUST generate a random
+# plaintext data key and set it on the encryption materials
+# (structures.md#encryption-materials).
+# 
+# The keyring MUST encrypt the plaintext data key in the encryption
+# materials (structures.md#encryption-materials) using AES-GCM.
+# 
+# The keyring MUST attempt to serialize the encryption materials'
+# (structures.md#encryption-materials) encryption context
+# (structures.md#encryption-context-1) in the same format as the
+# serialization of message header AAD key value pairs (../data-format/
+# message-header.md#key-value-pairs).  If the keyring cannot serialize
+# the encryption context, OnEncrypt MUST fail.
+# 
+# The keyring must use AES-GCM with the following specifics:
+# 
+# *  It uses the serialized encryption context
+#    (structures.md#encryption-context-1) as the additional
+#    authenticated data (AAD).
+# 
+# *  It uses this keyring's wrapping key (Section 2.5.1) as the AES-GCM
+#    cipher key.
+# 
+# *  It uses a randomly generated IV of 12 bytes.
+# 
+# *  It uses an authentication tag bit length of 128.
+# 
+# Based on the ciphertext output of the AES-GCM decryption, the keyring
+# MUST construct an encrypted data key (structures.md#encrypted-data-
+# key) with the following specifics:
+# 
+# *  The key provider ID (structures.md#key-provider-id) is this
+#    keyring's key namespace (./keyring-interface.md#key-namespace).
+# 
+# *  The key provider information (structures.md#key-provider-
+#    information) is serialized as the raw AES keyring key provider
+#    information (Section 2.6.1).
+# 
+# *  The ciphertext (structures.md#ciphertext) is serialized as the raw
+#    AES keyring ciphertext (Section 2.6.2).
+# 
+# The keyring MUST append the constructed encrypted data key to the
+# encrypted data key list in the encryption materials
+# (structures.md#encryption-materials).
+# 
+# OnEncrypt MUST output the modified encryption materials
+# (structures.md#encryption-materials).
+
+[[spec]]
+level = "MUST"
+quote = '''
+OnEncrypt MUST take encryption materials (structures.md#encryption-
+materials) as input.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the encryption materials (structures.md#encryption-materials) do
+not contain a plaintext data key, OnEncrypt MUST generate a random
+plaintext data key and set it on the encryption materials
+(structures.md#encryption-materials).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The keyring MUST encrypt the plaintext data key in the encryption
+materials (structures.md#encryption-materials) using AES-GCM.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The keyring MUST attempt to serialize the encryption materials'
+(structures.md#encryption-materials) encryption context
+(structures.md#encryption-context-1) in the same format as the
+serialization of message header AAD key value pairs (../data-format/
+message-header.md#key-value-pairs).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If the keyring cannot serialize
+the encryption context, OnEncrypt MUST fail.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Based on the ciphertext output of the AES-GCM decryption, the keyring
+MUST construct an encrypted data key (structures.md#encrypted-data-
+key) with the following specifics:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The keyring MUST append the constructed encrypted data key to the
+encrypted data key list in the encryption materials
+(structures.md#encryption-materials).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+OnEncrypt MUST output the modified encryption materials
+(structures.md#encryption-materials).
+'''
+

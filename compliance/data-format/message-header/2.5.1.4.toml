@@ -1,0 +1,14 @@
+target = "compliance/data-format/message-header.txt#2.5.1.4"
+
+# 2.5.1.4.  Type
+#
+# The type of the message format.  The type (hex) of this field MUST be
+# a value that exists in the following table:
+
+[[spec]]
+level = "MUST"
+quote = '''
+The type (hex) of this field MUST be
+a value that exists in the following table:
+'''
+

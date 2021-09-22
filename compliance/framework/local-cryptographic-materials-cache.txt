@@ -1,0 +1,189 @@
+
+
+
+
+AWS Crypto Tools                                            . Amazon AWS
+                                                              Amazon AWS
+                                                       21 September 2021
+
+
+                  local-cryptographic-materials-cache
+                  local-cryptographic-materials-cache
+
+Abstract
+
+   The local-cryptographic-materials-cache specification for the AWS
+   Encryption SDK.
+
+Table of Contents
+
+   1.  Conventions and Definitions
+   2.  Local Cryptographic Materials Cache
+     2.1.  Version
+       2.1.1.  Changelog
+     2.2.  Implementations
+     2.3.  Overview
+     2.4.  Definitions
+       2.4.1.  Conventions used in this document
+       2.4.2.  Time-to-live (TTL)
+     2.5.  Initialization
+       2.5.1.  Entry Capacity
+       2.5.2.  Entry Pruning Tail Size
+     2.6.  Behaviors
+       2.6.1.  Put Cache Entry
+       2.6.2.  Get Cache Entry
+     2.7.  Pruning
+   3.  Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here
+
+2.  Local Cryptographic Materials Cache
+
+2.1.  Version
+
+2.1.1.  Changelog
+
+   *  0.1.0
+
+      -  Initial record
+
+      -  Refactor Cryptographic Materials Cache Specification
+         (../changes/2020-07-14_refactor-cmc-spec/change.md)
+
+2.2.  Implementations
+
+   +==========+==========+=========+===================================================================+
+   |Language  |Confirmed |Minimum  |Implementation                                                     |
+   |          |Compatible|Version  |                                                                   |
+   |          |with Spec |Confirmed|                                                                   |
+   |          |Version   |         |                                                                   |
+   +==========+==========+=========+===================================================================+
+   |C         |n/a       |n/a      |local_cache.c (https://github.com/aws/aws-encryption-sdk-          |
+   |          |          |         |c/blob/master/source/local_cache.c)                                |
+   +----------+----------+---------+-------------------------------------------------------------------+
+   |Javascript|0.1.0     |0.1.0    |get_local_cryptographic_materials_cache.ts (https://github.com/aws/|
+   |          |          |         |aws-encryption-sdk-javascript/blob/master/modules/cache-           |
+   |          |          |         |material/src/get_local_cryptographic_materials_cache.ts)           |
+   +----------+----------+---------+-------------------------------------------------------------------+
+   |Python    |n/a       |n/a      |caches/local.py (https://github.com/aws/aws-encryption-sdk-        |
+   |          |          |         |python/blob/master/src/aws_encryption_sdk/caches/local.py)         |
+   +----------+----------+---------+-------------------------------------------------------------------+
+   |Java      |0.1.0     |1.3.0    |LocalCryptoMaterialsCache.java (https://github.com/aws/aws-        |
+   |          |          |         |encryption-sdk-                                                    |
+   |          |          |         |java/blob/master/src/main/java/com/amazonaws/encryptionsdk/caching/|
+   |          |          |         |LocalCryptoMaterialsCache.java)                                    |
+   +----------+----------+---------+-------------------------------------------------------------------+
+
+                                  Table 1
+
+2.3.  Overview
+
+   The local Cryptographic Materials Cache (local CMC) is a built-in
+   implementation of the CMC interface (cryptographic-materials-
+   cache.md) provided by the AWS Encryption SDK.  The local CMC is a
+   configurable, in-memory, least recently used (LRU) cache.  It
+   provides atomic access to cache entries (cryptographic-materials-
+   cache.md#cache-entry) per cache identifier (cryptographic-materials-
+   cache.md#cache-identifier).
+
+2.4.  Definitions
+
+2.4.1.  Conventions used in this document
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119
+   (https://tools.ietf.org/html/rfc2119).
+
+2.4.2.  Time-to-live (TTL)
+
+   Each cache entry has a time-to-live (TTL) field that represents a
+   point in time at which the cache entry MUST be considered invalid.
+   After a cache entry's TTL has elapsed, we say that the entry is _TTL-
+   expired_, and the local CMC MUST NOT return the entry to any caller.
+
+2.5.  Initialization
+
+   On initialization of the local CMC, the caller MUST provide the
+   following:
+
+   *  Entry Capacity (Section 2.5.1)
+
+   The local CMC MUST also define the following:
+
+   *  Entry Pruning Tail Size (Section 2.5.2)
+
+2.5.1.  Entry Capacity
+
+   The _entry capacity_ is the maximum size of the local CMC in terms of
+   cache entries.  The local CMC MUST NOT store more entries than this
+   value, except temporarily while performing a Put Cache Entry
+   operation.  The local CMC MUST accept entry capacity values between
+   zero and an implementation-defined maximum, inclusive.
+
+2.5.2.  Entry Pruning Tail Size
+
+   The _entry pruning tail size_ is the number of least recently used
+   entries that the local CMC MUST check during Section 2.7 for TTL-
+   expired entries to evict.
+
+2.6.  Behaviors
+
+2.6.1.  Put Cache Entry
+
+   When calling the Put Cache Entry operation, the caller MUST provide a
+   time delta value, which the local CMC uses to derive the cache
+   entry's time-to-live (TTL) value.  The local CMC MUST NOT return any
+   TTL-expired entry.
+
+   When performing a Put Cache Entry operation, the local CMC MUST prune
+   TTL-expired cache entries (Section 2.7).
+
+   While performing a Put Cache Entry operation, the local CMC MAY store
+   more entries than the entry capacity.  However, before returning the
+   inserted cache entry, the local CMC MUST evict least-recently used
+   entries until the number of stored entries does not exceed the entry
+   capacity.
+
+2.6.2.  Get Cache Entry
+
+   When performing a Get Cache Entry operation, the local CMC MUST prune
+   TTL-expired cache entries (Section 2.7).  The local CMC MUST NOT
+   return any TTL-expired entry.
+
+2.7.  Pruning
+
+   To prune TTL-expired cache entries, the local CMC MUST evict all TTL-
+   expired entries among the "N" least recently used entries, where "N"
+   is the Entry Pruning Tail Size (Section 2.5.2).
+
+   The local CMC SHOULD also periodically evict all TTL-expired entries
+   among the "N" least recently used entries.
+
+3.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+Acknowledgments
+
+Author's Address
+
+   Amazon AWS
+   Amazon AWS
+
+   Email: cryptools+rfc@amazon.com

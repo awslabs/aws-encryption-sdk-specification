@@ -1,0 +1,39 @@
+target = "compliance/client-apis/client.txt#2.4.2.3"
+
+# 2.4.2.3.  REQUIRE_ENCRYPT_REQUIRE_DECRYPT
+#
+# When the commitment policy "REQUIRE_ENCRYPT_REQUIRE_DECRYPT" is
+# configured:
+# 
+# *  "05 78" MUST be the default algorithm suite
+# 
+# *  encrypt (encrypt.md) MUST only support algorithm suites that have
+#    a Key Commitment (../framework/algorithm-suites.md#algorithm-
+#    suites-encryption-key-derivation-settings) value of True
+# 
+# *  decrypt (decrypt.md) MUST only support algorithm suites that have
+#    a Key Commitment (../framework/algorithm-suites.md#algorithm-
+#    suites-encryption-key-derivation-settings) value of True
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  "05 78" MUST be the default algorithm suite
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  encrypt (encrypt.md) MUST only support algorithm suites that have
+a Key Commitment (../framework/algorithm-suites.md#algorithm-
+suites-encryption-key-derivation-settings) value of True
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+*  decrypt (decrypt.md) MUST only support algorithm suites that have
+a Key Commitment (../framework/algorithm-suites.md#algorithm-
+suites-encryption-key-derivation-settings) value of True
+'''
+

@@ -1,0 +1,83 @@
+target = "compliance/data-format/message-header.txt#2.5.1.1"
+
+# 2.5.1.1.  Header Body Version 1.0
+#
+# The following table describes the fields that form the Version 1.0
+# header body.  The bytes are appended in the order shown.
+# 
+# +===========+=====================+================================+
+# | Field     | Length (bytes)      | Interpreted as                 |
+# +===========+=====================+================================+
+# | Section   | 1                   | See Supported Versions         |
+# | 2.1       |                     | (Section 2.5.1.3.1) (MUST be   |
+# |           |                     | "01" in version 1.0 Headers)   |
+# +-----------+---------------------+--------------------------------+
+# | Section   | 1                   | See Supported Types            |
+# | 2.5.1.4   |                     | (Section 2.5.1.4.1)            |
+# +-----------+---------------------+--------------------------------+
+# | Algorithm | 2                   | See Supported Algorithm Suites |
+# | Suite ID  |                     | (../framework/algorithm-       |
+# | (Section  |                     | suites.md#supported-algorithm- |
+# | 2.5.1.5)  |                     | suites)                        |
+# +-----------+---------------------+--------------------------------+
+# | Message   | 16                  | Bytes                          |
+# | ID        |                     |                                |
+# | (Section  |                     |                                |
+# | 2.5.1.6)  |                     |                                |
+# +-----------+---------------------+--------------------------------+
+# | Section   | Variable.           | Section 2.5.1.7                |
+# | 2.5.1.7   | Self-describing     |                                |
+# |           | (Section 2.5.1.7).  |                                |
+# +-----------+---------------------+--------------------------------+
+# | Encrypted | Variable.           | Encrypted Data Keys            |
+# | Data Keys | Determined by the   | (Section 2.5.1.8)              |
+# | (Section  | number of encrypted |                                |
+# | 2.5.1.8)  | data keys and the   |                                |
+# |           | length of each.     |                                |
+# +-----------+---------------------+--------------------------------+
+# | Content   | 1                   | See Supported Types            |
+# | Type      |                     | (Section 2.5.1.11.1)           |
+# | (Section  |                     |                                |
+# | 2.5.1.11) |                     |                                |
+# +-----------+---------------------+--------------------------------+
+# | Section   | 4                   | See Section 2.5.2.1            |
+# | 2.5.2.1   |                     |                                |
+# +-----------+---------------------+--------------------------------+
+# | IV Length | 1                   | UInt8                          |
+# | (Section  |                     |                                |
+# | 2.5.2.2)  |                     |                                |
+# +-----------+---------------------+--------------------------------+
+# | Frame     | 4                   | UInt32                         |
+# | Length    |                     |                                |
+# | (Section  |                     |                                |
+# | 2.5.2.3)  |                     |                                |
+# +-----------+---------------------+--------------------------------+
+# 
+#                               Table 2
+
+[[spec]]
+level = "MUST"
+quote = '''
++===========+=====================+================================+
+| Field     | Length (bytes)      | Interpreted as                 |
++===========+=====================+================================+
+| Section   | 1                   | See Supported Versions         |
+| 2.1       |                     | (Section 2.5.1.3.1) (MUST be   |
+|           |                     | "01" in version 1.0 Headers)   |
++-----------+---------------------+--------------------------------+
+| Section   | 1                   | See Supported Types            |
+| 2.5.1.4   |                     | (Section 2.5.1.4.1)            |
++-----------+---------------------+--------------------------------+
+| Algorithm | 2                   | See Supported Algorithm Suites |
+| Suite ID  |                     | (../framework/algorithm-       |
+| (Section  |                     | suites.md#supported-algorithm- |
+| 2.5.1.5)  |                     | suites)                        |
++-----------+---------------------+--------------------------------+
+| Message   | 16                  | Bytes                          |
+| ID        |                     |                                |
+| (Section  |                     |                                |
+| 2.5.1.6)  |                     |                                |
++-----------+---------------------+--------------------------------+
+| Section   | Variable.
+'''
+

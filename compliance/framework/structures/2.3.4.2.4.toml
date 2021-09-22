@@ -1,0 +1,19 @@
+target = "compliance/framework/structures.txt#2.3.4.2.4"
+
+# 2.3.4.2.4.  Verification Key
+#
+# The key to be used as the verification key for signature verification
+# during decryption (../client-apis/decrypt.md).
+# 
+# The verification key MUST fit the specification for the signature
+# algorithm (algorithm-suites.md#signature-algorithm) included in this
+# decryption material's algorithm suite (Section 2.3.4.2.1).
+
+[[spec]]
+level = "MUST"
+quote = '''
+The verification key MUST fit the specification for the signature
+algorithm (algorithm-suites.md#signature-algorithm) included in this
+decryption material's algorithm suite (Section 2.3.4.2.1).
+'''
+

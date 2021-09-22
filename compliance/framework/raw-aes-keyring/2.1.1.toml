@@ -1,0 +1,36 @@
+target = "compliance/framework/raw-aes-keyring.txt#2.1.1"
+
+# 2.1.1.  Changelog
+#
+# *  0.4.1
+# 
+#    -  Clarify keyring failure on decrypt (../changes/2020-06-04_how-
+#       to-fail-with-keyrings/change.md)
+# 
+# *  0.4.0
+# 
+#    -  Specify behavior for RawAESKeyring for invalid input EC
+#       (../changes/2020-07-15_specify-behavior-for-raw-aes-keyring-
+#       for-invalid-EC/change.md)
+# 
+# *  0.3.0
+# 
+#    -  Raw AES keyring MUST NOT accept a key namespace of "aws-kms".
+#       (https://github.com/awslabs/aws-encryption-sdk-specification/
+#       issues/101)
+# 
+# *  0.2.0
+# 
+#    -  Remove Keyring Trace (../changes/2020-05-13_remove-keyring-
+#       trace/change.md)
+# 
+# *  0.1.0-preview
+# 
+#    -  Initial record
+
+[[spec]]
+level = "MUST"
+quote = '''
+-  Raw AES keyring MUST NOT accept a key namespace of "aws-kms".
+'''
+

@@ -1,0 +1,15 @@
+target = "compliance/framework/algorithm-suites.txt#2.3"
+
+# 2.3.  Overview
+#
+# An algorithm suite is a collection of cryptographic algorithms and
+# related values.  The algorithm suite defines the behaviors the AWS
+# Encryption SDK MUST follow for cryptographic operations.
+
+[[spec]]
+level = "MUST"
+quote = '''
+The algorithm suite defines the behaviors the AWS
+Encryption SDK MUST follow for cryptographic operations.
+'''
+

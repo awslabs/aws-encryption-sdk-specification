@@ -1,0 +1,31 @@
+target = "compliance/data-format/message-body.txt#2.5.2.1.1"
+
+# 2.5.2.1.1.  Sequence Number
+#
+# The Frame sequence number.  It is an incremental counter number for
+# the frames.  Framed Data MUST start at Sequence Number 1.  Subsequent
+# frames MUST be in order and MUST contain an increment of 1 from the
+# previous frame.
+
+[[spec]]
+level = "MUST"
+quote = '''
+Framed Data MUST start at Sequence Number 1.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Subsequent
+frames MUST be in order and MUST contain an increment of 1 from the
+previous frame.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+Subsequent
+frames MUST be in order and MUST contain an increment of 1 from the
+previous frame.
+'''
+

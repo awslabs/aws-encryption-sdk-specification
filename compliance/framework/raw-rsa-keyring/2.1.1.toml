@@ -1,0 +1,36 @@
+target = "compliance/framework/raw-rsa-keyring.txt#2.1.1"
+
+# 2.1.1.  Changelog
+#
+# *  0.3.2
+# 
+#    -  Clarify keyring failure on decrypt (../changes/2020-06-04_how-
+#       to-fail-with-keyrings/change.md)
+# 
+# *  0.3.1
+# 
+#    -  Clarify failure language when only one key is defined
+#       (https://github.com/awslabs/aws-encryption-sdk-specification/
+#       issues/91)
+# 
+# *  0.3.0
+# 
+#    -  Raw RSA keyring MUST NOT accept a key namespace of "aws-kms".
+#       (https://github.com/awslabs/aws-encryption-sdk-specification/
+#       issues/101)
+# 
+# *  0.2.0
+# 
+#    -  Remove Keyring Trace (../changes/2020-05-13_remove-keyring-
+#       trace/change.md)
+# 
+# *  0.1.0-preview
+# 
+#    -  Initial record
+
+[[spec]]
+level = "MUST"
+quote = '''
+-  Raw RSA keyring MUST NOT accept a key namespace of "aws-kms".
+'''
+

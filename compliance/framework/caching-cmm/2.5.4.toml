@@ -1,0 +1,24 @@
+target = "compliance/framework/caching-cmm.txt#2.5.4"
+
+# 2.5.4.  Partition ID
+#
+# A string that is used to avoid collisions with other CMMs.  If this
+# parameter is not set, the caching CMM MUST set a partition ID that
+# uniquely identifies the respective caching CMM.  The Partition ID
+# MUST NOT be changed after initialization.
+
+[[spec]]
+level = "MUST"
+quote = '''
+If this
+parameter is not set, the caching CMM MUST set a partition ID that
+uniquely identifies the respective caching CMM.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The Partition ID
+MUST NOT be changed after initialization.
+'''
+

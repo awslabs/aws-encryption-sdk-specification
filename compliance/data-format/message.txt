@@ -1,0 +1,84 @@
+
+
+
+
+AWS Crypto Tools                                            . Amazon AWS
+                                                              Amazon AWS
+                                                       21 September 2021
+
+
+                                message
+                                message
+
+Abstract
+
+   The message specification for the AWS Encryption SDK.
+
+Table of Contents
+
+   1.  Conventions and Definitions
+   2.  Message
+     2.1.  Version
+     2.2.  Overview
+     2.3.  Structure
+   3.  Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here
+
+2.  Message
+
+2.1.  Version
+
+   0.2.0
+
+   Note: This is the version of the message specification, not the
+   message format.
+
+2.2.  Overview
+
+   A message is a formatted structure that contains encrypted data and
+   associated metadata.
+
+2.3.  Structure
+
+   A message is a sequence of bytes that is the serialization of the
+   following, in order:
+
+   *  Message Header (message-header.md)
+
+   *  Message Body (message-body.md)
+
+   If the message header (message-header.md) contains an algorithm suite
+   (../framework/algorithm-suites.md) in the algorithm suite ID
+   (message-header.md#algorithm-suite-id) field that contains a
+   signature algorithm (../framework/algorithm-suites.md#signature-
+   algorithm), the message MUST also contain a message footer (message-
+   footer.md), serialized after the message body (message-body.md).
+
+3.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+Acknowledgments
+
+Author's Address
+
+   Amazon AWS
+   Amazon AWS
+
+   Email: cryptools+rfc@amazon.com

@@ -1,0 +1,40 @@
+target = "compliance/framework/kms-keyring.txt#2.8.2"
+
+# 2.8.2.  OnDecrypt Goal
+#
+# When a user configures an AWS KMS keyring for use on decrypt, they
+# are stating their intent for which CMKs the keyring _attempts_ to use
+# to decrypt encrypted data keys.
+# 
+# For example, if a user configures an AWS KMS keyring with CMK C
+# (using the CMK ARN) and uses it to decrypt an encrypted message that
+# contains encrypted data keys for CMKs A, B, and C, then the keyring
+# attempts to decrypt using CMK C.
+# 
+# However, if the keyring attempts to decrypt using CMK C and cannot,
+# this failure still honors the configured intent and MUST NOT halt
+# decryption.  The configured intent is that the keyring MUST _attempt_
+# with these CMKs, not that they MUST _succeed_.
+
+[[spec]]
+level = "MUST"
+quote = '''
+However, if the keyring attempts to decrypt using CMK C and cannot,
+this failure still honors the configured intent and MUST NOT halt
+decryption.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The configured intent is that the keyring MUST _attempt_
+with these CMKs, not that they MUST _succeed_.
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+The configured intent is that the keyring MUST _attempt_
+with these CMKs, not that they MUST _succeed_.
+'''
+

@@ -1,0 +1,14 @@
+target = "compliance/framework/default-cmm.txt#2.7.1"
+
+# 2.7.1.  Legacy
+#
+# This is a legacy specification.  Master key providers SHOULD NOT be
+# included in any additional implementations.
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+Master key providers SHOULD NOT be
+included in any additional implementations.
+'''
+

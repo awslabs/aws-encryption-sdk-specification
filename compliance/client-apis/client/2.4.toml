@@ -1,0 +1,54 @@
+target = "compliance/client-apis/client.txt#2.4"
+
+# 2.4.  Initialization
+#
+# On client initialization, the caller MUST have the option to provide
+# a:
+# 
+# *  commitment policy (Section 2.4.1)
+# 
+# *  maximum number of encrypted data keys (Section 2.4.2)
+# 
+# If no commitment policy (Section 2.4.1) is provided the default MUST
+# be REQUIRE_ENCRYPT_REQUIRE_DECRYPT (../framework/algorithm-
+# suites.md#require_encrypt_require_decrypt).  If no maximum number of
+# encrypted data keys (Section 2.4.2) is provided the default MUST
+# result in no limit on the number of encrypted data keys (aside from
+# the limit imposed by the message format (../format/message-
+# header.md)).
+# 
+# Once a commitment policy (Section 2.4.1) has been set it SHOULD be
+# immutable.
+
+[[spec]]
+level = "MUST"
+quote = '''
+On client initialization, the caller MUST have the option to provide
+a:
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If no commitment policy (Section 2.4.1) is provided the default MUST
+be REQUIRE_ENCRYPT_REQUIRE_DECRYPT (../framework/algorithm-
+suites.md#require_encrypt_require_decrypt).
+'''
+
+[[spec]]
+level = "MUST"
+quote = '''
+If no maximum number of
+encrypted data keys (Section 2.4.2) is provided the default MUST
+result in no limit on the number of encrypted data keys (aside from
+the limit imposed by the message format (../format/message-
+header.md)).
+'''
+
+[[spec]]
+level = "SHOULD"
+quote = '''
+Once a commitment policy (Section 2.4.1) has been set it SHOULD be
+immutable.
+'''
+
