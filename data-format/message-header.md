@@ -255,7 +255,7 @@ It is the data key encrypted by the key provider.
 
 #### Content Type
 
-The content type of the [message body](message-body.md#content-type).
+The content type of the [message body](message-body.md).
 The value (hex) of this field MUST be a value that exists in the following table:
 
 ##### Supported Content Types
@@ -285,7 +285,7 @@ This value MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-
 #### Frame Length
 
 The length of the [encrypted content](message-body.md#encrypted-content) within each [regular frame](message-body.md#regular-frame) of framed content.
-When the [content type](#Content-Type) is non-framed, the value of this field MUST be 0.
+When the [content type](#content-type) is non-framed, the value of this field MUST be 0.
 
 ### Header Authentication
 

@@ -140,7 +140,7 @@ on initialization:
 On default CMM initialization,
 the caller MUST provide the following value:
 
-- [Master Key Provider](#master-key-provider-interface.md)
+- [Master Key Provider](master-key-provider-interface.md)
 
 ### Get Encryption Materials (master key provider)
 

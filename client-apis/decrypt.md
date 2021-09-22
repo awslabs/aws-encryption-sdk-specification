@@ -174,8 +174,8 @@ The Decrypt operation is divided into several distinct steps:
 - [Parse the header](#parse-the-header)
 - [Get the decryption materials](#get-the-decryption-materials)
 - [Verify the header](#verify-the-header)
-- [Decrypt the body](#decrypt-the-body)
-- [Verify the signature](#verify-the-signatue)
+- [Decrypt the message body](#decrypt-the-message-body)
+- [Verify the signature](#verify-the-signature)
   - If the message header contains an algorithm suite including a
     [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
     this operation MUST perform this step.
@@ -286,7 +286,7 @@ If this tag verification fails, this operation MUST immediately halt and fail.
 If the input encrypted message is being [streamed](streaming.md) to this operation:
 
 - This operation SHOULD release the parsed [encryption context](#encryption-context),
-  [algorithm suite ID](#algorithm-suite-id),
+  [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id),
   and [other header information](#parsed-header)
   as soon as tag verification succeeds.
   However, if this operation is using an algorithm suite with a signature algorithm
@@ -294,8 +294,7 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
 - This operation SHOULD input the serialized header to the signature algorithm as soon as it is deserialized,
-  such that the serialized frame isn't required to remain in memory to complete
-  the [signature calculation](#signature-calculation).
+  such that the serialized frame isn't required to remain in memory to [verify the signature](#verify-the-signature).
 
 ### Decrypt the message body
 

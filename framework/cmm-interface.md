@@ -94,7 +94,7 @@ The decrypt materials request MUST include the following:
 The CMM Interface MUST support the following behaviors:
 
 - [Get Encryption Materials](#get-encryption-materials)
-- [Decrypt Materials](#decryption-request)
+- [Decrypt Materials](#decrypt-materials)
 
 #### Get Encryption Materials
 

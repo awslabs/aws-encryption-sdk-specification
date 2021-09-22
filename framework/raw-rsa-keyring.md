@@ -92,7 +92,7 @@ This keyring MUST NOT use a padding scheme outside those defined above.
 The RSA public key used by this keyring to encrypt data keys.
 
 The public key MUST follow the [RSA specification for public keys](#rsa).
-The raw RSA keyring SHOULD support loading PEM encoded [X.509 SubjectPublicKeyInfo structures](#https://tools.ietf.org/html/rfc5280#section-4.1)
+The raw RSA keyring SHOULD support loading PEM encoded [X.509 SubjectPublicKeyInfo structures](https://tools.ietf.org/html/rfc5280#section-4.1)
 as public keys.
 
 ### Private Key
@@ -100,7 +100,7 @@ as public keys.
 The RSA private key used by this keyring to decrypt data keys.
 
 The private key MUST follow the [RSA specification for private keys](#rsa).
-The raw RSA keyring SHOULD support loading PEM encoded [PKCS #8 PrivateKeyInfo structures](#https://tools.ietf.org/html/rfc5958#section-2)
+The raw RSA keyring SHOULD support loading PEM encoded [PKCS #8 PrivateKeyInfo structures](https://tools.ietf.org/html/rfc5958#section-2)
 as private keys.
 The private key SHOULD contain all Chinese Remainder Theorem (CRT) components (public exponent, prime factors, CRT exponents, and CRT coefficient).
 
@@ -128,8 +128,8 @@ If RSA encryption was successful, OnEncrypt MUST return the input
 [encryption materials](structures.md#encryption-materials), modified in the following ways:
 
 - The encrypted data key list has a new encrypted data key added, constructed as follows:
-  - The [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](#key-namespace).
-  - The [key provider information](structures.md#key-provider-information) field is this keyring's [key name](#key-name).
+  - The [key provider ID](structures.md#key-provider-id) field is this keyring's [key namespace](keyring-interface.md#key-namespace).
+  - The [key provider information](structures.md#key-provider-information) field is this keyring's [key name](keyring-interface.md#key-name).
   - The [ciphertext](structures.md#ciphertext) field is the ciphertext output by
     the RSA encryption of the plaintext data key.
 
@@ -150,9 +150,9 @@ For each encrypted data key, the keyring MUST attempt to decrypt the encrypted d
 using RSA if and only if the following is true:
 
 - The encrypted data key's [key provider information](structures.md#key-provider-information).
-  has a value equal to this keyring's [key name](#key-name).
+  has a value equal to this keyring's [key name](keyring-interface.md#key-name).
 - The encrypted data key's [key provider ID](structures.md#key-provider-id) has a value equal to
-  this keyring's [key namespace](#key-namespace).
+  this keyring's [key namespace](keyring-interface.md#key-namespace).
 
 The keyring performs RSA decryption with the following specifics:
 

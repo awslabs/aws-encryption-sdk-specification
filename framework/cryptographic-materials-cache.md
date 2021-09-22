@@ -76,7 +76,7 @@ The number of messages encrypted by the [encryption](structures.md#encryption-ma
 
 ##### Bytes Usage
 
-The number of bytes encrypted by the [encryption](#structures.md#encryption-materials) materials cached in this cache entry.
+The number of bytes encrypted by the [encryption](structures.md#encryption-materials) materials cached in this cache entry.
 
 ## Supported CMCs
 

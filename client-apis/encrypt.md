@@ -90,7 +90,7 @@ A Keyring that implements the [keyring interface](../framework/keyring-interface
 
 ### Algorithm Suite
 
-The [algorithm suite](#algorithm-suite.md) that SHOULD be used for encryption.
+The [algorithm suite](../framework/algorithm-suite.md) that SHOULD be used for encryption.
 
 ### Frame Length
 
@@ -120,7 +120,7 @@ The client SHOULD return as an output:
 ### Encrypted Message
 
 An encrypted form of the input [plaintext](#plaintext),
-encrypted according to the [operation specified below](#operation).
+encrypted according to the [behavior specified below](#behavior).
 This MUST be a sequence of bytes
 and conform to the [message format specification](../data-format/message.md).
 
@@ -303,8 +303,7 @@ to the message header calculated in this step.
 If the algorithm suite contains a signature algorithm and
 this operation is [streaming](streaming.md) the encrypted message output to the caller,
 this operation MUST input the serialized header to the signature algorithm as soon as it is serialized,
-such that the serialized header isn't required to remain in memory to complete
-the [signature calculation](#signature-calculation).
+such that the serialized header isn't required to remain in memory to [construct the signature](#construct-the-signature).
 
 ## Construct the body
 
@@ -390,8 +389,7 @@ the serialized frame SHOULD be released.
 If the algorithm suite contains a signature algorithm and
 this operation is [streaming](streaming.md) the encrypted message output to the caller,
 this operation MUST input the serialized frame to the signature algorithm as soon as it is serialized,
-such that the serialized frame isn't required to remain in memory to complete
-the [signature calculation](#signature-calculation).
+such that the serialized frame isn't required to remain in memory to [construct the signature](#construct-the-signature).
 
 ### Construct the signature
 
