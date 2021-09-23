@@ -111,6 +111,8 @@ If the algorithm suite does not contain a [signing algorithm](algorithm-suites.m
 but the encryption context includes the reserved `aws-crypto-public-key` key,
 the operation MUST fail without returning any decryption materials.
 
+The request MUST fail if the algorithm suite on the request is not supported by the [commitment policy](../client-apis/client.md#commitment-policy) on the request.
+
 On each call to Decrypt Materials,
 the default CMM MUST make a call to its [keyring's](#keyring)
 [On Decrypt](keyring-interface.md#ondecrypt) operation.
