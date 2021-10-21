@@ -41,3 +41,22 @@ but to easily apply them,
 run `./ci/prettify.sh write`.
 If you want to check them without writing,
 run `./ci/prettify.sh check`.
+
+## Generate Duvet Reports
+
+[Duvet](https://github.com/awslabs/duvet) is a tool that can be used to ensure specification is documented alongside code.
+
+This repo contains helpful scripts for installing and using Duvet with this specification.
+
+To install Duvet:
+
+```
+./util/install-duvet
+```
+
+To generate a report on what portions of this specification are covered in code, use the `report` script.
+For example:
+
+```
+./util/report.js 'src/main/**/*.java' 'src/test/**/*.java'
+```
