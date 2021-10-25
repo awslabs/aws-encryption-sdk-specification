@@ -4,7 +4,7 @@
 
 AWS Crypto Tools                                            . Amazon AWS
                                                               Amazon AWS
-                                                       21 September 2021
+                                                         25 October 2021
 
 
                      aws-kms-mrk-match-for-decrypt
@@ -77,7 +77,7 @@ Table of Contents
 
    The caller MUST provide:
 
-   *  2 AWS KMS key identifier
+   *  2 AWS KMS key identifiers
 
    If both identifiers are identical, this function MUST return "true".
    Otherwise if either input is not identified as a multi-Region key
