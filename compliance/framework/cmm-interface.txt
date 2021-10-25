@@ -4,7 +4,7 @@
 
 AWS Crypto Tools                                            . Amazon AWS
                                                               Amazon AWS
-                                                       21 September 2021
+                                                         25 October 2021
 
 
                              cmm-interface
@@ -157,6 +157,8 @@ Table of Contents
    The decrypt materials request MUST include the following:
 
    *  Algorithm Suite (algorithm-suites.md)
+
+   *  Commitment Policy (../client-apis/client.md#commitment-policy)
 
    *  Encrypted Data Keys (structures.md#encrypted-data-keys)
 

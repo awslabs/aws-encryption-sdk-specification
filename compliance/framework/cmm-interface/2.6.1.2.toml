@@ -9,6 +9,8 @@ target = "compliance/framework/cmm-interface.txt#2.6.1.2"
 # 
 # *  Algorithm Suite (algorithm-suites.md)
 # 
+# *  Commitment Policy (../client-apis/client.md#commitment-policy)
+# 
 # *  Encrypted Data Keys (structures.md#encrypted-data-keys)
 # 
 # *  Encryption Context (structures.md#encryption-context)
