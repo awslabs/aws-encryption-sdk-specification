@@ -12,3 +12,6 @@ venv/
 /.history
 /framework/aws-kms/.refcache
 /.refcache
+
+# pyenv files
+.python-version
