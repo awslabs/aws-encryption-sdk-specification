@@ -14,8 +14,8 @@ target = "compliance/framework/default-cmm.txt#2.6.1"
 # 
 # *  If the encryption materials request (cmm-interface.md#encryption-
 #    materials-request) does not contain an algorithm suite, the
-#    default algorithm suite for the commitment policy (../client-apis/
-#    client.md#commitment-policy) on the request MUST be added as the
+#    operation MUST add the default algorithm suite for the commitment
+#    policy (../client-apis/client.md#commitment-policy) as the
 #    algorithm suite in the encryption materials returned.
 # 
 # *  If the encryption materials request (cmm-interface.md#encryption-
@@ -74,8 +74,10 @@ operation MUST fail rather than overwrite the associated value.
 [[spec]]
 level = "MUST"
 quote = '''
-./client-apis/
-client.md#commitment-policy) on the request MUST be added as the
+*  If the encryption materials request (cmm-interface.md#encryption-
+materials-request) does not contain an algorithm suite, the
+operation MUST add the default algorithm suite for the commitment
+policy (../client-apis/client.md#commitment-policy) as the
 algorithm suite in the encryption materials returned.
 '''
 

@@ -76,8 +76,8 @@ already contains the `aws-crypto-public-key` key,
 this operation MUST fail rather than overwrite the associated value.
 
 - If the [encryption materials request](cmm-interface.md#encryption-materials-request) does not contain an algorithm suite,
-  the default algorithm suite for the [commitment policy](../client-apis/client.md#commitment-policy) on the request
-  MUST be added as the algorithm suite in the encryption materials returned.
+  the operation MUST add the default algorithm suite for the [commitment policy](../client-apis/client.md#commitment-policy)
+  as the algorithm suite in the encryption materials returned.
 - If the [encryption materials request](cmm-interface.md#encryption-materials-request) does contain an algorithm suite,
   the request MUST fail if the algorithm suite is not supported by the [commitment policy](../client-apis/client.md#commitment-policy) on the request.
 - If the [encryption materials request](cmm-interface.md#encryption-materials-request) does contain an algorithm suite,
