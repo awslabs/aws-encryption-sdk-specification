@@ -87,22 +87,22 @@ If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signat
 the default CMM MUST Generate a [signing key](structures.md#signing-key).
 
 If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
-the default CMM MUST Add the following key-value pair to the [encryption context](structures.md#encryption-context):
-
-- The key MUST be the reserved name, `aws-crypto-public-key`.
-- The value MUST be the base64-encoded public verification key.
+the default CMM MUST Add the key-value pair of
+key `aws-crypto-public-key`,
+value `base64-encoded public verification key`
+to the [encryption context](structures.md#encryption-context).
 
 On each call to Get Encryption Materials,
 the default CMM MUST make a call to its [keyring's](#keyring)
 [On Encrypt](keyring-interface.md#onencrypt) operation.
 
 The default CMM MUST obtain the Plaintext Data Key from the
-Get Encryption Materials Response and include it in the
+On Encrypt Response and include it in the
 [encryption materials](structures.md#encryption-materials) returned.
 
 The default CMM MUST obtain the
 [Encrypted Data Keys](structures.md#encrypted-data-keys)
-from the Get Encryption Materials Response and include it
+from the On Encrypt Response and include it
 in the [encryption materials](structures.md#encryption-materials) returned.
 
 ### Decrypt Materials
@@ -124,7 +124,7 @@ the default CMM MUST make a call to its [keyring's](#keyring)
 [On Decrypt](keyring-interface.md#ondecrypt) operation.
 
 The default CMM MUST obtain the Plaintext Data Key from
-the Decrypt Materials response and include it in the decrypt
+the On Decrypt response and include it in the decrypt
 materials returned.
 
 ## Legacy Behavior : Master Key Providers

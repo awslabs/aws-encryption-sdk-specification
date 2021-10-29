@@ -22,8 +22,8 @@ target = "compliance/framework/default-cmm.txt#2.6.2"
 # to its keyring's (Section 2.5.1) On Decrypt (keyring-
 # interface.md#ondecrypt) operation.
 # 
-# The default CMM MUST obtain the Plaintext Data Key from the Decrypt
-# Materials response and include it in the decrypt materials returned.
+# The default CMM MUST obtain the Plaintext Data Key from the On
+# Decrypt response and include it in the decrypt materials returned.
 
 [[spec]]
 level = "MUST"
@@ -70,7 +70,7 @@ interface.md#ondecrypt) operation.
 [[spec]]
 level = "MUST"
 quote = '''
-The default CMM MUST obtain the Plaintext Data Key from the Decrypt
-Materials response and include it in the decrypt materials returned.
+The default CMM MUST obtain the Plaintext Data Key from the On
+Decrypt response and include it in the decrypt materials returned.
 '''
 

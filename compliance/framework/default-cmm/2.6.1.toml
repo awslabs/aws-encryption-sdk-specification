@@ -33,26 +33,23 @@ target = "compliance/framework/default-cmm.txt#2.6.1"
 # signing key (structures.md#signing-key).
 # 
 # If the algorithm suite contains a signing algorithm (algorithm-
-# suites.md#signature-algorithm), the default CMM MUST Add the
-# following key-value pair to the encryption context
-# (structures.md#encryption-context):
-# 
-# *  The key MUST be the reserved name, "aws-crypto-public-key".
-# 
-# *  The value MUST be the base64-encoded public verification key.
+# suites.md#signature-algorithm), the default CMM MUST Add the key-
+# value pair of key "aws-crypto-public-key", value "base64-encoded public
+# verification key" to the encryption context (structures.md#encryption-
+# context).
 # 
 # On each call to Get Encryption Materials, the default CMM MUST make a
 # call to its keyring's (Section 2.5.1) On Encrypt (keyring-
 # interface.md#onencrypt) operation.
 # 
-# The default CMM MUST obtain the Plaintext Data Key from the Get
-# Encryption Materials Response and include it in the encryption
-# materials (structures.md#encryption-materials) returned.
+# The default CMM MUST obtain the Plaintext Data Key from the On
+# Encrypt Response and include it in the encryption materials
+# (structures.md#encryption-materials) returned.
 # 
 # The default CMM MUST obtain the Encrypted Data Keys
-# (structures.md#encrypted-data-keys) from the Get Encryption Materials
-# Response and include it in the encryption materials
-# (structures.md#encryption-materials) returned.
+# (structures.md#encrypted-data-keys) from the On Encrypt Response and
+# include it in the encryption materials (structures.md#encryption-
+# materials) returned.
 
 [[spec]]
 level = "SHOULD"
@@ -111,21 +108,10 @@ signing key (structures.md#signing-key).
 level = "MUST"
 quote = '''
 If the algorithm suite contains a signing algorithm (algorithm-
-suites.md#signature-algorithm), the default CMM MUST Add the
-following key-value pair to the encryption context
-(structures.md#encryption-context):
-'''
-
-[[spec]]
-level = "MUST"
-quote = '''
-*  The key MUST be the reserved name, "aws-crypto-public-key".
-'''
-
-[[spec]]
-level = "MUST"
-quote = '''
-*  The value MUST be the base64-encoded public verification key.
+suites.md#signature-algorithm), the default CMM MUST Add the key-
+value pair of key "aws-crypto-public-key", value "base64-encoded public
+verification key" to the encryption context (structures.md#encryption-
+context).
 '''
 
 [[spec]]
@@ -139,17 +125,17 @@ interface.md#onencrypt) operation.
 [[spec]]
 level = "MUST"
 quote = '''
-The default CMM MUST obtain the Plaintext Data Key from the Get
-Encryption Materials Response and include it in the encryption
-materials (structures.md#encryption-materials) returned.
+The default CMM MUST obtain the Plaintext Data Key from the On
+Encrypt Response and include it in the encryption materials
+(structures.md#encryption-materials) returned.
 '''
 
 [[spec]]
 level = "MUST"
 quote = '''
 The default CMM MUST obtain the Encrypted Data Keys
-(structures.md#encrypted-data-keys) from the Get Encryption Materials
-Response and include it in the encryption materials
-(structures.md#encryption-materials) returned.
+(structures.md#encrypted-data-keys) from the On Encrypt Response and
+include it in the encryption materials (structures.md#encryption-
+materials) returned.
 '''
 
