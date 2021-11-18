@@ -66,14 +66,27 @@ the caller MUST provide the following:
 - [Key Namespace](./keyring-interface.md#key-namespace)
 - [Key Name](./keyring-interface.md#key-name)
 - [Wrapping Key](#wrapping-key)
+- [Wrapping Algorithm](#wrapping-algorithm)
 
 ### Wrapping Key
 
-The AES key input to AES-GCM to encrypt plaintext data keys
+The AES key input to be used with the configured [wrapping algorithm](#wrapping-algorithm) to encrypt plaintext data keys.
 
 The wrapping key MUST be a secret value consisting of cryptographically secure pseudo-random bytes.
 It MUST be randomly generated from a cryptographically secure entropy source.
 The length of the wrapping key MUST be 128, 192, or 256.
+
+### Wrapping Algorithm
+
+The algorithm to be used with the configured [wrapping key](#wrapping-key) to encrypt plaintext data keys.
+
+The keyring MUST support the following algorithm configurations:
+
+- AES_GCM with key size 128 bits, IV length 12 bytes, and tag length 16 bytes
+- AES_GCM with key size 192 bits, IV length 12 bytes, and tag length 16 bytes
+- AES_GCM with key size 256 bits, IV length 12 bytes, and tag length 16 bytes
+
+Initialization MUST fail if the length of the [wrapping key](#wrapping-key) does not match the length specified by the wrapping algorithm.
 
 ## Structure
 
@@ -101,13 +114,13 @@ The [Key Name](./keyring-interface.md#key-name) of this keyring.
 
 The length, in bits, of the authentication tag returned by the AES-GCM encryption.
 
-This value MUST be 128.
+This value MUST match the authentication tag length of the keyring's configured [wrapping algorithm](#wrapping-algorithm]).
 
 #### IV Length
 
 The length, in bytes, of the initialization vector (IV) input into the AES-GCM encryption.
 
-This value MUST be 12.
+This value MUST match the IV length of the keyring's configured [wrapping algorithm](#wrapping-algorithm]).
 
 #### IV
 
@@ -152,12 +165,12 @@ The keyring MUST attempt to serialize the [encryption materials'](structures.md#
 [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
 If the keyring cannot serialize the encryption context, OnEncrypt MUST fail.
 
-The keyring must use AES-GCM with the following specifics:
+The keyring uses AES-GCM with the following specifics:
 
-- It uses the serialized [encryption context](structures.md#encryption-context-1) as the additional authenticated data (AAD).
-- It uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key.
-- It uses a randomly generated IV of 12 bytes.
-- It uses an authentication tag bit length of 128.
+- It MUST use the serialized [encryption context](structures.md#encryption-context-1) as the additional authenticated data (AAD).
+- It MUST use this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key.
+- It MUST use a cryptographically random generated IV of length specified by this keyring's [wrapping algorithm](#wrapping-algorithm).
+- It MUST use an authentication tag bit of length specified by this keyring's [wrapping algorithm](#wrapping-algorithm).
 
 Based on the ciphertext output of the AES-GCM decryption,
 the keyring MUST construct an [encrypted data key](structures.md#encrypted-data-key) with the following specifics:
@@ -196,21 +209,21 @@ to obtain the [encrypted key](#encrypted-key) and [authentication tag](#authenti
 deserialize the [serialized key provider info](#key-provider-information) to obtain the [key name](./keyring-interface.md#key-name),
 [IV](#iv), [IV length](#iv-length), and [authentication tag length](#authentication-tag-length).
 
-The keyring MUST attempt to decrypt the encrypted data key if and only if the following is true:
+The keyring attempts to decrypt the encrypted data key if and only if the following is true:
 
-- The [ciphertext](#ciphertext) and [key provider information](#key-provider-information) are successfully deserialized.
-- The key name obtained from the encrypted data key's key provider information has a value equal to this keyring's [key name](./keyring-interface.md#key-name).
-- The key provider ID of the encrypted data key has a value equal to this keyring's [key namespace](./keyring-interface.md#key-namespace).
-- The [IV length](#iv-length) obtained from the encrypted data key's key provider information has a value equal to 12.
-- The [authentication tag length](#authentication-tag-length) obtained from the key provider information has a value equal to 128.
+- The [ciphertext](#ciphertext) and [key provider information](#key-provider-information) MUST be successfully deserialized.
+- The key name obtained from the encrypted data key's key provider information MUST have a value equal to this keyring's [key name](./keyring-interface.md#key-name).
+- The key provider ID of the encrypted data key MUST have a value equal to this keyring's [key namespace](./keyring-interface.md#key-namespace).
+- The [IV length](#iv-length) obtained from the encrypted data key's key provider information MUST have a value equal to the length specified by this keyring's [wrapping algorithm](#wrapping-algorithm).
+- The [authentication tag length](#authentication-tag-length) obtained from the key provider information MUST have a value equal to the length specified by this keyring's [wrapping algorithm](#wrapping-algorithm).
 
-If decrypting, the keyring MUST use AES-GCM with the following specifics:
+If decrypting, the keyring uses AES-GCM with the following specifics:
 
-- It uses the [encrypt key](#encrypted-key) obtained from deserialization as the AES-GCM input ciphertext.
-- It uses the [authentication tag](#authentication-tag) obtained from deserialization as the AES-GCM input authentication tag.
-- It uses this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key.
-- It uses the [IV](#iv) obtained from deserialization as the AES-GCM IV.
-- It uses the serialized [encryption context](structures.md#encryption-context-1) as the AES-GCM AAD.
+- It MUST use the [encrypt key](#encrypted-key) obtained from deserialization as the AES-GCM input ciphertext.
+- It MUST use the [authentication tag](#authentication-tag) obtained from deserialization as the AES-GCM input authentication tag.
+- It MUST use this keyring's [wrapping key](#wrapping-key) as the AES-GCM cipher key.
+- It MUST use the [IV](#iv) obtained from deserialization as the AES-GCM IV.
+- It MUST use the serialized [encryption context](structures.md#encryption-context-1) as the AES-GCM AAD.
 
 If a decryption succeeds, this keyring MUST
 add the resulting plaintext data key to the decryption materials and return the modified materials.
