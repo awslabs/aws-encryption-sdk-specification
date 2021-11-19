@@ -1,15 +1,33 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# AWS KMS MRK Aware Multi Keyrings
+# AWS KMS Multi Keyrings
 
 ## Version
 
-0.2.2
+0.3.0
 
 ### Changelog
 
+- 0.3.0
+
+  - Incorporate [KMS Keyring Redesign](https://github.com/awslabs/aws-encryption-sdk-specification/tree/master/proposals/2020-07-01_aws-kms-keyring-redesign)
+
 - 0.2.2
+
+  - Rename Key IDs to [Key Names](#key-names) for increased clarity
+  - Update [Key Names](#key-names) and [Generator](#generator) sections to reinforce support for all AWS KMS key identifiers
+  - [Pull request link for discussions](https://github.com/awslabs/aws-encryption-sdk-specification/pull/123)
+
+- 0.2.1
+
+  - [Clarify naming of KMS to AWS KMS](https://github.com/awslabs/aws-encryption-sdk-specification/issues/67)
+
+- 0.2.0
+
+  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+
+- 0.1.0-preview
 
   - Initial record
 
@@ -48,7 +66,7 @@ If a regional client supplier is not passed, then a default MUST be created that
 
 A set of AWS KMS clients MUST be created by calling regional client supplier for each region in the input set of regions.
 
-Then a set of [AWS KMS MRK Aware Symmetric Region Discovery Keyring](aws-kms-mrk-aware-symmetric-region-discovery-keyring.md) MUST be created for each AWS KMS client by initializing each keyring with
+Then a set of [AWS KMS Discovery Keyring](aws-kms-discovery-keyring.md) MUST be created for each AWS KMS client by initializing each keyring with
 
 - The AWS KMS client
 - The input discovery filter
@@ -62,16 +80,14 @@ This Multi-Keyring MUST be this functions output.
 The caller MUST provide:
 
 - An optional AWS KMS key identifiers to use as the generator.
-- An optional set of AWS KMS key identifiers to us as child keyrings.
+- An optional set of AWS KMS key identifiers to use as child keyrings.
 - An optional method that can take a region string and return an AWS KMS client e.g. a regional client supplier
 - An optional list of AWS KMS grant tokens
 
-If any of the AWS KMS key identifiers is not a [valid AWS KMS key ARN](aws-kms-key-arn.md#a-valid-aws-kms-arn), this function MUST fail
-All AWS KMS identifiers are passed to [Assert AWS KMS MRK are unique](aws-kms-mrk-are-unique.md#Implementation)
-and the function MUST return success otherwise this MUST fail.
+If any of the AWS KMS key identifiers is not a [valid AWS KMS key ARN](aws-kms-key-arn.md#a-valid-aws-kms-arn), this function MUST fail.
 If a regional client supplier is not passed, then a default MUST be created that takes a region string and generates a default AWS SDK client for the given region.
 
-If there is a generator input then the generator keyring MUST be a [AWS KMS MRK Aware Symmetric Keyring](aws-kms-mrk-aware-symmetric-keyring.md) initialized with
+If there is a generator input then the generator keyring MUST be a [AWS KMS Keyring](aws-kms-keyring.md) initialized with
 
 - The generator input.
 - The AWS KMS client that MUST be created by the regional client supplier
@@ -79,7 +95,7 @@ If there is a generator input then the generator keyring MUST be a [AWS KMS MRK 
   or a signal for the AWS SDK to select the default region.
 - The input list of AWS KMS grant tokens
 
-If there is a set of child identifiers then a set of [AWS KMS MRK Aware Symmetric Keyring](aws-kms-mrk-aware-symmetric-keyring.md) MUST be created for each AWS KMS key identifier by initialized each keyring with
+If there is a set of child identifiers then a set of [AWS KMS Keyring](aws-kms-keyring.md) MUST be created for each AWS KMS key identifier by initializing each keyring with
 
 - AWS KMS key identifier.
 - The AWS KMS client that MUST be created by the regional client supplier
@@ -90,4 +106,4 @@ If there is a set of child identifiers then a set of [AWS KMS MRK Aware Symmetri
 NOTE: The AWS Encryption SDK SHOULD NOT attempt to evaluate its own default region.
 
 Then a [Multi-Keyring](../multi-keyring.md#inputs) MUST be initialize by using this generator keyring as the [generator keyring](../multi-keyring.md#generator-keyring) and this set of child keyrings as the [child keyrings](../multi-keyring.md#child-keyrings).
-This Multi-Keyring MUST be this functions output.
+This Multi-Keyring MUST be this function's output.

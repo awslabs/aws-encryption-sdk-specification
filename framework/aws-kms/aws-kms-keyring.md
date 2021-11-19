@@ -1,15 +1,33 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# AWS KMS MRK Aware Symmetric Keyring
+# AWS KMS Keyring
 
 ## Version
 
-0.2.2
+0.3.0
 
 ### Changelog
 
+- 0.3.0
+
+  - Incorporate [KMS Keyring Redesign](https://github.com/awslabs/aws-encryption-sdk-specification/tree/master/proposals/2020-07-01_aws-kms-keyring-redesign)
+
 - 0.2.2
+
+  - Rename Key IDs to [Key Names](#key-names) for increased clarity
+  - Update [Key Names](#key-names) and [Generator](#generator) sections to reinforce support for all AWS KMS key identifiers
+  - [Pull request link for discussions](https://github.com/awslabs/aws-encryption-sdk-specification/pull/123)
+
+- 0.2.1
+
+  - [Clarify naming of KMS to AWS KMS](https://github.com/awslabs/aws-encryption-sdk-specification/issues/67)
+
+- 0.2.0
+
+  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
+
+- 0.1.0-preview
 
   - Initial record
 
@@ -20,9 +38,8 @@
 
 ## Overview
 
-A keyring which interacts with AWS Key Management Service (AWS KMS)
-to create, encrypt, and decrypt data keys
-using AWS KMS defined Customer Master Keys (CMKs).
+A keyring which interacts with AWS Key Management Service (AWS KMS) to create, encrypt, and decrypt data keys
+using AWS KMS keys.
 
 ## Definitions
 
@@ -71,7 +88,7 @@ OnEncrypt MUST NOT modify the [encryption materials](../structures.md#encryption
 
 If the Generate Data Key call succeeds, OnEncrypt MUST verify that the response `Plaintext` length matches
 the specification of the [algorithm suite](../algorithm-suites.md)'s Key Derivation Input Length field.
-The Generate Data Key response’s `KeyId` MUST be [A valid AWS KMS key ARN](aws-kms-key-arn.md#identifying-an-aws-kms-multi-region-key).
+The Generate Data Key response’s `KeyId` MUST be [a valid AWS KMS key ARN](aws-kms-key-arn.md#a-valid-aws-kms-arn).
 If verified, OnEncrypt MUST do the following with the response from [AWS KMS GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html):
 
 - set the plaintext data key on the [encryption materials](../structures.md#encryption-materials) as the response `Plaintext`.
@@ -121,8 +138,7 @@ The set of encrypted data keys MUST first be filtered to match this keyring’s 
 
 - Its provider ID MUST exactly match the value “aws-kms”.
 - The provider info MUST be a [valid AWS KMS ARN](aws-kms-key-arn.md#a-valid-aws-kms-arn) with a resource type of `key` or OnDecrypt MUST fail.
-- The the function [AWS KMS MRK Match for Decrypt](aws-kms-mrk-match-for-decrypt.md#implementation)
-  called with the configured AWS KMS key identifier and the provider info MUST return `true`.
+- The provider info MUST match the configured AWS KMS key identifier.
 
 For each encrypted data key in the filtered set, one at a time, the OnDecrypt MUST attempt to decrypt the data key.
 If this attempt results in an error, then these errors MUST be collected.
@@ -138,7 +154,7 @@ When calling [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIReferen
 
 - `GrantTokens`: this keyring's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token)
 
-If the call to [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html) succeeds OnDecrypt verifies
+If the call to [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html) succeeds OnDecrypt verifies:
 
 - The `KeyId` field in the response MUST equal the configured AWS KMS key identifier.
 - The length of the response’s `Plaintext` MUST equal the [key derivation input length](../algorithm-suites.md#key-derivation-input-length)
@@ -147,7 +163,7 @@ If the call to [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIRefer
 If the response does not satisfies these requirements then an error MUST be collected
 and the next encrypted data key in the filtered set MUST be attempted.
 
-If the response does satisfies these requirements then OnDecrypt MUST do the following with the response:
+If the response does satisfy these requirements then OnDecrypt MUST do the following with the response:
 
 - set the plaintext data key on the [decryption materials](../structures.md#decryption-materials) as the response `Plaintext`.
 - immediately return the modified [decryption materials](../structures.md#decryption-materials).
