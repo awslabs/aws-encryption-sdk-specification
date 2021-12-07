@@ -114,13 +114,13 @@ The [Key Name](./keyring-interface.md#key-name) of this keyring.
 
 The length, in bits, of the authentication tag returned by the AES-GCM encryption.
 
-This value MUST match the authentication tag length of the keyring's configured [wrapping algorithm](#wrapping-algorithm]).
+This value MUST match the authentication tag length of the keyring's configured [wrapping algorithm](#wrapping-algorithm).
 
 #### IV Length
 
 The length, in bytes, of the initialization vector (IV) input into the AES-GCM encryption.
 
-This value MUST match the IV length of the keyring's configured [wrapping algorithm](#wrapping-algorithm]).
+This value MUST match the IV length of the keyring's configured [wrapping algorithm](#wrapping-algorithm).
 
 #### IV
 
