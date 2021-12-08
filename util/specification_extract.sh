@@ -1,11 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-./util/extract.js framework/**/*.md
+SCRIPT_SOURCE=$(dirname "$0")
 
-./util/extract.js framework/*.md
+FILES=("$SCRIPT_SOURCE"/../framework/**/*.md)
+FILES+=("$SCRIPT_SOURCE"/../framework/*.md)
+FILES+=("$SCRIPT_SOURCE"/../client-apis/*.md)
+FILES+=("$SCRIPT_SOURCE"/../data-format/*.md)
 
-./util/extract.js client-apis/*.md 
+echo "Extracting ${#FILES[@]} files:"
 
-./util/extract.js data-format/*.md
-
-
+for FILE in "${FILES[@]}"
+do
+    RESOLVED="$(cd "$(dirname "$FILE")"; pwd -P)/$(basename "$FILE")"
+    echo "Extracting: $RESOLVED"
+    "$SCRIPT_SOURCE"/extract.js "$FILE"
+done
