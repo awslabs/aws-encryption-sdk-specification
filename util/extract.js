@@ -74,7 +74,7 @@ function extract(filePath) {
   );
 
   // Convert the markdown file from RFC XML
-  execSync(["kramdown-rfc2629", markdownSpecFile, ">", xmlRfcFile].join(" "), {stdio: 'inherit'});
+  execSync(["kramdown-rfc2629", "-3", markdownSpecFile, ">", xmlRfcFile].join(" "), {stdio: 'inherit'});
 
   // An existing spec may exists, clean up first
   try {
