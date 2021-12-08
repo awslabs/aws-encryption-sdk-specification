@@ -88,7 +88,12 @@ function extract(filePath) {
   mkdirSync(complianceDir, { recursive: true });
 
   // Convert the RFC XML to a ietf rfc
-  execSync(["xml2rfc", "-P", xmlRfcFile, "-o", complianceSpec].join(" "), {stdio: 'inherit'});
+  execSync(["xml2rfc",
+    "-P", xmlRfcFile,
+    "-s", "'Too long line found'", // Suppress warnings about long table line length
+    "-s", "'Total table width'",   // Suppress warnings about overall table width
+    "-o", complianceSpec
+  ].join(" "), {stdio: 'inherit'});
 
   const args = ["duvet", "extract", `${complianceSpec}`, "-o", "compliance"];
   // extract the specification
@@ -105,7 +110,7 @@ function extract_needs(filePath) {
 }
 
 // The `ipr: none` is particularly important
-// this removed boilerplate (especially Copyright) 
+// this removed boilerplate (especially Copyright)
 function header(docName) {
   return `---
 title: ${docName}
