@@ -15,8 +15,8 @@
 
 - 0.2.2
 
-  - Rename Key IDs to [Key Names](#key-names) for increased clarity
-  - Update [Key Names](#key-names) and [Generator](#generator) sections to reinforce support for all AWS KMS key identifiers
+  - Rename Key IDs to Key Names for increased clarity
+  - Update Key Names and Generator sections to reinforce support for all AWS KMS key identifiers
   - [Pull request link for discussions](https://github.com/awslabs/aws-encryption-sdk-specification/pull/123)
 
 - 0.2.1

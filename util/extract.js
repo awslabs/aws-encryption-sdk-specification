@@ -21,10 +21,6 @@ const ext = ".md";
 const pathToComplianceRoot = `${relative(process.cwd(), `${__dirname}/../compliance`)}`;
 
 needs(
-  () => statSync(pathToComplianceRoot).isDirectory(),
-  `Compliance directory ${pathToComplianceRoot} does not exist.`
-);
-needs(
   () => execSync("which kramdown-rfc2629"),
   "kramdown-rfc2629 needs to be installed try `gem install kramdown-rfc2629`"
 );
@@ -54,6 +50,13 @@ function extract(filePath) {
   const xmlRfcFile = resolve(tmpdir, `${fileName}.xml`);
   const complianceSpec = join(pathToComplianceRoot, dirname(filePath), `${fileName}.txt`);
   const complianceDir = join(pathToComplianceRoot, dirname(filePath), fileName);
+
+  // Create the root compliance directory if it doesn't exist
+  try {
+    statSync(pathToComplianceRoot).isDirectory();
+  } catch (ex) {
+    mkdirSync(pathToComplianceRoot, { recursive: true });
+  }
 
   /*
     1. Get the file name without extension
