@@ -107,7 +107,7 @@ and MUST NOT modify the [decryption materials](structures.md#decryption-material
 Otherwise, OnDecrypt MUST first attempt to decrypt the [encrypted data keys](structures.md#encrypted-data-keys-1)
 in the input [decryption materials](structures.md#decryption-materials) using its
 [generator keyring](#generator-keyring). If the generator keyring is unable to decrypt
-the materials, the multi-keyring MUST attempt to decrypt using its child keyrings.
+the materials, the multi-keyring MUST attempt to decrypt using its child keyrings,
 until one either succeeds in decryption or all have failed.
 
 For each [keyring](keyring-interface.md) to be used for decryption,
