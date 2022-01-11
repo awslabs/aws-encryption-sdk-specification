@@ -36,17 +36,17 @@ MUST implement that [AWS Encryption SDK Keyring interface](../keyring-interface.
 
 ## Initialization
 
-On initialization the caller MUST provide:
+On initialization the keyring MUST accept the following parameters:
 
-- An AWS KMS client
+- A required AWS KMS client
+- A required string indicating the region of the KMS client
 - An optional discovery filter that is an AWS partition and a set of AWS accounts
 - An optional list of AWS KMS grant tokens
 
-The keyring MUST know what Region the AWS KMS client is in.
-It SHOULD obtain this information directly from the client as opposed to having an additional parameter.
-However if it can not, then it MUST NOT create the client itself.
-It SHOULD have a Region parameter and SHOULD try to identify mismatched configurations.
-i.e. The client is in Region A and the Region parameter is B.
+They keyring MUST fail initialization if any required parameters are missing or null.
+The keyring SHOULD fail initialization if the provided region does not match the
+region of the KMS client. Note that in some implementations this may not be
+possible, as some AWS SDKs may not provide an API to access this information.
 
 ## OnEncrypt
 
