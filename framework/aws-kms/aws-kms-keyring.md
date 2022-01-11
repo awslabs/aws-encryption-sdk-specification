@@ -115,9 +115,9 @@ If the call to [AWS KMS Encrypt](https://docs.aws.amazon.com/kms/latest/APIRefer
 
 If the Encrypt call succeeds the response’s `KeyId` MUST be [A valid AWS KMS key ARN](aws-kms-key-arn.md#a-valid-aws-kms-arn). If verified, OnEncrypt MUST append a new [encrypted data key](../structures.md#encrypted-data-key) to the encrypted data key list in the [encryption materials](../structures.md#encryption-materials), constructed as follows:
 
-  - The [ciphertext](../structures.md#ciphertext) MUST be the response `CiphertextBlob`.
-  - The [key provider id](../structures.md#key-provider-id) MUST be "aws-kms".
-  - The [key provider information](../structures.md#key-provider-information) MUST be the response `KeyId`. Note that the `KeyId` in the response is always in key ARN format.
+- The [ciphertext](../structures.md#ciphertext) MUST be the response `CiphertextBlob`.
+- The [key provider id](../structures.md#key-provider-id) MUST be "aws-kms".
+- The [key provider information](../structures.md#key-provider-information) MUST be the response `KeyId`. Note that the `KeyId` in the response is always in key ARN format.
 
 If all Encrypt calls succeed, OnEncrypt MUST output the modified [encryption materials](../structures.md#encryption-materials).
 
