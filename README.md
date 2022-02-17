@@ -112,7 +112,7 @@ we are ahead of the tooling).
 
 Follow [AWS Crypto Tools Getting Started with Python instructions](https://github.com/aws/crypto-tools/blob/master/getting-started/python/README.md#local-development-setup) to install `pyenv`.
 
-Then, in this repository, run `pyenv local 3.8; pip install xml2rfc`.
+Then, in this repository, run `pyenv local 3.9.7; python3 -m pip install xml2rfc==3.5.0`.
 
 #### Set up `kramdown-rfc2629`
 
