@@ -42,7 +42,7 @@ this specification for encryption.
 
 The following inputs to this behavior are REQUIRED:
 
-- [Plaintext](#plaintext)
+- [Plaintext ](#plaintext)
 - Either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
 
 The following inputs to this behavior MUST be OPTIONAL:
@@ -51,12 +51,12 @@ The following inputs to this behavior MUST be OPTIONAL:
 - [Encryption Context](#encryption-context)
 - [Frame Length](#frame-length)
 
-If the input [plaintext](#plaintext) is of unknown length, the caller MAY also input a
+If the [plaintext ](#plaintext) is of unknown length, the caller MAY also input a
 [Plaintext Length Bound](#plaintext-length-bound).
 
-Implementations SHOULD ensure that a caller is not able to specify both a [plaintext](#plaintext)
+Implementations SHOULD ensure that a caller is not able to specify both a [plaintext ](#plaintext)
 with known length and a [Plaintext Length Bound](#plaintext-length-bound) by construction.
-If a caller is able to specify both an input [plaintext](#plaintext) with known length and
+If a caller is able to specify both an input [plaintext ](#plaintext) with known length and
 a [Plaintext Length Bound](#plaintext-length-bound),
 the [Plaintext Length Bound](#plaintext-length-bound) MUST NOT be used during the Encrypt operation
 and MUST be ignored.
@@ -100,7 +100,7 @@ This value MUST default to 4096 bytes.
 
 ### Plaintext Length Bound
 
-A bound on the length of [plaintext](#plaintext) with an unknown length to encrypt.
+A bound on the length of [plaintext ](#plaintext) with an unknown length to encrypt.
 
 If this input is provided, this operation MUST NOT encrypt a plaintext with length
 greater than this value.
@@ -119,7 +119,7 @@ The client SHOULD return as an output:
 
 ### Encrypted Message
 
-An encrypted form of the input [plaintext](#plaintext),
+An encrypted form of the input [plaintext ](#plaintext),
 encrypted according to the [behavior specified below](#behavior).
 This MUST be a sequence of bytes
 and conform to the [message format specification](../data-format/message.md).
@@ -132,14 +132,14 @@ that implementation SHOULD NOT provide an API that allows this output to be stre
 ### Encryption Context
 
 The [encryption context](../framework/structures.md#encryption-context) that is used as
-additional authenticated data during the encryption of the input [plaintext](#plaintext).
+additional authenticated data during the encryption of the input [plaintext ](#plaintext).
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
 ### Algorithm Suite
 
 The [algorithm suite](../framework/algorithm-suites.md) that is used to encrypt
-the input [plaintext](#plaintext).
+the input [plaintext ](#plaintext).
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
@@ -194,7 +194,7 @@ on that CMM MUST be constructed as follows:
   Otherwise, this field is not included.
 - Max Plaintext Length: If the [input plaintext](#plaintext) has known length,
   this length MUST be used.
-  If the input [plaintext](#plaintext) has unknown length and a [Plaintext Length Bound](#plaintext-length-bound)
+  If the input [plaintext ](#plaintext) has unknown length and a [Plaintext Length Bound](#plaintext-length-bound)
   was provided, this is the [Plaintext Length Bound](#plaintext-length-bound).
   Otherwise, this field is not included.
 
@@ -218,9 +218,7 @@ Note that if the key derivation algorithm is the [identity KDF](../framework/alg
 then the derived data key is the same as the plaintext data key.
 
 The frame length used in the procedures described below is the input [frame length](#frame-length),
-if supplied.
-If a frame length is not specified on input, this operation MUST choose a reasonable value to
-default to.
+if supplied, or the default if not.
 
 ### Construct the header
 
@@ -436,5 +434,5 @@ the [message body](../data-format/message-body.md) was serialized with the follo
   - The AAD is the serialized [message body AAD](../data-format/message-body-aad.md)
   - The IV is the [IV](../data-format/message-body.md#iv) specified above.
   - The cipherkey is the derived data key
-  - The plaintext is the input [plaintext](#plaintext)
+  - The plaintext is the input [plaintext ](#plaintext)
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag returned by the above encryption.

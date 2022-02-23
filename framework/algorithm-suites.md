@@ -78,7 +78,7 @@ the AWS Encryption SDK MUST use HKDF with the following specifics:
   - The length of the output keying material MUST equal the [encryption key length](#encryption-key-length)
     specified by the [algorithm suite encryption settings](#algorithm-suites-encryption-settings).
   - If [key commitment](#key-commitment) for the [algorithm suite encryption key derivation setting](#algorithm-suites-encryption-key-derivation-settings) is True,
-    then the input info MUST be the string `DERIVEKEY` as UTF8 encoded bytes.
+    then the input info MUST be a concatenation of the [algorithm suite ID](#algorithm-suite-id) followed by the string `DERIVEKEY` as UTF8 encoded bytes.
   - If [key commitment](#key-commitment) for the [algorithm suite encryption key derivation setting](#algorithm-suites-encryption-key-derivation-settings) is False,
     the the input info MUST be a concatenation of the [algorithm suite ID](#algorithm-suite-id)
     followed by the [message ID](../data-format/message-header.md#message-id).
