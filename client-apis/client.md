@@ -92,9 +92,9 @@ When the commitment policy `REQUIRE_ENCRYPT_REQUIRE_DECRYPT` is configured:
 ### Encrypt
 
 The AWS Encryption SDK Client MUST provide an [encrypt](./encrypt.md#input) function
-that will honor the client's configured [commitment policy](#commitment-policy).
+that adheres to [encrypt](./encrypt.md).
 
 ### Decrypt
 
 The AWS Encryption SDK Client MUST provide an [decrypt](./decrypt.md#input) function
-that will honor the client's configured [commitment policy](#commitment-policy).
+that adheres to [decrypt](./decrypt.md).
