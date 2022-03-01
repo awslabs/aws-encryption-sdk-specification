@@ -22,15 +22,15 @@ const pathToComplianceRoot = `${relative(process.cwd(), `${__dirname}/../complia
 
 needs(
   () => execSync("which kramdown-rfc2629"),
-  "kramdown-rfc2629 needs to be installed try `gem install kramdown-rfc2629`"
+  "kramdown-rfc2629 needs to be installed, try `gem install kramdown-rfc2629 -v 1.5.21`"
 );
 needs(
   () => execSync("which xml2rfc"),
-  "xml2rfc needs to be installed try `pip install xml2rfc`"
+  "xml2rfc needs to be installed, try `pip install xml2rfc==3.5.0`"
 );
 needs(
   () => execSync("which duvet"),
-  "duvet needs to be installed try `util/install-duvet`"
+  "duvet needs to be installed, try `util/install-duvet`"
 );
 
 /* May need to change this to a better parser...
