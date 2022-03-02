@@ -57,11 +57,12 @@ The bytes are appended in the order shown.
 #### Header Body Version 1.0
 
 The following table describes the fields that form the Version 1.0 header body.
+The value of the `Version` field MUST be `01` in the Version 1.0 header body.
 The bytes are appended in the order shown.
 
 | Field                                       | Length (bytes)                                                                    | Interpreted as                                                                                |
 | ------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [Version](#version)                         | 1                                                                                 | See [Supported Versions](#supported-versions) (MUST be `01` in version 1.0 Headers)           |
+| [Version](#version)                         | 1                                                                                 | See [Supported Versions](#supported-versions)                                                 |
 | [Type](#type)                               | 1                                                                                 | See [Supported Types](#supported-types)                                                       |
 | [Algorithm Suite ID](#algorithm-suite-id)   | 2                                                                                 | See [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) |
 | [Message ID](#message-id)                   | 16                                                                                | Bytes                                                                                         |
@@ -75,11 +76,12 @@ The bytes are appended in the order shown.
 #### Header Body Version 2.0
 
 The following table describes the fields that form the Version 2.0 header body.
+The value of the `Version` field MUST be `02` in the Version 2.0 header body.
 The bytes are appended in the order shown.
 
 | Field                                         | Length (bytes)                                                                    | Interpreted as                                                                                |
 | --------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [Version](#version)                           | 1                                                                                 | See [Supported Versions](#supported-versions) (MUST be `02` in version 2.0 Headers)           |
+| [Version](#version)                           | 1                                                                                 | See [Supported Versions](#supported-versions)                                                 |
 | [Algorithm Suite ID](#algorithm-suite-id)     | 2                                                                                 | See [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) |
 | [Message ID](#message-id)                     | 32                                                                                | Bytes                                                                                         |
 | [AAD](#aad)                                   | Variable. [Self-describing](#aad).                                                | [AAD](#aad)                                                                                   |
@@ -136,10 +138,6 @@ The purpose of the message ID is to:
 
 The Additional Authenticated Data (AAD) for the header.
 This AAD is an encoding of the [encryption context](../framework/structures.md#encryption-context).
-
-When algorithms with signing are used,
-the encryption context MUST contain the key-value pair {`aws-crypto-public-key`, `Qtxt`},
-where `Qtxt` is the base64-encoded serialized form of the [signature verification key](../framework/algorithm-suites.md#ecdsa).
 
 The following table describes the fields that form the AAD.
 The bytes are appended in the order shown.
