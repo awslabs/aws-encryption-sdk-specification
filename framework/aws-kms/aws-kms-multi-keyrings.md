@@ -51,31 +51,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 Customers need a way to compose the single AWS KMS keyrings in an easy way. These functions take configuration and produce and compose many keyrings into a Multi Keyring.
 
-## Discovery Multi-Keyring
-
-The caller MUST provide:
-
-- A set of Region strings
-- An optional discovery filter that is an AWS partition and a set of AWS accounts
-- An optional method that can take a region string and return an AWS KMS client e.g. a regional client supplier
-- An optional list of AWS KMS grant tokens
-
-If an empty set of Region is provided this function MUST fail.
-If any element of the set of regions is null or an empty string this function MUST fail.
-If a regional client supplier is not passed, then a default MUST be created that takes a region string and generates a default AWS SDK client for the given region.
-
-A set of AWS KMS clients MUST be created by calling regional client supplier for each region in the input set of regions.
-
-Then a set of [AWS KMS Discovery Keyring](aws-kms-discovery-keyring.md) MUST be created for each AWS KMS client by initializing each keyring with
-
-- The AWS KMS client
-- The input discovery filter
-- The input AWS KMS grant tokens
-
-Then a [Multi-Keyring](../multi-keyring.md#inputs) MUST be initialize by using this set of discovery keyrings as the [child keyrings](../multi-keyring.md#child-keyrings).
-This Multi-Keyring MUST be this functions output.
-
-## Strict Multi-Keyring
+## AWS KMS Multi-Keyring
 
 The caller MUST provide:
 
@@ -107,3 +83,27 @@ NOTE: The AWS Encryption SDK SHOULD NOT attempt to evaluate its own default regi
 
 Then a [Multi-Keyring](../multi-keyring.md#inputs) MUST be initialize by using this generator keyring as the [generator keyring](../multi-keyring.md#generator-keyring) and this set of child keyrings as the [child keyrings](../multi-keyring.md#child-keyrings).
 This Multi-Keyring MUST be this function's output.
+
+## AWS KMS Discovery Multi-Keyring
+
+The caller MUST provide:
+
+- A set of Region strings
+- An optional discovery filter that is an AWS partition and a set of AWS accounts
+- An optional method that can take a region string and return an AWS KMS client e.g. a regional client supplier
+- An optional list of AWS KMS grant tokens
+
+If an empty set of Region is provided this function MUST fail.
+If any element of the set of regions is null or an empty string this function MUST fail.
+If a regional client supplier is not passed, then a default MUST be created that takes a region string and generates a default AWS SDK client for the given region.
+
+A set of AWS KMS clients MUST be created by calling regional client supplier for each region in the input set of regions.
+
+Then a set of [AWS KMS Discovery Keyring](aws-kms-discovery-keyring.md) MUST be created for each AWS KMS client by initializing each keyring with
+
+- The AWS KMS client
+- The input discovery filter
+- The input AWS KMS grant tokens
+
+Then a [Multi-Keyring](../multi-keyring.md#inputs) MUST be initialize by using this set of discovery keyrings as the [child keyrings](../multi-keyring.md#child-keyrings).
+This Multi-Keyring MUST be this functions output.

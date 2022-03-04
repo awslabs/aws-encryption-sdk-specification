@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# AWS KMS MRK Aware Symmetric Region Discovery Keyring
+# AWS KMS MRK Discovery Keyring
 
 ## Version
 
