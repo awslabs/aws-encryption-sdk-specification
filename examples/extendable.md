@@ -54,4 +54,3 @@ Each example extendable MUST be in the appropriate directory.
 Example extendables MUST include sufficent code to clearly demonstrate
 how to implement the interface and
 how to use the implemented interface.
-This code MUST be in the native language.
