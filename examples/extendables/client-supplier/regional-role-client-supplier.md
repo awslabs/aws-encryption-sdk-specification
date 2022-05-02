@@ -3,7 +3,7 @@
 
 # Regional Role Client Supplier
 
-Implementations of this  MUST follow the rules defined in
+Implementations of this MUST follow the rules defined in
 [Example Extendables](../../../extendable.md).
 
 ## Implementations
@@ -20,10 +20,10 @@ The key words
 in this document are to be interpreted as described in
 [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
-
 ## Regional Role Client Supplier Class
 
 ### Header
+
 ```c#
 /// <summary>
 ///     Demonstrates implementing a Custom Client Supplier.
@@ -106,9 +106,11 @@ public class RegionalRoleClientSupplier : ClientSupplierBase
 ```
 
 ### Custom Exceptions
+
 These exceptions MUST extend `AwsCryptographicMaterialProvidersBaseException`.
 
 #### Missing Region Exception
+
 ```c#
 // Custom Exceptions SHOULD extend from the Library's Base Exception.
 // This is a quirk of using Dafny to generate the Encryption SDK.
@@ -126,6 +128,7 @@ public class MissingRegionException : AwsCryptographicMaterialProvidersBaseExcep
 ```
 
 #### Assume Role Exception
+
 ```c#
 public class AssumeRoleException : AwsCryptographicMaterialProvidersBaseException
 {
@@ -148,6 +151,7 @@ Implementations of this example MUST follow the rules defined in
 [Example Templates](../../../examples.md#example-templates).
 
 ### Header
+
 ```c#
 /// Demonstrates using a Custom Client Supplier.
 /// See <c>RegionalRoleClientSupplier.cs</c> for the details of implementing a
@@ -157,6 +161,7 @@ Implementations of this example MUST follow the rules defined in
 ```
 
 ### Summary
+
 ```c#
 /// Demonstrates using a Custom Client Supplier.
 ```
@@ -165,19 +170,17 @@ Implementations of this example MUST follow the rules defined in
 
 - **plaintext** :
   Plaintext to encrypt
-  
 - **keyArn** :
   KMS Key Arn to encrypt/decrypt data with
-  
 - **accountIds** :
   List of trusted AWS Account Ids
-  
 - **regions** :
   List of AWS Regions trusted AWS Accounts operate in
-  
+
 ### Steps
 
 1. Generate or load a ciphertext encrypted by the KMS Key.
+
 ```c#
 // Instantiate the Material Providers and the AWS Encryption SDK
 var materialProviders =
@@ -193,6 +196,7 @@ MemoryStream ciphertext;
 ```
 
 2. Create a KMS Multi Keyring with the `RegionalRoleClientSupplier`
+
 ```c#
 // Now create a Discovery keyring to use for decryption.
 // We are passing in our Custom Client Supplier.
@@ -214,6 +218,7 @@ var multiKeyring = materialProviders.CreateAwsKmsMrkDiscoveryMultiKeyring(create
 ```
 
 3. Decrypt the ciphertext with created KMS Multi Keyring
+
 ```c#
 var decryptInput = new DecryptInput
 {
@@ -224,16 +229,19 @@ var decryptOutput = encryptionSdk.Decrypt(decryptInput);
 ```
 
 4. Verify the encryption context (MAY be done with a helper method)
+
 ```c#
 VerifyEncryptionContext(decryptOutput, encryptionContext);
 ```
 
 5. Verify the decrypted plaintext is the same as the original (MAY be done with a helper method)
+
 ```c#
 VerifyDecryptedIsPlaintext(decryptOutput, plaintext);
 ```
 
 6. Test the Missing Region Exception
+
 ```c#
 // Demonstrate catching a custom exception.
 var createMultiFailed = false;
