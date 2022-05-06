@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.0
+0.3.0
 
 ### Changelog
+
+- 0.3.0
+
+  - Clarify handling of the `aws-crypto-public-key` encryption context key.
 
 - 0.2.0
 
@@ -64,6 +68,7 @@ The encryption materials request MUST include the following:
 
 - [Encryption Context](structures.md#encryption-context)
   - The encryption context provided MAY be empty.
+- [Commitment Policy](../client-apis/client.md#commitment-policy)
 
 The encryption request MAY include the following:
 
@@ -80,6 +85,7 @@ This is the input to the [decrypt materials](#decrypt-materials) behavior.
 The decrypt materials request MUST include the following:
 
 - [Algorithm Suite](algorithm-suites.md)
+- [Commitment Policy](../client-apis/client.md#commitment-policy)
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
 - [Encryption Context](structures.md#encryption-context)
   - The encryption context provided MAY be empty.
@@ -89,7 +95,7 @@ The decrypt materials request MUST include the following:
 The CMM Interface MUST support the following behaviors:
 
 - [Get Encryption Materials](#get-encryption-materials)
-- [Decrypt Materials](#decryption-request)
+- [Decrypt Materials](#decrypt-materials)
 
 #### Get Encryption Materials
 
@@ -109,6 +115,12 @@ The encryption materials returned MUST include the following:
 If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm):
 
 - The CMM MUST include a [signing key](structures.md#signing-key).
+- The CMM SHOULD also add a key-value pair using the reserved key `aws-crypto-public-key` to the encryption context.
+  If it does, the mapped value SHOULD be the signature verification key corresponding to the signing key.
+
+If the algorithm suite does not contain a [signing algorithm](algorithm-suites.md#signature-algorithm):
+
+- The CMM SHOULD NOT add a key-value pair using the reserved key `aws-crypto-public-key` to the encryption context.
 
 The CMM MUST ensure that the encryption materials returned are valid.
 
@@ -122,6 +134,9 @@ The CMM MUST ensure that the encryption materials returned are valid.
 
 When the CMM gets a [decrypt materials request](#decrypt-materials-request),
 it MUST return [decryption materials](structures.md#decryption-materials) appropriate for the request.
+
+If the requested algorithm suite does not include a signing algorithm but the encryption context includes the reserved `aws-crypto-public-key` key, the operation SHOULD fail.
+Likewise, if the requested algorithm suite includes a signing algorithm but the encryption context does not include the reserved `aws-crypto-public-key` key, the operation SHOULD fail.
 
 The decryption materials returned MUST include the following:
 

@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
+
+- 0.4.0
+
+  - Add unsigned streaming decryption option
 
 - 0.3.0
 
@@ -170,8 +174,8 @@ The Decrypt operation is divided into several distinct steps:
 - [Parse the header](#parse-the-header)
 - [Get the decryption materials](#get-the-decryption-materials)
 - [Verify the header](#verify-the-header)
-- [Decrypt the body](#decrypt-the-body)
-- [Verify the signature](#verify-the-signatue)
+- [Decrypt the message body](#decrypt-the-message-body)
+- [Verify the signature](#verify-the-signature)
   - If the message header contains an algorithm suite including a
     [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
     this operation MUST perform this step.
@@ -192,6 +196,10 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 - If this operation successfully completes the above steps
   but there are consumable bytes which are intended to be decrypted,
   this operation MUST fail.
+- The ESDK MUST provide a configuration option that causes the decryption operation
+  to fail immediately after parsing the header if a signed algorithm suite is used.
+  This can be used to ensure that data not yet [verified as signed data](#security-considerations)
+  is never released early.
 
 ### Parse the header
 
@@ -201,6 +209,12 @@ deserializing those bytes according to the [message format](../data-format/messa
 This operation MUST attempt to deserialize all consumable encrypted message bytes until it has
 successfully deserialized a valid [message header](../data-format/message-header.md).
 
+If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys)
+deserialized from the [message header](../data-format/message-header.md)
+is greater than the [maximum number of encrypted data keys](client.md#maximum-number-of-encrypted-data-keys) configured in the [client](client.md),
+then as soon as that can be determined during deserializing
+decrypt MUST process no more bytes and yield an error.
+
 This operation MUST wait if it doesn't have enough consumable encrypted message bytes to
 deserialize the next field of the message header until enough input bytes become consumable or
 the caller indicates an end to the encrypted message.
@@ -209,6 +223,10 @@ Until the [header is verified](#verify-the-header), this operation MUST NOT
 release any parsed information from the header.
 
 ### Get the decryption materials
+
+If the parsed [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id)
+is not supported by the [commitment policy](client.md#commitment-policy)
+configured in the [client](client.md) decrypt MUST yield an error.
 
 To verify the message header and decrypt the message body,
 a set of valid decryption materials is required.
@@ -233,7 +251,15 @@ MUST be constructed as follows:
 
 The data key used as input for all decryption described below is a data key derived from the plaintext data key
 included in the [decryption materials](../framework/structures.md#decryption-materials).
-The algorithm used to derive a data key from the plaintext data key MUST be
+The algorithm suite used as input for all decryption described below is a algorithm suite
+included in the [decryption materials](../framework/structures.md#decryption-materials).
+If the algorithm suite is not supported by the [commitment policy](client.md#commitment-policy)
+configured in the [client](client.md) decrypt MUST yield an error.
+If the [algorithm suite](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) supports [key commitment](../framework/algorithm-suites.md#key-commitment)
+then the [commit key](../framework/algorithm-suites.md#commit-key) MUST be derived from the plaintext data key
+using the [commit key derivation](../framework/algorithm-suites.md#algorithm-suites-commit-key-derivation-settings).
+The derived commit key MUST equal the commit key stored in the message header.
+The algorithm suite used to derive a data key from the plaintext data key MUST be
 the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-algorithm) included in the
 [algorithm suite](../framework/algorithm-suites.md) associated with
 the returned decryption materials.
@@ -260,7 +286,7 @@ If this tag verification fails, this operation MUST immediately halt and fail.
 If the input encrypted message is being [streamed](streaming.md) to this operation:
 
 - This operation SHOULD release the parsed [encryption context](#encryption-context),
-  [algorithm suite ID](#algorithm-suite-id),
+  [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id),
   and [other header information](#parsed-header)
   as soon as tag verification succeeds.
   However, if this operation is using an algorithm suite with a signature algorithm
@@ -268,8 +294,7 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
 - This operation SHOULD input the serialized header to the signature algorithm as soon as it is deserialized,
-  such that the serialized frame isn't required to remain in memory to complete
-  the [signature calculation](#signature-calculation).
+  such that the serialized frame isn't required to remain in memory to [verify the signature](#verify-the-signature).
 
 ### Decrypt the message body
 

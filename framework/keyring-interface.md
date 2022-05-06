@@ -189,7 +189,7 @@ and the [decryption materials](structures.md#decryption-materials) still do not 
 it SHOULD set one resulting plaintext data key on the [decryption materials](structures.md#decryption-materials).
 
 If the keyring is unable to get any plaintext data key using the input [encrypted data keys](structures.md#encrypted-data-key),
-the keyring MUST NOT not update the [decryption materials](structures.md#decryption-materials).
+the keyring MUST NOT not update the [decryption materials](structures.md#decryption-materials) and MUST return failure.
 
 ## Security Considerations
 

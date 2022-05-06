@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.1
+0.3.0
 
 ### Changelog
+
+- 0.3.0
+
+  - Clarify handling of the `aws-crypto-public-key` encryption context key.
 
 - 0.2.1
 
@@ -151,6 +155,13 @@ If the plaintext data key is not included in this set of encryption materials, t
 
 The [encryption context](#encryption-context) associated with this [encryption](../client-apis/encrypt.md).
 
+If an [encryption material](#encryption-materials) contains a [signing key](#signing-key),
+the [encryption context](#encryption-context) SHOULD include the reserved key `aws-crypto-public-key`.
+The mapped value from the reserved key `aws-crypto-public-key` SHOULD be the signature verification key
+corresponding to the [signing key](#signing-key) stored on the [encryption material](#encryption-materials).
+If an [encryption material](#encryption-materials) does not contains a [signing key](#signing-key),
+the [encryption context](#encryption-context) SHOULD NOT include the reserved key `aws-crypto-public-key`.
+
 ##### Plaintext Data Key
 
 A data key to be used as input for [encryption](../client-apis/encrypt.md).
@@ -172,6 +183,7 @@ The key to be used as the signing key for signature verification during [encrypt
 
 The signing key MUST fit the specification described by the [signature algorithm](algorithm-suites.md#signature-algorithm)
 included in this encryption material's [algorithm suite](#algorithm-suite).
+If the algorithm suite does not contain a signing algorithm, the signing key MUST NOT be present.
 
 The value of this key MUST be kept secret.
 
@@ -203,6 +215,13 @@ The [algorithm suite](algorithm-suites.md) to be used for [decryption](../client
 ##### Encryption Context
 
 The [encryption context](#encryption-context) associated with this [decryption](../client-apis/decrypt.md).
+
+If a [decryption materials](#decryption-materials) contains a [verification key](#verification-key),
+the [encryption context](#encryption-context) SHOULD include the reserved key `aws-crypto-public-key`.
+The mapped value from the reserved key `aws-crypto-public-key`
+SHOULD be the signature verification key stored on the [decryption materials](#decryption-materials).
+If a [decryption materials](#decryption-materials) does not contain a [verification key](#verification-key),
+the [encryption context](#encryption-context) SHOULD NOT include the reserved key `aws-crypto-public-key`.
 
 ##### Plaintext Data Key
 

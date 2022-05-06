@@ -37,7 +37,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 The caller MUST provide:
 
-- 2 AWS KMS key identifier
+- 2 AWS KMS key identifiers
 
 If both identifiers are identical, this function MUST return `true`.
 Otherwise if either input is not [identified as a multi-Region key](aws-kms-key-arn.md#identifying-an-aws-kms-multi-region-key),

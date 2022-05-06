@@ -21,20 +21,16 @@ const ext = ".md";
 const pathToComplianceRoot = `${relative(process.cwd(), `${__dirname}/../compliance`)}`;
 
 needs(
-  () => statSync(pathToComplianceRoot).isDirectory(),
-  `Compliance directory ${pathToComplianceRoot} does not exist.`
-);
-needs(
   () => execSync("which kramdown-rfc2629"),
-  "kramdown-rfc2629 needs to be installed try `gem install kramdown-rfc2629`"
+  "kramdown-rfc2629 needs to be installed, try `gem install kramdown-rfc2629 -v 1.5.21`"
 );
 needs(
   () => execSync("which xml2rfc"),
-  "xml2rfc needs to be installed try `pip install xml2rfc`"
+  "xml2rfc needs to be installed, try `pip install xml2rfc==3.5.0`"
 );
 needs(
   () => execSync("which duvet"),
-  "duvet needs to be installed try `util/install-duvet`"
+  "duvet needs to be installed, try `util/install-duvet`"
 );
 
 /* May need to change this to a better parser...
@@ -55,6 +51,13 @@ function extract(filePath) {
   const complianceSpec = join(pathToComplianceRoot, dirname(filePath), `${fileName}.txt`);
   const complianceDir = join(pathToComplianceRoot, dirname(filePath), fileName);
 
+  // Create the root compliance directory if it doesn't exist
+  try {
+    statSync(pathToComplianceRoot).isDirectory();
+  } catch (ex) {
+    mkdirSync(pathToComplianceRoot, { recursive: true });
+  }
+
   /*
     1. Get the file name without extension
     2. Add the RFC crap to a new tmp file
@@ -71,10 +74,7 @@ function extract(filePath) {
   );
 
   // Convert the markdown file from RFC XML
-  execSync(["kramdown-rfc2629", markdownSpecFile, ">", xmlRfcFile].join(" "), {stdio: 'inherit'});
-
-  // Convert the RFC XML to a ietf rfc
-  execSync(["xml2rfc", "-P", xmlRfcFile, "-o", complianceSpec].join(" "), {stdio: 'inherit'});
+  execSync(["kramdown-rfc2629", "-3", markdownSpecFile, ">", xmlRfcFile].join(" "), {stdio: 'inherit'});
 
   // An existing spec may exists, clean up first
   try {
@@ -89,6 +89,14 @@ function extract(filePath) {
 
   // make sure the compliance directory exists
   mkdirSync(complianceDir, { recursive: true });
+
+  // Convert the RFC XML to a ietf rfc
+  execSync(["xml2rfc",
+    "-P", xmlRfcFile,
+    "-s", "'Too long line found'", // Suppress warnings about long table line length
+    "-s", "'Total table width'",   // Suppress warnings about overall table width
+    "-o", complianceSpec
+  ].join(" "), {stdio: 'inherit'});
 
   const args = ["duvet", "extract", `${complianceSpec}`, "-o", "compliance"];
   // extract the specification
@@ -105,7 +113,7 @@ function extract_needs(filePath) {
 }
 
 // The `ipr: none` is particularly important
-// this removed boilerplate (especially Copyright) 
+// this removed boilerplate (especially Copyright)
 function header(docName) {
   return `---
 title: ${docName}

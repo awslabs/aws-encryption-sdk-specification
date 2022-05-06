@@ -104,28 +104,25 @@ If the decryption materials already contain a plaintext data key,
 the keyring MUST fail
 and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
 
-Otherwise, OnDecrypt MUST attempt to decrypt the [encrypted data keys](structures.md#encrypted-data-keys-1)
+Otherwise, OnDecrypt MUST first attempt to decrypt the [encrypted data keys](structures.md#encrypted-data-keys-1)
 in the input [decryption materials](structures.md#decryption-materials) using its
-[child keyrings](#child-keyrings) and, if it is specified, its [generator keyring](#generator-keyring).
-It MUST attempt to decrypt using these keyrings until it either succeeds in decryption,
-or it has attempted to decrypt using all its child keyrings and, if it is specified, its generator keyring.
-If a generator keyring is specified, it MUST be used first.
+[generator keyring](#generator-keyring). If the generator keyring is unable to decrypt
+the materials, the multi-keyring MUST attempt to decrypt using its child keyrings,
+until one either succeeds in decryption or all have failed.
 
 For each [keyring](keyring-interface.md) to be used for decryption,
 the multi-keyring MUST call that keyring's [OnDecrypt](keyring-interface.md#ondecrypt) using
 the unmodified [decryption materials](structures.md#decryption-materials) and the input
 [encrypted data key](structures.md#encrypted-data-key) list.
 If [OnDecrypt](keyring-interface.md#ondecrypt) returns [decryption materials](structures.md#decryption-materials)
-containing a plaintext data key, the keyring MUST immediately return the modified decryption materials.
+containing a plaintext data key, the multi-keyring MUST immediately return the modified decryption materials.
+If the child keyring's OnDecrypt call fails, the multi-keyring MUST collect the error and continue
+to the next keyring, if any.
 
 If, after calling [OnDecrypt](keyring-interface.md#ondecrypt) on every [child keyring](#child-keyrings)
 (and possibly the [generator keyring](#generator-keyring)), the [decryption materials](structures.md#decryption-materials)
-still do not contain a plaintext data key:
-
-- If none of the above [OnDecrypt](keyring-interface.md#ondecrypt) calls failed, the keyring
-  MUST return the unmodified [decryption materials](structures.md#decryption-materials).
-- If at least one of the above [OnDecrypt](keyring-interface.md#ondecrypt) calls failed,
-  OnDecrypt MUST also fail, and MUST not modify the input [decryption materials](structures.md#decryption-materials).
+still do not contain a plaintext data key, OnDecrypt MUST return a failure message containing the
+collected failure messages from the child keyrings.
 
 ## Security Considerations
 

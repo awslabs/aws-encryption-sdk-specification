@@ -11,4 +11,10 @@
 venv/
 /.history
 /framework/aws-kms/.refcache
-/.refcache
+.refcache
+
+# pyenv files
+.python-version
+
+# compliance files are generated on-the-fly
+compliance

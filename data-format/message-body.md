@@ -168,9 +168,7 @@ The value MUST be encoded as the 4 bytes `FF FF FF FF` in hexadecimal notation.
 ##### Sequence Number
 
 The Frame Sequence Number.  
-It is an incremental counter number for the frames.  
-Framed Data MUST start at Sequence Number 1.  
-Subsequent frames MUST be in order and MUST contain an increment of 1 from the previous frame.  
+It is an incremental counter number for the frames.
 The Final Frame Sequence number MUST be equal to the total number of frames in the Framed Data.
 
 ##### IV

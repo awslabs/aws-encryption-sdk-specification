@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.1
+0.3.0
 
 ### Changelog
+
+- 0.3.0
+
+  - Clarify handling of the `aws-crypto-public-key` encryption context key.
 
 - 0.2.1
 
@@ -33,7 +37,10 @@
 
 ## Overview
 
-The Default Cryptographic Materials Manager (CMM) is a built-in implementation of the [CMM interface](cmm-interface.md) provided by the AWS Encryption SDK.  
+The Default Cryptographic Materials Manager (CMM)
+is a built-in implementation of the
+[CMM interface](cmm-interface.md) provided by the AWS Encryption SDK.
+
 It is used by default to wrap the key provider.
 
 ## Definitions
@@ -60,49 +67,65 @@ The [keyring](keyring-interface.md) this CMM uses to
 ### Get Encryption Materials
 
 This operation will add a key-value pair
-to the encryption context included in the request
+to the encryption context included in the [encryption materials request](cmm-interface.md#encryption-materials-request)
 using the key `aws-crypto-public-key`.
-If the encryption context included in the request
+Adding the key `aws-crypto-public-key` SHOULD be done to a copy of the encryption context
+so that the caller's encryption context is not mutated.
+If the encryption context included in the [encryption materials request](cmm-interface.md#encryption-materials-request)
 already contains the `aws-crypto-public-key` key,
 this operation MUST fail rather than overwrite the associated value.
 
-- If the encryption materials request does not contain an algorithm suite,
-  the algorithm suite with algorithm suite ID [03 78 (hex)](algorithm-suites.md#supported-algorithm-suites)
-  MUST be added as the algorithm suite in the encryption materials returned.
-- If the encryption materials request does contain an algorithm suite, the encryption materials returned MUST contain the same algorithm suite.
+- If the [encryption materials request](cmm-interface.md#encryption-materials-request) does not contain an algorithm suite,
+  the operation MUST add the default algorithm suite for the [commitment policy](../client-apis/client.md#commitment-policy)
+  as the algorithm suite in the encryption materials returned.
+- If the [encryption materials request](cmm-interface.md#encryption-materials-request) does contain an algorithm suite,
+  the request MUST fail if the algorithm suite is not supported by the [commitment policy](../client-apis/client.md#commitment-policy) on the request.
+- If the [encryption materials request](cmm-interface.md#encryption-materials-request) does contain an algorithm suite,
+  the encryption materials returned MUST contain the same algorithm suite.
 
-If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm), the default CMM MUST:
+If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
+the default CMM MUST Generate a [signing key](structures.md#signing-key).
 
-- Generate a [signing key](structures.md#signing-key)
-- Add the following key-value pair to the [encryption context](structures.md#encryption-context):
-  - The key MUST be the reserved name, `aws-crypto-public-key`.
-  - The value MUST be the base64-encoded public verification key.
+If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
+the default CMM MUST Add the key-value pair of
+key `aws-crypto-public-key`,
+value `base64-encoded public verification key`
+to the [encryption context](structures.md#encryption-context).
 
 On each call to Get Encryption Materials,
 the default CMM MUST make a call to its [keyring's](#keyring)
 [On Encrypt](keyring-interface.md#onencrypt) operation.
 
-The default CMM MUST obtain the following from the response:
+The default CMM MUST obtain the Plaintext Data Key from the
+On Encrypt Response and include it in the
+[encryption materials](structures.md#encryption-materials) returned.
 
-- Plaintext Data Key
-- [Encrypted Data Keys](structures.md#encrypted-data-keys)
-
-The values obtained above MUST be included in the encryption materials returned.
+The default CMM MUST obtain the
+[Encrypted Data Keys](structures.md#encrypted-data-keys)
+from the On Encrypt Response and include it
+in the [encryption materials](structures.md#encryption-materials) returned.
 
 ### Decrypt Materials
 
 If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
-the default CMM MUST remove the verification key from the encryption context.
+the default CMM MUST extract the verification key
+from the encryption context under the reserved `aws-crypto-public-key` key.
+If this key is not present in the encryption context, the operation MUST fail
+without returning any decryption materials.
+
+If the algorithm suite does not contain a [signing algorithm](algorithm-suites.md#signature-algorithm),
+but the encryption context includes the reserved `aws-crypto-public-key` key,
+the operation MUST fail without returning any decryption materials.
+
+The request MUST fail if the algorithm suite on the request is not supported by the [commitment policy](../client-apis/client.md#commitment-policy) on the request.
 
 On each call to Decrypt Materials,
 the default CMM MUST make a call to its [keyring's](#keyring)
 [On Decrypt](keyring-interface.md#ondecrypt) operation.
 
-The default CMM MUST obtain the following from the response:
-
-- Plaintext Data Key
-
-The values obtained above MUST be included in the decrypt materials returned.
+The default CMM MUST obtain the Plaintext Data Key from
+the On Decrypt response and include it in the decrypt
+materials returned.
 
 ## Legacy Behavior : Master Key Providers
 
@@ -123,7 +146,7 @@ on initialization:
 On default CMM initialization,
 the caller MUST provide the following value:
 
-- [Master Key Provider](#master-key-provider-interface.md)
+- [Master Key Provider](master-key-provider-interface.md)
 
 ### Get Encryption Materials (master key provider)
 

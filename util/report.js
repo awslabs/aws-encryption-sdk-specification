@@ -12,7 +12,7 @@ const data = execSync("git remote -v")
   .toString()
   .split("\n")
   /* Push because that is where the code can go */
-  .filter((line) => line.includes("(push)"))
+  .filter((line) => line.includes("(fetch)"))
   /* Trim the identifier by removing the name and the (push) */
   .map((line) => line.split(/\s/)[1])
   /* Only git or https please */
