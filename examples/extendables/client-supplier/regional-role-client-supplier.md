@@ -37,15 +37,14 @@ in this document are to be interpreted as described in
 #### Properties/Fields
 
 - **RegionIAMRoleMap**:
-  Maps a Region to the Arn of the 
+  Maps a Region to the Arn of the
   IAM Role the client supplier will
   use when supplying a client.
-  
 - **STSClient**:
-  Amazon Security Token Service, or STS, 
+  Amazon Security Token Service, or STS,
   allows customers to fetch
   temporary credentials.
-  
+
 #### Methods
 
 ##### GetClient
@@ -141,7 +140,7 @@ Implementations of this example MUST follow the rules defined in
 // We are passing in our Custom Client Supplier.
 // This is a Multi Keyring composed of MRK Discovery Keyrings.
 // All the keyrings have the same Discovery Filter.
-// Each keyring has its own KMS Client, 
+// Each keyring has its own KMS Client,
 // which is provisioned by the Custom Client Supplier.
 ```
 
