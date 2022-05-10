@@ -60,11 +60,10 @@ in this document are to be interpreted as described in
 // the Encryption SDK will encrypt the plaintext without key commitment.
 ```
 
-3. Decrypt the encrypted data 
+3. Decrypt the encrypted data
 
 4. Demonstrate that the decrypted plaintext is identical to the original plaintext.
 
 5. Demonstrate that an EncryptionSDK that enforces Key Commitment on Decryption will fail to decrypt the encrypted message (as it was encrypted without Key Commitment).
 
 6. Demonstrate that the EncryptionSDK will not allow the commitment policy and the Algorithm Suite to be in conflict.
-
