@@ -62,13 +62,11 @@ in this document are to be interpreted as described in
 
 - **plaintext** :
   Plaintext that is/will be encrypted
-  
 - **trustedAccountIds** :
   List of AWS Account Ids that are trusted.
-  
 - **awsPartition** :
   AWS Partition that contains all the members of "trustedAccountIds".
-  
+
 ## Steps
 
 1. Instantiate the Material Providers and Encryption SDK
@@ -84,6 +82,7 @@ in this document are to be interpreted as described in
 ```
 
 2. Create a Discovery Keyring with a Discovery Filter
+
 ```c#
 // We create a Discovery keyring to use for decryption.
 // We'll add a discovery filter so that we limit the set of Encrypted Data Keys
