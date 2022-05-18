@@ -44,7 +44,7 @@ run `./ci/prettify.sh check`.
 
 ## Generate Duvet Reports
 
-[Duvet](https://github.com/awslabs/duvet) is a tool that can be used to ensure specification is documented alongside code.
+[Duvet](https://github.com/awslabs/aws-encryption-sdk-specification/issues/240) is a tool that can be used to ensure specification is documented alongside code.
 
 This repo contains helpful scripts for installing and using Duvet with this specification.
 
