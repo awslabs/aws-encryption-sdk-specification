@@ -7,26 +7,26 @@
 
 This serves as a reference of all features that this change affects.
 
-| Features                                                                                                                                              |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Features                                                                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/aws-kms/aws-kms-keyring.md) |
-| [AWS KMS Discovery Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/84)                                                    |
-| [Split AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/83)                                                        |
-| [AWS KMS Keyring Error Handling](https://github.com/awslabs/aws-encryption-sdk-specification/issues/40)                                               |
-| [Client Suppliers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/94)                                                             |
-| [Generators](https://github.com/awslabs/aws-encryption-sdk-specification/issues/49)                                                                   |
-| [Limiting network calls to specific AWS regions](https://github.com/awslabs/aws-encryption-sdk-specification/issues/90)                               |
-| [AWS SDK KMS service client caching](https://github.com/awslabs/aws-encryption-sdk-specification/issues/16)                                           |
-| [AWS SDK KMS service client initialization/configuration](https://github.com/awslabs/aws-encryption-sdk-specification/issues/15)                      |
-| [AWS SDK KMS service client user agent string](https://github.com/awslabs/aws-encryption-sdk-specification/issues/59)                                 |
-| [Passing provider info to the AWS KMS Decrypt API Call](https://github.com/awslabs/aws-encryption-sdk-specification/issues/139)                       |
+| [AWS KMS Discovery Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/84)                                                                |
+| [Split AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/83)                                                                    |
+| [AWS KMS Keyring Error Handling](https://github.com/awslabs/aws-encryption-sdk-specification/issues/40)                                                           |
+| [Client Suppliers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/94)                                                                         |
+| [Generators](https://github.com/awslabs/aws-encryption-sdk-specification/issues/49)                                                                               |
+| [Limiting network calls to specific AWS regions](https://github.com/awslabs/aws-encryption-sdk-specification/issues/90)                                           |
+| [AWS SDK KMS service client caching](https://github.com/awslabs/aws-encryption-sdk-specification/issues/16)                                                       |
+| [AWS SDK KMS service client initialization/configuration](https://github.com/awslabs/aws-encryption-sdk-specification/issues/15)                                  |
+| [AWS SDK KMS service client user agent string](https://github.com/awslabs/aws-encryption-sdk-specification/issues/59)                                             |
+| [Passing provider info to the AWS KMS Decrypt API Call](https://github.com/awslabs/aws-encryption-sdk-specification/issues/139)                                   |
 
 ## Affected Specifications
 
 This serves as a reference of all specification documents that this change affects.
 
-| Specification                                     |
-| ------------------------------------------------- |
+| Specification                                                 |
+| ------------------------------------------------------------- |
 | [AWS KMS Keyring](../../framework/aws-kms/aws-kms-keyring.md) |
 
 ## Affected Implementations
