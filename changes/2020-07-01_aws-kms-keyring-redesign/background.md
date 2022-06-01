@@ -16,7 +16,7 @@ in this document are to be interpreted as described in
 ## Background
 
 The AWS Encryption SDK’s (ESDK’s) AWS KMS keyring has become increasingly complex as it supports various customer use cases.
-The existing [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/aws-kms/aws-kms-keyring.md)
+The existing [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md)
 encrypts and decrypts data using AWS KMS [CMKs](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#master_keys).
 It also supports the concept of an _AWS KMS discovery keyring_ that is enabled
 through a derived [_Is Discovery_](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#is-discovery) property.
@@ -809,7 +809,7 @@ Failures resulting from AWS SDK client initialization occur before keyring API r
 
 _"Current Implementation"_ refer to the existing AWS KMS keyring,
 as it is defined in the ESDK Specification
-([AWS KMS keyring version 0.2.2](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/aws-kms/aws-kms-keyring.md)).
+([AWS KMS keyring version 0.2.2](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md)).
 
 We do not currently support all customer use cases listed below.
 **"Code change"** is bolded under _Current implementation_ options

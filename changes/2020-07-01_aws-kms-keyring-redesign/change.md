@@ -7,19 +7,19 @@
 
 This serves as a reference of all features that this change affects.
 
-| Features                                                                                                                                                          |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/aws-kms/aws-kms-keyring.md) |
-| [AWS KMS Discovery Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/84)                                                                |
-| [Split AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/83)                                                                    |
-| [AWS KMS Keyring Error Handling](https://github.com/awslabs/aws-encryption-sdk-specification/issues/40)                                                           |
-| [Client Suppliers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/94)                                                                         |
-| [Generators](https://github.com/awslabs/aws-encryption-sdk-specification/issues/49)                                                                               |
-| [Limiting network calls to specific AWS regions](https://github.com/awslabs/aws-encryption-sdk-specification/issues/90)                                           |
-| [AWS SDK KMS service client caching](https://github.com/awslabs/aws-encryption-sdk-specification/issues/16)                                                       |
-| [AWS SDK KMS service client initialization/configuration](https://github.com/awslabs/aws-encryption-sdk-specification/issues/15)                                  |
-| [AWS SDK KMS service client user agent string](https://github.com/awslabs/aws-encryption-sdk-specification/issues/59)                                             |
-| [Passing provider info to the AWS KMS Decrypt API Call](https://github.com/awslabs/aws-encryption-sdk-specification/issues/139)                                   |
+| Features                                                                                                                                              |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md) |
+| [AWS KMS Discovery Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/84)                                                    |
+| [Split AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/issues/83)                                                        |
+| [AWS KMS Keyring Error Handling](https://github.com/awslabs/aws-encryption-sdk-specification/issues/40)                                               |
+| [Client Suppliers](https://github.com/awslabs/aws-encryption-sdk-specification/issues/94)                                                             |
+| [Generators](https://github.com/awslabs/aws-encryption-sdk-specification/issues/49)                                                                   |
+| [Limiting network calls to specific AWS regions](https://github.com/awslabs/aws-encryption-sdk-specification/issues/90)                               |
+| [AWS SDK KMS service client caching](https://github.com/awslabs/aws-encryption-sdk-specification/issues/16)                                           |
+| [AWS SDK KMS service client initialization/configuration](https://github.com/awslabs/aws-encryption-sdk-specification/issues/15)                      |
+| [AWS SDK KMS service client user agent string](https://github.com/awslabs/aws-encryption-sdk-specification/issues/59)                                 |
+| [Passing provider info to the AWS KMS Decrypt API Call](https://github.com/awslabs/aws-encryption-sdk-specification/issues/139)                       |
 
 ## Affected Specifications
 
@@ -52,7 +52,7 @@ in this document are to be interpreted as described in
 
 ## Summary
 
-The AWS Encryption SDK’s (ESDK’s) [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/aws-kms/aws-kms-keyring.md) has become increasingly complex
+The AWS Encryption SDK’s (ESDK’s) [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md) has become increasingly complex
 as it [supports various customer use cases](background.md).
 We are separating the functionality of the AWS KMS keyring into multiple smaller-scoped keyrings.
 Each new keyring maintains a smaller API surface area.
@@ -155,7 +155,7 @@ Usage examples and documentation MUST be updated for the new keying implementati
 
 ## Guide-level Explanation
 
-The existing [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/aws-kms/aws-kms-keyring.md)
+The existing [AWS KMS Keyring](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md)
 encrypts and decrypts data using AWS KMS [CMKs](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#master_keys).
 It also supports the concept of an _AWS KMS discovery keyring_
 that is enabled through a derived [_Is Discovery_](https://github.com/awslabs/aws-encryption-sdk-specification/blob/dbc17f93100667e28dc54e64d05a625db3e5bac2/framework/kms-keyring.md#is-discovery) property.
