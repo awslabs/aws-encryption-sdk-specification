@@ -10,7 +10,7 @@ This serves as a reference of all features that this change affects.
 | Feature                                                                                             |
 | --------------------------------------------------------------------------------------------------- |
 | [Encrypted Data Key](../../framework/structures.md#encrypted-data-key)                              |
-| [AWS KMS Keyring](../../framework/kms-keyring.md)                                                   |
+| [AWS KMS Keyring](../../framework/aws-kms/aws-kms-keyring.md)                                                   |
 | [Raw AES Keyring](../../framework/raw-aes-keyring.md)                                               |
 | [Raw RSA Keyring](../../framework/raw-rsa-keyring.md)                                               |
 | [Keyring Decryption Contract](https://github.com/awslabs/aws-encryption-sdk-specification/pull/131) |
@@ -23,7 +23,7 @@ This serves as a reference of all specification documents that this change affec
 | --------------------------------------------------------- |
 | [Structures](../../framework/structures.md)               |
 | [Keyring Interface](../../framework/keyring-interface.md) |
-| [AWS KMS Keyring](../../framework/kms-keyring.md)         |
+| [AWS KMS Keyring](../../framework/aws-kms/aws-kms-keyring.md)         |
 | [Raw AES Keyring](../../framework/raw-aes-keyring.md)     |
 | [Raw RSA Keyring](../../framework/raw-rsa-keyring.md)     |
 
