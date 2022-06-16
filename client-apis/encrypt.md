@@ -90,7 +90,7 @@ A Keyring that implements the [keyring interface](../framework/keyring-interface
 
 ### Algorithm Suite
 
-The [algorithm suite](../framework/algorithm-suite.md) that SHOULD be used for encryption.
+The [algorithm suite](../framework/algorithm-suites.md) that SHOULD be used for encryption.
 
 ### Frame Length
 
