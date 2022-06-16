@@ -22,17 +22,17 @@ in this document are to be interpreted as described in
 
 ## Header
 
-```c#
-/// Demonstrate an encrypt/decrypt cycle using a raw AES keyring and a non-signing Algorithm Suite.
-/// This also demonstrates how to customize the Algorithm Suite used to encrypt the plaintext.
-/// For a full list of the Algorithm Suites the Encryption SDK supports,
-/// see https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/algorithms-reference.html
+```
+Demonstrate an encrypt/decrypt cycle using a raw AES keyring and a non-signing Algorithm Suite.
+This also demonstrates how to customize the Algorithm Suite used to encrypt the plaintext.
+For a full list of the Algorithm Suites the Encryption SDK supports,
+see https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/algorithms-reference.html
 ```
 
 ## Summary
 
-```c#
-/// Demonstrate an encrypt/decrypt cycle using a non-signing Algorithm Suite.
+```
+Demonstrate an encrypt/decrypt cycle using a non-signing Algorithm Suite.
 ```
 
 ## Inputs
@@ -46,14 +46,14 @@ in this document are to be interpreted as described in
 
 2. Encrypt the plaintext with a non-signing algorithm.
 
-```c#
-// Here, we customize the Algorithm Suite that is used to Encrypt the plaintext.
-// In particular, we use an Algorithm Suite without Signing.
-// Signature verification adds a significant performance cost on decryption.
-// If the users encrypting data and the users decrypting data are equally trusted,
-// consider using an algorithm suite that does not include signing.
-// See more about Digital Signatures:
-// https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/concepts.html#digital-sigs
+```
+Here, we customize the Algorithm Suite that is used to Encrypt the plaintext.
+In particular, we use an Algorithm Suite without Signing.
+Signature verification adds a significant performance cost on decryption.
+If the users encrypting data and the users decrypting data are equally trusted,
+consider using an algorithm suite that does not include signing.
+See more about Digital Signatures:
+https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/concepts.html#digital-sigs
 ```
 
 3. Demonstrate that the ciphertext and plaintext are different.
