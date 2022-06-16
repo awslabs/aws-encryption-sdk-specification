@@ -44,7 +44,7 @@ run `./ci/prettify.sh check`.
 
 ## Generate Duvet Reports
 
-[Duvet](https://github.com/awslabs/duvet) is a tool that can be used to ensure specification is documented alongside code.
+[Duvet](https://github.com/awslabs/aws-encryption-sdk-specification/issues/240) is a tool that can be used to ensure specification is documented alongside code.
 
 This repo contains helpful scripts for installing and using Duvet with this specification.
 
@@ -112,7 +112,7 @@ we are ahead of the tooling).
 
 Follow [AWS Crypto Tools Getting Started with Python instructions](https://github.com/aws/crypto-tools/blob/master/getting-started/python/README.md#local-development-setup) to install `pyenv`.
 
-Then, in this repository, run `pyenv local 3.9.7; python3 -m pip install xml2rfc==3.5.0`.
+Then, in this repository, run `pyenv local 3.9.7; pyenv exec python -m pip install xml2rfc==3.5.0 markupsafe==2.0.1`.
 
 #### Set up `kramdown-rfc2629`
 
