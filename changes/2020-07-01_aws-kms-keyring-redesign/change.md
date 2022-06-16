@@ -25,9 +25,9 @@ This serves as a reference of all features that this change affects.
 
 This serves as a reference of all specification documents that this change affects.
 
-| Specification                                     |
-| ------------------------------------------------- |
-| [AWS KMS Keyring](../../framework/kms-keyring.md) |
+| Specification                                                 |
+| ------------------------------------------------------------- |
+| [AWS KMS Keyring](../../framework/aws-kms/aws-kms-keyring.md) |
 
 ## Affected Implementations
 
