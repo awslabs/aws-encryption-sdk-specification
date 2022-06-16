@@ -39,8 +39,8 @@ in this document are to be interpreted as described in
   - In a directory named for the extendable interface/class,
   - In a directory named for the example,
   - two files should exsist:
-  - The implementation of the extendable interface/class,
-  - An example that utilizes it.
+    - The implementation of the extendable interface/class,
+    - An example that utilizes it.
 
 - Every example extendable MUST only contain logic that is reasonable for production use.
 - If an example extendable MUST contain logic that is not reasonable for production use,
