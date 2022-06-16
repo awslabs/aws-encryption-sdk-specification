@@ -22,18 +22,18 @@ in this document are to be interpreted as described in
 
 ## Header
 
-```c#
-/// The commitment policy is a security feature that, if set to its strictest
-/// setting, ensures that messages are decrypted with the same data key
-/// used to encrypt them.
-/// Read more about Key Commitment and the commitment policy Here:
-/// https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/concepts.html#key-commitment
+```
+The commitment policy is a security feature that, if set to its strictest
+setting, ensures that messages are decrypted with the same data key
+used to encrypt them.
+Read more about Key Commitment and the commitment policy Here:
+https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/concepts.html#key-commitment
 ```
 
 ## Summary
 
-```c#
-/// Demonstrates setting the commitment policy.
+```
+Demonstrates setting the commitment policy.
 ```
 
 ## Inputs
@@ -45,25 +45,38 @@ in this document are to be interpreted as described in
 
 1. Instantiate the Material Providers and Encryption SDK
 
-```c#
-// Instantiate the Encryption SDK
-// Set the EncryptionSDK's commitment policy parameter
-// to it's least strict setting,
-// FORBID_ENCRYPT_ALLOW_DECRYPT
+```
+Instantiate the Encryption SDK
+Set the EncryptionSDK's commitment policy parameter
+to it's least strict setting, FORBID_ENCRYPT_ALLOW_DECRYPT
 ```
 
 2. Encrypt the plaintext data.
 
-```c#
-// Encrypt your plaintext data.
-// Since the CommitmentPolicy is set to Forbid Encrypt,
-// the Encryption SDK will encrypt the plaintext without key commitment.
+```
+Encrypt your plaintext data.
+Since the CommitmentPolicy is set to Forbid Encrypt,
+the Encryption SDK will encrypt the plaintext without key commitment.
 ```
 
 3. Decrypt the encrypted data
 
 4. Demonstrate that the decrypted plaintext is identical to the original plaintext.
 
-5. Demonstrate that an EncryptionSDK that enforces Key Commitment on Decryption will fail to decrypt the encrypted message (as it was encrypted without Key Commitment).
+5. Demonstrate that an EncryptionSDK that enforces Key Commitment on Decryption
+   will fail to decrypt the encrypted message (as it was encrypted without Key Commitment).
 
-6. Demonstrate that the EncryptionSDK will not allow the commitment policy and the Algorithm Suite to be in conflict.
+```
+Repeat the earlier decryption steps, proving that they fail
+```
+
+6. Demonstrate that the EncryptionSDK will not allow the commitment policy
+   and the Algorithm Suite to be in conflict.
+
+```
+Now, the `encryptionSDK` is configured to Require Key Commitment
+on both Encrypt and Decrypt (this was set on lines 100 - 105).
+If we try and Encrypt data with an Algorithm that does not support Commitment:
+
+The encryption will fail.
+```
