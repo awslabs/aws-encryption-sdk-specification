@@ -32,7 +32,9 @@
 
 ## Overview
 
-The Cryptographic Materials Manager (CMM) assembles the cryptographic materials used to encrypt the [message](../data-format/message.md) and decrypt the encrypted messages.
+The Cryptographic Materials Manager (CMM) assembles the cryptographic materials
+used to encrypt and decrypt the encrypted messages
+for each [supported library](./algorithm-suites.md#supported-libraries).
 The CMM interface describes the interface that all CMMs MUST implement.
 
 ## Definitions
@@ -68,7 +70,7 @@ The encryption materials request MUST include the following:
 
 - [Encryption Context](structures.md#encryption-context)
   - The encryption context provided MAY be empty.
-- [Commitment Policy](../client-apis/client.md#commitment-policy)
+- [Commitment Policy](./commitment-policy.md#supported-commitment-policy-enum)
 
 The encryption request MAY include the following:
 
@@ -85,7 +87,7 @@ This is the input to the [decrypt materials](#decrypt-materials) behavior.
 The decrypt materials request MUST include the following:
 
 - [Algorithm Suite](algorithm-suites.md)
-- [Commitment Policy](../client-apis/client.md#commitment-policy)
+- [Commitment Policy](./commitment-policy.md#supported-commitment-policy-enum)
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
 - [Encryption Context](structures.md#encryption-context)
   - The encryption context provided MAY be empty.
