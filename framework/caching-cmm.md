@@ -192,7 +192,7 @@ returns the serialization of the encryption context.
 Some of the cache entry identifier formulas include
 the two-byte algorithm suite ID for the algorithm suite in a materials request.
 The algorithm suite IDs are defined in the
-[Supported Algorithm Suites specification](../framework/algorithm-suites.md#supported-algorithm-suites).
+[Supported Algorithm Suites specification](./algorithm-suites.md#supported-algorithm-suites).
 In the following appendix sections we use `AlgorithmSuiteId`
 to the denote the function that,
 given an algorithm suite as specified in a materials request,
@@ -252,7 +252,7 @@ in the order listed:
 1.  The SHA-512 hash of a UTF-8 encoding of the caching CMM’s Partition ID
 2.  The two-byte algorithm suite ID corresponding to the algorithm suite in the request
 3.  The concatenation of the lexicographically-sorted SHA-512 hashes of the serialized encrypted data keys,
-    where serialization is as defined in the [Encrypted Data Key Entries specification](../../data-format/message-header.md#encrypted-data-key-entries).
+    where serialization is as defined in the [Encrypted Data Key Entries specification](../data-format/message-header.md#encrypted-data-key-entries).
 4.  A sentinel field of 512 zero bits (or equivalently, 64 null bytes), indicating the end of the key hashes
 5.  The SHA-512 hash of the serialized encryption context
 
