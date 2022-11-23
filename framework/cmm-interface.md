@@ -74,7 +74,7 @@ The encryption materials request MUST include the following:
 
 The encryption request MAY include the following:
 
-- [Algorithm Suite](algorithm-suites.md)
+- [Algorithm Suite Id](algorithm-suites.md#algorithm-suite-id)
 - Max Plaintext Length
   - This value represents the maximum length of the plaintext to be encrypted
     using the returned materials.
@@ -86,7 +86,7 @@ This is the input to the [decrypt materials](#decrypt-materials) behavior.
 
 The decrypt materials request MUST include the following:
 
-- [Algorithm Suite](algorithm-suites.md)
+- [Algorithm Suite Id](algorithm-suites.md#algorithm-suite-id)
 - [Commitment Policy](./commitment-policy.md#supported-commitment-policy-enum)
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
 - [Encryption Context](structures.md#encryption-context)
