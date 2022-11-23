@@ -130,11 +130,14 @@ Users MUST NOT use the encryption context to store secret data.
 #### Structure
 
 Encryption materials are a structure containing materials needed for [encryption](../client-apis/encrypt.md).
-This structure MAY include any of the following fields:
+This structure MUST include the following fields:
 
 - [Algorithm Suite](#algorithm-suite)
 - [Encrypted Data Keys](#encrypted-data-keys)
 - [Encryption Context](#encryption-context-1)
+
+This structure MAY include any of the following fields:
+
 - [Plaintext Data Key](#plaintext-data-key)
 - [Signing Key](#signing-key)
 
@@ -198,14 +201,17 @@ The value of this key MUST be kept secret.
 | Python     | 0.1.0-preview                          | n/a                       | [materials_managers](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/materials_managers/__init__.py)                        |
 | Java       | 0.1.0-preview                          | n/a                       | [DecryptionMaterials.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/DecryptionMaterials.java) |
 
-#### Structure
+#### Fields
 
 Decryption materials are a structure containing materials needed for [decryption](../client-apis/decrypt.md).
-This structure MAY include any of the following fields:
+This structure MUST include the following fields:
 
 - [Algorithm Suite](#algorithm-suite-1)
 - [Encryption Context](#encryption-context-2)
 - [Plaintext Data Key](#plaintext-data-key-1)
+
+This structure MAY include any of the following fields:
+
 - [Verification Key](#verification-key)
 
 ##### Algorithm Suite

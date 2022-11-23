@@ -102,8 +102,8 @@ and SHOULD be equal to a UTF-8 encoding of the key name.
 
 ### OnEncrypt
 
-This interface takes [encryption materials](structures.md#encryption-materials) as input
-and MAY modify it with any of the following behaviors:
+This interface MUST take [encryption materials](structures.md#encryption-materials) as input.
+It MUST modify it with at least one of the following behaviors:
 
 - [Generate data key](#generate-data-key)
 - [Encrypt data key](#encrypt-data-key)
@@ -117,10 +117,10 @@ and it MUST NOT modify the [encryption materials](structures.md#encryption-mater
 #### Generate Data Key
 
 If the [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key,
-OnEncrypt MAY generate a data key.
+OnEncrypt MUST generate a data key.
 If the encryption materials contain a plaintext data key, OnEncrypt MUST NOT generate a data key.
 
-Generate Data Key MAY modify the following fields in the [encryption materials](structures.md#encryption-materials):
+Generate Data Key MUST modify the following fields in the [encryption materials](structures.md#encryption-materials):
 
 - [plaintext data key](structures.md#plaintext-data-key)
 
@@ -137,10 +137,10 @@ perform the [Encrypt Data Key](#encrypt-data-key) behavior.
 #### Encrypt Data Key
 
 If the [encryption materials](structures.md#encryption-materials) contain a plaintext data key,
-OnEncrypt MAY encrypt a data key.
+OnEncrypt MUST encrypt a data key.
 If the encryption materials do not contain a plaintext data key, OnEncrypt MUST NOT encrypt a data key.
 
-Encrypt Data Key MAY modify the following fields in the [encryption materials](structures.md#encryption-materials):
+Encrypt Data Key MUST modify the following fields in the [encryption materials](structures.md#encryption-materials):
 
 - [encrypted data keys](structures.md#encrypted-data-keys)
 
@@ -155,9 +155,9 @@ have [ciphertexts](structures.md#ciphertext) that can be decrypted to the plaint
 
 ### OnDecrypt
 
-This interface takes [decryption materials](structures.md#decryption-materials) and
-a list of [encrypted data keys](structures.md#encrypted-data-key) as input and
-MAY modify it with the following behavior:
+This interface MUST take [decryption materials](structures.md#decryption-materials) and
+a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
+It MUST modify it with the following behavior:
 
 - [Decrypt data key](#decrypt-data-key)
 
@@ -175,16 +175,16 @@ and MUST NOT modify the [decryption materials](structures.md#decryption-material
 
 If the encryption materials do contain a plaintext data key, OnDecrypt MUST NOT decrypt a data key.
 If the [decryption materials](structures.md#decryption-materials) do not include a plaintext data key,
-OnDecrypt MAY decrypt a data key.
+OnDecrypt MUST decrypt a data key.
 
-The decrypt data key MAY modify the following fields in the [decryption materials](structures.md#decryption-materials):
+The decrypt data key MUST modify the following fields in the [decryption materials](structures.md#decryption-materials):
 
 - [Plaintext data key](structures.md#plaintext-data-key-1)
 
 To perform this behavior, the keyring attempts to retrieve a plaintext data key from the input list
 of [encrypted data keys](structures.md#encrypted-data-key).
 
-If the keyring is able to succesfully get at least one plaintext data key from any [encrypted data key](structures.md#encrypted-data-key)
+If the keyring is able to successfully get at least one plaintext data key from any [encrypted data key](structures.md#encrypted-data-key)
 and the [decryption materials](structures.md#decryption-materials) still do not include a plaintext data key,
 it SHOULD set one resulting plaintext data key on the [decryption materials](structures.md#decryption-materials).
 
