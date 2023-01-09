@@ -7,6 +7,10 @@
 
 ### Changelog
 
+- 0.2.0
+
+  - Updating the interface. Moving elements from the Local CMC to the interface.
+
 - 0.1.0
   - Initial record
   - [Refactor Cryptographic Materials Cache Specification](../changes/2020-07-14_refactor-cmc-spec/change.md)
@@ -35,14 +39,6 @@ per [cache identifier](cryptographic-materials-cache.md#cache-identifier).
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
 in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
-
-### Time-to-live (TTL)
-
-Each cache entry has a time-to-live (TTL) field
-that represents a point in time at which the cache entry MUST be considered invalid.
-After a cache entry's TTL has elapsed,
-we say that the entry is _TTL-expired_,
-and the local CMC MUST NOT return the entry to any caller.
 
 ## Initialization
 
@@ -74,18 +70,14 @@ for TTL-expired entries to evict.
 
 ### Put Cache Entry
 
-When calling the Put Cache Entry operation,
-the caller MUST provide a time delta value,
-which the local CMC uses to derive the cache entry's time-to-live (TTL) value.
-The local CMC MUST NOT return any TTL-expired entry.
-
 When performing a Put Cache Entry operation,
-the local CMC MUST [prune TTL-expired cache entries](#pruning).
+the local CMC should not [prune TTL-expired cache entries](#pruning).
+This is because an entry is added after a get miss.
+A prune happens during the get operation.
 
 While performing a Put Cache Entry operation,
 the local CMC MAY store more entries than the entry capacity.
-However, before returning the inserted cache entry,
-the local CMC MUST evict least-recently used entries
+However, before returning, the local CMC MUST evict least-recently used entries
 until the number of stored entries does not exceed the entry capacity.
 
 ### Get Cache Entry
@@ -100,6 +92,8 @@ To prune TTL-expired cache entries,
 the local CMC MUST evict all TTL-expired entries
 among the `N` least recently used entries,
 where `N` is the [Entry Pruning Tail Size](#entry-pruning-tail-size).
+This means that a maximum of `N` entries
+and a minimum of `0` entries will be evicted.
 
 The local CMC SHOULD also periodically evict all TTL-expired entries
 among the `N` least recently used entries.
