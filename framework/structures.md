@@ -5,9 +5,13 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
+
+- 0.4.0
+
+  - Add Hierarchical Materials.
 
 - 0.3.0
 
@@ -51,6 +55,7 @@ Structures defined in this document:
 - [Encryption Context](#encryption-context)
 - [Encryption Materials](#encryption-materials)
 - [Decryption Materials](#decryption-materials)
+- [Hierarchical Materials](#hierarchical-materials)
 
 ### Encrypted Data Key
 
@@ -281,3 +286,30 @@ These keys should have been reproduced by the caller on decrypt.
 
 Every key in Required Encryption Context Keys
 MUST be a key in the [encryption context](#encryption-context-2).
+
+### Hierarchical Materials
+
+#### Implementations
+
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+| -------- | -------------------------------------- | ------------------------- | -------------- |
+
+#### Structure
+
+Hierarchical materials are a structure containing materials that are used to establish a key hierarchy in order to
+reuse a data key that wraps other data keys.
+This structure MAY include any of the following fields:
+
+- [Branch Key](#branch-key)
+- [Branch Key Version](#branch-key-version)
+
+##### Branch Key
+
+Data keys that are reused to derive unique data keys for envelope encryption. This data key MUST only be generated through
+AWS KMS using the [`GenerateDataKeyWithoutPlaintext`](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) API.
+
+##### Branch Key Version
+
+The UTF8 Encoded value of the version of the corresponding [branch key](#branch-key).
+The plaintext value of which is stored in the [branch key store](./branch-key-store.md).
+This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
