@@ -5,10 +5,13 @@
 
 ## Version
 
-0.3.0
+0.5.0
 
 ### Changelog
 
+- 0.5.0
+  - Add [Hierarchical Materials](./structures.md#hierarchical-materials) to the materials
+    allowed in the cache.
 - 0.4.0
   - Updating the interface. Moving elements from the Local CMC to the interface.
 - 0.3.0
@@ -60,7 +63,8 @@ and MUST have the following information.
 #### Materials
 
 The cryptographic materials,
-[encryption](structures.md#encryption-materials) or [decryption](structuresmd#decryption-materials)
+[encryption](structures.md#encryption-materials), [decryption](structuresmd#decryption-materials),
+or [hierarchical](structures.md#hierarchical-materials)
 materials to be cached along with other metadata.
 
 #### Creation Time
