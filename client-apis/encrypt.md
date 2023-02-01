@@ -5,9 +5,13 @@
 
 ## Version
 
-0.4.0
+0.5.0
 
 ### Changelog
+
+- 0.5.0
+
+  - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
 
 - 0.3.0
 
@@ -236,7 +240,10 @@ then the [message header body](../data-format/message-header.md#header-body-vers
 - [Message ID](../data-format/message-header.md#message-id): The process used to generate
   this identifier MUST use a good source of randomness to make the chance of duplicate identifiers negligible.
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
-  in the [encryption materials](../framework/structures.md#encryption-materials)
+  in the [encryption materials](../framework/structures.md#encryption-materials),
+  and this serialization MUST NOT contain any key value pairs listed in
+  the [encryption material's](../framework/structures.md#encryption-materials)
+  [required encryption context keys](../framework/structures.md#required-encryption-context-keys).
 - [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
   [encrypted data keys](../framework/structures.md#encrypted-data-keys) in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Content Type](../data-format/message-header.md#content-type): MUST be [02](../data-format/message-header.md#supported-content-types)
@@ -256,7 +263,10 @@ then the [message header body](../data-format/message-header.md#header-body-vers
 - [Message ID](../data-format/message-header.md#message-id): The process used to generate
   this identifier MUST use a good source of randomness to make the chance of duplicate identifiers negligible.
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
-  in the [encryption materials](../framework/structures.md#encryption-materials)
+  in the [encryption materials](../framework/structures.md#encryption-materials),
+  and this serialization MUST NOT contain any key value pairs listed in
+  the [encryption material's](../framework/structures.md#encryption-materials)
+  [required encryption context keys](../framework/structures.md#required-encryption-context-keys).
 - [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
   [encrypted data keys](../framework/structures.md#encrypted-data-keys) in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Content Type](../data-format/message-header.md#content-type): MUST be [02](../data-format/message-header.md#supported-content-types)
@@ -270,7 +280,14 @@ over the message header body.
 The value of this MUST be the output of the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
 specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
 
-- The AAD is the serialized [message header body](../data-format/message-header.md#header-body).
+- The AAD MUST be the concatenation of the serialized [message header body](../data-format/message-header.md#header-body)
+  and the serialization of encryption context to only authenticate.
+  The encryption context to only authenticate MUST be the [encryption context](../framework/structures.md#encryption-context)
+  in the [encryption materials](../framework/structures.md#encryption-materials)
+  filtered to only contain key value pairs listed in
+  the [encryption material's](../framework/structures.md#encryption-materials)
+  [required encryption context keys](../framework/structures.md#required-encryption-context-keys)
+  serialized in the same format as the [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
 - The IV has a value of 0.
 - The cipherkey is the derived data key
 - The plaintext is an empty byte array
@@ -436,3 +453,9 @@ the [message body](../data-format/message-body.md) was serialized with the follo
   - The cipherkey is the derived data key
   - The plaintext is the input [plaintext ](#plaintext)
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag returned by the above encryption.
+
+### Encryption Context not stored in the message
+
+The encryption context to only authenticate is backwards compatible
+with older messages because the [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
+will serialize an empty encryption context as 0 bytes.

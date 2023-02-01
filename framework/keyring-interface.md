@@ -114,6 +114,11 @@ it MUST output the modified [encryption materials](structures.md#encryption-mate
 If the keyring did not attempt any of the above behaviors, it MUST fail
 and it MUST NOT modify the [encryption materials](structures.md#encryption-materials).
 
+The keyring SHOULD NOT attempt to store the encryption context
+in the [encrypted data key's](structures.md#encrypted-data-key) properties.
+This is especially important given the `Required Encryption Context Keys`
+that exists on [encryption materials](structures.md#encryption-materials) and [decryption materials](structures.md#decryption-materials)
+
 #### Generate Data Key
 
 If the [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key,

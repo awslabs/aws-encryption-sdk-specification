@@ -135,6 +135,7 @@ This structure MUST include the following fields:
 - [Algorithm Suite](#algorithm-suite)
 - [Encrypted Data Keys](#encrypted-data-keys)
 - [Encryption Context](#encryption-context-1)
+- [Required Encryption Context Keys](#required-encryption-context-keys)
 
 This structure MAY include any of the following fields:
 
@@ -190,6 +191,20 @@ If the algorithm suite does not contain a signing algorithm, the signing key MUS
 
 The value of this key MUST be kept secret.
 
+##### Required Encryption Context Keys
+
+Communicates to higher level `encrypt` APIs
+in [supported libraries](algorithm-suites.md#supp#supported-libraries)
+how to split the encryption context
+into elements that are authenticated and stored
+from elements that are only authenticated and not stored.
+Keys in this set should not be stored
+with ciphertext protected by these materials.
+These keys are required to be reproduced on decrypt.
+
+Every key in Required Encryption Context Keys
+MUST be a key in the [encryption context](#encryption-context-1).
+
 ### Decryption Materials
 
 #### Implementations
@@ -208,10 +223,11 @@ This structure MUST include the following fields:
 
 - [Algorithm Suite](#algorithm-suite-1)
 - [Encryption Context](#encryption-context-2)
-- [Plaintext Data Key](#plaintext-data-key-1)
+- [Required Encryption Context Keys](#required-encryption-context-keys-1)
 
 This structure MAY include any of the following fields:
 
+- [Plaintext Data Key](#plaintext-data-key-1)
 - [Verification Key](#verification-key)
 
 ##### Algorithm Suite
@@ -250,3 +266,18 @@ The key to be used as the verification key for signature verification during [de
 
 The verification key MUST fit the specification for the [signature algorithm](algorithm-suites.md#signature-algorithm)
 included in this decryption material's [algorithm suite](#algorithm-suite-1).
+
+##### Required Encryption Context Keys
+
+A set of strings to communicate to higher level `decrypt` APIs
+in [supported libraries](algorithm-suites.md#supp#supported-libraries)
+how to split the [encryption context](#encryption-context-2)
+into elements that are authenticated and stored
+from elements that are only authenticated
+and not stored in the encrypted message.
+Keys in this set should not have been stored
+with the ciphertext protected by these materials.
+These keys should have been reproduced by the caller on decrypt.
+
+Every key in Required Encryption Context Keys
+MUST be a key in the [encryption context](#encryption-context-2).
