@@ -11,6 +11,7 @@
 
 - 0.4.0
 
+  - Add symmetric signature keys to materials
   - Add Hierarchical Materials.
 
 - 0.3.0
@@ -146,6 +147,7 @@ This structure MAY include any of the following fields:
 
 - [Plaintext Data Key](#plaintext-data-key)
 - [Signing Key](#signing-key)
+- [Symmetric Signing Keys](#symmetric-signing-key)
 
 ##### Algorithm Suite
 
@@ -188,11 +190,11 @@ The plaintext data key SHOULD offer an interface to zero the plaintext data key.
 
 ##### Signing Key
 
-The key to be used as the signing key for signature verification during [encryption](../client-apis/encrypt.md).
+The key to be used as the signing key for asymmetric signature verification during [encryption](../client-apis/encrypt.md).
 
-The signing key MUST fit the specification described by the [signature algorithm](algorithm-suites.md#signature-algorithm)
+The signing key MUST fit the specification described by the [asymmetric signature algorithm](algorithm-suites.md#asymmetric-signature-algorithm)
 included in this encryption material's [algorithm suite](#algorithm-suite).
-If the algorithm suite does not contain a signing algorithm, the signing key MUST NOT be present.
+If the algorithm suite does not contain an asymmetric signing algorithm, the signing key MUST NOT be present.
 
 The value of this key MUST be kept secret.
 
@@ -209,6 +211,19 @@ These keys are required to be reproduced on decrypt.
 
 Every key in Required Encryption Context Keys
 MUST be a key in the [encryption context](#encryption-context-1).
+
+##### Symmetric Signing Keys
+
+A list of symmetric signing keys, such that each key in this list corresponds to the encrypted data key in the [encrypted data key list](#encrypted-data-keys) at the same index.
+These keys are used to generate symmetric signatures during encryption.
+
+If the algorithm suite does not contain a symmetric signing algorithm, this list MUST either be empty or not included in the materials.
+If the algorithm suite does contain a symmetric signing algorithm, this list MUST have length equal to the [encrypted data key list](#encrypted-data-keys).
+
+The symmetric signature keys MUST adhere to the specification for [symmetric signature algorithms](./algorithm-suites.md#symmetric-signature-algorithm)
+included in this encryption material's [algorithm suite](#algorithm-suite).
+
+The value of keys in this list MUST be kept secret.
 
 ### Decryption Materials
 
@@ -234,6 +249,7 @@ This structure MAY include any of the following fields:
 
 - [Plaintext Data Key](#plaintext-data-key-1)
 - [Verification Key](#verification-key)
+- [Symmetric Signing Key](#symmetric-signing-key)
 
 ##### Algorithm Suite
 
@@ -267,9 +283,9 @@ The plaintext data key SHOULD offer an interface to zero the plaintext data key.
 
 ##### Verification Key
 
-The key to be used as the verification key for signature verification during [decryption](../client-apis/decrypt.md).
+The key to be used as the verification key for asymmetric signature verification during [decryption](../client-apis/decrypt.md).
 
-The verification key MUST fit the specification for the [signature algorithm](algorithm-suites.md#signature-algorithm)
+The verification key MUST fit the specification for the [asymmetric signature algorithm](algorithm-suites.md#asymmetric-signature-algorithm)
 included in this decryption material's [algorithm suite](#algorithm-suite-1).
 
 ##### Required Encryption Context Keys
@@ -286,6 +302,15 @@ These keys should have been reproduced by the caller on decrypt.
 
 Every key in Required Encryption Context Keys
 MUST be a key in the [encryption context](#encryption-context-2).
+
+##### Symmetric Signing Key
+
+The key to be used to validate a symmetric signature during decryption.
+
+The symmetric signature key MUST fit the specification for the [symmetric signature algorithm](algorithm-suites.md#symmetric-signature-algorithm)
+included in this decryption material's [algorithm suite](#algorithm-suite-1).
+
+This value MUST be kept secret.
 
 ### Hierarchical Materials
 
