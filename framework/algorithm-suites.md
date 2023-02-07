@@ -9,6 +9,10 @@
 
 ### Changelog
 
+- 0.4.0
+
+  - Add suites with symmetric signing
+
 - 0.3.0
   - [Material Providers Library (MPL)](../changes/2022-06-19_seperate_material_providers/change.md)
 
@@ -26,7 +30,7 @@
 ## Overview
 
 An algorithm suite is a collection of cryptographic algorithms and related values.
-The algorithm suite defines the behaviors the AWS Encryption SDK MUST follow for cryptographic operations.
+The algorithm suite defines the behaviors [supported libraries](#supported-libraries) MUST follow for cryptographic operations.
 
 ## Definitions
 
@@ -95,18 +99,19 @@ The following tables includes the dependant libraries
 supported by the Material Providers Library.
 Both short and long name MUST be unique.
 
-| Library (long name)  | Library (short name) |
-| -------------------- | -------------------- |
-| AWS Encryption SDK   | ESDK                 |
-| S3 Encryption Client | S3EC                 |
+| Library (long name)        | Library (short name) |
+| -------------------------- | -------------------- |
+| AWS Encryption SDK         | ESDK                 |
+| S3 Encryption Client       | S3EC                 |
+| DynamoDb Encryption Client | DDBEC                |
 
 ## Supported Library Algorithm Suites ENUM
 
 The following tables includes the algorithm suites
 supported by the Material Providers Library
-for each [supported library](./algorithm-suites.md#supported-libraries).
+for each [supported library](#supported-libraries).
 The Material Providers Library MUST provide
-a set of algorithm suite ENUM for each [supported library](./algorithm-suites.md#supported-libraries).
+a set of algorithm suite ENUM for each [supported library](#supported-libraries).
 
 | ESDK Algorithm Suite ENUM                         |
 | ------------------------------------------------- |
@@ -128,6 +133,11 @@ a set of algorithm suite ENUM for each [supported library](./algorithm-suites.md
 | ALG_AES_256_CTR_IV16_TAG16_NO_KDF |
 | ALG_AES_256_GCM_IV12_TAG16_NO_KDF |
 
+| DDBEC Algorithm Suite ENUM                                           |
+| -------------------------------------------------------------------- |
+| ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            |
+| ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 |
+
 ## Supported Algorithm Suites ENUM
 
 The Material Providers Library MUST provide
@@ -140,132 +150,233 @@ For example `ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF`
 is the Algorithm Suite ENUM for the ESDK Algorithm Suite ENUM `ALG_AES_128_GCM_IV12_TAG16_NO_KDF`.
 This means that different libraries MAY have duplicate Library Algorithm Suite ENUM.
 
-| Algorithm Suite ENUM                                   |
-| ------------------------------------------------------ |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384 |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY            |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256 |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256            |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256            |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256            |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                 |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                 |
-| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                       |
-| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                 |
-| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 |
+| Algorithm Suite ENUM                                                       |
+| -------------------------------------------------------------------------- |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                     |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                     |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                     |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                     |
+| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                           |
+| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                     |
+| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 |
 
 ## Supported Algorithm Suites
 
-The following table includes the algorithm suites supported by the AWS Encryption SDK.
+The following table includes all supported algorithm suites.
 The value `00 00` is reserved
 and MUST NOT be used
 as an Algorithm Suite ID in the future.
-Algorithm Suite ID MUST be a unique hex value across all [supported algorithm suites](#supported-algorithm-suites).
+Algorithm Suite ID MUST be a unique hex value across all supported algorithm suites.
 
-| Algorithm Suite ENUM                                   | Algorithm Suite ID (hex) | Message Format Version | Algorithm Suite Data Length (bytes) |
-| ------------------------------------------------------ | ------------------------ | ---------------------- | ----------------------------------- |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384 | 05 78                    | 2.0                    | 32                                  |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY            | 04 78                    | 2.0                    | 32                                  |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | 03 78                    | 1.0                    | N/A                                 |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | 03 46                    | 1.0                    | N/A                                 |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256 | 02 14                    | 1.0                    | N/A                                 |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256            | 01 78                    | 1.0                    | N/A                                 |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256            | 01 46                    | 1.0                    | N/A                                 |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256            | 01 14                    | 1.0                    | N/A                                 |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | 00 78                    | 1.0                    | N/A                                 |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                 | 00 46                    | 1.0                    | N/A                                 |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                 | 00 14                    | 1.0                    | N/A                                 |
-| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                       | 00 70                    | 1.0                    | N/A                                 |
-| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                 | 00 71                    | 1.0                    | N/A                                 |
-| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | 00 72                    | 1.0                    | N/A                                 |
+| Algorithm Suite ENUM                                                       | Algorithm Suite ID (hex) | Message Format Version | Algorithm Suite Data Length (bytes) |
+| -------------------------------------------------------------------------- | ------------------------ | ---------------------- | ----------------------------------- |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            | 67 00                    | 1.0                    | N/A                                 |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 | 67 01                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                     | 05 78                    | 2.0                    | 32                                  |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                                | 04 78                    | 2.0                    | 32                                  |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | 03 78                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | 03 46                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                     | 02 14                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                                | 01 78                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                                | 01 46                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                                | 01 14                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | 00 78                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                     | 00 46                    | 1.0                    | N/A                                 |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                     | 00 14                    | 1.0                    | N/A                                 |
+| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                           | 00 70                    | 1.0                    | N/A                                 |
+| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                     | 00 71                    | 1.0                    | N/A                                 |
+| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | 00 72                    | 1.0                    | N/A                                 |
 
 ## Algorithm Suites Encryption Key Derivation Settings
 
 The following table includes key derivation information for supported algorithm suites.
 
-| Algorithm Suite ENUM                                   | Key Derivation Input Length (bits) | Algorithm    | Hash Function | Salt Length (bits) | Key Commitment |
-| ------------------------------------------------------ | ---------------------------------- | ------------ | ------------- | ------------------ | -------------- |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384 | 256                                | HKDF         | SHA-512       | 256                | True           |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY            | 256                                | HKDF         | SHA-512       | 256                | True           |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | 256                                | HKDF         | SHA-384       | 0                  | False          |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | 192                                | HKDF         | SHA-384       | 0                  | False          |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256 | 128                                | HKDF         | SHA-256       | 0                  | False          |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256            | 256                                | HKDF         | SHA-256       | 0                  | False          |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256            | 192                                | HKDF         | SHA-256       | 0                  | False          |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256            | 128                                | HKDF         | SHA-256       | 0                  | False          |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | 256                                | Identity KDF | N/A           | 0                  | False          |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                 | 192                                | Identity KDF | N/A           | 0                  | False          |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                 | 128                                | Identity KDF | N/A           | 0                  | False          |
-| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                       | 256                                | Identity KDF | N/A           | 0                  | False          |
-| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                 | 256                                | Identity KDF | N/A           | 0                  | False          |
-| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | 256                                | Identity KDF | N/A           | 0                  | False          |
+| Algorithm Suite ENUM                                                       | Key Derivation Input Length (bits) | Algorithm    | Hash Function | Salt Length (bits) | Key Commitment |
+| -------------------------------------------------------------------------- | ---------------------------------- | ------------ | ------------- | ------------------ | -------------- |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            | 256                                | HKDF         | SHA-512       | N/A                | True           |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 | 256                                | HKDF         | SHA-512       | N/A                | True           |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                     | 256                                | HKDF         | SHA-512       | 256                | True           |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                                | 256                                | HKDF         | SHA-512       | 256                | True           |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | 256                                | HKDF         | SHA-384       | 0                  | False          |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | 192                                | HKDF         | SHA-384       | 0                  | False          |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                     | 128                                | HKDF         | SHA-256       | 0                  | False          |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                                | 256                                | HKDF         | SHA-256       | 0                  | False          |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                                | 192                                | HKDF         | SHA-256       | 0                  | False          |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                                | 128                                | HKDF         | SHA-256       | 0                  | False          |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | 256                                | Identity KDF | N/A           | 0                  | False          |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                     | 192                                | Identity KDF | N/A           | 0                  | False          |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                     | 128                                | Identity KDF | N/A           | 0                  | False          |
+| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                           | 256                                | Identity KDF | N/A           | 0                  | False          |
+| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                     | 256                                | Identity KDF | N/A           | 0                  | False          |
+| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | 256                                | Identity KDF | N/A           | 0                  | False          |
 
 ## Algorithm Suites Encryption Settings
 
 The following table includes the encryption settings for supported algorithm suites.
 
-| Algorithm Suite ENUM                                   | Encryption Algorithm | Encryption Algorithm Mode | Encryption Key Length (bits) | IV Length (bytes) | Authentication Tag Length (bytes) |
-| ------------------------------------------------------ | -------------------- | ------------------------- | ---------------------------- | ----------------- | --------------------------------- |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384 | AES                  | GCM                       | 256                          | 12                | 16                                |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY            | AES                  | GCM                       | 256                          | 12                | 16                                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | AES                  | GCM                       | 256                          | 12                | 16                                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | AES                  | GCM                       | 192                          | 12                | 16                                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256 | AES                  | GCM                       | 128                          | 12                | 16                                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256            | AES                  | GCM                       | 256                          | 12                | 16                                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256            | AES                  | GCM                       | 192                          | 12                | 16                                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256            | AES                  | GCM                       | 128                          | 12                | 16                                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | AES                  | GCM                       | 256                          | 12                | 16                                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                 | AES                  | GCM                       | 192                          | 12                | 16                                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                 | AES                  | GCM                       | 128                          | 12                | 16                                |
-| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                       | AES                  | CBC                       | 256                          | 16                | N/A                               |
-| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                 | AES                  | CTR                       | 256                          | 16                | N/A                               |
-| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | AES                  | GCM                       | 256                          | 12                | 16                                |
+| Algorithm Suite ENUM                                                       | Encryption Algorithm | Encryption Algorithm Mode | Encryption Key Length (bits) | IV Length (bytes) | Authentication Tag Length (bytes) |
+| -------------------------------------------------------------------------- | -------------------- | ------------------------- | ---------------------------- | ----------------- | --------------------------------- |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            | AES                  | GCM                       | 256                          | 12                | 16                                |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 | AES                  | GCM                       | 256                          | 12                | 16                                |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                     | AES                  | GCM                       | 256                          | 12                | 16                                |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                                | AES                  | GCM                       | 256                          | 12                | 16                                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | AES                  | GCM                       | 256                          | 12                | 16                                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | AES                  | GCM                       | 192                          | 12                | 16                                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                     | AES                  | GCM                       | 128                          | 12                | 16                                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                                | AES                  | GCM                       | 256                          | 12                | 16                                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                                | AES                  | GCM                       | 192                          | 12                | 16                                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                                | AES                  | GCM                       | 128                          | 12                | 16                                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | AES                  | GCM                       | 256                          | 12                | 16                                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                     | AES                  | GCM                       | 192                          | 12                | 16                                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                     | AES                  | GCM                       | 128                          | 12                | 16                                |
+| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                           | AES                  | CBC                       | 256                          | 16                | N/A                               |
+| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                     | AES                  | CTR                       | 256                          | 16                | N/A                               |
+| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | AES                  | GCM                       | 256                          | 12                | 16                                |
 
 ## Algorithm Suites Commit Key Derivation Settings
 
 The following table includes commitment information for supported algorithm suites.
 These values are only relevant to algorithm suites that support [key commitment](#key-commitment).
 
-| Algorithm Suite ENUM                                   | Key Derivation Input Length (bits) | Algorithm | Hash Function | Salt Length (bits) |
-| ------------------------------------------------------ | ---------------------------------- | --------- | ------------- | ------------------ |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384 | 256                                | HKDF      | SHA-512       | 256                |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY            | 256                                | HKDF      | SHA-512       | 256                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256 | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256            | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256            | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256            | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                 | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                 | N/A                                | N/A       | N/A           | N/A                |
-| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                       | N/A                                | N/A       | N/A           | N/A                |
-| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                 | N/A                                | N/A       | N/A           | N/A                |
-| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | N/A                                | N/A       | N/A           | N/A                |
+| Algorithm Suite ENUM                                                       | Key Derivation Input Length (bits) | Algorithm | Hash Function | Salt Length (bits) |
+| -------------------------------------------------------------------------- | ---------------------------------- | --------- | ------------- | ------------------ |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            | 256                                | HKDF      | SHA-512       | N/A                |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 | 256                                | HKDF      | SHA-512       | N/A                |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                     | 256                                | HKDF      | SHA-512       | 256                |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                                | 256                                | HKDF      | SHA-512       | 256                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | N/A                                | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | N/A                                | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                     | N/A                                | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                                | N/A                                | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                                | N/A                                | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                                | N/A                                | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | N/A                                | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                     | N/A                                | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                     | N/A                                | N/A       | N/A           | N/A                |
+| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                           | N/A                                | N/A       | N/A           | N/A                |
+| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                     | N/A                                | N/A       | N/A           | N/A                |
+| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | N/A                                | N/A       | N/A           | N/A                |
 
 ## Algorithm Suites Signature Settings
 
 The following table includes signature information for supported algorithm suites.
 
-| Algorithm Suite ENUM                                   | Signature Algorithm          |
-| ------------------------------------------------------ | ---------------------------- |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384 | ECDSA with P-384 and SHA-384 |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY            | Not applicable               |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | ECDSA with P-384 and SHA-384 |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384 | ECDSA with P-384 and SHA-384 |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256 | ECDSA with P-256 and SHA-256 |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256            | Not applicable               |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256            | Not applicable               |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256            | Not applicable               |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | Not applicable               |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                 | Not applicable               |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                 | Not applicable               |
-| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                       | Not applicable               |
-| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                 | Not applicable               |
-| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                 | Not applicable               |
+An algorithm suite with a symmetric signature algorithm MUST use [intermediate key wrapping](#intermediate-key-wrapping).
+
+| Algorithm Suite ENUM                                                       | Asymmetric Signature Algorithm | Symmetric Signature Algorithm |
+| -------------------------------------------------------------------------- | ------------------------------ | ----------------------------- |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            | Not applicable                 | HMAC with SHA-384             |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 | ECDSA with P-384 and SHA-384   | HMAC with SHA-384             |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                     | ECDSA with P-384 and SHA-384   | Not appliccable               |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                                | Not applicable                 | Not appliccable               |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | ECDSA with P-384 and SHA-384   | Not appliccable               |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | ECDSA with P-384 and SHA-384   | Not appliccable               |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                     | ECDSA with P-256 and SHA-256   | Not appliccable               |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                                | Not applicable                 | Not appliccable               |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                                | Not applicable                 | Not appliccable               |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                                | Not applicable                 | Not appliccable               |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | Not applicable                 | Not appliccable               |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                     | Not applicable                 | Not appliccable               |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                     | Not applicable                 | Not appliccable               |
+| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                           | Not applicable                 | Not appliccable               |
+| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                     | Not applicable                 | Not appliccable               |
+| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | Not applicable                 | Not appliccable               |
+
+## Algorithm Suitees EDK Wrapping Settings
+
+Based on the algorithm suite, there may be additional requirements to the wrapping and serialization of [encrypted data keys (EDKs)](./structures.md#encrypted-data-key).
+
+The following table includes EDK wrapping information for supported algorithm suites.
+
+| Algorithm Suite ENUM                                                       | EDK Wrapping Algorithm    |
+| -------------------------------------------------------------------------- | ------------------------- |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            | Intermediate Key Wrapping |
+| DDBEC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 | Intermediate Key Wrapping |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                     | Direct Key Wrapping       |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                                | Direct Key Wrapping       |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | Direct Key Wrapping       |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                     | Direct Key Wrapping       |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                     | Direct Key Wrapping       |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                                | Direct Key Wrapping       |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                                | Direct Key Wrapping       |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                                | Direct Key Wrapping       |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | Direct Key Wrapping       |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                     | Direct Key Wrapping       |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                     | Direct Key Wrapping       |
+| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                           | Direct Key Wrapping       |
+| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                     | Direct Key Wrapping       |
+| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                     | Direct Key Wrapping       |
+
+### Supported EDK Wrapping Algorithms
+
+- [Direct Key Wrapping](#direct-key-wrapping)
+- [Intermediate Key Wrapping](#intermediate-key-wrapping)
+
+#### Direct Key Wrapping
+
+[Encrypted data keys](./structures.md#encrypted-data-key) produced under algorithms suites
+using Direct Key Wrapping have no additional requirements,
+other than those already perscribed by the [EDK Ciphertext specification](./structures.md#encrypted-data-key).
+
+#### Intermediate Key Wrapping
+
+For algorithm suites including symmetric signing, additional steps are needed in order to create material
+unique for each encrypted data key that can be used for symmetric signing.
+Through the creation of intermediate material during the key wrapping process,
+those with access to unwrap a particular encrypted data key also have access to symmetric signing material associated
+with that particular encrypted data key.
+With this property, a message can be created that is decryptable by several parties,
+but also signed by each party such that party A can be sure that the message was not
+updated by party B.
+Only those with the ability to wrap data keys for all parties are capable of
+creating messages that will be authenticated by all parties.
+
+[Encrypted data keys](./structures.md#encrypted-data-key) produced under algorithm suites using Intermediate Key Wrapping,
+have the following requirements:
+
+- For each encrypted data key, a distinct `intermediate key` MUST be generated using cryptographically secure random bytes.
+  This intermediate key MUST have length equal to the encryption key length of the algorithm suite.
+- For each encrypted data key, a [symmetric signing key](./structures.md#symmetric-signing-key) MUST be derived from the `intermediate key`
+  using the key derivation algorithm in the algorithm suite, with the following specifics:
+  - The input key material is the `intermediate key`
+  - The salt is empty
+  - The info is "TRUSS_KEYWRAP_MAC" as UTF8 bytes. (TODO remove Truss name from info?)
+- For each encrypted data key, a `key encryption key` MUST be derived from the `intermediate key`
+  using the key derivation algorithm in the algorithm suite, with the following specifics:
+  - The input key material is the `intermediate key`
+  - The salt is empty
+  - The info is "TRUSS_KEYWRAP_ENC" as UTF8 bytes. (TODO remove Truss name from info?)
+- The [EDK ciphertext](./structures.md#ciphertext) MUST be the following serialization:
+
+| Field                      | Length (bytes)                                     | Interpreted as |
+| -------------------------- | -------------------------------------------------- | -------------- |
+| Wrapped Plaintext Data Key | The algorithm suite's encryption key length + 12   | Bytes          |
+| Wrapped Intermediate Key   | Determined by the keyring responsible for wrapping | Bytes          |
+
+##### Wrapped Plaintext Data Key
+
+The wrapped plaintext data key MUST be the result of the following AES GCM 256 Encrypt operation:
+
+- Plaintext: the [plaintext data key](./structures.md#plaintext-data-key) in the related encryption or decryption materials.
+- Encryption key: The `key encryption key` derived above.
+- AAD: The [enccryption context](./structures.md#encryption-context) in the related encryption or decryption materials,
+  serialized according to the the [ESDK message header](../data-format/message-header.md#aad). (TODO: centralize this serialization)
+
+This value MUST be equal to the algorithm suite's encryption key length + 12.
+
+##### Wrapped Intermediate Key
+
+The wrapped intermediate key has the same requirements for wrapping as the
+[EDK Ciphertext](./structures.md#encrypted-data-key) normally has under [Direct Key Wrapping](#direct-key-wrapping).
 
 ## Structure
 
@@ -358,26 +469,47 @@ The specified KDF algorithm MUST be used to generate the [commit key](#commit-ke
 
 The length of the commit key used to verify [key commitment](#key-commitment).
 
-### Signature Algorithm
+### Asymmetric Signature Algorithm
 
 This field is OPTIONAL.
 
-The signature algorithm defines what algorithm to use for signature generation and verification.
+The asymmetric signature algorithm defines what asymmetric algorithm to use for asymmetric signature generation and verification.
 
-If the algorithm suite includes a signature algorithm:
+If the algorithm suite includes an asymmetric signature algorithm:
 
-- Signatures MUST be generated using the specified signature algorithm.
-- Signatures MUST be verified using the specified signature algorithm.
+- Asymmetric signatures MUST be generated using the specified asymmetric signature algorithm.
+- Asymmetric signatures MUST be verified using the specified asymmetric signature algorithm.
 
-If the algorithm suite does not include a signature algorithm:
+If the algorithm suite does not include a asymmetric signature algorithm:
 
-- Signatures MUST NOT be generated.
-- Signatures MUST NOT be verified.
+- Asymmetric signatures MUST NOT be generated.
+- Asymmetric signatures MUST NOT be verified.
 
-#### Supported Signature Algorithms
+#### Supported Asymmetric Signature Algorithms
 
 - [ECDSA with P256 and SHA256](./transitive-requirements.md#ecdsa)
 - [ECDSA with P384 and SHA384](./transitive-requirements.md#ecdsa)
+
+### Symmetric Signature Algorithm
+
+This field is OPTIONAL.
+
+The symmetric signature algorithm defines what symmetric algorithm to use for symmetric signature generation and verification.
+
+If the algorithm suite includes an symmetric signature algorithm:
+
+- Symmetric signatures MUST be generated using the specified symmetric signature algorithm.
+- Symmetric signatures MUST be verified using the specified symmetric signature algorithm.
+- The algorithm suite MUST also use [Intermediate Key Wrapping](#intermediate-key-wrapping).
+
+If the algorithm suite does not include a symmetric signature algorithm:
+
+- Symmetric signatures MUST NOT be generated.
+- Symmetric signatures MUST NOT be verified.
+
+#### Supported Symmetric Signature Algorithms
+
+- [SHA384](https://www.rfc-editor.org/rfc/rfc6234)
 
 ### Message Format Version
 
@@ -393,6 +525,10 @@ This MUST be used to branch any serialization/deserialization logic in [supporte
 - 2.0
 
 **S3EC**
+
+- 1.0
+
+**DDBEC**
 
 - 1.0
 
