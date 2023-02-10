@@ -12,6 +12,7 @@
 - 0.5.0
 
   - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
+  - Add requirements to specify that Algorithm Suite be ESDK supported
 
 - 0.3.0
 
@@ -95,6 +96,7 @@ A Keyring that implements the [keyring interface](../framework/keyring-interface
 ### Algorithm Suite
 
 The [algorithm suite](../framework/algorithm-suites.md) that SHOULD be used for encryption.
+This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 ### Frame Length
 
@@ -144,6 +146,8 @@ This output MAY be satisfied by outputting a [parsed header](#parsed-header) con
 
 The [algorithm suite](../framework/algorithm-suites.md) that is used to encrypt
 the input [plaintext ](#plaintext).
+
+This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
@@ -207,6 +211,8 @@ MUST be the algorithm suite in the [encryption materials](../framework/structure
 returned from the [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) call.
 Note that the algorithm suite in the retrieved encryption materials MAY be different
 from the [input algorithm suite](#algorithm-suite).
+If this algorithm suite is not [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum)
+encrypt MUST yield an error.
 If this [algorithm suite](../framework/algorithm-suites.md) is not supported by the [commitment policy](client.md#commitment-policy)
 configured in the [client](client.md) encrypt MUST yield an error.
 If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys) on the [encryption materials](../framework/structures.md#encryption-materials)
