@@ -12,6 +12,7 @@
 - 0.5.0
 
   - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
+  - Add requirements to specify that Algorithm Suite be ESDK supported
 
 - 0.4.0
 
@@ -169,6 +170,8 @@ This output MAY be satisfied by outputting a [parsed header](#parsed-header) con
 The [algorithm suite](../framework/algorithm-suites.md) that is used to decrypt
 the input [encrypted message](#encrypted-message).
 
+This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
+
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
 ### Parsed Header
@@ -262,6 +265,8 @@ The data key used as input for all decryption described below is a data key deri
 included in the [decryption materials](../framework/structures.md#decryption-materials).
 The algorithm suite used as input for all decryption described below is a algorithm suite
 included in the [decryption materials](../framework/structures.md#decryption-materials).
+If this algorithm suite is not [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum)
+encrypt MUST yield an error.
 If the algorithm suite is not supported by the [commitment policy](client.md#commitment-policy)
 configured in the [client](client.md) decrypt MUST yield an error.
 If the [algorithm suite](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) supports [key commitment](../framework/algorithm-suites.md#key-commitment)

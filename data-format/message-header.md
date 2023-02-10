@@ -9,6 +9,10 @@
 
 ### Changelog
 
+- 0.1.2
+
+  - Add requirements to specify that Algorithm Suite be ESDK supported
+
 - 0.1.1
 
   - Include `aws-crypto-public-key` encryption context key.
@@ -118,6 +122,7 @@ The type (hex) of this field MUST be a value that exists in the following table:
 The identifier for the algorithm suite used when generating the message.
 The value (hex) of this field MUST be a value that exists in the
 [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) table.
+This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 #### Message ID
 
