@@ -22,7 +22,7 @@ This set of keys MUST
 
 - Exist in the encryption context of all [Encryption Materials Requests](./cmm-interface.md#encryption-materials-request).
 - Exist in the [required encryption context keys](./structures.md#required-encryption-context-keys) for returned [encryption materials](./structures.md#encryption-materials)
-  so that [supported libraries](./algorithm-suites.md#supported-libraries) will not serialize these values.
+  so that these values will not be serialized into the [supported formats](./algorithm-suites.md#supported-formats).
 - Exist the reproduced encryption context of all [Decrypt Materials Requests](#decrypt-materials-request).
 
 ## Definitions

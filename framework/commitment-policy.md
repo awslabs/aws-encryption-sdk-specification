@@ -5,7 +5,13 @@
 
 ## Version
 
-0.2.0
+0.3.0
+
+### Changelog
+
+- 0.3.0
+
+  - Add commitment policy for DBE.
 
 ## Implementations
 
@@ -28,17 +34,17 @@ It is important that all messages that could be sent to a host can be decrypted 
 A top level client makes such settings [hard to misuse](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/tenets.md#hard-to-misuse)
 because anything a client encrypts can be decrypted by the same client.
 
-## Supported Library Commitment Policy ENUM
+## Supported Format Commitment Policy ENUM
 
 The following tables include the commitment policies
 supported by the Material Providers Library
-for each [supported library](./algorithm-suites.md#supported-libraries).
+for each [supported format](./algorithm-suites.md#supported-formats).
 
 The Material Providers Library MUST provide
-a distinct commitment policy ENUM for each library.
-The `Library` Commitment Policy ENUM, where `Library`
-is a value from [supported library short name](./algorithm-suites.md#supported-libraries).
-This ENUM can be used by each library to configured
+a distinct commitment policy ENUM for each format.
+The `Format` Commitment Policy ENUM, where `Format`
+is a value from [supported format short name](./algorithm-suites.md#supported-formats).
+This ENUM can be used to configure
 which Commitment Policies it supports.
 
 | ESDK Commitment Policy ENUM     |
@@ -47,23 +53,28 @@ which Commitment Policies it supports.
 | REQUIRE_ENCRYPT_ALLOW_DECRYPT   |
 | REQUIRE_ENCRYPT_REQUIRE_DECRYPT |
 
+| DBE Commitment Policy ENUM      |
+| ------------------------------- |
+| REQUIRE_ENCRYPT_REQUIRE_DECRYPT |
+
 ## Supported Commitment Policy ENUM
 
 The Material Providers Library also MUST provide
 a union ENUM for all distinct commitment policy ENUMs
 called the Commitment Policy ENUM.
 In this specification this union Commitment Policy ENUM
-will be denoted as `Library.LibraryENUM`
-to uniquely identify an Commitment Policy ENUM across all supported libraries.
+will be denoted as `Format.FormatENUM`
+to uniquely identify an Commitment Policy ENUM across all supported formats.
 For example `ESDK.FORBID_ENCRYPT_ALLOW_DECRYPT`
-is the Commitment Policy ENUM for the ESDK Commitment Policy ENU `FORBID_ENCRYPT_ALLOW_DECRYPT`.
-This means that different libraries MAY have duplicate Library Commitment Policy ENUM.
+is the Commitment Policy ENUM for the ESDK Commitment Policy ENUM `FORBID_ENCRYPT_ALLOW_DECRYPT`.
+This means that different formats MAY have duplicate Format Commitment Policy ENUM.
 
 | Algorithm Suite ENUM                 |
 | ------------------------------------ |
 | ESDK.FORBID_ENCRYPT_ALLOW_DECRYPT    |
 | ESDK.REQUIRE_ENCRYPT_ALLOW_DECRYPT   |
 | ESDK.REQUIRE_ENCRYPT_REQUIRE_DECRYPT |
+| DBE.REQUIRE_ENCRYPT_REQUIRE_DECRYPT  |
 
 #### ESDK.FORBID_ENCRYPT_ALLOW_DECRYPT
 
@@ -86,5 +97,13 @@ When the commitment policy `ESDK.REQUIRE_ENCRYPT_ALLOW_DECRYPT` is configured:
 When the commitment policy `ESDK.REQUIRE_ENCRYPT_REQUIRE_DECRYPT` is configured:
 
 - `05 78` MUST be the default algorithm suite
+- [Get Encryption Materials](./cmm-interface.md#get-encryption-materials) MUST only support algorithm suites that have a [Key Commitment](./algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
+- [Decrypt Materials](./cmm-interface.md#decrypt-materials) MUST only support algorithm suites that have a [Key Commitment](./algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
+
+#### DBE.REQUIRE_ENCRYPT_REQUIRE_DECRYPT
+
+The commitment policy `ESDK.REQUIRE_ENCRYPT_REQUIRE_DECRYPT` is always configured for DBE,
+and results in the following requirements:
+
 - [Get Encryption Materials](./cmm-interface.md#get-encryption-materials) MUST only support algorithm suites that have a [Key Commitment](./algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
 - [Decrypt Materials](./cmm-interface.md#decrypt-materials) MUST only support algorithm suites that have a [Key Commitment](./algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
