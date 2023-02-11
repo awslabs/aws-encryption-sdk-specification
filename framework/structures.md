@@ -201,7 +201,7 @@ The value of this key MUST be kept secret.
 ##### Required Encryption Context Keys
 
 Communicates to higher level `encrypt` APIs
-in [supported libraries](algorithm-suites.md#supp#supported-libraries)
+of [supported formats](algorithm-suites.md#supp#supported-formats)
 how to split the encryption context
 into elements that are authenticated and stored
 from elements that are only authenticated and not stored.
@@ -291,7 +291,7 @@ included in this decryption material's [algorithm suite](#algorithm-suite-1).
 ##### Required Encryption Context Keys
 
 A set of strings to communicate to higher level `decrypt` APIs
-in [supported libraries](algorithm-suites.md#supp#supported-libraries)
+of [supported formats](algorithm-suites.md#supp#supported-formats)
 how to split the [encryption context](#encryption-context-2)
 into elements that are authenticated and stored
 from elements that are only authenticated

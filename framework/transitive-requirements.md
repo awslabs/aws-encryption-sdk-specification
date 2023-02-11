@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Transitive requirements for supported libraries
+# Transitive requirements for supported formats
 
 ## Version
 
@@ -24,11 +24,11 @@ There are implementation specific details that are relevant to some algorithm su
 These requirements may not be enforced by the Material Providers Library.
 This is the place to track these requirements.
 
-In each [supported library](./algorithm-suites.md#supported-libraries)
-these requirements need to be ensured.
+These requirements need to be ensured in the implementation of
+the encryption and decryption of each [supported format](./algorithm-suites.md#supported-format).
 By placing them in a separate markdown
 the expectation is that this file can be parsed by `duvet`
-and the appropriate annotations can be added in each [supported library](./algorithm-suites.md#supported-libraries).
+and the appropriate annotations can be added in each library implementing a [supported format](./algorithm-suites.md#supported-formats).
 
 ## Definitions
 

@@ -34,7 +34,7 @@
 
 The Cryptographic Materials Manager (CMM) assembles the cryptographic materials
 used to encrypt and decrypt the encrypted messages
-for each [supported library](./algorithm-suites.md#supported-libraries).
+for each [supported format](./algorithm-suites.md#supported-formats).
 The CMM interface describes the interface that all CMMs MUST implement.
 
 ## Definitions
