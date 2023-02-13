@@ -350,12 +350,12 @@ have the following requirements:
   using the key derivation algorithm in the algorithm suite, with the following specifics:
   - The input key material is the `intermediate key`
   - The salt is empty
-  - The info is "TRUSS_KEYWRAP_MAC" as UTF8 bytes. (TODO remove Truss name from info?)
+  - The info is "AWS_MPL_INTERMEDIATE_KEYWRAP_MAC" as UTF8 bytes.
 - For each encrypted data key, a `key encryption key` MUST be derived from the `intermediate key`
   using the key derivation algorithm in the algorithm suite, with the following specifics:
   - The input key material is the `intermediate key`
   - The salt is empty
-  - The info is "TRUSS_KEYWRAP_ENC" as UTF8 bytes. (TODO remove Truss name from info?)
+  - The info is "AWS_MPL_INTERMEDIATE_KEYWRAP_ENC" as UTF8 bytes.
 - The [EDK ciphertext](./structures.md#ciphertext) MUST be the following serialization:
 
 | Field                      | Length (bytes)                                     | Interpreted as |
