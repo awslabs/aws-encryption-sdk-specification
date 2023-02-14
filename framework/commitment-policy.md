@@ -105,5 +105,6 @@ When the commitment policy `ESDK.REQUIRE_ENCRYPT_REQUIRE_DECRYPT` is configured:
 The commitment policy `ESDK.REQUIRE_ENCRYPT_REQUIRE_DECRYPT` is always configured for DBE,
 and results in the following requirements:
 
+- `67 01` MUST be the default algorithm suite
 - [Get Encryption Materials](./cmm-interface.md#get-encryption-materials) MUST only support algorithm suites that have a [Key Commitment](./algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
 - [Decrypt Materials](./cmm-interface.md#decrypt-materials) MUST only support algorithm suites that have a [Key Commitment](./algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
