@@ -217,7 +217,7 @@ MUST be a key in the [encryption context](#encryption-context-1).
 A list of symmetric signing keys, such that each key in this list corresponds to the encrypted data key in the [encrypted data key list](#encrypted-data-keys) at the same index.
 These keys are used to generate symmetric signatures during encryption.
 
-If the algorithm suite does not contain a symmetric signing algorithm, this list MUST either be empty or not included in the materials.
+If the algorithm suite does not contain a symmetric signing algorithm, this list MUST NOT be included in the materials.
 If the algorithm suite does contain a symmetric signing algorithm, this list MUST have length equal to the [encrypted data key list](#encrypted-data-keys).
 
 The symmetric signature keys MUST adhere to the specification for [symmetric signature algorithms](./algorithm-suites.md#symmetric-signature-algorithm)
