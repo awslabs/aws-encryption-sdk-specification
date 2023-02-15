@@ -307,7 +307,14 @@ MUST be a key in the [encryption context](#encryption-context-2).
 
 The key to be used to validate a symmetric signature during decryption.
 
-The symmetric signature key MUST fit the specification for the [symmetric signature algorithm](algorithm-suites.md#symmetric-signature-algorithm)
+If the algorithm suite does not contain a symmetric signing algorithm,
+the symmetric signing key MUST NOT be included in the materials.
+
+If the algorithm suite does contain a symmetric signing algorithm,
+the symmetric signing key MUST also be included in the materials
+if and only if the materials also include a [plaintext data key](#plaintext-data-key-1).
+
+If included, the symmetric signature key MUST fit the specification for the [symmetric signature algorithm](algorithm-suites.md#symmetric-signature-algorithm)
 included in this decryption material's [algorithm suite](#algorithm-suite-1).
 
 This value MUST be kept secret.
