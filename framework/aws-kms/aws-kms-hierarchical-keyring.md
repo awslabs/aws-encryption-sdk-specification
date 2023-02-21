@@ -200,7 +200,7 @@ The hierarchical keyring MUST:
    - MUST use the plain text data key that will be wrapped by the `derivedBranchKey` as the AES-GCM message.
    - MUST use the derived `IV` as the AES-GCM IV.
    - MUST use an authentication tag byte of length 16.
-   - MUST use the serialized [AAD](#branch-key-wrappingunwrapping-aad) as the AES-GCM AAD.
+   - MUST use the serialized [AAD](#branch-key-wrapping-and-unwrapping-aad) as the AES-GCM AAD.
 
 If OnEncrypt fails to do any of the above, OnEncrypt MUST fail.
 
@@ -312,11 +312,11 @@ To decrypt an encrypted data key with a branch key, the hierarchical keyring MUS
    - It MUST use the `authentication tag` obtained from deserialization as the AES-GCM input authentication tag.
    - It MUST use the `derivedBranchKey` as the AES-GCM cipher key.
    - It MUST use the `IV` obtained from deserialization as the AES-GCM input IV.
-   - It MUST use the serialized [encryption context](#branch-key-wrappingunwrapping-aad) as the AES-GCM AAD.
+   - It MUST use the serialized [encryption context](#branch-key-wrapping-and-unwrapping-aad) as the AES-GCM AAD.
 
 If OnDecrypt fails to do any of the above, OnDecrypt MUST fail.
 
-### Branch Key Wrapping/Unwrapping AAD
+### Branch Key Wrapping and Unwrapping AAD
 
 To Encrypt and Decrypt the `wrappedDerivedBranchKey` the keyring MUST include the following values as part of the AAD for
 the AES Encrypt/Decrypt calls.

@@ -339,6 +339,7 @@ This structure MAY include any of the following fields:
 
 Data keys that are reused to derive unique data keys for envelope encryption. This data key MUST only be generated through
 AWS KMS using the [`GenerateDataKeyWithoutPlaintext`](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) API.
+This key MUST be 32 bytes long.
 
 ##### Branch Key Version
 
