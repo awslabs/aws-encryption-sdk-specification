@@ -76,9 +76,9 @@ the [ciphertext](structures.md#ciphertext) field in
 [encrypted data keys](structures.md#encrypted-data-key) produced by the AWS KMS Hierarchical Keyring.
 
 This structure is formed using the 16 byte `salt` used to derive the `derivedBranchKey`
-concatanated with the AES-GCM-256 12 byte `IV`
-concatanated with the byte representation of the UUID branch key version from the AWS DDB response `version` value
-concatanated with the AES Encryption output from the [branch key wrapping](#branch-key-wrapping).
+concatenated with the AES-GCM-256 12 byte `IV`
+concatenated with the byte representation of the UUID branch key version from the AWS DDB response `version` value
+concatenated with the AES Encryption output from the [branch key wrapping](#branch-key-wrapping).
 
 The following table describes the fields that form the ciphertext for this keyring.
 The bytes are appended in the order shown.
@@ -195,6 +195,7 @@ The hierarchical keyring MUST:
 1. Use a [KDF in Counter Mode with a Pseudo Random Function with HMAC SHA 256](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-108r1.pdf) to derive a 32 byte `derivedBranchKey` data key with the following inputs:
    - Use the `salt` as the salt.
    - Use the branch key as the `key`.
+   - Use the UTF8 Encoded value "aws-kms-hierarchy" as the label.
 1. Encrypt a plaintext data key with the `derivedBranchKey` using `AES-GCM-256` with the following inputs:
    - MUST use the `derivedBranchKey` as the AES-GCM cipher key.
    - MUST use the plain text data key that will be wrapped by the `derivedBranchKey` as the AES-GCM message.
@@ -321,7 +322,7 @@ If OnDecrypt fails to do any of the above, OnDecrypt MUST fail.
 To Encrypt and Decrypt the `wrappedDerivedBranchKey` the keyring MUST include the following values as part of the AAD for
 the AES Encrypt/Decrypt calls.
 
-To construct the AAD, the keyring MUST concatante the following values
+To construct the AAD, the keyring MUST concatenate the following values
 
 1. "aws-kms-hierarchy" as UTF8 Bytes
 1. Value of `branch-key-id` as UTF8 Bytes
