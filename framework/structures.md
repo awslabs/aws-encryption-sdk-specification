@@ -9,6 +9,9 @@
 
 ### Changelog
 
+- 0.5.0
+  - Rename Hierarchical Materials to Branch Key Materials.
+  - Add Beacon Key Materials
 - 0.4.0
 
   - Add symmetric signature keys to materials
@@ -56,7 +59,8 @@ Structures defined in this document:
 - [Encryption Context](#encryption-context)
 - [Encryption Materials](#encryption-materials)
 - [Decryption Materials](#decryption-materials)
-- [Hierarchical Materials](#hierarchical-materials)
+- [Branch Key Materials](#branch-key-materials)
+- [Beacon Key Materials](#beacon-key-materials)
 
 ### Encrypted Data Key
 
@@ -319,7 +323,7 @@ included in this decryption material's [algorithm suite](#algorithm-suite-1).
 
 This value MUST be kept secret.
 
-### Hierarchical Materials
+### Branch Key Materials
 
 #### Implementations
 
@@ -328,7 +332,7 @@ This value MUST be kept secret.
 
 #### Structure
 
-Hierarchical materials are a structure containing materials that are used to establish a key hierarchy in order to
+Branch Key materials are a structure containing materials that are used to establish a key hierarchy in order to
 reuse a data key that wraps other data keys.
 This structure MAY include any of the following fields:
 
@@ -346,3 +350,41 @@ This key MUST be 32 bytes long.
 The UTF8 Encoded value of the version of the corresponding [branch key](#branch-key).
 The plaintext value of which is stored in the [branch key store](./branch-key-store.md).
 This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
+
+## Beacon Key Materials
+
+#### Implementations
+
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+| -------- | -------------------------------------- | ------------------------- | -------------- |
+
+#### Structure
+
+Beacon Key materials are a structure containing materials
+that are used in structured encryption.
+They contain HMAC keys derived from a Beacon Key
+stored in the [Key Store](branch-key-store.md)
+
+This structure MUST include the following fields:
+
+- [Beacon Key Id](#beacon-key-id)
+
+This structure MAY include the following fields:
+
+- [Beacon Key](#beacon-key)
+- [HMAC Keys](#hmac-keys)
+
+##### Beacon Key
+
+The Beacon Key that is stored
+in the [Key Store](branch-key-store.md)
+
+##### Beacon Key Id
+
+The Beacon key id that was used to obtain
+the beacon key from a [Key Store](branch-key-store.md)
+
+##### HMAC Keys
+
+The a key-value mapping of arbitrary, UTF-8 encoded strings
+to HMAC Keys derived from the beacon key material.

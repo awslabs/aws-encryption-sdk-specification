@@ -9,8 +9,11 @@
 
 ### Changelog
 
+- 0.5.1
+  - Rename Hierarchical Materials to Branch Key Materials.
+  - Add Beacon Key Materials to allowed materials in the cache.
 - 0.5.0
-  - Add [Hierarchical Materials](./structures.md#hierarchical-materials) to the materials
+  - Add Hierarchical Materials to the materials
     allowed in the cache.
 - 0.4.0
   - Updating the interface. Moving elements from the Local CMC to the interface.
@@ -64,7 +67,7 @@ and MUST have the following information.
 
 The cryptographic materials,
 [encryption](structures.md#encryption-materials), [decryption](structuresmd#decryption-materials),
-or [hierarchical](structures.md#hierarchical-materials)
+[branch key](structures.md#branch-key-materials), or [beacon key](structures.md#beacon-key-materials)
 materials to be cached along with other metadata.
 
 #### Creation Time
