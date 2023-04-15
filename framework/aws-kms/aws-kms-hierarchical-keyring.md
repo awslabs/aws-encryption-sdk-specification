@@ -28,6 +28,7 @@ The Hierarchical keyring allows customers to reduce AWS KMS calls by locally cac
 
 - [Branch Key(s)](../structures.md#branch-key): Data keys that are reused to derive unique data keys for envelope encryption.
   For security considerations on when to rotate the branch key, refer to [Appendix B](#appendix-b-security-considerations-for-branch-key-rotation).
+- [Key Store](../branch-key-store.md): a resource responsible for managing and protecting branch keys in DDB.
 - [UUID](https://www.ietf.org/rfc/rfc4122.txt): a universally unique identifier that can be represented as a byte sequence or a string.
 
 ### Conventions used in this document
@@ -44,11 +45,9 @@ MUST implement the [AWS Encryption SDK Keyring interface](../keyring-interface.m
 On initialization, the caller:
 
 - MUST provide an AWS KMS key identifier
-- MUST provide an AWS KMS SDK client
-- MUST provide an AWS DDB SDK client
-- MUST provide an [AWS DDB Table ARN](https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondynamodb.html#amazondynamodb-table)
+- MUST provide a [KeyStore](../branch-key-store.md)
 - MUST provide a [cache limit TTL](#cache-limit-ttl)
-- MUST provide a Branch Key Identifier
+- MUST provide either a Branch Key Identifier or a [Branch Key Supplier](#branch-key-supplier)
 - MAY provide a max cache size
 - MAY provide a list of Grant Tokens
 
@@ -64,7 +63,7 @@ max cache size of 1000.
 ### Cache Limit TTL
 
 The maximum amount of time in seconds that an entry within the cache may be used before it MUST be evicted.
-The client MUST set a time-to-live (TTL) for [hierarchical materials](../structures.md#hierarchical-materials) in the underlying cache.
+The client MUST set a time-to-live (TTL) for [branch key materials](../structures.md#branch-key-materials) in the underlying cache.
 This value MUST be greater than zero.
 
 ## Structure
@@ -101,26 +100,29 @@ The authentication tag returned by the AES-GCM encryption.
 
 OnEncrypt MUST take [encryption materials](../structures.md#encryption-materials) as input.
 
+The `branchKeyId` used in this operation is either the configured branchKeyId, if supplied, or the result of the `branchKeySupplier`'s
+`getBranchKeyId` operation, using the encryption material's encryption context as input.
+
 If the input [encryption materials](../structures.md#encryption-materials) do not contain a plaintext data key,
 OnEncrypt MUST generate a random plaintext data key, according to the key length defined in the [algorithm suite](../algorithm-suites.md#encryption-key-length).
 The process used to generate this random plaintext data key MUST use a secure source of randomness.
 
-The hierarchical keyring MUST attempt to find [hierarchical materials](../structures.md#hierarchical-materials)
+The hierarchical keyring MUST attempt to find [branch key materials](../structures.md#branch-key-materials)
 from the underlying [cryptographic materials cache](../local-cryptographic-materials-cache.md).
 The hierarchical keyring MUST use the formulas specified in [Appendix A](#appendix-a-cache-entry-identifier-formulas)
 to compute the [cache entry identifier](../cryptographic-materials-cache.md#cache-identifier).
 
-If a cache entry is found and the entry's TTL has not expired, the hierarchical keyring MUST use those hierarchical materials for key wrapping.
+If a cache entry is found and the entry's TTL has not expired, the hierarchical keyring MUST use those branch key materials for key wrapping.
 
-If a cache entry is not found or the cache entry is expired, the hierarchical keyring MUST attempt to obtain the hierarchical materials
-by querying the backing branch keystore specified in the [retrive OnEncrypt hierarchical materials](#query-branch-keystore-onencrypt) section.
+If a cache entry is not found or the cache entry is expired, the hierarchical keyring MUST attempt to obtain the branch key materials
+by querying the backing branch keystore specified in the [retrieve OnEncrypt branch key materials](#query-branch-keystore-onencrypt) section.
 
 If the keyring is not able to retrieve materials through the underyling cryptographic materials cache or
 it no longer has access to them through the backing keystore, OnEncrypt MUST fail.
 
 Otherwise, OnEncrypt:
 
-- MUST wrap a data key with the hierarchical materials according to the [branch key wrapping](#branch-key-wrapping) section.
+- MUST wrap a data key with the branch key materials according to the [branch key wrapping](#branch-key-wrapping) section.
 
 If the keyring is unable to wrap a plaintext data key, OnEncrypt MUST fail
 and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
@@ -138,48 +140,17 @@ The branch keystore persists [branch keys](#definitions) that are reused to deri
 reduce the number of calls to AWS KMS through the use of the
 [cryptographic materials cache](../cryptographic-materials-cache.md).
 
-During OnEncrypt, the branch keystore is indexed by the `STATUS` of the keys.
-To query this keystore, the caller MUST do the following:
+OnEncrypt MUST call the KeyStore's [GetActiveBranchKey](../branch-key-store.md#getactivebranchkey) operation with the following inputs:
 
-1. Use the global secondary index (GSI) `Active-Keys` to query the keystore to retrieve the active key that matches the `branch-key-id` configured on the keyring.
-   1. If the client is unable to fetch an `ACTIVE` key, OnEncrypt MUST fail.
-   1. Performing a query on the [branch keystore](../branch-key-store.md#record-format) may return multiple entries.
-      There SHOULD only be one `ACTIVE` key. In the case where more than one key is labeled `ACTIVE`,
-      the keyring MUST resolve which key to use using the `create-time` field, the latest time value should be used as the `ACTIVE` key.
-      - If the `create-time` values between two active keys are the same, the keyring MUST order by the `version` lexicographically, and resolve to
-        the "highest" version
+- the `branchKeyId` used in this operation
+- the AWS KMS Key Identifier configured on the keyring
+- the list of Grant Tokens configured on the keyring
 
-In Java this query would look like:
+If the KeysStore's GetActiveBranchKey operation succeeds:
 
-```
-Map<String, AttributeValue> keyEntry = ddbClient.query(
-   QueryRequest.builder()
-             .tableName(tableName)
-             .indexName(gsi)
-             .keyConditionExpression("#status = :status and #branch-key-id = :branch-key-id")
-             .expressionAttributeNames(expressionAttributesNames)
-             .expressionAttributeValues(expressionAttributeValues)
-             .build();
- )
- .items();
-```
-
-The AWS DDB response MUST contain the fields defined in the [branch keystore record format](../branch-key-store.md#record-format).
-If the record does not contain the defined fields, OnEncrypt MUST fail.
-
-The keyring MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
-
-If the branch key fails to decrypt, OnEncrypt MUST fail.
-
-If the decryption of the branch key succeeds, OnEncrypt verifies:
-
-- The `KeyId` field in the AWS KMS response MUST equal the configured AWS KMS key identifier.
-
-If decryption and verification of the branch key succeeds:
-
-- The keyring MUST construct Hierarchical Materials using the `Plaintext` value from the KMS response and
+- The keyring MUST construct branch key materials using the `Plaintext` value from the KMS response and
   the [`version`](../branch-key-store.md#record-format) value in its string representation from the AWS DDB branch key record response.
-- The keyring MUST put the constructed Hierarchical Materials in the cache using the
+- The keyring MUST put the constructed branch key materials in the cache using the
   formula defined in [Appendix A](#appendix-a-cache-entry-identifier-formulas).
 
 Otherwise, OnEncrypt MUST fail.
@@ -209,34 +180,37 @@ If OnEncrypt fails to do any of the above, OnEncrypt MUST fail.
 
 OnDecrypt MUST take [decryption materials](../structures.md#decryption-materials) and a list of [encrypted data keys](../structures.md#encrypted-data-keys) as input.
 
+The `branchKeyId` used in this operation is either the configured branchKeyId, if supplied, or the result of the `branchKeySupplier`'s
+`getBranchKeyId` operation, using the decryption material's encryption context as input.
+
 If the decryption materials already contain a `PlainTextDataKey`, OnDecrypt MUST fail.
 
 The set of encrypted data keys MUST first be filtered to match this keyring’s configuration. For the encrypted data key to match:
 
 - Its provider ID MUST match the UTF8 Encoded value of “aws-kms-hierarchy”.
 - Deserialize the key provider info, if deserialization fails the next EDK in the set MUST be attempted.
-  -- The deserialized key provider info MUST be UTF8 Decoded and MUST match this keyring's configured `Branch Key Identifier`.
+  - The deserialized key provider info MUST be UTF8 Decoded and MUST match this keyring's configured `Branch Key Identifier`.
 
 For each encrypted data key in the filtered set, one at a time, OnDecrypt MUST attempt to decrypt the encrypted data key.
 If this attempt results in an error, then these errors MUST be collected.
 
 To decrypt each encrypted data key in the filtered set, the hierarchical keyring MUST attempt
-to find the corresponding [hierarchical materials](../structures.md#hierarchical-materials)
+to find the corresponding [branch key materials](../structures.md#branch-key-materials)
 from the underlying [cryptographic materials cache](../local-cryptographic-materials-cache.md).
 The hierarchical keyring MUST use the OnDecrypt formula specified in [Appendix A](#decryption-materials)
 in order to compute the [cache entry identifier](cryptographic-materials-cache.md#cache-identifier).
 
-If a cache entry is found and the entry's TTL has not expired, the hierarchical keyring MUST use those hierarchical materials for key unwrapping.
+If a cache entry is found and the entry's TTL has not expired, the hierarchical keyring MUST use those branch key materials for key unwrapping.
 
 If a cache entry is not found or the cache entry is expired, the hierarchical keyring
-MUST attempt to obtain the hierarchical materials by calling the backing branch key
-store specified in the [retrieve OnDecrypt hierarchical materials](#getitem-branch-keystore-ondecrypt) section.
+MUST attempt to obtain the branch key materials by calling the backing branch key
+store specified in the [retrieve OnDecrypt branch key materials](#getitem-branch-keystore-ondecrypt) section.
 
-If the keyring is not able to retrieve `hierarchical materials` from the backing keystore then OnDecrypt MUST fail.
+If the keyring is not able to retrieve `branch key materials` from the backing keystore then OnDecrypt MUST fail.
 
-If the keyring is able to retrieve `hierarchical materials` from the backing keystore, OnDecrypt:
+If the keyring is able to retrieve `branch key materials` from the backing keystore, OnDecrypt:
 
-- MUST unwrap the encrypted data key with the hierarchical materials according to the [branch key unwrapping](#branch-key-unwrapping) section.
+- MUST unwrap the encrypted data key with the branch key materials according to the [branch key unwrapping](#branch-key-unwrapping) section.
 
 If a decryption succeeds, this keyring MUST
 add the resulting plaintext data key to the decryption materials and return the modified materials.
@@ -251,45 +225,24 @@ The branch keystore persists [branch keys](#definitions) that are reused to deri
 reduce the number of calls to AWS KMS through the use of the
 [cryptographic materials cache](../cryptographic-materials-cache.md).
 
-During OnDecrypt, the branch keystore is indexed by the `branch-key-id` and `version` values.
-To get a branch key from the keystore the caller MUST do the following:
+OnDecrypt MUST calculate the following values:
 
-1. Deserialize the UTF8-Decoded `branch-key-id` from the [key provider info](../structures.md#key-provider-information) of the [encrypted data key](../structures.md#encrypted-data-key).
-1. Deserialize the UUID string representation of the `version` from the [encrypted data key](../structures.md#encrypted-data-key) [ciphertext](#ciphertext).
-1. Call AWS DDB `GetItem` using the `branch-key-id` as the Partition Key and the `version` value as the Sort Key.
-   1. If the client is not able to retrieve hierarchical materials, then OnDecrypt MUST fail.
+- Deserialize the UTF8-Decoded `branch-key-id` from the [key provider info](../structures.md#key-provider-information) of the [encrypted data key](../structures.md#encrypted-data-key)
+  and verify this is equal to the configured or supplied `branch-key-id`.
+- Deserialize the UUID string representation of the `version` from the [encrypted data key](../structures.md#encrypted-data-key) [ciphertext](#ciphertext).
 
-In Java this `GetItem` call would look like:
+OnDecrypt MUST call the KeyStore's [GetBranchKeyVersion](../branch-key-store.md#getbranchkeyversion) operation with the following inputs:
 
-```
-Map<String, AttributeValue> desiredKey= new HashMap<>();
-desiredKey.put("branch-key-id", AttributeValue.builder().s(<some value>).build());
-desiredKey.put("version", AttributeValue.builder().s(<some uuid>).build());
+- The deserialized, UTF8-Decoded `branch-key-id`
+- The deserialized UUID string representation of the `version`
+- The AWS KMS Key Identifier configured on the keyring
+- The list of Grant Tokens configured on the keyring
 
-GetItemResponse response = ddbClient.getItem(
-   GetItemRequest.builder()
-      .tableName(tableName)
-      .key(desiredKey)
-      .build()
-);
-```
+If the KeysStore's GetBranchKeyVersion operation succeeds:
 
-The AWS DDB response MUST contain the fields defined in the [branch keystore record format](../branch-key-store.md#record-format).
-If the record does not contain the defined fields, OnDecrypt MUST fail.
-
-The keyring MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
-
-If the branch key fails to decrypt, OnDecrypt MUST fail.
-
-If the decryption of the branch key succeeds, OnDecrypt verifies:
-
-- The `KeyId` field in the AWS KMS response MUST equal the configured AWS KMS key identifier.
-
-If the decryption and verification of the branch key succeeds:
-
-- The keyring MUST construct Hierarchical Materials using the `Plaintext` value in the KMS response and
+- The keyring MUST construct branch key materials using the `Plaintext` value in the KMS response and
   the [`version`](../branch-key-store.md#record-format) value from the branch key record
-- The keyring MUST put the constructed Hierarchical Materials in the cache using the
+- The keyring MUST put the constructed branch key materials in the cache using the
   formula defined in [Appendix A](#appendix-a-cache-entry-identifier-formulas).
 
 Otherwise, OnDecrypt MUST fail.
@@ -339,24 +292,6 @@ To construct the AAD, the keyring MUST concatenate the following values
 | encryption context  | Variable       | [UTF-8 Encoded Key Value Pairs](<(../../data-format/message-header.md#key-value-pairs)>) |
 
 If the keyring cannot serialize the encryption context, the operation MUST fail.
-
-### AWS KMS Branch Key Decryption
-
-The keyring MUST use the configured `KMS SDK Client` to decrypt the value of the branch key field.
-The keyring MUST create a branch key [encryption context](../structures.md#encryption-context) map using
-each attribute name from the AWS DDB response except the `enc` attribute as a key and each corresponding
-attribute value as the value of the KMS Encryption Context.
-
-- Each attribute value on the record MUST be transformed into its string representation.
-- Attributes not defined in the [record format](../branch-key-store.md#record-format)
-  are unspecified but SHOULD be included as part of the [encryption context](../structures.md#encryption-context).
-
-When calling [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html), the keyring MUST call with a request constructed as follows:
-
-- `KeyId` MUST be the configured AWS KMS key identifier.
-- `CiphertextBlob` MUST be the `enc` AWS DDB response value.
-- `EncryptionContext` MUST be the branch key encryption context map.
-- `GrantTokens` MUST be this keyring's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 ## Appendix A: Cache Entry Identifier Formulas
 
@@ -419,6 +354,16 @@ ENTRY_ID = SHA512(
     branch key version
 )[0:32]
 ```
+
+## Branch Key Supplier
+
+The Branch Key Supplier is an interface containing the `GetBranchKeyId` operation.
+This operation MUST take in an encryption context as input,
+and return a branch key id (string) as output.
+
+This supplier may be implemented by customers in order to configure behavior where the hierarchical
+keyring may decide on which branch key to use based on information in the encryption context.
+This gives customers more flexibility in multi-tenant use cases.
 
 ## Appendix B: Security Considerations for Branch Key Rotation
 
