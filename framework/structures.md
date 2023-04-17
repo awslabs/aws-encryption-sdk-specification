@@ -386,5 +386,8 @@ the beacon key from a [Key Store](branch-key-store.md)
 
 ##### HMAC Keys
 
-The a key-value mapping of arbitrary, UTF-8 encoded strings
-to HMAC Keys derived from the beacon key material.
+A key-value mapping of arbitrary strings
+to bytes.
+Where the string is the name of the beacon and
+the bytes are the HMAC Key derived from the beacon key
+concatenated with the UTF8 Encoding of the beacon name.
