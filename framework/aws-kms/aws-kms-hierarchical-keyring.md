@@ -44,17 +44,11 @@ MUST implement the [AWS Encryption SDK Keyring interface](../keyring-interface.m
 
 On initialization, the caller:
 
-- MUST provide an AWS KMS key identifier
 - MUST provide a [KeyStore](../branch-key-store.md)
 - MUST provide a [cache limit TTL](#cache-limit-ttl)
 - MUST provide either a Branch Key Identifier or a [Branch Key Supplier](#branch-key-supplier)
 - MAY provide a max cache size
 - MAY provide a list of Grant Tokens
-
-The AWS KMS key identifier MUST be [a valid identifier](aws-kms-key-arn.md#a-valid-aws-kms-identifier).
-
-On initialization the Hiearchical MUST append a user agent string to the AWS KMS SDK Client with the
-value `aws-kms-hierarchical-keyring`.
 
 On initialization the Hierarchical Keyring MUST initialize a [cryptographic-materials-cache](../local-cryptographic-materials-cache.md) with the configured cache limit TTL and the max cache size.
 If no max cache size is provided, the crypotgraphic materials cache MUST be configured to a
@@ -143,7 +137,6 @@ reduce the number of calls to AWS KMS through the use of the
 OnEncrypt MUST call the KeyStore's [GetActiveBranchKey](../branch-key-store.md#getactivebranchkey) operation with the following inputs:
 
 - the `branchKeyId` used in this operation
-- the AWS KMS Key Identifier configured on the keyring
 - the list of Grant Tokens configured on the keyring
 
 If the KeysStore's GetActiveBranchKey operation succeeds:
@@ -235,7 +228,6 @@ OnDecrypt MUST call the KeyStore's [GetBranchKeyVersion](../branch-key-store.md#
 
 - The deserialized, UTF8-Decoded `branch-key-id`
 - The deserialized UUID string representation of the `version`
-- The AWS KMS Key Identifier configured on the keyring
 - The list of Grant Tokens configured on the keyring
 
 If the KeysStore's GetBranchKeyVersion operation succeeds:
