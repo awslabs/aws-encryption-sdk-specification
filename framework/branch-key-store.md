@@ -124,7 +124,9 @@ The following KeySchema MUST be configured on the table:
 
 The table MUST configure a single GlobalSecondaryIndex:
 
-- Index Name: A concatenation of `Active-Keys-` + [configured table name](#table-name)
+- Index Name: `Active-Keys`
+  - We are able to ensure a 1:1 mapping of the GSI to the configured [table name](#table-name)
+    because the GSI ARN contains the table name.
 - Projection:
   - ProjectionType: ALL
 
@@ -235,7 +237,7 @@ This operation MUST get the active key at `branch-key-id` using the same process
 
 This operation MUST make a DDB::Query to get the branch key at `branchKeyId` with status `ACTIVE`
 
-1. Use the global secondary index (GSI) `Active-Keys` + [table name](#table-name) to query the keystore to retrieve the active key that matches the `branch-key-id` supplied.
+1. Use the global secondary index (GSI) `Active-Keys` to query the keystore to retrieve the active key that matches the `branch-key-id` supplied.
    1. If the client is unable to fetch an `ACTIVE` key, GetActiveBranchKey MUST fail.
    1. Performing a query on the [branch keystore](../branch-key-store.md#record-format) may return multiple entries.
       There MUST only be one `ACTIVE` key. If there is more than one `ACTIVE` key, the operation MUST fail.
@@ -326,7 +328,7 @@ On invocation, the caller:
 
 To query this keystore, this operation MUST do the following:
 
-1. Use the global secondary index (GSI) `Active-Keys` + [table name](#table-name) to query the keystore to retrieve the active key that matches the `branch-key-id` supplied.
+1. Use the global secondary index (GSI) `Active-Keys` to query the keystore to retrieve the active key that matches the `branch-key-id` supplied.
    1. If the client is unable to fetch an `ACTIVE` key, GetActiveBranchKey MUST fail.
    1. Performing a query on the [branch keystore](../branch-key-store.md#record-format) may return multiple entries.
       There SHOULD only be one `ACTIVE` key. In the case where more than one key is labeled `ACTIVE`,
