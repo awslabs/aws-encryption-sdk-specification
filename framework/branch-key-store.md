@@ -44,6 +44,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 The following inputs MAY be specified to create a KeyStore:
 
 - [ID](#key-store-id)
+- [AWS KMS Grant Tokens](#gran-tokens)
 
 The following inputs MUST be specified to create a KeyStore:
 
@@ -56,6 +57,10 @@ The following inputs MUST be specified to create a KeyStore:
 
 The Identifier for this KeyStore.
 If one is not supplied, then a [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt) MUST be used.
+
+### AWS KMS Grant Tokens
+
+A list of AWS KMS [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 ### Table Name
 
@@ -141,10 +146,6 @@ KeySchema:
 
 ### CreateKey
 
-On invocation, the caller:
-
-- MAY provide a list of Grant Tokens
-
 This operation MUST create both a [branch key](#branch-key) and a [beacon key](#beacon-key) according to
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
 
@@ -172,6 +173,7 @@ The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request c
 - `KeyId` MUST be the configured KMS Key ARN.
 - `NumberOfBytes` MUST be 32.
 - `EncryptionContext` MUST be the [encryption context for branch keys](#encryption-context).
+- `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If the call to AWS KMS GenerateDataKeyWithoutPlaintext succeeds, the operation MUST use the `ciphertextBlob` as the
 wrapped Branch Key.
@@ -185,6 +187,7 @@ The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request c
 - `KeyId` MUST be the configured KMS Key ARN.
 - `NumberOfBytes` MUST be 32.
 - `EncryptionContext` MUST be the [encryption context for beacon keys](#encryption-context).
+- `GrantTokens` MUST be this keysotre's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If the call to AWS KMS GenerateDataKeyWithoutPlaintext succeeds, the operation MUST use the `ciphertextBlob` as the
 wrapped Beacon Key.
@@ -231,7 +234,6 @@ Otherwise, this operation MUST yield an error.
 On invocation, the caller:
 
 - MUST supply a `branch-key-id`
-- MAY supply a list of grant tokens
 
 This operation MUST get the active key at `branch-key-id` using the same process as [GetActiveBranchKey](#getactivebranchkey), including successfully unwrapping the key.
 
@@ -262,6 +264,7 @@ The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request c
 - `KeyId` MUST be the configured KMS key identifier.
 - `NumberOfBytes` MUST be the 32.
 - `EncryptionContext` MUST be the [encryption context for branch keys](#encryption-context).
+- `GrantTokens` MUST be this keysotre's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If any of the AWS KMS operations fail, the operation MUST fail.
 
@@ -324,7 +327,6 @@ The operation MUST verify that there is only one `ACTIVE` branch key for the sup
 On invocation, the caller:
 
 - MUST supply a `branch-key-id`
-- MAY supply a list of grant tokens
 
 To query this keystore, this operation MUST do the following:
 
@@ -386,7 +388,6 @@ On invocation, the caller:
 
 - MUST supply a `branch-key-id`
 - MUST supply a `branchKeyVersion`
-- MAY supply a list of grant tokens
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "beacon:true" value as the Sort Key.
@@ -447,8 +448,7 @@ When calling [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIReferen
 - `KeyId` MUST be the AWS KMS Key ARN configured in the key store operation.
 - `CiphertextBlob` MUST be the `enc` AWS DDB response value.
 - `EncryptionContext` MUST be the branch key encryption context map.
-- `GrantTokens` MUST be the [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token)
-  provided as input to the key store operation.
+- `GrantTokens` MUST be this keysotre's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 ## AWS KMS Branch Key ReEncryption
 
@@ -465,8 +465,7 @@ When calling [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/latest/APIR
 - `CiphertextBlob` MUST be the encrypted branch key value that is stored in AWS DDB.
 - `DestinationKeyId` MUST be the AWS KMS Key ARN configured in the key store operation.
 - `DestinationEncryptionContext` MUST be the DECRYPT_ONLY branch key encryption context created.
-- `GrantTokens` MUST be the [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token)
-  provided as input to the key store operation.
+- `GrantTokens` MUST be this keysotre's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 - `SourceEncryptionContext` MUST be the branch key encryption context.
 - `SourceKeyId` MUST be the AWS KMS Key ARN configured in the key store operation.
 
