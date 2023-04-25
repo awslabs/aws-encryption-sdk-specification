@@ -48,7 +48,6 @@ On initialization, the caller:
 - MUST provide a [cache limit TTL](#cache-limit-ttl)
 - MUST provide either a Branch Key Identifier or a [Branch Key Supplier](#branch-key-supplier)
 - MAY provide a max cache size
-- MAY provide a list of Grant Tokens
 
 On initialization the Hierarchical Keyring MUST initialize a [cryptographic-materials-cache](../local-cryptographic-materials-cache.md) with the configured cache limit TTL and the max cache size.
 If no max cache size is provided, the crypotgraphic materials cache MUST be configured to a
@@ -137,7 +136,6 @@ reduce the number of calls to AWS KMS through the use of the
 OnEncrypt MUST call the KeyStore's [GetActiveBranchKey](../branch-key-store.md#getactivebranchkey) operation with the following inputs:
 
 - the `branchKeyId` used in this operation
-- the list of Grant Tokens configured on the keyring
 
 If the KeysStore's GetActiveBranchKey operation succeeds:
 
@@ -228,7 +226,6 @@ OnDecrypt MUST call the KeyStore's [GetBranchKeyVersion](../branch-key-store.md#
 
 - The deserialized, UTF8-Decoded `branch-key-id`
 - The deserialized UUID string representation of the `version`
-- The list of Grant Tokens configured on the keyring
 
 If the KeysStore's GetBranchKeyVersion operation succeeds:
 
