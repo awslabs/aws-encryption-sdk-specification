@@ -45,13 +45,14 @@ The following inputs MAY be specified to create a KeyStore:
 
 - [ID](#key-store-id)
 - [AWS KMS Grant Tokens](#gran-tokens)
+- [DynamoDb Client](#dynamodb-client)
+- [KMS Client](#kms-client)
 
 The following inputs MUST be specified to create a KeyStore:
 
 - [Table Name](#table-name)
-- [AWS KMS Key ARN](#aws-kms-key-arn)
-- [DynamoDb Client](#dynamodb-client)
-- [KMS Client](#kms-client)
+- [AWS KMS Configuration](#aws-kms-configuration)
+- [Logical KeyStore Name](#logical-keystore-name)
 
 ### Key Store ID
 
@@ -62,30 +63,50 @@ If one is not supplied, then a [version 4 UUID](https://www.ietf.org/rfc/rfc4122
 
 A list of AWS KMS [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
-### Table Name
-
-The table name of the DynamoDb table that backs this Keystore.
-
-### AWS KMS Key ARN
-
-A valid [AWS KMS Key ARN](./aws-kms/aws-kms-key-arn.md#a-valid-aws-kms-arn)
-that wraps and unwraps keys stored in Amazon DynamoDB.
-
 ### DynamoDb Client
 
-The DynamoDb Client used to put keys into get keys from the backing DDB table.
+The DynamoDb Client used to put and get keys from the backing DDB table.
+
+If not provided, one will be created in the region of the supplied KMS Key ARN
 
 ### KMS Client
 
 The KMS Client used when wrapping and unwrapping keys.
 
+If not provided, one will be created in the region of the supplied KMS Key ARN
+
 On initialization the KeyStore MUST append a user agent string to the AWS KMS SDK Client with the
 value `aws-kms-hierarchy`.
+
+### Table Name
+
+The table name of the DynamoDb table that backs this Keystore.
+
+### AWS KMS Configuration
+
+A valid [AWS KMS Key ARN](./aws-kms/aws-kms-key-arn.md#a-valid-aws-kms-arn)
+that wraps and unwraps keys stored in Amazon DynamoDB.
+
+### Logical KeyStore Name
+
+The logical name for the DynamoDB Key Store Table.
+This value can match the Table Name
+but does not need to.
+This name is cryptographically bound to all data stored in this table.
+In the case of a restore from backup
+the [DynamoDB Table Name](#dynamodb-table-name) can change to a new name,
+but this name must remain the same.
+
+When mapping [DynamoDB Table Names](#dynamodb-table-name) to [logical table name](#logical-table-name)
+there MUST be a one to one mapping between the two.
+The purpose of the logical name is to simplify restore type operations,
+not make it easier to confuse what data comes from what physical table.
 
 ## Operations
 
 The Keystore MUST support the following operations:
 
+- [GetKeyStoreInfo](#getKeyStoreInfo)
 - [CreateKeyStore](#createkeystore)
 - [CreateKey](#createkey)
 - [VersionKey](#versionkey)
@@ -93,6 +114,18 @@ The Keystore MUST support the following operations:
 - [GetBranchKeyVersion](#getbranchkeyversion)
 - [GetBeaconKey](#beacon-key)
 - [BranchKeyStatusResolution](#branch-key-status-resolution)
+
+### GetKeyStoreInfo
+
+This operation MUST return the key store information in this key store configuration.
+
+This MUST include:
+
+- [key store id](#key-store-id)
+- [key store name](#table-name)
+- [logical key store name](#logical-keystore-name)
+- [AWS KMS Grant Tokens](#aws-kms-grant-tokens)
+- [AWS KMS Configuration](#aws-kms-configuration)
 
 ### CreateKeyStore
 
@@ -419,7 +452,7 @@ MUST construct an encryption context with the following key/values:
 - status: The string literal "ACTIVE" | "SEARCH" if generating a beacon key
 - create-time: the `timestamp`
 - tablename: the configured [`Table Name`](#table-name) for this key store
-- kms-arn: the configured [`AWS KMS Key ARN`](#aws-kms-key-arn) for this key store
+- kms-arn: the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this key store
 - hierarchy-version: The string literal "1"
 
 Additionally the operations MUST add any additional fields found on the record.
@@ -433,7 +466,7 @@ The operation MUST construct an encryption context with the following key/values
 - status: The string literal "DECRYPT_ONLY"
 - create-time: the `timestamp`
 - tablename: the configured [`Table Name`](#table-name) for this key store
-- kms-arn: the configured [`AWS KMS Key ARN`](#aws-kms-key-arn) for this key store
+- kms-arn: the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this key store
 - hierarchy-version: The string literal "1"
 
 Additionally the operation MUST add any additional fields found on the record.
@@ -477,7 +510,7 @@ A branch key record MUST include the following key-value pairs:
 1. `type` : the string literal "beacon:true" if this is a branch key. If this is a branch key, the concatenation "version" + `version`, where `version` is a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt) of the Branch Key Version; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `enc` : Encrypted branch key; represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `status` : Identifier for the lifecycle of the key. Possible values MAY include: `ACTIVE`, `DECRYPT_ONLY`. `SEARCH`
-1. `kms-arn`: The [AWS KMS Key ARN](#aws-kms-key-arn) used to generate the `enc` value.
+1. `kms-arn`: The AWS KMS Key ARN in the [AWS KMS Configuration](#aws-kms-configuration) used to generate the `enc` value.
 1. `create-time`: Timestamp in ISO8601 format in UTC, to microsecond precision.
    Represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `hierarchy-version`: Version of the hierarchical keyring; represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)

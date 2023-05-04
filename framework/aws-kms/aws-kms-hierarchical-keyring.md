@@ -273,12 +273,12 @@ To construct the AAD, the keyring MUST concatenate the following values
    [encryption materials](../structures.md#encryption-materials) in the same format as the serialization of
    [message header AAD key value pairs](../../data-format/message-header.md#key-value-pairs).
 
-| Field               | Length (bytes) | Interpreted as                                                                           |
-| ------------------- | -------------- | ---------------------------------------------------------------------------------------- |
-| "aws-kms-hierarchy" | 17             | UTF-8 Encoded                                                                            |
-| branch-key-id       | Variable       | UTF-8 Encoded                                                                            |
-| version             | 16             | Bytes                                                                                    |
-| encryption context  | Variable       | [UTF-8 Encoded Key Value Pairs](<(../../data-format/message-header.md#key-value-pairs)>) |
+| Field               | Length (bytes) | Interpreted as                                                                       |
+| ------------------- | -------------- | ------------------------------------------------------------------------------------ |
+| "aws-kms-hierarchy" | 17             | UTF-8 Encoded                                                                        |
+| branch-key-id       | Variable       | UTF-8 Encoded                                                                        |
+| version             | 16             | Bytes                                                                                |
+| encryption context  | Variable       | [UTF-8 Encoded Key Value Pairs](../../data-format/message-header.md#key-value-pairs) |
 
 If the keyring cannot serialize the encryption context, the operation MUST fail.
 
