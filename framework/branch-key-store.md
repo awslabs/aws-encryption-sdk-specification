@@ -451,7 +451,7 @@ MUST construct an encryption context with the following key/values:
 - type: the `type`
 - status: The string literal "ACTIVE" | "SEARCH" if generating a beacon key
 - create-time: the `timestamp`
-- tablename: the configured [`Table Name`](#table-name) for this key store
+- logicalKeyStoreName: the configured [logical Key Store name](#logical-keystore-name) for this key store
 - kms-arn: the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this key store
 - hierarchy-version: The string literal "1"
 
@@ -465,7 +465,7 @@ The operation MUST construct an encryption context with the following key/values
 - type: the `type`
 - status: The string literal "DECRYPT_ONLY"
 - create-time: the `timestamp`
-- tablename: the configured [`Table Name`](#table-name) for this key store
+- logicalKeyStoreName: the configured [logical Key Store name](#logical-keystore-name) for this key store
 - kms-arn: the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this key store
 - hierarchy-version: The string literal "1"
 
