@@ -161,8 +161,7 @@ The keyring MUST encrypt the plaintext data key in the [encryption materials](st
 using AES-GCM.
 
 The keyring MUST attempt to serialize the [encryption materials'](structures.md#encryption-materials)
-[encryption context](structures.md#encryption-context-1) in the same format as the serialization of
-[message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
+[encryption context](structures.md#encryption-context-1) according to the [encryption context serialization specification](structures.md#serialization).
 If the keyring cannot serialize the encryption context, OnEncrypt MUST fail.
 
 The keyring uses AES-GCM with the following specifics:
@@ -196,8 +195,7 @@ the keyring MUST fail
 and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
 
 The keyring MUST attempt to serialize the [decryption materials'](structures.md#decryption-materials)
-[encryption context](structures.md#encryption-context-1) in the same format
-as the serialization of the [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
+[encryption context](structures.md#encryption-context-1) according to the [encryption context serialization specification](structures.md#serialization).
 If the keyring cannot serialize the encryption context, OnDecrypt MUST fail.
 
 The keyring MUST perform the following actions on each [encrypted data key](structures.md#encrypted-data-key)

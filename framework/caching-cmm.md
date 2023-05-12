@@ -182,8 +182,7 @@ in order to compute the [cache entry identifier](cryptographic-materials-cache.m
 ### Preliminaries
 
 Each of the cache entry identifier formulas includes a serialized encryption context,
-as defined in the
-[Key Value Pairs specification](../data-format/message-header.md#key-value-pairs).
+as defined in the [encryption context serialization specification](structures.md#serialization).
 In the following appendix sections we use `SerializeEncryptionContext`
 to denote the function that,
 given an encryption context,

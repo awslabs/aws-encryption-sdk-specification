@@ -369,10 +369,11 @@ The wrapped plaintext data key MUST be the result of the following AES GCM 256 E
 
 - Plaintext: the [plaintext data key](./structures.md#plaintext-data-key) in the related encryption or decryption materials.
 - Encryption key: The `key encryption key` derived above.
-- AAD: The [enccryption context](./structures.md#encryption-context) in the related encryption or decryption materials,
-  serialized according to the the [ESDK message header](../data-format/message-header.md#aad). (TODO: centralize this serialization)
+- AAD: The [encryption context](./structures.md#encryption-context) in the related encryption or decryption materials,
+  [serialized according to it's specification](structures.md#serialization).
+- IV: The IV is 0.
 
-This value MUST be equal to the algorithm suite's encryption key length + 12.
+This value MUST be equal to the algorithm suite's encryption key length + 16.
 
 ##### Wrapped Intermediate Key
 

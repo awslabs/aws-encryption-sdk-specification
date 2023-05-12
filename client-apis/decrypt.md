@@ -295,7 +295,7 @@ to decrypt with the following inputs:
   filtered to only contain key value pairs listed in
   the [decryption material's](../framework/structures.md#decryption-materials)
   [required encryption context keys](../framework/structures.md#required-encryption-context-keys-1)
-  serialized in the same format as the [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
+  serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
 - For message format version [1.0](../data-format/message-header.md#supported-versions)
   the IV MUST be the value serialized in the message header's [IV field](../data-format/message-header#iv).
   For message format version [2.0](../data-format/message-header.md#supported-versions)

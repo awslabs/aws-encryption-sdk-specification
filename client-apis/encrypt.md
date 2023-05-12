@@ -293,7 +293,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
   filtered to only contain key value pairs listed in
   the [encryption material's](../framework/structures.md#encryption-materials)
   [required encryption context keys](../framework/structures.md#required-encryption-context-keys)
-  serialized in the same format as the [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs).
+  serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
 - The IV has a value of 0.
 - The cipherkey is the derived data key
 - The plaintext is an empty byte array
@@ -463,5 +463,5 @@ the [message body](../data-format/message-body.md) was serialized with the follo
 ### Encryption Context not stored in the message
 
 The encryption context to only authenticate is backwards compatible
-with older messages because the [message header AAD key value pairs](../data-format/message-header.md#key-value-pairs)
+with older messages because the [encryption context serialization specification](../framework/structures.md#serialization)
 will serialize an empty encryption context as 0 bytes.
