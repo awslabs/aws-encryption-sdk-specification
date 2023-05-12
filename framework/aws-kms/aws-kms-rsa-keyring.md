@@ -90,8 +90,7 @@ OnEncrypt MUST generate a random plaintext data key and set it on the [encryptio
 OnEncrypt MUST calculate a Encryption Context Digest by:
 
 1. Serializing The [encryption context](structures.md#encryption-context-1) from the input
-   [encryption materials](../structures.md#encryption-materials) in the same format as the serialization of
-   [message header AAD key value pairs](../../data-format/message-header.md#key-value-pairs).
+   [encryption materials](../structures.md#encryption-materials) according to the [encryption context serialization specification](../structures.md#serialization).
 2. Taking the SHA-384 Digest of this concatenation.
 
 The keyring MUST determine the [Padding Scheme](#padding-scheme)
@@ -146,8 +145,7 @@ The set of encrypted data keys MUST first be filtered to match this keyring’s 
 OnDecrypt MUST calculate a Encryption Context Digest Prime by:
 
 1. Serializing The [encryption context](structures.md#encryption-context-2) from the input
-   [decryption materials](../structures.md#decryption-materials) in the same format as the serialization of
-   [message header AAD key value pairs](../../data-format/message-header.md#key-value-pairs).
+   [decryption materials](../structures.md#decryption-materials) according to the [encryption context serialization specification](../structures.md#serialization).
 2. Taking the SHA-384 Digest of this concatenation.
 
 For each encrypted data key in the filtered set,

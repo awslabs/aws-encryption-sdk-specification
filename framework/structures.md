@@ -126,6 +126,43 @@ Users SHOULD use the encryption context to store:
 
 Users MUST NOT use the encryption context to store secret data.
 
+#### Serialization
+
+If the encryption context is empty, its serialization MUST be
+an empty byte sequence.
+
+If the encryption context is not empty, its serialization MUST
+take the following form:
+
+| Field                                             | Length (bytes)                                                       | Interpreted as                                    |
+| ------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------- |
+| [Key Value Pair Count](#key-value-pair-count)     | 2                                                                    | UInt16                                            |
+| [Key Value Pair Entries](#key-value-pair-entries) | Variable. Determined by the count and length of each key-value pair. | [Key Value Pair Entries](#key-value-pair-entries) |
+
+###### Key Value Pair Count
+
+The number of key-value pairs within the [Key Value Pair Entries](#key-value-pair-entries) field.
+The value of this field MUST be greater than 0.
+
+###### Key Value Pair Entries
+
+A sequence of one or more key-value pair entries.
+
+This sequence MUST NOT contain duplicate entries.
+
+These entries MUST be sorted, by key,
+in ascending order according to the UTF-8 encoded binary value.
+
+The following table describes the fields that form each key value pair entry.
+The bytes are appended in the order shown.
+
+| Field        | Length (bytes)                                                                 | Interpreted as      |
+| ------------ | ------------------------------------------------------------------------------ | ------------------- |
+| Key Length   | 2                                                                              | UInt16              |
+| Key          | Variable. Equal to the value specified in the previous 2 bytes (Key Length).   | UTF-8 encoded bytes |
+| Value Length | 2                                                                              | UInt16              |
+| Value        | Variable. Equal to the value specified in the previous 2 bytes (Value Length). | UTF-8 encoded bytes |
+
 ### Encryption Materials
 
 #### Implementations

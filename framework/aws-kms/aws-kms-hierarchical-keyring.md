@@ -270,15 +270,14 @@ To construct the AAD, the keyring MUST concatenate the following values
 1. Value of `branch-key-id` as UTF8 Bytes
 1. [version](../structures.md#branch-key-version) as Bytes
 1. [encryption context](structures.md#encryption-context-1) from the input
-   [encryption materials](../structures.md#encryption-materials) in the same format as the serialization of
-   [message header AAD key value pairs](../../data-format/message-header.md#key-value-pairs).
+   [encryption materials](../structures.md#encryption-materials) according to the [encryption context serialization specification](../structures.md#serialization).
 
-| Field               | Length (bytes) | Interpreted as                                                                       |
-| ------------------- | -------------- | ------------------------------------------------------------------------------------ |
-| "aws-kms-hierarchy" | 17             | UTF-8 Encoded                                                                        |
-| branch-key-id       | Variable       | UTF-8 Encoded                                                                        |
-| version             | 16             | Bytes                                                                                |
-| encryption context  | Variable       | [UTF-8 Encoded Key Value Pairs](../../data-format/message-header.md#key-value-pairs) |
+| Field               | Length (bytes) | Interpreted as                                       |
+| ------------------- | -------------- | ---------------------------------------------------- |
+| "aws-kms-hierarchy" | 17             | UTF-8 Encoded                                        |
+| branch-key-id       | Variable       | UTF-8 Encoded                                        |
+| version             | 16             | Bytes                                                |
+| encryption context  | Variable       | [Encryption Context](../structures.md#serialization) |
 
 If the keyring cannot serialize the encryption context, the operation MUST fail.
 
