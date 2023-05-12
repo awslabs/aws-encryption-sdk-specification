@@ -82,6 +82,11 @@ for [AWS KMS RSA key specs](https://docs.aws.amazon.com/kms/latest/developerguid
 
 OnEncrypt MUST fail if this keyring does not have a specified Public Key.
 
+OnEncrypt MUST fail if the input [encryption materials](../structures.md#encryption-materials)
+contains an [algorithm suite](../algorithm-suites.md) containing an
+[asymmetric signature](../algorithm-suites.md#asymmetric-signature-algorithm).
+See [Security Considerations](#security-considerations).
+
 OnEncrypt MUST take [encryption materials](../structures.md#encryption-materials) as input.
 
 If the [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key,
@@ -127,6 +132,11 @@ If RSA encryption was NOT successful, OnEncrypt MUST fail.
 ### OnDecrypt
 
 OnDecrypt MUST fail if this keyring does not have a specified AWS KMS SDK client.
+
+OnDecrypt MUST fail if the input [decryption materials](../structures.md#decryption-materials)
+contains an [algorithm suite](../algorithm-suites.md) containing an
+[asymmetric signature](../algorithm-suites.md#asymmetric-signature-algorithm).
+See [Security Considerations](#security-considerations).
 
 OnDecrypt MUST take [decryption materials](../structures.md#decryption-materials) and
 a list of [encrypted data keys](../structures.md#encrypted-data-key) as input.
@@ -205,3 +215,53 @@ support 1024 bit keys.
 
 The Encryption Context Digest Prime is the SHA-384 hash of
 the Decryption Materials' Encryption Context.
+
+## Security Considerations
+
+The AWS KMS RSA Keyring does not support use
+with an algorithm suite containing an asymmetric signature.
+The purpose of the asymmetric signature algorithm is to create
+the security property where decryptors of a message are able
+to assert that the encrypted messaged originated from an entity
+with encrypt access to the material that protects the data key
+for the message.
+As an example, this property is useful for customers that use
+the AWS KMS Keyring (using a KMS symmetric key),
+restrict encrypt and decrypt access to this key separately
+via KMS Key Policies,
+and the entities given decrypt access are not as trusted as
+the entities given encrypt access.
+In such a case it is valuable to be able to ensure that one decryptor
+is not able to create a message that looks valid to a different decryptor.
+
+By definition, access to the material that the AWS KMS RSA Keyring
+uses for encryption is public.
+While customers may use AWS KMS Key Policies to restrict access
+to obtaining the public key through KMS, the public key
+should not be considered anything other than public.
+Because it should be assumed that everyone has access to the
+material responsible for protecting data keys using this Keyring,
+there is no additional security value to using an algorithm suite
+with asymmetric signing.
+In order to avoid an expensive cryptographic calculation,
+as well as to avoid cases where the customer may be misinterpreting
+the intent of the signature algorithm,
+the AWS KMS Keyring rejects any material containing an algorithm suite
+with asymmetric signing.
+
+A similar situation exists in the [Raw AES Keyring](../raw-rsa-keyring.md)
+and [Raw RSA Keyrings](../raw-aes-keyring.md).
+With the Raw RSA Keyring, the material used on encrypt is public,
+so there is no set up in which it makes sense to use an algorithm suite
+with asymmetric signing.
+With the Raw AES Keyring, because the Keyring requires
+the AWS symmetric key for decryption to be available in memory
+(as opposed to calling out for the decryption to happen via an HSM,
+which may have access control on it),
+decrypt access necessarially implies encrypt access.
+Again, our asymmetric signing provides no additional value for this set up.
+Currently, these two keyrings accept algorithm suites with asymmetric signing.
+This is for backwards compatability reasons.
+If these Keyrings are refactored in the future,
+they may be updated (over a major version bump) to also reject
+algorithm suites with asymmetric signing.
