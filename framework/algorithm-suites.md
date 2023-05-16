@@ -511,7 +511,7 @@ If the algorithm suite does not include a symmetric signature algorithm:
 
 #### Supported Symmetric Signature Algorithms
 
-- [SHA384](https://www.rfc-editor.org/rfc/rfc6234)
+- [HMAC](https://datatracker.ietf.org/doc/html/rfc2104) with [SHA384](https://www.rfc-editor.org/rfc/rfc6234)
 
 ### Message Format Version
 
