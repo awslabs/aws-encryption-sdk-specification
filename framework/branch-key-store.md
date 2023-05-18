@@ -160,7 +160,7 @@ The following KeySchema MUST be configured on the table:
 
 #### GlobalSecondary Indexes
 
-The table MUST configure a single GlobalSecondaryIndex:
+The table MUST contain a GlobalSecondaryIndex defined as follows:
 
 - Index Name: `Active-Keys`
   - We are able to ensure a 1:1 mapping of the GSI to the configured [table name](#table-name)
