@@ -30,7 +30,7 @@ This Keystore interface defines operations that any implementation of its specif
 
 - [Branch Key(s)](../structures.md#branch-key): Data keys that are reused to derive unique data keys for envelope encryption.
   For security considerations on when to rotate the branch key, refer to [Appendix B](#appendix-b-security-considerations-for-branch-key-rotation).
-- [Beacon Key(s)](https://github.com/awslabs/aws-database-encryption-sdk-java/blob/main/specification/searchable-encryption/beacons.md#beacons):
+- [Beacon Key(s)](https://github.com/awslabs/aws-database-encryption-sdk-dynamodb-java/blob/main/specification/searchable-encryption/beacons.md#beacons):
   A root key used to then derive different beacon keys per beacon.
 - [UUID](https://www.ietf.org/rfc/rfc4122.txt): a universally unique identifier that can be represented as a byte sequence or a string.
 
