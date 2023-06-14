@@ -127,11 +127,15 @@ getting cache entries and deleting cache entries.
 ### Put Cache Entry
 
 Attempts to put a cache entry for the specified cache ID.
-If a cache entry for the given cache ID does not exists in the cache,
-the CMC creates a new cache entry.
+If a cache entry for the given cache ID exists in the cache, it must be removed.
+The CMC MUST create a new cache entry for the specified cache ID.
 This operation MUST NOT return the inserted cache entry.
 The cache entry MUST include all [usage metadata](#usage-metadata)
 since this information can not be updated after the put operation.
+
+If used in a multi-threaded context,
+the next [Get Cache Entry](#get-cache-entry) operation
+MAY not return the entry just added.
 
 ### Get Cache Entry
 
@@ -141,6 +145,15 @@ has not exceeded it's stored [TTL](#time-to-live-ttl).
 A successful call to Get Entry returns the [cache entry](#cache-entry)
 and an unsuccessful call returns a cache miss.
 
+If used in a multi-threaded context :
+
+ * Get Cache Entry MAY return a cache miss when the TTL has net yet been exceeded.
+
+ * Get Cache Entry MAY not return immediately if no cache entry exists for the specified cache ID,
+and a cache miss was recently returned for another thread. 
+
 ### Delete Cache Entry
 
 Attempts to delete a cache entry from the CMC.
+
+If no cache entry exists for the specified cache ID, Delete Cache Entry must return successfully.
