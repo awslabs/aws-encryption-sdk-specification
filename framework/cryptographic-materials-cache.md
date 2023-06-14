@@ -9,6 +9,8 @@
 
 ### Changelog
 
+- 0.5.2
+  - Add specific language for multi-threading, and PutItem where the item already exists.
 - 0.5.1
   - Rename Hierarchical Materials to Branch Key Materials.
   - Add Beacon Key Materials to allowed materials in the cache.
@@ -112,11 +114,24 @@ However the [creation time](#creation-time) is also include
 in case a stricter view of TTL is enforced by a caller.
 This can be done by deleting the entry.
 
+## Thread Safety
+
+The CMC interface says nothing about thread safety.
+Specific implementations provide different levels of thread safety,
+and client code must select the appropriate implementation for their use case.
+
 ## Supported CMCs
 
 The AWS Encryption SDK provides a built-in [local cryptographic materials cache](local-cryptographic-materials-cache.md) (local CMC).
 The local CMC is a configurable, in-memory, least recently used (LRU) cache.
-It provides non-blocking, locking, [cache entries](#cache-entry) per [cache identifier](#cache-identifier).
+It provides non-blocking, locking, [cache entries](#cache-entry) per [cache identifier](#cache-identifier),
+and is NOT thread safe.
+
+Also provided are :
+
+- SynchronizedLocalCMC : a thread safe wrapper around the local CMC.
+- StormTrackerCMC : a thread safe wrapper around the local CMC, which also ameliorates KMS storms,
+  by preventing multiple clients from resolving the same KMS key at the same time.
 
 ## Behaviors
 
