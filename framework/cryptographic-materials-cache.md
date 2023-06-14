@@ -147,10 +147,10 @@ and an unsuccessful call returns a cache miss.
 
 If used in a multi-threaded context :
 
- * Get Cache Entry MAY return a cache miss when the TTL has net yet been exceeded.
+- Get Cache Entry MAY return a cache miss when the TTL has net yet been exceeded.
 
- * Get Cache Entry MAY not return immediately if no cache entry exists for the specified cache ID,
-and a cache miss was recently returned for another thread. 
+- Get Cache Entry MAY not return immediately if no cache entry exists for the specified cache ID,
+  and a cache miss was recently returned for another thread.
 
 ### Delete Cache Entry
 
