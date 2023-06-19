@@ -118,6 +118,9 @@ In this case, one client per [grace interval](#grace-interval) will
 receive `NoSuchEntry` as above.
 The other clients will block until an entry is available.
 
+In a single threaded context, this results in behavior that is exactly that of the
+[Local Cryptographic Materials Cache](../../framework/local-cryptographic-materials-cache.md).
+
 #### Multi-Key Storm
 
 [expiration](#expiration-storm) and [initialization](#initialization-storm) storms
@@ -133,6 +136,10 @@ and for which `PutCacheEntry` has not yet been called.
 
 If `GetCacheEntry` is called, and one of the above amelioration
 strategies would otherwise return `No Such Entry`,
-we instead return as if the [grace interval](#grace-interval) has
+and the number of in flight keys would exceed the [Lookup Fanout](#lookup-fanout),
+then we instead return as if the [grace interval](#grace-interval) had
 no yet passed, that is, if an unexpired entry exists in the cache we return it,
 otherwise we block.
+
+In a single threaded context, this results in behavior that is exactly that of the
+[Local Cryptographic Materials Cache](../../framework/local-cryptographic-materials-cache.md).
