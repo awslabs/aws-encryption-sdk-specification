@@ -143,3 +143,19 @@ otherwise we block.
 
 In a single threaded context, this results in behavior that is exactly that of the
 [Local Cryptographic Materials Cache](../../framework/local-cryptographic-materials-cache.md).
+
+### Service Outage
+
+On rare occasions, the service from which you get your plaintext keys might be down.
+
+The Storm Tracking CMC can help keep your service running in this situation,
+because with a six hour grace period,
+the backend service can be down for six hours with most clients being unaffected.
+So if you want your typical TTL to be six hours, but you're willing to extend that
+by eight hours if the backend service is down, then set a TTL of 14 hours and
+a grace time of eight hours.
+
+The only remaining trouble is that throughout the period while the backend service is down,
+one client per key will be trying to get a key, rather than doing useful work.
+To remedy this, make sure the [grace interval](#grace-interval) is large compared
+to the time it takes to fail to get a key.
