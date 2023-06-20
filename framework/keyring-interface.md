@@ -215,7 +215,7 @@ the decryption is overwhelmingly likely to fail.
 Users SHOULD use a keyring that protects wrapping keys and performs cryptographic operations within a secure boundary.
 Examples are:
 
-- The built-in [AWS KMS keyrings](./aws-kms),
+- The built-in [AWS KMS keyrings](./aws-kms/),
   which use AWS Key Management Service (AWS KMS) customer master keys (CMKs) that never leave AWS KMS as plaintext.
 - A custom keyring that uses wrapping keys that are stored in your hardware security modules (HSMs)
 - A custom keyring protected by another master key service.
@@ -230,11 +230,11 @@ however users should refer to their specification for notes on their respective 
 The following keyrings are compatible with the referenced [master key providers](master-key-provider-interface.md) or
 [master keys](master-key-interface.md) when configured to use the same wrapping key.
 
-| Keyring         | Master Key Provider: Java and Python                                                                             |
-| --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Keyring          | Master Key Provider: Java and Python                                                                             |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------- |
 | AWS KMS keyrings | KMS master key (Java), KMS master key provider (Java), KMS master key (Python), KMS master key provider (Python) |
-| Raw AES keyring | When they are used with symmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                    |
-| Raw RSA keyring | When they are used with asymmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                   |
+| Raw AES keyring  | When they are used with symmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                    |
+| Raw RSA keyring  | When they are used with asymmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                   |
 
 ### Why should I use Keyrings instead of Master Key Providers and Master Keys?
 
