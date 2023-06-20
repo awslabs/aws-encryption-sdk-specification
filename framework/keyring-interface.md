@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.3
+0.2.4
 
 ### Changelog
+
+- 0.2.4
+
+  - Fix broken links to AWS KMS Keyrings
 
 - 0.2.3
 
@@ -79,7 +83,7 @@ The key provider ID MUST be a binary value
 and SHOULD be equal to a UTF-8 encoding of the key namespace.
 
 This value MUST NOT be "aws-kms"
-unless this encrypted data key was produced by the [AWS KMS Keyring](kms-keyring.md).
+unless this encrypted data key was produced by one of the [AWS KMS Keyrings](./aws-kms/).
 
 ### key provider info
 
@@ -93,7 +97,7 @@ and SHOULD be equal to a UTF-8 encoding of the key name.
 
 ## Supported Keyrings
 
-- [AWS KMS Keyring](kms-keyring.md)
+- [AWS KMS Keyrings](./aws-kms/)
 - [Multi-Keyring](multi-keyring.md)
 - [Raw AES Keyring](raw-aes-keyring.md)
 - [Raw RSA Keyring](raw-rsa-keyring.md)
@@ -211,8 +215,8 @@ the decryption is overwhelmingly likely to fail.
 Users SHOULD use a keyring that protects wrapping keys and performs cryptographic operations within a secure boundary.
 Examples are:
 
-- The built-in [AWS KMS keyring](kms-keyring.md),
-  which uses AWS Key Management Service (AWS KMS) customer master keys (CMKs) that never leave AWS KMS plaintext.
+- The built-in [AWS KMS keyrings](./aws-kms),
+  which use AWS Key Management Service (AWS KMS) customer master keys (CMKs) that never leave AWS KMS as plaintext.
 - A custom keyring that uses wrapping keys that are stored in your hardware security modules (HSMs)
 - A custom keyring protected by another master key service.
 
@@ -228,7 +232,7 @@ The following keyrings are compatible with the referenced [master key providers]
 
 | Keyring         | Master Key Provider: Java and Python                                                                             |
 | --------------- | ---------------------------------------------------------------------------------------------------------------- |
-| AWS KMS keyring | KMS master key (Java), KMS master key provider (Java), KMS master key (Python), KMS master key provider (Python) |
+| AWS KMS keyrings | KMS master key (Java), KMS master key provider (Java), KMS master key (Python), KMS master key provider (Python) |
 | Raw AES keyring | When they are used with symmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                    |
 | Raw RSA keyring | When they are used with asymmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                   |
 
