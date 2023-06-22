@@ -26,9 +26,11 @@ in this document are to be interpreted as described in
 
 The [Cryptographic Materials Cache](../../framework/cryptographic-materials-cache.md) interface
 and the [Local Cryptographic Materials Cache](../../framework/local-cryptographic-materials-cache.md)
-were written with a single-threaded mindset.
+were written without specifying a threading model.
 
-Since a cache is, almost by definition, shared across multiple threads, this must be generalized.
+The threading model detailed here addresses basic thread safety,
+as well as the higher level problems of "lookup storms" where
+many threads all try to get information for the cache all at once.
 
 ## Configuration
 
@@ -50,7 +52,7 @@ A number of seconds (at least 1, default 1).
 While within the [grace period](#grace-period),
 attempts to refresh the cache are made no more often than once per interval.
 
-### Lookup Fanout
+### FanOut
 
 A number (at least 1, default 20).
 
@@ -136,7 +138,7 @@ and for which `PutCacheEntry` has not yet been called.
 
 If `GetCacheEntry` is called, and one of the above amelioration
 strategies would otherwise return `No Such Entry`,
-and the number of in flight keys would exceed the [Lookup Fanout](#lookup-fanout),
+and the number of in flight keys would exceed the [FanOut](#fanout),
 then we instead return as if the [grace interval](#grace-interval) had
 no yet passed, that is, if an unexpired entry exists in the cache we return it,
 otherwise we block.
@@ -155,7 +157,9 @@ So if you want your typical TTL to be six hours, but you're willing to extend th
 by eight hours if the backend service is down, then set a TTL of 14 hours and
 a grace time of eight hours.
 
-The only remaining trouble is that throughout the period while the backend service is down,
-one client per key will be trying to get a key, rather than doing useful work.
+One problem remains. While the backend service is down,
+we need to make sure that all clients are making progress,
+rather than spending all their time querying the backend service.
 To remedy this, make sure the [grace interval](#grace-interval) is large compared
-to the time it takes to fail to get a key.
+to the time it takes to fail to get a key,
+so that the remainder of the [grace interval](#grace-interval) can be spent doing work.

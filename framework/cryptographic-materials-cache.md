@@ -172,3 +172,12 @@ If used in a multi-threaded context :
 Attempts to delete a cache entry from the CMC.
 
 If no cache entry exists for the specified cache ID, Delete Cache Entry must return successfully.
+
+## Background Processing
+
+If a cache sees no activity for a long time,
+then even though all of the entries may have expired,
+they still exist in the cache.
+
+An implementation SHOULD provide a way to avoid this, for example,
+by spawning a background thread to occasionally remove expired entries.
