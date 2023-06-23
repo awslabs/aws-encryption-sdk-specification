@@ -148,21 +148,26 @@ precise formulations of customer requirements.
    To protect myself from confused deputy problems
    I want to use information to identify
    the customer who owns this ciphertext.
-   This information is non-public
-   and disclosure of this information
-   could impact either the customer
-   or the security of the application as a whole.
+   This information is non-public.
+   While it is not so sensitive that it
+   must be encrypted in transit,
+   it is also not appropriate to
+   transmit this data publicly in plaintext.
 
    For example, using a customer ID
    or email address would result
-   in leaking non-public data.
+   in always sending that data
+   in plaintext as part of the
+   encrypted messages.
 
    **As an encrypter I want
    to have non-public information
    in my encryption context,
    but still store or transit
-   my ciphertext in public
-   without leaking my non-public data.**
+   my ciphertext without
+   additionally storing or transmitting
+   this non-public information
+   in plaintext.**
 
 1. Non-public is not the same as secret
 
