@@ -14,7 +14,7 @@
 
 ## Overview
 
-Expected Encryption Context Cryptographic Materials Manager (CMM)
+Required Encryption Context Cryptographic Materials Manager (CMM)
 is a built-in CMM to add additional controls for Encryption Context.
 
 This CMM can be configured with a set of [encryption context](./structures.md#encryption-context) keys.
@@ -34,7 +34,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Initialization
 
-On Expected Encryption Context CMM initialization,
+On Required Encryption Context CMM initialization,
 the caller MUST provide the following values:
 
 - [Required Encryption Context Keys](#required-encryption-context-keys)
@@ -45,7 +45,7 @@ Additionally, the caller MUST provide one of the following values:
 - [Keyring](keyring-interface.md)
 
 If the caller provides a keyring,
-then the Expected Encryption Context CMM MUST set its underlying CMM
+then the Required Encryption Context CMM MUST set its underlying CMM
 to a [default CMM](default-cmm.md) initialized with the keyring.
 
 ### Underlying Cryptographic Materials Manager
@@ -55,7 +55,7 @@ to query for encryption/decryption materials.
 
 ### Required Encryption Context Keys
 
-The set of encryption context keys to expect
+The set of encryption context keys to require
 in all [behaviors](#behaviors).
 
 ## Behaviors
@@ -66,7 +66,7 @@ The encryption context on the [encryption materials request](./cmm-interface.md#
 MUST contain a value for every key in the configured [required encryption context keys](#required-encryption-context-keys)
 or this request MUST fail.
 
-The Expected Encryption Context CMM MUST attempt to obtain [encryption materials](./structures.md#encryption-materials)
+The Required Encryption Context CMM MUST attempt to obtain [encryption materials](./structures.md#encryption-materials)
 by making a call to the [underlying CMM's](#underlying-cryptographic-materials-manager)
 [Get Encryption Materials](cmm-interface.md#get-encryption-materials).
 All configured [required encryption context keys](#required-encryption-context-keys)
@@ -84,7 +84,7 @@ The reproduced encryption context on the [decrypt materials request](./cmm-inter
 MUST contain a value for every key in the configured [required encryption context keys](#required-encryption-context-keys)
 or this request MUST fail.
 
-The Expected Encryption Context
+The Required Encryption Context
 CMM MUST attempt to obtain [decryption materials](./structures.md#decryption-materials)
 by making a call to the [underlying CMM's](#underlying-cryptographic-materials-manager)
 [decrypt materials](cmm-interface.md#decrypt-materials) interface
