@@ -89,18 +89,16 @@ that wraps and unwraps keys stored in Amazon DynamoDB.
 
 ### Logical KeyStore Name
 
-The logical name for the DynamoDB Key Store Table.
-This value can match the Table Name
-but does not need to.
-This name is cryptographically bound to all data stored in this table.
-In the case of a restore from backup
-the [DynamoDB Table Name](#dynamodb-table-name) can change to a new name,
-but this name must remain the same.
+This name is cryptographically bound to all data stored in this table,
+and logically separates data between different tables.
 
-When mapping [DynamoDB Table Names](#dynamodb-table-name) to [logical table name](#logical-table-name)
-there MUST be a one to one mapping between the two.
-The purpose of the logical name is to simplify restore type operations,
-not make it easier to confuse what data comes from what physical table.
+There MUST be a one to one mapping between the
+DynamoDB Table Names to the Logical KeyStore Name.
+
+This value can be set to the DynamoDB table name itself, but does not need to.
+
+Controlling this value independently enables restoring from DDB table backups
+even when the table name after restoration is not exactly the same.
 
 ## Operations
 
