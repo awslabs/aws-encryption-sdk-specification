@@ -36,7 +36,8 @@ there is customer value in a more nuanced view of encryption context.
    and valuable authenticated encryption context.
 
 1. Customers should not be forced
-   to choose between leaking non-public data
+   to choose between storing non-public data
+   alongside encrypted messages
    and valuable authenticated encryption context.
 
 1. Customers should be able
