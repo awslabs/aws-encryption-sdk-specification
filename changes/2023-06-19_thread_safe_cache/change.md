@@ -58,6 +58,12 @@ A number (at least 1, default 20).
 
 The maximum number of individual keys for which lookups can be in flight.
 
+### In Flight TTL
+
+A number of seconds (at least 1, default 20).
+
+If an entry has been in flight for this long, it is no longer considered in flight.
+
 ### PutCacheEntry if key already exists
 
 The first change that must be made is to PutCacheEntry.
@@ -132,7 +138,7 @@ In the case where there are many different keys in use,
 many keys might need refreshing at the same time,
 and the other types of storm amelioration won't help.
 
-The number of inflight keys is defined as
+The number of in flight keys is defined as
 the number of keys for which we have returned `No Such Entry`
 and for which `PutCacheEntry` has not yet been called.
 
@@ -145,6 +151,23 @@ otherwise we block.
 
 In a single threaded context, this results in behavior that is exactly that of the
 [Local Cryptographic Materials Cache](../../framework/local-cryptographic-materials-cache.md).
+
+### Stale Entries
+
+The solution to the [Multi-Key Storm](#multi-key-storm) is the cause of a new problem.
+
+In somewhat rare circumstances, a client might receive NoSuchEntry from GetCacheEntry,
+follow that up with a failed attempt to get new materials,
+and then never get around to calling GetCacheEntry again for that key.
+In this circumstance, that key will considered in flight forever.
+Enough of those, and the [FanOut](#fanout) will be full of these stale entries,
+and all future cache lookups will block forever.
+
+Thus we introduce the [In Flight TTL](#in-flight-ttl) configuration.
+
+If an entry has been sitting untouched in the In Flight state for this long,
+the it is no longer considered in flight, and no longer is counted toward the
+limit imposed by [FanOut](#fanout).
 
 ### Service Outage
 
