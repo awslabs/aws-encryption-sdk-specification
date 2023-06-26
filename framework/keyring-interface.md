@@ -11,7 +11,7 @@
 
 - 0.2.4
 
-  - Fix broken links to AWS KMS Keyrings
+  - Update list of AWS KMS Keyrings
 
 - 0.2.3
 
@@ -98,6 +98,14 @@ and SHOULD be equal to a UTF-8 encoding of the key name.
 ## Supported Keyrings
 
 - [AWS KMS Keyrings](./aws-kms/)
+  - [AWS KMS Keyring](./aws-kms/aws-kms-keyring.md)
+  - [AWS KMS RSA Keyring](./aws-kms/aws-kms-rsa-keyring.md)
+  - [AWS KMS Multi Keyrings](./aws-kms/aws-kms-multi-keyrings.md)
+  - [AWS KMS Discovery Keyring](./aws-kms/aws-kms-discovery-keyring.md)
+  - [AWS KMS MRK Discovery Keyring](./aws-kms/aws-kms-mrk-discovery-keyring.md)
+  - [AWS KMS MRK Keyring](./aws-kms/aws-kms-mrk-keyring.md)
+  - [AWS KMS MRK Multi Keyrings](./aws-kms/aws-kms-mrk-multi-keyrings.md)
+  - [AWS KMS Hierarchical Keyring](./aws-kms/aws-kms-hierarchical-keyring.md)
 - [Multi-Keyring](multi-keyring.md)
 - [Raw AES Keyring](raw-aes-keyring.md)
 - [Raw RSA Keyring](raw-rsa-keyring.md)
