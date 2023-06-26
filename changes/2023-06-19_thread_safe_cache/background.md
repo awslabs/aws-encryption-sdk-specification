@@ -15,6 +15,28 @@ in this document are to be interpreted as described in
 
 ## Issues and Alternatives
 
+### Why specify concurrency?
+
+We live in a concurrent world.
+Almost every piece of code will eventually be used in a multi-threaded context.
+At a minimum, any library needs to specify whether or not it can be used
+safely with multiple threads. Ideally, that answer will be "yes".
+
+### What changes to the existing CMC are required?
+
+There are two tiers of change required.
+
+_Basic Usability_ : Using the CMC in a multi-threaded context must not introduce new problems.
+Basic invariants must be maintained, and spurious errors must be avoided.
+These are covered in [basic thread safety](./change.md#basic-thread-safety)
+and [PutCacheEntry if key already exists](./change.md#putcacheentry-if-key-already-exists).
+
+_Full Usability_ : Using the CMC in a multi-threaded context must be pleasant and unsurprising,
+without any edge cases that would make a service unnecessarily unresponsive.
+This is covered in all the other sections of the [change document](./change.md),
+and primarily involves avoiding redundant calls, or excessive concurrent calls,
+to the backend materials provider,
+
 ### API changes
 
 The original interface produces client code of the form
@@ -74,3 +96,15 @@ for the number of bytes or messages; however
 1 The cache can know when time passes, but it is the client's responsibility
 to track data usage, and so rather large interface changes would be necessary
 to handle those factors.
+
+Can existing DDB-EC customer use the CMC cache?
+What interface should the cache take to prevent refresh storms?
+How can the existing interface prevent storms on an empty cache?
+How do we deal with multiple key storms?
+How can customers prevent downtime while still satisfying their security requirements?
+What parameters should be configurable and how?
+Should we offer a static stability option?
+How can we deal with the circular dependency with the ESDK file format?
+Given cryptographic size limitation what if the cache is too large to serialize?
+What other failure modes of caches should we attempt to handle?
+Any other bi-model behavior you want to talk about?
