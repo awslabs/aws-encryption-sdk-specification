@@ -37,7 +37,8 @@ It MAY also provide
 
 - [Grace Period](#grace-period)
 - [Grace Interval](#grace-interval)
-- [Lookup Fanout](#lookup fanout)
+- [FanOut](#fanout)
+- [Inflight TTL](#inflight-ttl)
 
 ### Grace Period
 
@@ -55,18 +56,24 @@ A number of seconds (at least 1, default 1).
 While within the [grace period](#grace-period),
 attempts to refresh the cache are made no more often than once per interval.
 
-### Lookup Fanout
+### FanOut
 
 A number (at least 1, default 20).
 
 The maximum number of individual keys for which lookups can be in flight.
+
+### Inflight TTL
+
+A number (at least 1, default 20).
+
+An entry that has been in flight for this long is no longer considered in flight.
 
 ## Behaviors
 
 All behaviors MUST be exactly the same as a [Local CMC](local-cryptographic-materials-cache.md),
 even if used in a multi-threaded context, with two exceptions
 
-- GetCacheEntry might return NoSuchEntry, even thought there is really an entry
+- GetCacheEntry might return NoSuchEntry, even though there is really an entry.
 - GetCacheEntry might block for a time before returning a result.
 
 Specifics for these two exceptions are outlines below.
@@ -93,7 +100,7 @@ If that key is in the cache AND that key is not within the [Grace Period](#grace
 
 - GetCacheEntry MUST return the cache entry. It SHOULD be the case that the key is not inflight.
 
-Else If the number of things inflight is greater than or equal to the [Lookup Fanout](#lookup-fanout) THEN
+Else If the number of things inflight is greater than or equal to the [FanOut](#fanout) THEN
 
 - If the key is in the cache THEN GetCacheEntry MUST return the cache entry.
 - Else GetCacheEntry MUST block until some other option is available.
