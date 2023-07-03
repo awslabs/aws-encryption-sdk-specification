@@ -5,13 +5,17 @@
 
 ## Version
 
-0.4.0
+0.6.0
 
 ### Changelog
+
+- 0.6.0
+  - Update keystore structure and add encryption context options
 
 - 0.5.0
   - Rename Hierarchical Materials to Branch Key Materials.
   - Add Beacon Key Materials
+
 - 0.4.0
 
   - Add symmetric signature keys to materials
@@ -371,22 +375,46 @@ This value MUST be kept secret.
 
 Branch Key materials are a structure containing materials that are used to establish a key hierarchy in order to
 reuse a data key that wraps other data keys.
-This structure MAY include any of the following fields:
+This structure MUST include all of the following fields:
 
 - [Branch Key](#branch-key)
+- [Branch Key Id](#branch-key-id)
 - [Branch Key Version](#branch-key-version)
+- [Encryption Context](#encryption-context-3)
 
 ##### Branch Key
 
-Data keys that are reused to derive unique data keys for envelope encryption. This data key MUST only be generated through
+Data keys that are reused to derive unique data keys for envelope encryption.
+This data key MUST only be generated through
 AWS KMS using the [`GenerateDataKeyWithoutPlaintext`](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) API.
 This key MUST be 32 bytes long.
+
+##### Branch Key Id
+
+The UTF8 Encoded value of the ID of the corresponding [branch key](#branch-key).
+The plaintext value of which is stored in the [branch key store](./branch-key-store.md).
+
 
 ##### Branch Key Version
 
 The UTF8 Encoded value of the version of the corresponding [branch key](#branch-key).
 The plaintext value of which is stored in the [branch key store](./branch-key-store.md).
 This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
+
+##### Encryption Context
+
+The [custom encryption context](#encryption-context) associated with this branch key.
+
+When using this branch key version to add an [encrypted data key](#encrypted-data-key)
+to [encryption materials](#encryption-materials) the [encryption materials encryption context](#encryption-context-1)
+MUST contain every key in [this encryption context](#encryption-context-3),
+and the two values MUST be equal.
+
+When using this branch key version for [decryption materials](#decryption-materials)
+to add a [plaintext data key](#plaintext-data-key-1)
+the [decryption materials encryption context](#encryption-context-2)
+MUST contain every key in [this encryption context](#encryption-context-3),
+and the two values MUST be equal.
 
 ## Beacon Key Materials
 
@@ -400,7 +428,7 @@ This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
 Beacon Key materials are a structure containing materials
 that are used in structured encryption.
 They contain HMAC keys derived from a Beacon Key
-stored in the [Key Store](branch-key-store.md)
+stored in the [Keystore](branch-key-store.md)
 
 This structure MUST include the following fields:
 
@@ -414,12 +442,17 @@ This structure MAY include the following fields:
 ##### Beacon Key
 
 The Beacon Key that is stored
-in the [Key Store](branch-key-store.md)
+in the [Keystore](branch-key-store.md).
+
+The beacon key is optional,
+because the beacon key is used to derive [HMAC Keys](#hmac-keys).
+Once this has been complete,
+the beacon key can be discarded.
 
 ##### Beacon Key Id
 
 The Beacon key id that was used to obtain
-the beacon key from a [Key Store](branch-key-store.md)
+the beacon key from a [Keystore](branch-key-store.md)
 
 ##### HMAC Keys
 
