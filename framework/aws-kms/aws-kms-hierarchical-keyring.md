@@ -220,7 +220,7 @@ OnDecrypt MUST calculate the following values:
   and verify this is equal to the configured or supplied `branch-key-id`.
 - Deserialize the UUID string representation of the `version` from the [encrypted data key](../structures.md#encrypted-data-key) [ciphertext](#ciphertext).
 
-OnDecrypt MUST call the Keystore's [GetBranchKeyVersion](../key-store.md#getbranchkeyversion) operation with the following inputs:
+OnDecrypt MUST call the Keystore's [GetBranchKeyVersion](../branch-key-store.md#getbranchkeyversion) operation with the following inputs:
 
 - The deserialized, UTF8-Decoded `branch-key-id`
 - The deserialized UUID string representation of the `version`
