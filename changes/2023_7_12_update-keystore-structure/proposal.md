@@ -93,7 +93,7 @@ also requires additional encryption context for validation.
 
 on [CreateKey](../../framework/branch-key-store.md#createkey)
 
-Both the active and the version items as well as the beacon item
+The active and the version items as well as the beacon item
 need to be inserted.
 
 ### New section Wrapped Branch Key Creation
