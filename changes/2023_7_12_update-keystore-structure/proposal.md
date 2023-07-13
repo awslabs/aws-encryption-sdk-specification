@@ -18,7 +18,7 @@ This serves as a reference of all specification documents that this change affec
 
 | Specification                                                                           |
 | ----------------------------------------------------------------------------------------|
-| [Keystore](../../framework/key-store.md)                                                |
+| [Keystore](../../framework/branch-key-store.md)                                                |
 | [Structures](../../framework/structures.md)                                             |
 | [AWS KMS Hierarchical Keyring](../../framework/aws-kms/aws-kms-hierarchical-keyring.md) |
 
