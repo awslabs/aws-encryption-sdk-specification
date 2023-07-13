@@ -66,7 +66,7 @@ The goal then is to simplify the structure and offer the feature.
 This change will invalidate existing keystore tables.
 Given that the current code is in developer preview
 this is an acceptable risk.
-The library is documents as not ready for production workloads.
+The library is documented as not ready for production workloads.
 
 ## Reference-level Explanation
 
