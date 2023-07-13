@@ -120,7 +120,7 @@ It is nice that we would no longer require reEncrypt.
 
 KMS already has extensive hooks for policy control over encryption context.
 By extending this feature to branch keys there is a clear policy hook for decrypting the branch key on the KMS side.
-By extending these encryption context values to the use of this branch key we create a strong control for customer about how their branch keys are access, used, and reasoned about.
+By extending these encryption context values to the use of this branch key we create a strong control for customer about how their branch keys are accessed, used, and reasoned about.
 
 Let’s look at an extreme case of how this is useful.
 Say we have a branch key id collision for some reason.
