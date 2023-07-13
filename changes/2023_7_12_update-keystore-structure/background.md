@@ -22,7 +22,7 @@ However, customers want to use their own id for the branch key to simplify bindi
 They could take control of creation and implement their own creation process.
 As a customer did this it lead them to ask
 “how can I ensure that there does not already exist a branch key for this id?”
-This question is fundamental any branch key creation process.
+This question is fundamental to any branch key creation process.
 Since a GUID is very generally unique --
 but it is possible to have such a collision.
 
