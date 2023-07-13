@@ -9,7 +9,7 @@ This serves as a reference of all features that this change affects.
 
 | Feature                                         |
 | ----------------------------------------------- |
-| [Keystore](../../framework/key-store.md)        |
+| [Keystore](../../framework/branch-key-store.md)        |
 | [Structures](../../framework/structures.md)     |
 
 ## Affected Specifications
