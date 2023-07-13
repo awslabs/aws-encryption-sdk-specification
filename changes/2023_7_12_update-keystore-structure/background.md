@@ -53,7 +53,7 @@ It would be much better if the system was correct by construction and there coul
 
 # Design questions
 
-_**Preferred options are identified like this.**_
+*Preferred options are identified like this.*
 
 ## How can duplicate branch keys be rejected by construction?
 
