@@ -405,17 +405,6 @@ This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
 
 The [custom encryption context](#encryption-context) associated with this branch key.
 
-When using this branch key version to add an [encrypted data key](#encrypted-data-key)
-to [encryption materials](#encryption-materials) the [encryption materials encryption context](#encryption-context-1)
-MUST contain every key in [this encryption context](#encryption-context-3),
-and the two values MUST be equal.
-
-When using this branch key version for [decryption materials](#decryption-materials)
-to add a [plaintext data key](#plaintext-data-key-1)
-the [decryption materials encryption context](#encryption-context-2)
-MUST contain every key in [this encryption context](#encryption-context-3),
-and the two values MUST be equal.
-
 ## Beacon Key Materials
 
 #### Implementations
@@ -433,6 +422,7 @@ stored in the [Keystore](branch-key-store.md)
 This structure MUST include the following fields:
 
 - [Beacon Key Id](#beacon-key-id)
+- [Encryption Context](#encryption-context-4)
 
 This structure MAY include the following fields:
 
@@ -448,6 +438,10 @@ The beacon key is optional,
 because the beacon key is used to derive [HMAC Keys](#hmac-keys).
 Once this has been complete,
 the beacon key can be discarded.
+
+##### Encryption Context
+
+The [custom encryption context](#encryption-context) associated with this beacon key.
 
 ##### Beacon Key Id
 

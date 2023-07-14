@@ -168,6 +168,10 @@ The CreateKey caller MUST provide:
 If an optional branch key id is provided
 and no encryption context keys are provided this operation MUST fail.
 
+If no branch key id is provided,
+then this operation MUST create a [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
+to be used as the branch key id.
+
 This operation MUST create a [branch key](#branch-key) and a [beacon key](#beacon-key) according to
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
 
@@ -182,9 +186,15 @@ Otherwise, this operation MUST yield an error.
 
 #### Branch Key and Beacon Key Creation
 
-To create a branch key, this operation must generate the following values:
+To create a branch key, this operation must take the following:
 
-- `branchKeyId`: a new guid. This guid MUST be [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
+- `branchKeyId`: The identifier
+
+This operation needs to generate the following:
+
+- `version`: a new guid. This guid MUST be [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
+- `timestamp`: a timestamp for the current time.
+  This timestamp MUST be in ISO8601 format in UTC, to microsecond precision (e.g. “YYYY-MM-DDTHH:mm:ss.ssssssZ“)
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
 
@@ -204,12 +214,7 @@ the operation MUST use the `CiphertextBlob` as the wrapped Beacon Key.
 
 #### Wrapped Branch Key Creation
 
-Given a `branchKeyId` to create wrapped branch keys,
-this operation must generate the following values:
-
-- `version`: a new guid. This guid MUST be [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
-- `timestamp`: a timestamp for the current time.
-  This timestamp MUST be in ISO8601 format in UTC, to microsecond precision (e.g. “YYYY-MM-DDTHH:mm:ss.ssssssZ“)
+Given a `branchKeyId`, `version` and `timestamp`
 
 The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
 The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
@@ -343,12 +348,12 @@ The operation MUST use the configured `KMS SDK Client` to authenticate the value
 Every attribute on the AWS DDB response item will be authenticated.
 
 Every key in the constructed [encryption context](#encryption-context)
+except `tableName`
 MUST exist as a string attribute in the AWS DDB response item.
 Every value in the constructed [encryption context](#encryption-context)
+except the logical table name
 MUST equal the value with the same key in the AWS DDB response item.
 The key `enc` MUST NOT exist in the constructed [encryption context](#encryption-context).
-The number of keys in the constructed [encryption context](#encryption-context)
-MUST be one less than the number of attributes in the AWS DDB response item.
 
 The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
 with a request constructed as follows:
