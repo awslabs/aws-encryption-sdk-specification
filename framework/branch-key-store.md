@@ -189,6 +189,7 @@ Otherwise, this operation MUST yield an error.
 To create a branch key, this operation must take the following:
 
 - `branchKeyId`: The identifier
+- `encryptionContext`: Additional encryption context to bind to the created keys
 
 This operation needs to generate the following:
 
@@ -255,7 +256,7 @@ List of TransactWriteItem:
 - PUT:
   - Item:
     - “branch-key-id” (S): `branchKeyId`,
-    - “type“ (S): "version:" + `version`,
+    - “type“ (S): "branch:version:" + `version`,
     - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured `KMS Key ARN`
@@ -275,7 +276,7 @@ List of TransactWriteItem:
 - PUT:
   - Item:
     - “branch-key-id” (S): `branchKeyId`,
-    - “type“ (S): "beacon:true",
+    - “type“ (S): "beacon:ACTIVE",
     - “enc” (B): the wrapped Beacon Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured `KMS Key ARN`
@@ -316,7 +317,7 @@ List of TransactWriteItem:
 - PUT:
   - Item:
     - “branch-key-id” (S): `branchKeyId`,
-    - “type“ (S): "version:" + `version`,
+    - “type“ (S): "branch:version:" + `version`,
     - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured `KMS Key ARN`
@@ -395,7 +396,7 @@ On invocation, the caller:
 - MUST supply a `branchKeyVersion`
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
-using the `branch-key-id` as the Partition Key and "version:" + `branchKeyVersion` value as the Sort Key.
+using the `branch-key-id` as the Partition Key and "branch:version:" + `branchKeyVersion` value as the Sort Key.
 
 The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
@@ -417,7 +418,7 @@ On invocation, the caller:
 - MUST supply a `branchKeyVersion`
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
-using the `branch-key-id` as the Partition Key and "beacon:true" value as the Sort Key.
+using the `branch-key-id` as the Partition Key and "beacon:ACTIVE" value as the Sort Key.
 
 The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
@@ -467,7 +468,7 @@ The AWS KMS encryption context for the DECRYPT_ONLY branch key item
 MUST have the following attributes:
 
 - branch-key-id: the `branchKeyId`
-- type: `"version:"` + `version`
+- type: `"branch:version:"` + `version`
 - create-time: the `timestamp`
 - logicalKeyStoreName: the configured [logical Keystore name](#logical-keystore-name) for this keystore
 - kms-arn: the `kms-arn` on the used to wrap this branch key
@@ -480,7 +481,7 @@ The AWS KMS encryption context for the DECRYPT_ONLY branch key item
 MUST have the following attributes:
 
 - branch-key-id: the `branchKeyId`
-- type: `"beacon:true"`
+- type: `"beacon:ACTIVE"`
 - create-time: the `timestamp`
 - logicalKeyStoreName: the configured [logical Keystore name](#logical-keystore-name) for this keystore
 - kms-arn: the `kms-arn` on the used to wrap this branch key
@@ -523,29 +524,32 @@ the keystore operation MUST call with a request constructed as follows:
 A branch key record MUST include the following key-value pairs:
 
 1. `branch-key-id` : Unique identifier for a branch key; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-1. `type` : One of the following
-    - The string literal `"beacon:true"`. Then `enc` is the a wrapped beacon key.
-    - The string "version" + `version`, where `version` is a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt) of the Branch Key Version; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes). Then `enc` is the wrapped branch key.
+1. `type` : One of the following; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+    - The string literal `"beacon:ACTIVE"`. Then `enc` is the wrapped beacon key.
+    - The string `"branch:version:"` + `version`, where `version` is the Branch Key Version. Then `enc` is the wrapped branch key.
     - The string literal `"branch:ACTIVE"`. Then `enc` is the wrapped beacon key of the active version. Then 
 1. `version` : Only exists if `type` is the string literal `"branch:ACTIVE"`.
-  Then `version` is a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt) of the Branch Key Version; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes).
-1. `enc` : Encrypted version of the key; represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-1. `kms-arn`: The AWS KMS Key ARN in the [AWS KMS Configuration](#aws-kms-configuration) used to generate the `enc` value.
+  Then it is the Branch Key Version. represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+1. `enc` : Encrypted version of the key;
+  represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+1. `kms-arn`: The AWS KMS Key ARN used to generate the `enc` value.
+  represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `create-time`: Timestamp in ISO8601 format in UTC, to microsecond precision.
    Represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-1. `hierarchy-version`: Version of the hierarchical keyring; represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+1. `hierarchy-version`: Version of the hierarchical keyring;
+  represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 
 A branch key record MAY include [custom encryption context](#custom-encryption-context) key-value pairs.
-These attributes MUST be prefixed with `aws-crypto-ec:` exactly the same way they are for [AWS KMS encryption context](#encryption-context).
+These attributes should be prefixed with `aws-crypto-ec:` the same way they are for [AWS KMS encryption context](#encryption-context).
 
 ### Branch Key Materials From Authenticated Encryption Context
 
-The `type` attribute MUST either be equal to `"branch:ACTIVE"` or start with `"version:"`.
+The `type` attribute MUST either be equal to `"branch:ACTIVE"` or start with `"branch:version:"`.
 
 If the `type` attribute is equal to `"branch:ACTIVE"`
 then the authenticated encryption context MUST have a `version` attribute
 and the version string is this value.
-If the `type` attribute start with `"version:"` then the version string MUST be equal to this value.
+If the `type` attribute start with `"branch:version:"` then the version string MUST be equal to this value.
 
 To construct [beacon key materials](./structures.md#beacon-key-materials) from authenticated encryption context as follows:
 
@@ -582,7 +586,7 @@ The DECRYPT_ONLY simplified JavaScript JSON format would look like this
 ```
 {
   "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
-  "type" : "version:83eec007-5659-4554-bf11-699b90f41ac6",
+  "type" : "branch:version:83eec007-5659-4554-bf11-699b90f41ac6",
   "enc" : "NnYwxJ/oiQCLnqRh/IcrCR2mmOnO4SAVLw2pspKJKd6rpa0H8z/4hGpGxcWozdb7VByebDFWb0VTWxaOUA8=",
   "kms-arn" : "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
   "create-time" : "2023-06-03T19:03:29.358Z",
@@ -608,7 +612,7 @@ The BEACON simplified JavaScript JSON format would look like this
 ```
 {
   "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
-  "type" : "beacon:true",
+  "type" : "beacon:ACTIVE",
   "enc" : "hgb2RyDQinOCpzKWdi17E+t9WB9pRExQXpD/20bsu9hxr38HjQvGvihoYpL6sKuF0Ek+37B1UE9tK3SIOiE=",
   "kms-arn" : "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
   "create-time" : "2023-06-03T19:03:29.358Z",
