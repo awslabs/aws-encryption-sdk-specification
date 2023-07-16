@@ -375,19 +375,15 @@ To get the active version for the branch key id from the keystore
 this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
 
-The AWS DDB response MUST contain the fields defined in the [branch keystore record format](../branch-key-store.md#record-format).
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
 
 The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
 If the branch key fails to decrypt, GetActiveBranchKey MUST fail.
 
-If the decryption of the branch key succeeds, GetActiveBranchKey verifies:
-
-- The `KeyId` field in the AWS KMS response MUST equal the configured AWS KMS Key ARN.
-
 This GetActiveBranchKey MUST construct [beacon key materials](./structures.md#beacon-key-materials)
-according to [Branch Key Materials From DDB Record](#branch-key-materials-from-ddb-record).
+according to [Branch Key Materials From Authenticated Encryption Context](#branch-key-materials-from-authenticated-encryption-context).
 
 This operation MUST return the constructed [branch key materials](./structures.md#branch-key-materials).
 
@@ -401,19 +397,15 @@ On invocation, the caller:
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "version:" + `branchKeyVersion` value as the Sort Key.
 
-The AWS DDB response MUST contain the fields defined in the [branch keystore record format](../branch-key-store.md#record-format).
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
 
 The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
 If the branch key fails to decrypt, this operation MUST fail.
 
-If the decryption of the branch key succeeds, this operation verifies:
-
-- The `KeyId` field in the AWS KMS response MUST equal the configured AWS KMS Key ARN.
-
 This GetBranchKeyVersion MUST construct [beacon key materials](./structures.md#beacon-key-materials)
-according to [Branch Key Materials From DDB Record](#branch-key-materials-from-ddb-record).
+according to [Branch Key Materials From Authenticated Encryption Context](#branch-key-materials-from-authenticated-encryption-context).
 
 This operation MUST return the constructed [branch key materials](./structures.md#branch-key-materials).
 
@@ -427,7 +419,7 @@ On invocation, the caller:
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "beacon:true" value as the Sort Key.
 
-The AWS DDB response MUST contain the fields defined in the [branch keystore record format](../branch-key-store.md#record-format).
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
 If the record does not contain "SEARCH" as the "status" field, this operation MUST fail.
 
@@ -511,12 +503,12 @@ Every attribute except for `enc` on the AWS DDB response item
 MUST be authenticated in the decryption of `enc`
 
 Every key in the constructed [encryption context](#encryption-context)
+except `tableName`
 MUST exist as a string attribute in the AWS DDB response item.
 Every value in the constructed [encryption context](#encryption-context)
+except the logical table name
 MUST equal the value with the same key in the AWS DDB response item.
 The key `enc` MUST NOT exist in the constructed [encryption context](#encryption-context).
-The number of keys in the constructed [encryption context](#encryption-context)
-MUST be one less than the number of attributes in the AWS DDB response item.
 
 When calling [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html),
 the keystore operation MUST call with a request constructed as follows:
@@ -546,26 +538,28 @@ A branch key record MUST include the following key-value pairs:
 A branch key record MAY include [custom encryption context](#custom-encryption-context) key-value pairs.
 These attributes MUST be prefixed with `aws-crypto-ec:` exactly the same way they are for [AWS KMS encryption context](#encryption-context).
 
-### Branch Key Materials From DDB Record
+### Branch Key Materials From Authenticated Encryption Context
 
 The `type` attribute MUST either be equal to `"branch:ACTIVE"` or start with `"version:"`.
 
-To construct [beacon key materials](./structures.md#beacon-key-materials) from a AWS DDB response item as follows:
+If the `type` attribute is equal to `"branch:ACTIVE"`
+then the authenticated encryption context MUST have a `version` attribute
+and the version string is this value.
+If the `type` attribute start with `"version:"` then the version string MUST be equal to this value.
+
+To construct [beacon key materials](./structures.md#beacon-key-materials) from authenticated encryption context as follows:
 
 - [Branch Key](./structures.md#branch-key) MUST be the [decrypted branch key material](#aws-kms-branch-key-decryption)
 - [Branch Key Id](./structures.md#branch-key-id) MUST be the `branch-key-id`
 - [Branch Key Version](./structures.md#branch-key-version)
-  If the `type` attribute equals `"branch:ACTIVE"` the AWS DDB response item MUST have a `version` attribute
-  and the [branch key version](./structures.md#branch-key-version) MUST be equal to this value.
-  If the `type` attribute starts with `"version:"`
-  then the `"version:"` + [branch key version](./structures.md#branch-key-version)
-  MUST be equal to the `type` attribute.
+  The version string MUST start with `branch:version:`.
+  The remaining string encoded as UTF8 bytes MUST be the Branch Key version.
 - [Encryption Context](./structures.md#encryption-context-3)
   Every value in the [encryption context](./structures.md#encryption-context-3)
-  MUST equal the value in the AWS DDB response item
+  MUST equal the value in the authenticated encryption context
   who's attribute name is equal to `aws-crypto-ec:` + the key.
   The number of keys in the [encryption context](./structures.md#encryption-context-3)
-  MUST equal the number of attributes in the AWS DDB response item
+  MUST equal the number of attributes in the authenticated encryption context
   who's name starts with `aws-crypto-ec:`.
 
 ### Example
