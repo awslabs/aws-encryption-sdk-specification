@@ -558,13 +558,20 @@ To construct [beacon key materials](./structures.md#beacon-key-materials) from a
 - [Branch Key Version](./structures.md#branch-key-version)
   The version string MUST start with `branch:version:`.
   The remaining string encoded as UTF8 bytes MUST be the Branch Key version.
-- [Encryption Context](./structures.md#encryption-context-3)
-  Every value in the [encryption context](./structures.md#encryption-context-3)
-  MUST equal the value in the authenticated encryption context
-  who's attribute name is equal to `aws-crypto-ec:` + the key.
-  The number of keys in the [encryption context](./structures.md#encryption-context-3)
-  MUST equal the number of attributes in the authenticated encryption context
-  who's name starts with `aws-crypto-ec:`.
+- [Encryption Context](./structures.md#encryption-context-3) MUST be constructed by 
+  [Custom Encryption Context From Authenticated Encryption Context](#custom-encryption-context-from-authenticated-encryption-context)
+  
+
+### Custom Encryption Context From Authenticated Encryption Context
+
+The custom encryption context is stored as map of UTF8 Encoded bytes.
+
+For every key in the [encryption context](./structures.md#encryption-context-3)
+the string `aws-crypto-ec:` + the UTF8 decode of this key
+MUST exist as a key in the authenticated encryption context.
+Also, the value in the [encryption context](./structures.md#encryption-context-3) for this key
+MUST equal the value in the authenticated encryption context
+for the constructed key.
 
 ### Example
 
