@@ -24,7 +24,7 @@
 A Keystore persists hierarchical data that allows customers to call AWS KMS less often.
 The Keystore persists branch keys in DynamoDb that wrap multiple data keys.
 This creates a hierarchy where a branch key wraps multiple data keys and facilitates caching.
-These branch keys MUST only be generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
+These branch keys are only generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
 
 This Keystore interface defines operations that any implementation of its specification must support and implement.
 
@@ -94,9 +94,9 @@ that wraps and unwraps keys stored in Amazon DynamoDB.
 This name is cryptographically bound to all data stored in this table,
 and logically separates data between different tables.
 
-There MUST be a one to one mapping between the
-DynamoDB Table Names to the Logical KeyStore Name.
+The logical keystore name MUST be bound to every created key.
 
+There needs to be a one to one mapping between DynamoDB Table Names the the Logical KeyStore Name.
 This value can be set to the DynamoDB table name itself, but does not need to.
 
 Controlling this value independently enables restoring from DDB table backups
