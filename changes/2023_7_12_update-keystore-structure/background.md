@@ -157,7 +157,7 @@ The secret has already been unwrapped.
 
 ## How is this encryption context for access to the branch key added to a branch key?
 
-### _In the create branch key, add an optional encryption context values_
+### _In the create branch key function, add an optional parameter for encryption context
 
 This value MUST be immutable to the branch key.
 Changing these values changes the authorization for previously encrypted messages.
