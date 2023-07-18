@@ -15,7 +15,7 @@ interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
 The current keystore DDB table relies on the branch key id and version being random.
 
-By making the branch key the partition key we can easily group versions together.
+By making the branch key ID the partition key we can easily group versions together.
 By using GUIDs as the branch key ID, e.g. the partition key,
 we have a strong control that each branch key is unique.
 However, customers want to use their own id for the branch key to simplify binding a branch keys to their customers.
