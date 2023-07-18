@@ -540,7 +540,7 @@ then the authenticated encryption context MUST have a `version` attribute
 and the version string is this value.
 If the `type` attribute start with `"branch:version:"` then the version string MUST be equal to this value.
 
-To construct [beacon key materials](./structures.md#beacon-key-materials) from authenticated encryption context as follows:
+To construct [branch key materials](./structures.md#branch-key-materials) from authenticated encryption context as follows:
 
 - [Branch Key](./structures.md#branch-key) MUST be the [decrypted branch key material](#aws-kms-branch-key-decryption)
 - [Branch Key Id](./structures.md#branch-key-id) MUST be the `branch-key-id`
