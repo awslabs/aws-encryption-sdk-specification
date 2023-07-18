@@ -212,7 +212,7 @@ But this policy is not required to function, it is just an exercise in least pri
 The idea here would be
 
 1. Get the current item (if no active item exists fail)
-2. ReEncrypt this item to encryption context identical encryption context
+2. ReEncrypt this item to encryption context identical to the existing encryption context.
 3. All encryption context is now authenticated
 4. Construct a `GenerateDataKeyWithoutPlaintext` request with the now authenticated additional values
 5. ReEncrypt this new version so that a new Active item can be inserted
