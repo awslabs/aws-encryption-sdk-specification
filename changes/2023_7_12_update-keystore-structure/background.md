@@ -18,7 +18,7 @@ The current keystore DDB table relies on the branch key id and version being ran
 By making the branch key ID the partition key we can easily group versions together.
 By using GUIDs as the branch key ID, e.g. the partition key,
 we have a strong control that each branch key is unique.
-However, customers want to use their own id for the branch key to simplify binding a branch keys to their customers.
+However, customers want to use their own id for the branch key to simplify binding branch keys to their customers.
 They could take control of creation and implement their own creation process.
 As a customer did this it lead them to ask
 “how can I ensure that there does not already exist a branch key for this id?”
