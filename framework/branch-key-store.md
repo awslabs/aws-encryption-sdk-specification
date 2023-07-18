@@ -522,7 +522,7 @@ A branch key record MUST include the following key-value pairs:
 1. `enc` : Encrypted version of the key;
    represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `kms-arn`: The AWS KMS Key ARN used to generate the `enc` value.
-   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+   represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `create-time`: Timestamp in ISO8601 format in UTC, to microsecond precision.
    Represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `hierarchy-version`: Version of the hierarchical keyring;
