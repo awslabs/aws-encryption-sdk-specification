@@ -96,7 +96,7 @@ and logically separates data between different tables.
 
 The logical keystore name MUST be bound to every created key.
 
-There needs to be a one to one mapping between DynamoDB Table Names the the Logical KeyStore Name.
+There needs to be a one to one mapping between DynamoDB Table Names and the Logical KeyStore Name.
 This value can be set to the DynamoDB table name itself, but does not need to.
 
 Controlling this value independently enables restoring from DDB table backups
