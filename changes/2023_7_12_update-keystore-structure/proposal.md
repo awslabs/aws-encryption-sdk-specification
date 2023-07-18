@@ -35,7 +35,7 @@ in this document are to be interpreted as described in
 ## Summary
 
 Inserting a record into the keystore table should correct by construction.
-The current design relied to heavily on GUID for correctness of the data in the table.
+The current design relied too heavily on GUID for correctness of the data in the table.
 A duplicate branch key id has the potential to create confusion
 about what data is encrypted under what AWS KMS key.
 By changing the data model we ensure that global unique guarantees
