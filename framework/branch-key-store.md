@@ -406,7 +406,7 @@ The operation MUST decrypt the branch key according to the [AWS KMS Branch Key D
 
 If the branch key fails to decrypt, this operation MUST fail.
 
-This GetBranchKeyVersion MUST construct [beacon key materials](./structures.md#beacon-key-materials)
+This GetBranchKeyVersion MUST construct [branch key materials](./structures.md#branch-key-materials)
 according to [Branch Key Materials From Authenticated Encryption Context](#branch-key-materials-from-authenticated-encryption-context).
 
 This operation MUST return the constructed [branch key materials](./structures.md#branch-key-materials).
