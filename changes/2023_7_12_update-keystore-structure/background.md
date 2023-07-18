@@ -159,7 +159,7 @@ The secret has already been unwrapped.
 
 ### _In the create branch key, add an optional encryption context values_
 
-This value SHOULD be immutable to the branch key.
+This value MUST be immutable to the branch key.
 Changing these values changes the authorization for previously encrypted messages.
 
 ### Also add on new version
