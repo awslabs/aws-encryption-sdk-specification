@@ -597,6 +597,7 @@ The ACTIVE simplified JavaScript JSON format would look like this
 {
   "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
   "type" : ""branch:ACTIVE",
+  "version": "branch:version:83eec007-5659-4554-bf11-699b90f41ac6"
   "enc" : "BiXHTm0j27+jsgJZ7yCnvI6yvjFyStMsHiC8fnR9KzKjwwhi0gB+5CZTfXFC2ufmBtCYX/sLvKsFnEITR+k=",
   "kms-arn" : "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
   "create-time" : "2023-06-03T19:03:29.358Z",
