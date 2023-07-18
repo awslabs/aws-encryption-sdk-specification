@@ -415,24 +415,18 @@ This operation MUST return the constructed [branch key materials](./structures.m
 On invocation, the caller:
 
 - MUST supply a `branch-key-id`
-- MUST supply a `branchKeyVersion`
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "beacon:ACTIVE" value as the Sort Key.
 
 The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
-If the record does not contain "SEARCH" as the "status" field, this operation MUST fail.
 
 The operation MUST decrypt the beacon key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
 If the beacon key fails to decrypt, this operation MUST fail.
 
-If the decryption of the beacon key succeeds, this operation verifies:
-
-- The `KeyId` field in the AWS KMS response MUST equal the configured AWS KMS Key ARN.
-
-This operation MUST construct [beacon key materials](./structures.md#beacon-key-materials) from the decrypted branch key material
+This GetBeaconKey MUST construct [beacon key materials](./structures.md#beacon-key-materials) from the decrypted branch key material
 and the `branchKeyId` from the returned `branch-key-id` field.
 
 This operation MUST return the constructed [beacon key materials](./structures.md#beacon-key-materials).
