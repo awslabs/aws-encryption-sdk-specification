@@ -187,7 +187,7 @@ Otherwise, this operation MUST yield an error.
 
 #### Branch Key and Beacon Key Creation
 
-To create a branch key, this operation must take the following:
+To create a branch key, this operation MUST take the following:
 
 - `branchKeyId`: The identifier
 - `encryptionContext`: Additional encryption context to bind to the created keys
