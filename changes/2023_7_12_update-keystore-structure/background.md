@@ -168,7 +168,7 @@ This complicates things greatly.
 It is more flexible and could still be immutable but merging these two sets could be tricky to reason about.
 This is a feature that can be added later.
 
-## How should the encryption context for access be serialized into the key store item?
+## How should the encryption context for access be serialized into the keystore item?
 
 ### _Prefix the custom values_
 
