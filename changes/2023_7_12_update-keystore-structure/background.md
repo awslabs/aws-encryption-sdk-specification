@@ -33,7 +33,7 @@ This means that there would not be an error and the create caller would have no 
 This compounds because this means that the create caller may not have an opportunity
 to raise an error before some other code attempts to use this duplicate.
 Once different customer data is encrypted with duplicates,
-while possible to disambiguate, this a very complicated problem.
+while possible to disambiguate, it becomes a very complicated problem.
 It would be much better if the system was correct by construction and there could only be a single `active` version.
 
 # Requirements
