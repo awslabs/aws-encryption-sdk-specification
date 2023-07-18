@@ -66,7 +66,7 @@ as opposed to update of an existing branch key.
 
 Here we would query only the partition key.
 By only returning the partition key and sort keys we can can be comfortable that we will always return all records in every successful case.
-This is because 1 DDB read unit 4K, much more than ~200 bytes for 6 GUIDs (3 branch key/version records).
+This is because 1 DDB read unit can read an item up to 4KB, much more than ~200 bytes for 6 GUIDs (3 branch key/version records).
 
 However, this function has a fundamental race.
 Even if the read is strongly consistent, while this means that there will be a winner, this still means that we have created duplicate records.
