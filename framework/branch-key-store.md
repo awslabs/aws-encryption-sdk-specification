@@ -455,7 +455,7 @@ MUST be added to the encryption context.
 ### ACTIVE Encryption Context
 
 The ACTIVE branch key is a copy of the DECRYPT_ONLY with the same `version`.
-It is structured slightly differently so that the active version can be access quickly.
+It is structured slightly differently so that the active version can be accessed quickly.
 
 In addition to the [encryption context](#encryption-context):
 
