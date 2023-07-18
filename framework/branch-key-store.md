@@ -304,7 +304,7 @@ using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as th
 
 The values on the AWS DDB response item
 MUST be authenticated according to [authenticating a keystore item](#authenticating-a-keystore-item).
-The the item fails to authenticate this operation MUST fail.
+If the item fails to authenticate this operation MUST fail.
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
 
