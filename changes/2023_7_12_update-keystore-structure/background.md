@@ -59,7 +59,7 @@ _Preferred options are identified like this._
 
 This would mean that there is a single active sort key for a branch key.
 Because the partition key/sort key is now a unique value this means that dynamoDB enforces uniqueness naturally.
-By enforcing a consistent write that has a conditional update that requires that this partition/sort key not exist this enforces both uniqueness and creation,
+By enforcing a consistent write that has a conditional update that requires that this partition/sort key not exist it enforces both uniqueness and creation,
 as opposed to update of an existing branch key.
 
 ### Query the table for the existing branch key
