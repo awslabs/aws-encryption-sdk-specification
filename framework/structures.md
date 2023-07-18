@@ -10,9 +10,11 @@
 ### Changelog
 
 - 0.6.0
+
   - Update keystore structure and add encryption context options
 
 - 0.5.0
+
   - Rename Hierarchical Materials to Branch Key Materials.
   - Add Beacon Key Materials
 
@@ -393,7 +395,6 @@ This key MUST be 32 bytes long.
 
 The UTF8 Encoded value of the ID of the corresponding [branch key](#branch-key).
 The plaintext value of which is stored in the [branch key store](./branch-key-store.md).
-
 
 ##### Branch Key Version
 

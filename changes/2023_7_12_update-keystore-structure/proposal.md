@@ -9,7 +9,7 @@ This serves as a reference of all features that this change affects.
 
 | Feature                                         |
 | ----------------------------------------------- |
-| [Keystore](../../framework/branch-key-store.md)        |
+| [Keystore](../../framework/branch-key-store.md) |
 | [Structures](../../framework/structures.md)     |
 
 ## Affected Specifications
@@ -17,8 +17,8 @@ This serves as a reference of all features that this change affects.
 This serves as a reference of all specification documents that this change affects.
 
 | Specification                                                                           |
-| ----------------------------------------------------------------------------------------|
-| [Keystore](../../framework/branch-key-store.md)                                                |
+| --------------------------------------------------------------------------------------- |
+| [Keystore](../../framework/branch-key-store.md)                                         |
 | [Structures](../../framework/structures.md)                                             |
 | [AWS KMS Hierarchical Keyring](../../framework/aws-kms/aws-kms-hierarchical-keyring.md) |
 
@@ -81,6 +81,7 @@ This is no longer used and does not need to exist.
 on [CreateKey](../../framework/branch-key-store.md#createkey)
 
 The input needs to be able to take two new optional inputs
+
 - branch key id
 - encryption context
 

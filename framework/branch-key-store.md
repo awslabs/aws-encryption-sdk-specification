@@ -162,6 +162,7 @@ The following KeySchema MUST be configured on the table:
 ### CreateKey
 
 The CreateKey caller MUST provide:
+
 - An optional branch key id
 - An optional encryption context
 
@@ -433,7 +434,7 @@ This operation MUST return the constructed [beacon key materials](./structures.m
 
 ## Encryption Context
 
-This section describes how the  AWS KMS encryption context is built
+This section describes how the AWS KMS encryption context is built
 from the DynamoDB items that store the branch keys.
 
 The following encryption context keys are shared:
@@ -513,19 +514,19 @@ A branch key record MUST include the following key-value pairs:
 
 1. `branch-key-id` : Unique identifier for a branch key; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `type` : One of the following; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-    - The string literal `"beacon:ACTIVE"`. Then `enc` is the wrapped beacon key.
-    - The string `"branch:version:"` + `version`, where `version` is the Branch Key Version. Then `enc` is the wrapped branch key.
-    - The string literal `"branch:ACTIVE"`. Then `enc` is the wrapped beacon key of the active version. Then 
+   - The string literal `"beacon:ACTIVE"`. Then `enc` is the wrapped beacon key.
+   - The string `"branch:version:"` + `version`, where `version` is the Branch Key Version. Then `enc` is the wrapped branch key.
+   - The string literal `"branch:ACTIVE"`. Then `enc` is the wrapped beacon key of the active version. Then
 1. `version` : Only exists if `type` is the string literal `"branch:ACTIVE"`.
-  Then it is the Branch Key Version. represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+   Then it is the Branch Key Version. represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `enc` : Encrypted version of the key;
-  represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `kms-arn`: The AWS KMS Key ARN used to generate the `enc` value.
-  represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `create-time`: Timestamp in ISO8601 format in UTC, to microsecond precision.
    Represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 1. `hierarchy-version`: Version of the hierarchical keyring;
-  represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+   represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 
 A branch key record MAY include [custom encryption context](#custom-encryption-context) key-value pairs.
 These attributes should be prefixed with `aws-crypto-ec:` the same way they are for [AWS KMS encryption context](#encryption-context).
@@ -546,9 +547,8 @@ To construct [beacon key materials](./structures.md#beacon-key-materials) from a
 - [Branch Key Version](./structures.md#branch-key-version)
   The version string MUST start with `branch:version:`.
   The remaining string encoded as UTF8 bytes MUST be the Branch Key version.
-- [Encryption Context](./structures.md#encryption-context-3) MUST be constructed by 
+- [Encryption Context](./structures.md#encryption-context-3) MUST be constructed by
   [Custom Encryption Context From Authenticated Encryption Context](#custom-encryption-context-from-authenticated-encryption-context)
-  
 
 ### Custom Encryption Context From Authenticated Encryption Context
 
@@ -578,6 +578,7 @@ There would be three items in the keystore table.
 The DECRYPT_ONLY version, the ACTIVE version, and a beacon key.
 
 The DECRYPT_ONLY simplified JavaScript JSON format would look like this
+
 ```
 {
   "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
@@ -591,6 +592,7 @@ The DECRYPT_ONLY simplified JavaScript JSON format would look like this
 ```
 
 The ACTIVE simplified JavaScript JSON format would look like this
+
 ```
 {
   "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
@@ -604,6 +606,7 @@ The ACTIVE simplified JavaScript JSON format would look like this
 ```
 
 The BEACON simplified JavaScript JSON format would look like this
+
 ```
 {
   "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
@@ -615,4 +618,3 @@ The BEACON simplified JavaScript JSON format would look like this
   "aws-crypto-ec:department" : "admin",
 }
 ```
-

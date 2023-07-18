@@ -36,7 +36,6 @@ Once different customer data is encrypted with duplicates,
 while possible to disambiguate, this a very complicated problem.
 It would be much better if the system was correct by construction and there could only be a single `active` version.
 
-
 # Requirements
 
 1. Branch key ids and versions creation is deterministically unique
@@ -50,14 +49,13 @@ It would be much better if the system was correct by construction and there coul
 - Migration from the developer preview version
 - Local policy evaluation for use of branch keys
 
-
 # Design questions
 
-*Preferred options are identified like this.*
+_Preferred options are identified like this._
 
 ## How can duplicate branch keys be rejected by construction?
 
-### *Make the `active` version identifier part of the sort key.*
+### _Make the `active` version identifier part of the sort key._
 
 This would mean that there is a single active sort key for a branch key.
 Because the partition key/sort key is now a unique value this means that dynamoDB enforces uniqueness naturally.
@@ -79,7 +77,7 @@ It is significantly better for the request to be as atomic as possible.
 
 ## How do we distinguish active from non-active versions?
 
-### *Insert 2 records, the active record and the version record*
+### _Insert 2 records, the active record and the version record_
 
 Here we insert the version record and that data is immutable.
 Then we also insert a “version” that is the active version.
@@ -98,7 +96,7 @@ Especially if there is ever a need to recover, this record always exists.
 
 ## How do we create these two ciphertext blobs?
 
-### *Generate the immutable version item and reEncrypt for the active  item*
+### _Generate the immutable version item and reEncrypt for the active item_
 
 In this case we would GenerateDataKeyWithoutPlaintext to generate the immutable version, and then reEncrypt this data key to generate the active version.
 
@@ -130,7 +128,7 @@ However it occurs the system is intending to have two distinct branch keys.
 Given the changes above, any such collision will fail.
 But what if this failure does not halt the system correctly?
 For example, two different customers `A` and `B` want to encrypt data with branch key `foo`.
-Unknown to `B` the creation of `foo`_b failed and the `foo` branch key is for `A`.
+Unknown to `B` the creation of `foo`\_b failed and the `foo` branch key is for `A`.
 What would happen is a request of `foo` would succeed for both and `B`’s data is incorrect.
 
 By having encryption context associated with the branch the access of these keys can be controlled by this information.
@@ -147,7 +145,7 @@ and can be handled as an additional feature in the future.
 
 ## What kinds of encryption context conditions should exist for access to a branch key?
 
-### *Only equality*
+### _Only equality_
 
 This is obviously the simplest.
 AWS KMS is the party doing the evaluation.
@@ -159,7 +157,7 @@ The secret has already been unwrapped.
 
 ## How is this encryption context for access to the branch key added to a branch key?
 
-### *In the create branch key, add an optional encryption context values*
+### _In the create branch key, add an optional encryption context values_
 
 This value SHOULD be immutable to the branch key.
 Changing these values changes the authorization for previously encrypted messages.
@@ -172,7 +170,7 @@ This is a feature that can be added later.
 
 ## How should the encryption context for access be serialized into the key store item?
 
-### *Prefix the custom values*
+### _Prefix the custom values_
 
 This complicates writing policies for these custom values slightly.
 Customers need to know these strings.
@@ -201,7 +199,7 @@ KMS policy control is only on strict equality so combining all this information 
 
 ## How is the encryption context for access propagated to versions?
 
-### *Authenticate the values from the current active key*
+### _Authenticate the values from the current active key_
 
 We do not want to give the versioning process access to the key, so decrypt is out.
 But we already need reEncrypt to create the active entry.
@@ -238,13 +236,13 @@ It also creates a new value that is not a branch key that is now floating around
 
 ## How can we let customers control the branch key id?
 
-### *Require an encryption context constraint when creating with a defined branch key id*
+### _Require an encryption context constraint when creating with a defined branch key id_
 
 Since the customer is providing the id value, they know what the value is and can therefore construct the requirement around it.
 Even if these values are literally the same, this adds values.
 Since then the unsafe condition is when the customer system has duplicates.
 Since creating a duplicate will fail, if they continue from there we have to assume some level of shared responsibility.
-Since a customer *could* just use an existing branch key guid.
+Since a customer _could_ just use an existing branch key guid.
 
 ### An optional branch key id on create
 
