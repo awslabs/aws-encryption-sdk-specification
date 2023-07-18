@@ -236,7 +236,7 @@ It also creates a new value that is not a branch key that is now floating around
 
 ## How can we let customers control the branch key id?
 
-### _Require an encryption context constraint when creating with a defined branch key id_
+### _Require that encryption context MUST also be provided when creating with a defined branch key id_
 
 Since the customer is providing the id value, they know what the value is and can therefore construct the requirement around it.
 Even if these values are literally the same, this adds values.
