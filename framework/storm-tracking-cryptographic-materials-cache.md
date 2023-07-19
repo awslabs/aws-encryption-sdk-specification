@@ -34,6 +34,7 @@ the caller MUST provide exactly what is required by a
 [Local CMC](local-cryptographic-materials-cache.md).
 
 Initialization MUST also provide
+
 - [Grace Period](#grace-period)
 - [Grace Interval](#grace-interval)
 - [FanOut](#fanout)
