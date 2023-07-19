@@ -28,7 +28,7 @@ The Hierarchical keyring allows customers to reduce AWS KMS calls by locally cac
 
 - [Branch Key(s)](../structures.md#branch-key): Data keys that are reused to derive unique data keys for envelope encryption.
   For security considerations on when to rotate the branch key, refer to [Appendix B](#appendix-b-security-considerations-for-branch-key-rotation).
-- [Key Store](../branch-key-store.md): a resource responsible for managing and protecting branch keys in DDB.
+- [Keystore](../branch-key-store.md): a resource responsible for managing and protecting branch keys in DDB.
 - [UUID](https://www.ietf.org/rfc/rfc4122.txt): a universally unique identifier that can be represented as a byte sequence or a string.
 
 ### Conventions used in this document
@@ -44,7 +44,7 @@ MUST implement the [AWS Encryption SDK Keyring interface](../keyring-interface.m
 
 On initialization, the caller:
 
-- MUST provide a [KeyStore](../branch-key-store.md)
+- MUST provide a [Keystore](../branch-key-store.md)
 - MUST provide a [cache limit TTL](#cache-limit-ttl)
 - MUST provide either a Branch Key Identifier or a [Branch Key Supplier](#branch-key-supplier)
 - MAY provide a max cache size
@@ -110,7 +110,8 @@ If a cache entry is found and the entry's TTL has not expired, the hierarchical 
 If a cache entry is not found or the cache entry is expired, the hierarchical keyring MUST attempt to obtain the branch key materials
 by querying the backing branch keystore specified in the [retrieve OnEncrypt branch key materials](#query-branch-keystore-onencrypt) section.
 
-If the keyring is not able to retrieve materials through the underyling cryptographic materials cache or
+If the keyring is not able to retrieve [branch key materials](../structures.md#branch-key-materials)
+through the underlying cryptographic materials cache or
 it no longer has access to them through the backing keystore, OnEncrypt MUST fail.
 
 Otherwise, OnEncrypt:
@@ -127,22 +128,19 @@ to the encrypted data key list in the [encryption materials](../structures.md#en
 - [key provider id](../structures.md#key-provider-id): MUST be UTF8 Encoded "aws-kms-hierarchy"
 - [key provider info](../structures.md#key-provider-information): MUST be the UTF8 Encoded AWS DDB response `branch-key-id`
 
-#### Query Branch KeyStore OnEncrypt
+#### Query Branch Keystore OnEncrypt
 
 The branch keystore persists [branch keys](#definitions) that are reused to derive unique data keys for envelope encryption to
 reduce the number of calls to AWS KMS through the use of the
 [cryptographic materials cache](../cryptographic-materials-cache.md).
 
-OnEncrypt MUST call the KeyStore's [GetActiveBranchKey](../branch-key-store.md#getactivebranchkey) operation with the following inputs:
+OnEncrypt MUST call the Keystore's [GetActiveBranchKey](../branch-key-store.md#getactivebranchkey) operation with the following inputs:
 
 - the `branchKeyId` used in this operation
 
-If the KeysStore's GetActiveBranchKey operation succeeds:
-
-- The keyring MUST construct branch key materials using the `Plaintext` value from the KMS response and
-  the [`version`](../branch-key-store.md#record-format) value in its string representation from the AWS DDB branch key record response.
-- The keyring MUST put the constructed branch key materials in the cache using the
-  formula defined in [Appendix A](#appendix-a-cache-entry-identifier-formulas).
+If the Keystore's GetActiveBranchKey operation succeeds
+the keyring MUST put the returned branch key materials in the cache using the
+formula defined in [Appendix A](#appendix-a-cache-entry-identifier-formulas).
 
 Otherwise, OnEncrypt MUST fail.
 
@@ -210,7 +208,7 @@ If OnDecrypt fails to successfully decrypt any [encrypted data key](../structure
 then it MUST yield an error that includes all the collected errors
 and MUST NOT modify the [decryption materials](structures.md#decryption-materials).
 
-#### GetItem Branch KeyStore OnDecrypt
+#### GetItem Branch Keystore OnDecrypt
 
 The branch keystore persists [branch keys](#definitions) that are reused to derive unique data keys for key wrapping to
 reduce the number of calls to AWS KMS through the use of the
@@ -222,17 +220,14 @@ OnDecrypt MUST calculate the following values:
   and verify this is equal to the configured or supplied `branch-key-id`.
 - Deserialize the UUID string representation of the `version` from the [encrypted data key](../structures.md#encrypted-data-key) [ciphertext](#ciphertext).
 
-OnDecrypt MUST call the KeyStore's [GetBranchKeyVersion](../branch-key-store.md#getbranchkeyversion) operation with the following inputs:
+OnDecrypt MUST call the Keystore's [GetBranchKeyVersion](../branch-key-store.md#getbranchkeyversion) operation with the following inputs:
 
 - The deserialized, UTF8-Decoded `branch-key-id`
 - The deserialized UUID string representation of the `version`
 
-If the KeysStore's GetBranchKeyVersion operation succeeds:
-
-- The keyring MUST construct branch key materials using the `Plaintext` value in the KMS response and
-  the [`version`](../branch-key-store.md#record-format) value from the branch key record
-- The keyring MUST put the constructed branch key materials in the cache using the
-  formula defined in [Appendix A](#appendix-a-cache-entry-identifier-formulas).
+If the Keystore's GetBranchKeyVersion operation succeeds
+the keyring MUST put the returned branch key materials in the cache using the
+formula defined in [Appendix A](#appendix-a-cache-entry-identifier-formulas).
 
 Otherwise, OnDecrypt MUST fail.
 
@@ -403,6 +398,6 @@ Birthday Problem calculations:
 ```
 
 The above number is how many times one would have to wrap with the `derivedBranchKey` before a theoretical collision.
-Althought this is a higher number we decided on the current selection of including a salt and an IV to not only
+Although this is a higher number we decided on the current selection of including a salt and an IV to not only
 lower the overhead of bytes we have to store in the [edk ciphertext](../structures.md#ciphertext) but to
 easily reason about the security properties of the key derivation since it is what AWS KMS does.
