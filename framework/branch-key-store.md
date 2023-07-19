@@ -120,7 +120,7 @@ This operation MUST return the keystore information in this keystore configurati
 
 This MUST include:
 
-- [keystore id](#key-store-id)
+- [keystore id](#keystore-id)
 - [keystore name](#table-name)
 - [logical Keystore name](#logical-keystore-name)
 - [AWS KMS Grant Tokens](#aws-kms-grant-tokens)
