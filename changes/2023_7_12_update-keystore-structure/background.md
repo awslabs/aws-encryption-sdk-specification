@@ -272,7 +272,7 @@ As opposed to trying to not support this or talk about it.
 
 # Security Considerations
 
-This creates a mechanisms
+This creates a mechanism
 to enforce access to branch keys.
 Explicit encryption context verification
 is more secure than implicit encryption context verification.
