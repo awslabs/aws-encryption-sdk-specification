@@ -94,7 +94,7 @@ I think that it is still possible to update everything, but now there is a singl
 It seems impossible, but not ever updating a row in the database is the safest way to go.
 Especially if there is ever a need to recover, this record always exists.
 
-## How do we create these two ciphertext blobs?
+## How do we create these two ciphertext blobs (existing `enc` attribute) for the two inserted records?
 
 ### _Generate the immutable version item and reEncrypt for the active item_
 
