@@ -29,16 +29,16 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Initialization
 
-On initialization of the synchronized local CMC,
+On initialization of the storm tracking CMC,
 the caller MUST provide exactly what is required by a
 [Local CMC](local-cryptographic-materials-cache.md).
 
-It MAY also provide
-
+Initialization MUST also provide
 - [Grace Period](#grace-period)
 - [Grace Interval](#grace-interval)
 - [FanOut](#fanout)
-- [Inflight TTL](#inflight-ttl)
+- [Inflight TTL](#inflight-ttl).
+- [sleepMilli](#sleepmilli).
 
 ### Grace Period
 
@@ -68,6 +68,12 @@ A number (at least 1, default 20).
 
 An entry that has been in flight for this long is no longer considered in flight.
 
+### SleepMilli
+
+If the implementation must block, and no more intelligent signaling is used,
+then the implementation should sleep for this many milliseconds before
+reexamining the state of the cache.
+
 ## Behaviors
 
 All behaviors MUST be exactly the same as a [Local CMC](local-cryptographic-materials-cache.md),
@@ -76,7 +82,7 @@ even if used in a multi-threaded context, with two exceptions
 - GetCacheEntry might return NoSuchEntry, even though there is really an entry.
 - GetCacheEntry might block for a time before returning a result.
 
-Specifics for these two exceptions are outlines below.
+Specifics for these two exceptions are outlined below.
 
 ### In Flight
 
@@ -94,23 +100,30 @@ PutCacheEntry MUST ensure the key is not in flight.
 
 If GetCacheEntry is called for a key :
 
-If that key is in the cache but expired, that key must be removed from the cache before further processing.
+If that key is in the cache but expired, that key MUST be removed from the cache before further processing.
 
-If that key is in the cache AND that key is not within the [Grace Period](#grace-period)
+If that key is in the cache AND that key is not within the [Grace Period](#grace-period),
+GetCacheEntry MUST return the cache entry.
 
-- GetCacheEntry MUST return the cache entry. It SHOULD be the case that the key is not inflight.
+If the number of things inflight is greater than or equal to the [FanOut](#fanout)
+and the key is in the cache THEN GetCacheEntry MUST return the cache entry.
 
-Else If the number of things inflight is greater than or equal to the [FanOut](#fanout) THEN
+If the number of things inflight is greater than or equal to the [FanOut](#fanout)
+and the key is not in the cache GetCacheEntry MUST block until some other option is available.
 
-- If the key is in the cache THEN GetCacheEntry MUST return the cache entry.
-- Else GetCacheEntry MUST block until some other option is available.
+If the key is in flight AND the current time is within the [the grace interval](#grace-interval)
+GetCacheEntry MUST block until some other option is available.
 
-Else if the key is not in the cache THEN
+If the key is not in the cache and not in flight
+GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
 
-- If the key is in flight AND the current time is within the [the grace interval](#grace-interval) THEN GetCacheEntry MUST block until some other option is available.
-- Else GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+If the key is in flight AND the current time is not within the [the grace interval](#grace-interval)
+GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
 
-Else // the key is in the cache, and within the grace period
+If the key is in the cache and in flight
+and the current time is within the [the grace interval](#grace-interval)
+GetCacheEntry MUST return the cache entry.
 
-- If the key is in flight AND the current time is within the [the grace interval](#grace-interval) THEN GetCacheEntry MUST return the cache entry.
-- Else GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+If the key is in the cache and in flight
+and the current time is not within the [the grace interval](#grace-interval)
+GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
