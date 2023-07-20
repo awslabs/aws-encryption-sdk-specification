@@ -47,7 +47,8 @@ if GetCacheEntry(k) == NoSuchEntry
    PutCacheEntry(k, s)
 ```
 
-Another popular choice produces client code of the form
+Another popular choice has the write process be part of the cache,
+produces client code of the form
 
 ```
 function f(k) := LookupFor(k)
@@ -60,17 +61,23 @@ Both of these interfaces can accomplish that.
 
 The original interface is sufficient to implement the full set of thread friendly
 features, and is arguably simpler and so no interface change was deemed necessary.
-Further, the original interface gives simpler control over what to do if a lookup fails.
+Further, the original interface gives simpler control over what to do if a lookup fails,
+as well as being more composable.
 
 ### Default Values
 
-Providing default values for Grace Time, Grace Interval and FanOut
+Providing default values for
+[Grace Period](../../framework/storm-tracking-cryptographic-materials-cache.md#grace-period),
+[Grace Interval](../../framework/storm-tracking-cryptographic-materials-cache.md#grace-interval),
+[FanOut](../../framework/storm-tracking-cryptographic-materials-cache.md#fanout),
+[Inflight TTL](../../framework/storm-tracking-cryptographic-materials-cache.md#inflight-ttl), and
+[sleepMilli](../../framework/storm-tracking-cryptographic-materials-cache.md#sleepmilli)
 is safe because nothing else in the system needs to coordinate with these value.
 
 The defaults assume the typical use case, where the TTL is many minutes,
 and getting new materials takes dozens of milliseconds.
 
-Grace Time : The default of 10 seconds fetches new materials only slightly
+Grace Period : The default of 10 seconds fetches new materials only slightly
 sooner than a regular cache, while still providing plenty of time for
 a successful lookup before time runs out, preventing both lookup storms and
 client blocking.
@@ -82,6 +89,12 @@ before any other clients need to block.
 FanOut : 20 network requests in flight at one time seems a reasonable balance
 between enough parallelism for good performance and so much parallelism that
 performance starts to degrade.
+
+Inflight TTL : 20 seconds is plenty of time to acquire new materials.
+If a client hasn't done something in 20 seconds, they're likely to never respond.
+
+sleepMilli : 20 milliseconds is enough time, under normal circumstances,
+to get materials once or twice, and short enough not to overly delay processing.
 
 ### Grace Period Metrics
 
@@ -96,15 +109,3 @@ for the number of bytes or messages; however
 1 The cache can know when time passes, but it is the client's responsibility
 to track data usage, and so rather large interface changes would be necessary
 to handle those factors.
-
-Can existing DDB-EC customer use the CMC cache?
-What interface should the cache take to prevent refresh storms?
-How can the existing interface prevent storms on an empty cache?
-How do we deal with multiple key storms?
-How can customers prevent downtime while still satisfying their security requirements?
-What parameters should be configurable and how?
-Should we offer a static stability option?
-How can we deal with the circular dependency with the ESDK file format?
-Given cryptographic size limitation what if the cache is too large to serialize?
-What other failure modes of caches should we attempt to handle?
-Any other bi-model behavior you want to talk about?

@@ -77,7 +77,7 @@ reexamining the state of the cache.
 
 ## Behaviors
 
-All behaviors MUST be exactly the same as a [Local CMC](local-cryptographic-materials-cache.md),
+The interface MUST be exactly the same as a [Local CMC](local-cryptographic-materials-cache.md),
 even if used in a multi-threaded context, with two exceptions
 
 - GetCacheEntry might return NoSuchEntry, even though there is really an entry.
@@ -88,38 +88,43 @@ Specifics for these two exceptions are outlined below.
 ### In Flight
 
 Any time the storm tracking CMC returns NoSuchEntry from GetCacheEntry,
-that key is said to `in flight` until that same key is written with PutCacheEntry.
+that key is said to be `in flight` until that same key is written with PutCacheEntry.
 
 For each in flight key, the storm tracking CMC MUST keep track of the most recent time
 that NoSuchEntry was returned, with accuracy to the second.
 
 ### PutCacheEntry
 
-PutCacheEntry MUST ensure the key is not in flight.
+PutCacheEntry MUST mark the key as not in flight.
+
+### Within Grace Period
+
+A time `now` MUST be considered within the grace period for an entry that expires
+at a time `expiry` if `now < (expiry - gracePeriod)`
 
 ### GetCacheEntry
 
 If GetCacheEntry is called for a key :
 
-If that key is in the cache but expired, that key MUST be removed from the cache before further processing.
+If the number of things inflight is greater than or equal to the [FanOut](#fanout)
+and the key is in the cache THEN GetCacheEntry MUST return the cache entry.
 
 If that key is in the cache AND that key is not within the [Grace Period](#grace-period),
 GetCacheEntry MUST return the cache entry.
 
 If the number of things inflight is greater than or equal to the [FanOut](#fanout)
-and the key is in the cache THEN GetCacheEntry MUST return the cache entry.
-
-If the number of things inflight is greater than or equal to the [FanOut](#fanout)
-and the key is not in the cache GetCacheEntry MUST block until some other option is available.
+and the key is not in the cache GetCacheEntry MUST block until
+a [FanOut](#fanout) slot is available, or the key appears in the cache.
 
 If the key is in flight AND the current time is within the [the grace interval](#grace-interval)
-GetCacheEntry MUST block until some other option is available.
+and the key is not in the cache GetCacheEntry MUST block until
+a [FanOut](#fanout) slot is available, or the key appears in the cache.
 
 If the key is not in the cache and not in flight
 GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
 
 If the key is in flight AND the current time is not within the [the grace interval](#grace-interval)
-GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+GetCacheEntry MUST return NoSuchEntry and mark the inflight key with the current time.
 
 If the key is in the cache and in flight
 and the current time is within the [the grace interval](#grace-interval)

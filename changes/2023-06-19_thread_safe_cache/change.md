@@ -38,12 +38,13 @@ Some new configuration is needed
 
 ### Grace Period
 
-A number of seconds (at least 2, default 10).
+A number of seconds (at least 1, default 10).
 
 If an entry will expire within this amount of time,
 attempts will be made to refresh the cache.
 
-This should be significantly less than the TTL for any item put into the cache.
+This should be less than the TTL for any item put into the cache,
+or it will never come into play.
 
 ### Grace Interval
 
@@ -51,6 +52,11 @@ A number of seconds (at least 1, default 1).
 
 While within the [grace period](#grace-period),
 attempts to refresh the cache are made no more often than once per interval.
+
+If the Grace Interval if greater than half of the Grace Period,
+then only one attempt will be made to fetch new materials before the entry expires.
+
+`((Period-1)/Interval) + 1` is the maximum number of attempted fetches before the entry expires.
 
 ### FanOut
 
@@ -63,6 +69,8 @@ The maximum number of individual keys for which lookups can be in flight.
 A number of seconds (at least 1, default 20).
 
 If an entry has been in flight for this long, it is no longer considered in flight.
+
+This prevents the FanOut from being exhausted by clients that are never going to respond.
 
 ### PutCacheEntry if key already exists
 
