@@ -43,7 +43,7 @@ Initialization MUST also provide
 
 ### Grace Period
 
-A number of seconds (at least 2, default 10).
+A number of seconds (at least 1, default 10).
 
 If an entry will expire within this amount of time,
 attempts will be made to refresh the cache.
