@@ -71,6 +71,8 @@ An entry that has been in flight for this long is no longer considered in flight
 
 ### SleepMilli
 
+A number of milliseconds (at least 1, default 20).
+
 If the implementation must block, and no more intelligent signaling is used,
 then the implementation should sleep for this many milliseconds before
 reexamining the state of the cache.
