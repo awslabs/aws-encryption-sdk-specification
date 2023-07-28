@@ -109,3 +109,109 @@ for the number of bytes or messages; however
 1 The cache can know when time passes, but it is the client's responsibility
 to track data usage, and so rather large interface changes would be necessary
 to handle those factors.
+
+## Testing
+
+If the implementation language has the necessary support, testing would be done this way.
+
+First we make a static KeyStore which
+1 Is initialized with a set of keys
+1 has a thread safe mechanism for counting how many times each key was requested
+1 has a mechanism for reporting those counts
+
+With each key there is an associated Key Delay List,
+which indicates how long it should take to fetch the materials for that key.
+The last item in the list is virtually repeated indefinitely,
+so [1] means that all fetches should take 1 milliseconds,
+and [2,6,4] means that the first fetch should tak2 2 milliseconds,
+the second 6, and all the rest 4.
+
+We then construct a CMM from such a KeyStore. In any given test, all threads use the same CMM instance.
+
+Define TestingMethod(Key), initialized with
+
+- The CMM
+- The Number of Iterations
+- The Sleep Interval
+
+TestingMethod(Key) is then
+
+```
+for i := 0 to The Number of Iterations
+   if i != 0 Sleep(Sleep Interval)
+   GetEncryptionMaterials(Key)
+   GetDecryptionMaterials(Key)
+```
+
+A typical test will have one Testing Method, run for each of half a dozen keys,
+each run concurrently by a few dozen threads.
+
+### Wait For Tick
+
+Right before we spawn the threads for a test, we execute
+
+```
+   var startTime := now()
+   while (startTime == now())
+      Sleep(1 millisecond)
+```
+
+Thus we know we've started at the beginning of a second, and our tests are more repeatable.
+
+### Basic Test
+
+Much activity, but no key expiration.
+
+- Key Delay is 1 millisecond
+- Cache size is large compared to number of keys
+- TTL is large compared to the time for the whole test, e.g 1000 seconds
+- Grace Time is small compared to the TTL, e.g. 10 seconds
+- **ensure** that each key was requested exactly once.
+
+### Grace Period Test
+
+Each key should hit the grace period exactly once.
+
+- Key Delay is 1 millisecond
+- TTL is 12 seconds
+- Grace Time is 10 seconds
+- Grace Interval is 10 seconds
+- Sleep Interval is 100 milliseconds
+- Number of Iterations is 30 (test time : 3 seconds)
+- **ensure** that each key was requested exactly twice.
+
+### Grace Interval Test
+
+Each key should hit the grace period exactly once
+but resolving takes more than the grace interval.
+
+- One Testing Method, Five Keys
+- Key Delay is (1, 1200, 1) milliseconds
+- TTL is 12 seconds
+- Grace Time is 10 seconds
+- Grace Interval is 1 seconds
+- Sleep Interval is 100 milliseconds
+- Number of Iterations is 35 (test time : 3.5 seconds for most threads, 4.7 seconds for one thread per key)
+- **ensure** that each key was requested exactly three times.
+
+### FanOut Tests
+
+Repeat Basic Test, Grace Period Test and Grace Interval Test,
+but FanOut is 5 and there are 10 keys.
+
+### Small Size Tests
+
+Five keys, and max cache size of three.
+
+Repeat Basic Test, Grace Period Test and Grace Interval Test,
+but do not check number of times each key was requested,
+only make sure everything finished.
+
+### InFlightTTL Tests
+
+FanOut is 5, there are 10 keys and InFlightTTL is 1.
+Key Delay is 2000, Number of Iterations is 5.
+
+Repeat Basic Test, Grace Period Test and Grace Interval Test,
+but do not check number of times each key was requested,
+only make sure everything finished.

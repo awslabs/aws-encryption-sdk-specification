@@ -118,32 +118,31 @@ If the key **is** found in the cache, it is returned,
 unless the current time is within the [Grace Period](#grace-period),
 and no other thread is currently fetching new materials. Specifically --
 
- * If the number of things inflight is greater than or equal to the [FanOut](#fanout)
-GetCacheEntry MUST return the cache entry.
+- If the number of things inflight is greater than or equal to the [FanOut](#fanout)
+  GetCacheEntry MUST return the cache entry.
 
- * If the key's expiration is not within the [Grace Period](#grace-period),
-GetCacheEntry MUST return the cache entry.
+- If the key's expiration is not within the [Grace Period](#grace-period),
+  GetCacheEntry MUST return the cache entry.
 
-* If the key is in flight
-and the current time is within the [the grace interval](#grace-interval)
-GetCacheEntry MUST return the cache entry.
+- If the key is in flight
+  and the current time is within the [the grace interval](#grace-interval)
+  GetCacheEntry MUST return the cache entry.
 
 If the key is in flight
 and the current time is not within the [the grace interval](#grace-interval)
 GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
 
-
 If the key is **not** found in the cache,
-one thread receives NoSuchEntry, while others are blocked until an entry appears. Specifically -- 
+one thread receives NoSuchEntry, while others are blocked until an entry appears. Specifically --
 
- * If the number of things inflight is greater than or equal to the [FanOut](#fanout)
-GetCacheEntry MUST block until a [FanOut](#fanout) slot is available, or the key appears in the cache.
+- If the number of things inflight is greater than or equal to the [FanOut](#fanout)
+  GetCacheEntry MUST block until a [FanOut](#fanout) slot is available, or the key appears in the cache.
 
- * If the key is in flight AND the current time is within the [the grace interval](#grace-interval)
-GetCacheEntry MUST block until a [FanOut](#fanout) slot is available, or the key appears in the cache.
+- If the key is in flight AND the current time is within the [the grace interval](#grace-interval)
+  GetCacheEntry MUST block until a [FanOut](#fanout) slot is available, or the key appears in the cache.
 
 If the key is in flight AND the current time is not within the [the grace interval](#grace-interval)
 GetCacheEntry MUST return NoSuchEntry and mark the inflight key with the current time.
 
- * If the key is not in flight
-GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+- If the key is not in flight
+  GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
