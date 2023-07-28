@@ -141,8 +141,8 @@ one thread receives NoSuchEntry, while others are blocked until an entry appears
 - If the key is in flight AND the current time is within the [the grace interval](#grace-interval)
   GetCacheEntry MUST block until a [FanOut](#fanout) slot is available, or the key appears in the cache.
 
-If the key is in flight AND the current time is not within the [the grace interval](#grace-interval)
-GetCacheEntry MUST return NoSuchEntry and mark the inflight key with the current time.
+- If the key is in flight AND the current time is not within the [the grace interval](#grace-interval)
+  GetCacheEntry MUST return NoSuchEntry and mark the inflight key with the current time.
 
 - If the key is not in flight
   GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
