@@ -113,6 +113,13 @@ A time `now` MUST be considered within the [grace interval](#grace-interval)
 of an inflight entry at `inflight` time
 if `now < (inflight + graceInterval)`
 
+### GetCacheEntry
+
+If GetCacheEntry is called for a key :
+
+The implementation MUST call the [Local CMC](local-cryptographic-materials-cache.md)
+to find the cached materials for the key, if any.
+
 If the key **is** found in the cache, it is returned,
 unless the current time is [within the grace period](#within-grace-period),
 and no other thread is currently fetching new materials. Specifically --
