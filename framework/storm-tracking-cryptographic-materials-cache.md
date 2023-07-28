@@ -104,33 +104,38 @@ PutCacheEntry MUST mark the key as not in flight.
 
 ### Within Grace Period
 
-A time `now` MUST be considered within the grace period for an entry that expires
-at a time `expiry` if `now >= (expiry - gracePeriod)`
+A time `now` MUST be considered within the [grace period](#grace-period) for an entry that expires
+at a time `expiry` if `(expiry - gracePeriod) <= now`
 
-### GetCacheEntry
+### Within Grace Interval
 
-If GetCacheEntry is called for a key :
-
-The implementation MUST call the [Local CMC](local-cryptographic-materials-cache.md)
-to find the cached materials for the key, if any.
+A time `now` MUST be considered within the [grace interval](#grace-interval)
+of an inflight entry at `inflight` time
+if `now < (inflight + graceInterval)`
 
 If the key **is** found in the cache, it is returned,
-unless the current time is within the [Grace Period](#grace-period),
+unless the current time is [within the grace period](#within-grace-period),
 and no other thread is currently fetching new materials. Specifically --
 
 - If the number of things inflight is greater than or equal to the [FanOut](#fanout)
   GetCacheEntry MUST return the cache entry.
 
-- If the key's expiration is not within the [Grace Period](#grace-period),
+- If the key's expiration _is not_ [within the grace period](#within-grace-period),
   GetCacheEntry MUST return the cache entry.
 
-- If the key is in flight
-  and the current time is within the [the grace interval](#grace-interval)
+- If the key's expiration _is_ [within the grace period](#within-grace-period),
+  and the key _is not_ inflight
+  GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+
+- If the key's expiration _is_ [within the grace period](#within-grace-period),
+  and the key _is_ inflight
+  and the inflight time _is_ [within the grace interval](#within-grace-interval)
   GetCacheEntry MUST return the cache entry.
 
-If the key is in flight
-and the current time is not within the [the grace interval](#grace-interval)
-GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+- If the key's expiration _is_ [within the grace period](#within-grace-period),
+  and the key _is_ inflight
+  and the inflight time _is not_ [within the grace interval](#within-grace-interval)
+  GetCacheEntry MUST return NoSuchEntry and update the key as inflight at the current time.
 
 If the key is **not** found in the cache,
 one thread receives NoSuchEntry, while others are blocked until an entry appears. Specifically --
@@ -138,11 +143,13 @@ one thread receives NoSuchEntry, while others are blocked until an entry appears
 - If the number of things inflight is greater than or equal to the [FanOut](#fanout)
   GetCacheEntry MUST block until a [FanOut](#fanout) slot is available, or the key appears in the cache.
 
-- If the key is in flight AND the current time is within the [the grace interval](#grace-interval)
+- If the key _is not_ inflight
+  GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+
+- If the key _is_ inflight
+  and the current time _is_ [within the grace interval](#within-grace-interval)
   GetCacheEntry MUST block until a [FanOut](#fanout) slot is available, or the key appears in the cache.
 
-- If the key is in flight AND the current time is not within the [the grace interval](#grace-interval)
-  GetCacheEntry MUST return NoSuchEntry and mark the inflight key with the current time.
-
-- If the key is not in flight
-  GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+- If the key _is_ inflight
+  and the current time _is not_ [within the grace interval](#within-grace-interval)
+  GetCacheEntry MUST return NoSuchEntry and update the key as inflight at the current time.
