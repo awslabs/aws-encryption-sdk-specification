@@ -20,14 +20,14 @@
 
 ## Implementations
 
-| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                            |
-| ---------- | -------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C          | 0.1.0                                  | n/a                       | [cipher.c](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/cipher.c)                                                                   |
-| NodeJS     | 0.1.0                                  | n/a                       | [node_algorithms.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/node_algorithms.ts)             |
-| Browser JS | 0.1.0                                  | n/a                       | [web_crypto_algorithms.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/web_crypto_algorithms.ts) |
-| Python     | 0.1.0                                  | n/a                       | [identifiers.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/identifiers.py)                                      |
-| Java       | 0.1.0                                  | n/a                       | [CryptoAlgorithm.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/CryptoAlgorithm.java)         |
-| Dafny      | 0.1.0                                  | n/a                       | [AlgorithmSuites.dfy](https://github.com/aws/aws-encryption-sdk-dafny/blob/mainline/src/AwsCryptographicMaterialProviders/AlgorithmSuites.dfy)            |
+| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                      |
+| ---------- | -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C          | 0.1.0                                  | n/a                       | [cipher.c](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/cipher.c)                                                                             |
+| NodeJS     | 0.1.0                                  | n/a                       | [node_algorithms.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/node_algorithms.ts)                       |
+| Browser JS | 0.1.0                                  | n/a                       | [web_crypto_algorithms.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/material-management/src/web_crypto_algorithms.ts)           |
+| Python     | 0.1.0                                  | n/a                       | [identifiers.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/identifiers.py)                                                |
+| Java       | 0.1.0                                  | n/a                       | [CryptoAlgorithm.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/CryptoAlgorithm.java)                   |
+| Dafny      | 0.1.0                                  | n/a                       | [AlgorithmSuites.dfy](https://github.com/aws/aws-encryption-sdk-dafny/blob/mainline/src/AwsCryptographicMaterialProviders/AlgorithmSuites.dfy)                      |
 | Java       | 0.3.0                                  | 0.3.0                     | [AlgorithmSuite.java](https://github.com/aws/amazon-s3-encryption-client-java/blob/main/src/main/java/software/amazon/encryption/s3/algorithms/AlgorithmSuite.java) |
 
 ## Overview
