@@ -9,6 +9,8 @@
 
 ### Changelog
 
+- 0.6.0 [Required Encryption Context Keys exist in message header, their values MUST match](../changes/2023-09-26_encryption-context-decrypt/change.md)
+
 - 0.5.0
 
   - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
@@ -161,7 +163,8 @@ that implementation SHOULD NOT provide an API that allows the caller to stream t
 ### Encryption Context
 
 The [encryption context](../framework/structures.md#encryption-context) that is used as
-additional authenticated data during the decryption of the input [encrypted message](#encrypted-message).
+additional authenticated data during the decryption of the input [encrypted message](#encrypted-message) and
+the [encryption context for authentication only](../client-apis/encrypt.md#encryption-context-not-stored-in-the-message) if available.
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
@@ -184,6 +187,7 @@ The Decrypt operation is divided into several distinct steps:
 
 - [Parse the header](#parse-the-header)
 - [Get the decryption materials](#get-the-decryption-materials)
+- [Check required keys in header](#check-required-keys-in-header)
 - [Verify the header](#verify-the-header)
 - [Decrypt the message body](#decrypt-the-message-body)
 - [Verify the signature](#verify-the-signature)
@@ -280,6 +284,17 @@ the returned decryption materials.
 This document refers to the output of the key derivation algorithm as the derived data key.
 Note that if the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
 then the derived data key is the same as the plaintext data key.
+
+### Check required keys in header
+
+Once the decryption materials request to a CMM succeeds
+Decrypt MUST verify the following:
+
+- If a [required encryption context key](../framework/structures.md#required-encryption-context-keys) in
+  the decryption materials' response exists in the [message header body](../data-format/message-header.md#header-body)
+  the value in the decryption materials' encryption context MUST equal the value stored in the message header body.
+
+If this encryption context verification fails, this operation MUST immediately halt and fail.
 
 ### Verify the header
 
