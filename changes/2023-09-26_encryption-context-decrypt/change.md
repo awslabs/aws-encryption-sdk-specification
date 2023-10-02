@@ -48,5 +48,10 @@ This verifies that the reproduced encryption context is used to decrypt the mess
 NOT some key-value pair that the underlying CMM MAY have modified.
 
 If required keys exist, match stored encryption context, AND decryption succeeds
-Decrypt MUST return both the Encryption Context stored in the header AND the
+Decrypt MUST return the Encryption Context stored in the header AND the
 encryption context to only authenticate.
+The encryption context to only authenticate MUST be the [encryption context](../framework/structures.md#encryption-context)
+in the [decryption materials](../framework/structures.md#decryption-materials)
+filtered to only contain key value pairs listed in
+the [decryption material's](../framework/structures.md#decryption-materials)
+[required encryption context keys](../framework/structures.md#required-encryption-context-keys-1).

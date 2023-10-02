@@ -164,7 +164,7 @@ that implementation SHOULD NOT provide an API that allows the caller to stream t
 
 The [encryption context](../framework/structures.md#encryption-context) that is used as
 additional authenticated data during the decryption of the input [encrypted message](#encrypted-message).
-Specifically, the union of the encryption context serialized into the message header and
+Specifically, it MUST be the union of the encryption context serialized into the message header and
 the encryption context for authentication only, if available.
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.

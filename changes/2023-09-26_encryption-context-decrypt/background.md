@@ -34,7 +34,7 @@ It MUST be required that the decryption materials obtained from the underlying C
 contain all configured encryption context keys in its encryption context and the values MUST remain
 unchanged.
 
-The Decrypt API MUST return the encryption context stored in the header and the encryption
+The Decrypt API MUST return the set of the union of the encryption context stored in the header and the encryption
 context used for authentication only.
 
 ### What changes to the existing Required Encryption Context CMM are required?
@@ -43,8 +43,8 @@ None
 
 ### API changes
 
-If required encryption context keys match any keys stored in the message header,
-their values MUST match. Otherwise old messages are not compatible with the required encryption context CMM.
+If any required encryption context keys from the CMM's `DecryptionMaterials` response
+match any keys stored in the message header, their values MUST match.
 
 ```
 forall k <- decryptionMaterials.requiredEncryptionContextKeys
@@ -341,8 +341,7 @@ var aesKeyring := GetAesKeyring();
 
 // Test supply same encryption context on encrypt and decrypt NO filtering
 var encryptionContext := map[ keyA := valA, keyB := valB ];
-var reproducedAdditionalEncryptionContext := map[ keyA := valB, keyB := valA  ];
-var requiredEncryptionContextKeys := [keyA, keyB];
+var reproducedAdditionalEncryptionContext := map[ keyA := valA, keyB := valB, keyC := valC ];
 
 var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
    mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
@@ -362,19 +361,10 @@ var encryptOutput := esdk.Encrypt(Types.EncryptInput(
 expect encryptOutput.Success?;
 var esdkCiphertext := encryptOutput.value.ciphertext;
 
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
 var decryptOutput := esdk.Decrypt(Types.DecryptInput(
    ciphertext := esdkCiphertext,
-   materialsManager := Some(reqCMM),
-   keyring := None,
+   materialsManager := None,
+   keyring := Some(aesKeyring),
    encryptionContext := Some(reproducedAdditionalEncryptionContext)
 ));
 
@@ -534,6 +524,60 @@ var decryptOutput := esdk.Decrypt(Types.DecryptInput(
    materialsManager := None,
    keyring := Some(aesKeyring)
    encryptionContext := Some(droppedRequiredKeyEncryptionContext)
+));
+
+expect decryptOutput.Failure?;
+```
+
+### Test Encryption Context has an extra pair on Decrypt Failure
+
+Encrypt will not store all encryption context.
+Decrypt will supply the key-value that was dropped but will also include a new key-value that
+was not used.
+This operation MUST fail.
+
+```
+// The string "asdf" as bytes
+var asdf := [ 97, 115, 100, 102 ];
+var aesKeyring := GetAesKeyring();
+
+// Test supply same encryption context on encrypt and decrypt NO filtering
+var encryptionContext := map[ keyA := valA, keyB := valB ];
+var requiredEncryptionContextKeys := [keyA];
+var reproducedEncryptionContext := map[ keyA := valA, keyC := valC ];
+
+var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
+   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
+         keyring := aesKeyring
+   )
+);
+
+// Create Required EC CMM with the required EC Keys we want
+var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
+   mplTypes.CreateRequiredEncryptionContextCMMInput(
+         underlyingCMM := Some(defaultCMM),
+         keyring := None,
+         requiredEncryptionContextKeys := requiredEncryptionContextKeys
+   )
+);
+
+var encryptOutput := esdk.Encrypt(Types.EncryptInput(
+   plaintext := asdf,
+   encryptionContext := Some(encryptionContext),
+   materialsManager := Some(reqCMM),
+   keyring := None,
+   algorithmSuiteId := None,
+   frameLength := None
+));
+
+expect encryptOutput.Success?;
+var esdkCiphertext := encryptOutput.value.ciphertext;
+
+var decryptOutput := esdk.Decrypt(Types.DecryptInput(
+   ciphertext := esdkCiphertext,
+   materialsManager := None,
+   keyring := Some(aesKeyring)
+   encryptionContext := Some(reproducedEncryptionContext)
 ));
 
 expect decryptOutput.Failure?;
