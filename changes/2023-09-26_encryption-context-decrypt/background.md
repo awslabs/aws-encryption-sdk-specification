@@ -22,13 +22,13 @@ This requirement may be satisfied by returning the parsed header that contains t
 
 With the addition of the [required encryption context cmm](../../framework/required-encryption-context-cmm.md),
 the encrypt API is able to filter out encryption context key-value pairs that
-are not stored but instead authenticated.
+are not stored on the message.
 
-Currently, on decrypt takes in optional encryption context.
-This optional encryption context is used as encryption context for authentication only.
+Currently, Decrypt takes in optional encryption context.
+This optional encryption context is not stored in the message header, but is still authenticated.
 
-The Required Encryption Context CMM can modify the encryption context on decrypt.
-This results in values that are not authenticated against the message or the plaintext data key.
+However, the CMM's DecryptMaterials is allowed to modify the encryption context on decrypt.
+A poorly designed CMM could theoretically return materials with an "incorrect" encryption context that contradicts the encryption context in the header of the message.
 
 It MUST be required that the decryption materials obtained from the underlying CMM's MUST
 contain all configured encryption context keys in its encryption context and the values MUST remain
