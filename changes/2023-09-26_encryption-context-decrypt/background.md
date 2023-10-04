@@ -45,7 +45,6 @@ None
 
 ### What changes to the existing Cryptographic Materials Manager Interface are required?
 
-
 ### API changes
 
 If any required encryption context keys from the CMM's `DecryptionMaterials` response
