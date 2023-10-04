@@ -33,8 +33,8 @@ how it should deal with required encryption context keys it receives from the ca
 Cryptographic Materials Manager, the encryption context it optionally takes in, and the stored
 encryption context on the message header.
 
-Decrypt MUST verify that if the keys in the required encryption context keys exist in the reproduced encryption context
-AND they are stored in the message header, they MUST have the same value as the reproduced encryption context supplied.
+For required encryption context keys the value in stored in the message header
+MUST equal the value in decryption materials encryption context.
 
 ### `decrypt` API required encryption context keys and stored encryption context verification
 

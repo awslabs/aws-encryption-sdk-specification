@@ -17,17 +17,19 @@ in this document are to be interpreted as described in
 
 ### What kind of Encryption Context should Decrypt return?
 
-Decrypt returns Encryption Context.
-This requirement may be satisfied by returning the parsed header that contains this value.
-
 With the addition of the [required encryption context cmm](../../framework/required-encryption-context-cmm.md),
 the encrypt API is able to filter out encryption context key-value pairs that
 are not stored on the message.
 
-Currently, Decrypt takes in optional encryption context.
-This optional encryption context is not stored in the message header, but is still authenticated.
+Decrypt returns Encryption Context.
+We were able to satisfy this requirement by returning the parsed message header.
+This is no longer adequate as the header may not contain all Encryption Context values used to
+authenticate the message.
 
-However, the CMM's DecryptMaterials is allowed to modify the encryption context on decrypt.
+Currently, Decrypt takes in optional encryption context.
+This optional encryption context MAY not be stored in the message header, but is still authenticated.
+
+However, the CMMs DecryptMaterials is allowed to modify the encryption context on decrypt.
 A poorly designed CMM could theoretically return materials with an "incorrect" encryption context that contradicts the encryption context in the header of the message.
 
 It MUST be required that the decryption materials obtained from the underlying CMM's MUST
@@ -40,6 +42,9 @@ context used for authentication only.
 ### What changes to the existing Required Encryption Context CMM are required?
 
 None
+
+### What changes to the existing Cryptographic Materials Manager Interface are required?
+
 
 ### API changes
 
