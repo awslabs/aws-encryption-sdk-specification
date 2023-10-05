@@ -18,26 +18,37 @@ in this document are to be interpreted as described in
 ### What kind of Encryption Context should Decrypt return?
 
 With the addition of the [required encryption context cmm](../../framework/required-encryption-context-cmm.md),
-the encrypt API is able to filter out encryption context key-value pairs that
+the `encrypt` API is able to filter out encryption context key-value pairs that
 are not stored on the message.
 
-Decrypt returns Encryption Context.
+`decrypt` returns Encryption Context.
 We were able to satisfy this requirement by returning the parsed message header.
 This is no longer adequate as the header may not contain all Encryption Context values used to
 authenticate the message.
 
-Currently, Decrypt takes in optional encryption context.
+Currently, `decrypt` takes in optional encryption context.
 This optional encryption context MAY not be stored in the message header, but is still authenticated.
 
+If `decrypt` uses [encryption context to only authenticate](../../client-apis/decrypt.md#encryption-context-to-only-authenticate)
+to successfully decrypt a message, then the encryption context output
+MUST be the union of the encryption context serialized into the message header and
+the [encryption context for authentication only](#encryption-context-to-only-authenticate), if available. 
+
+
+### Can you construct message that stores different encryption context than the encryption context returned by a CMM?
+
+None of the built-in implementations of the [CMM interface](../../framework/cmm-interface.md)
+modify the encryption context on DecryptMaterials.
+
 However, the CMMs DecryptMaterials is allowed to modify the encryption context on decrypt.
-A poorly designed CMM could theoretically return materials with an "incorrect" encryption context that contradicts the encryption context in the header of the message.
+A poorly designed CMM could theoretically return materials with an "incorrect" encryption context
+that contradicts the encryption context in the header of the message.
 
-It MUST be required that the decryption materials obtained from the underlying CMM's MUST
-contain all configured encryption context keys in its encryption context and the values MUST remain
-unchanged.
-
-The Decrypt API MUST return the set of the union of the encryption context stored in the header and the encryption
-context used for authentication only.
+The `decrypt` API SHOULD not check if the encryption context that was stored on the message matches
+what it receives from the CMMs DecryptMaterials because the current implementation
+of the `encrypt` API used with the built-in CMMs is not able to write a message 
+that on `decrypt` the CMM returns "incorrect" encryption context that contradicts 
+the encryption context stored in the header of the message.
 
 ### What changes to the existing Required Encryption Context CMM are required?
 
@@ -45,544 +56,99 @@ None
 
 ### What changes to the existing Cryptographic Materials Manager Interface are required?
 
-### API changes
-
-If any required encryption context keys from the CMM's `DecryptionMaterials` response
-match any keys stored in the message header, their values MUST match.
-
-```
-forall k <- decryptionMaterials.requiredEncryptionContextKeys
-   | k in headerEncryptionContext
-   :: decryptionMaterials[k] == headerEncryptionContext[k]
-```
+None
 
 ## Testing
 
 In order to test that decrypt behaves as expected according to the specification, testing should include the following
 scenarios to accurately reason about the behavior of using the Required Encryption Context CMM.
 
-### Test Decrypt with Identical Encryption Context
-
-Without using a Required Encryption Context CMM, Decrypt MUST succeed if provided with the identical encryption context
-that was used on Encrypt.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := None,
-   keyring := Some(aesKeyring),
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := None,
-   keyring := Some(aesKeyring),
-   encryptionContext := Some(encryptionContext)
-));
-
-expect decryptOutput.Success?;
-var cycledPlaintext := decryptOutput.value.plaintext;
-expect cycledPlaintext == asdf;
-```
-
-### Test Filter out Encryption Context on Encrypt AND supply on Decrypt
-
-On Encrypt will not write one key-value pair to the message header and instead will include it in the header signature.
-On Decrypt will supply the Encryption Context pair that was not written but will
-NOT use the Required Encryption Context CMM. This operation MUST succeed.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var reproducedEncryptionContext := map[keyA := valA];
-var requiredEncryptionContextKeys := [keyA];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := None,
-   keyring := Some(rawAesKeyring),
-   encryptionContext := Some(reproducedEncryptionContext)
-));
-
-expect decryptOutput.Success?;
-var cycledPlaintext := decryptOutput.value.plaintext;
-expect cycledPlaintext == asdf;
-```
-
-### Test Filter out on Encrypt and Supply on Decrypt with Required Encryption Context CMM
-
-On Encrypt will not write one key-value pair to the message header and instead will include it in the header signature.
-On Decrypt will supply the Encryption Context pair that was not written but will
-use the Required Encryption Context CMM requiring that the filtered out key on Encrypt is supplied.
-This operation MUST succeed.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var reproducedEncryptionContext := map[keyA := valA];
-var requiredEncryptionContextKeys := [keyA];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-// Create Required EC CMM with the required EC Keys we want
-reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   encryptionContext := Some(reproducedEncryptionContext)
-));
-
-expect decryptOutput.Success?;
-var cycledPlaintext := decryptOutput.value.plaintext;
-expect cycledPlaintext == asdf;
-```
-
-### Test Removing Encryption Context on Encrypt is Backwards Compatible
-
-On Encrypt will write all encryption context supplied to the message.
-On Decrypt will have a Required Encryption Context CMM that requires all encryption context
-on Decrypt.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var requiredEncryptionContextKeys := [keyA, keyB];
-var reproducedEncryptionContext := map[ keyA := valA, keyB := valB];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(defaultCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   encryptionContext := Some(reproducedEncryptionContext)
-));
-
-expect decryptOutput.Success?;
-var cycledPlaintext := decryptOutput.value.plaintext;
-expect cycledPlaintext == asdf;
-```
-
-### Test Different Encryption Context on Decrypt Failure
-
-Encrypt with and store all encryption context in the message header.
-On Decrypt will supply additional encryption context not stored in the header.
-This operation MUST fail.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var reproducedAdditionalEncryptionContext := map[ keyC := valC ];
-var requiredEncryptionContextKeys := [keyA, keyB];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(defaultCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   encryptionContext := Some(reproducedAdditionalEncryptionContext)
-));
-
-expect decryptOutput.Failure?;
-```
-
-### Test MisMatched Encryption Context on Decrypt Failure
-
-Encrypt with and store all encryption context in the message header.
-On Decrypt will supply mismatched encryption context that is stored in the header.
-This operation MUST fail.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var reproducedAdditionalEncryptionContext := map[ keyA := valA, keyB := valB, keyC := valC ];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(defaultCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := None,
-   keyring := Some(aesKeyring),
-   encryptionContext := Some(reproducedAdditionalEncryptionContext)
-));
-
-expect decryptOutput.Failure?;
-```
-
-### Test filter out Encryption Context and DO NOT supply on Decrypt
-
-Encrypt will NOT store all encryption context.
-Decrypt will NOT supply reproduced encryption context.
-This operation MUST fail.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var requiredEncryptionContextKeys := [keyA, keyB];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := Some(defaultCMM),
-   keyring := None,
-   encryptionContext := None
-));
-
-expect decryptOutput.Failure?;
-```
-
-### Test filter out Encryption Context and supply mis-matched Encryption Context on Decrypt
-
-Encrypt will not store all encryption context.
-Decrypt will supply the correct key but a different value.
-This operation MUST fail.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var requiredEncryptionContextKeys := [keyA, keyB];
-var mismatchedReproducedEncryptionContext := map[keyA := valB, keyB := valA];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := None,
-   keyring := Some(aesKeyring)
-   encryptionContext := Some(mismatchedReproducedEncryptionContext)
-));
-
-expect decryptOutput.Failure?;
-```
-
-### Test filter out Encryption Context and supply with missing required value on Decrypt
-
-Encrypt will not store all encryption context.
-Decrypt will supply the key-value that is stored but not the one that was dropped.
-This operation MUST fail.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var requiredEncryptionContextKeys := [keyA];
-var droppedRequiredKeyEncryptionContext := map[ keyB := valB ];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := None,
-   keyring := Some(aesKeyring)
-   encryptionContext := Some(droppedRequiredKeyEncryptionContext)
-));
-
-expect decryptOutput.Failure?;
-```
-
-### Test Encryption Context has an extra pair on Decrypt Failure
-
-Encrypt will not store all encryption context.
-Decrypt will supply the key-value that was dropped but will also include a new key-value that
-was not used.
-This operation MUST fail.
-
-```
-// The string "asdf" as bytes
-var asdf := [ 97, 115, 100, 102 ];
-var aesKeyring := GetAesKeyring();
-
-// Test supply same encryption context on encrypt and decrypt NO filtering
-var encryptionContext := map[ keyA := valA, keyB := valB ];
-var requiredEncryptionContextKeys := [keyA];
-var reproducedEncryptionContext := map[ keyA := valA, keyC := valC ];
-
-var defaultCMM :- expect mpl.CreateDefaultCryptographicMaterialsManager(
-   mplTypes.CreateDefaultCryptographicMaterialsManagerInput(
-         keyring := aesKeyring
-   )
-);
-
-// Create Required EC CMM with the required EC Keys we want
-var reqCMM :- expect mpl.CreateRequiredEncryptionContextCMM(
-   mplTypes.CreateRequiredEncryptionContextCMMInput(
-         underlyingCMM := Some(defaultCMM),
-         keyring := None,
-         requiredEncryptionContextKeys := requiredEncryptionContextKeys
-   )
-);
-
-var encryptOutput := esdk.Encrypt(Types.EncryptInput(
-   plaintext := asdf,
-   encryptionContext := Some(encryptionContext),
-   materialsManager := Some(reqCMM),
-   keyring := None,
-   algorithmSuiteId := None,
-   frameLength := None
-));
-
-expect encryptOutput.Success?;
-var esdkCiphertext := encryptOutput.value.ciphertext;
-
-var decryptOutput := esdk.Decrypt(Types.DecryptInput(
-   ciphertext := esdkCiphertext,
-   materialsManager := None,
-   keyring := Some(aesKeyring)
-   encryptionContext := Some(reproducedEncryptionContext)
-));
-
-expect decryptOutput.Failure?;
-```
+To test the new encryption context (EC) features
+the following dimensions exists:
+
+* Stored EC -- EC stored in the header
+* Not stored EC -- EC authenticated to the header but not stored
+* CMM Material EC -- EC on the decryption material
+* Required keys -- Keys for the EC that MAY be only authenticated
+* Reproduced EC -- EC passed on decrypt
+
+Given the EC `{ a: a, b: b }`
+we break this into the following interesting options:
+
+Stored EC/Not Stored EC
+* `{a: a, b: b}` / `{}`
+* `{a: a}` / `{b: b}`
+* `{}` / `{a: a, b: b}`
+
+CMM Material/Required Keys
+* `{a: a, b: b}` / `{}`
+* `{a: a, b: b}` / `{a}`
+* `{a: a, b: b}` / `{a,b}`
+* `{a: a, b: c}` / `{a}`
+* `{a: a, b: b}` / `{c}`
+
+Reproduced EC
+* `{}`
+* `{ a: a }`
+* `{ b: b }`
+* `{ a: a, b: b }`
+* `{ a: c }`
+* `{ b: c }`
+* `{ a: c, b: b }`
+* `{ a: c, b: c }`
+* `{ c: c }`
+* `{ a: a, c: c }`
+* `{ b: b, c: c}`
+* `{ a: a, b: b, c: c }`
+
+
+### Message: `{a: a, b: b}` / `{}`
+
+CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` |  `{a: a, b: b}` / `{a}`|  `{a: a, b: b}` / `{a,b}`| `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
+------------------------------------------------------------|-----------------------|------------------------|--------------------------|------------------------|------------------------|
+`{}`                                                        |         pass          |                        |                          |                        |                        |
+`{ a: a }`                                                  |                       |                        |                          |                        |                        |
+`{ b: b }`                                                  |                       |                        |                          |                        |                        |
+`{ a: a, b: b }`                                            |                       |                        |                          |                        |                        |
+`{ a: c }`                                                  |                       |                        |                          |                        |                        |
+`{ b: c }`                                                  |                       |                        |                          |                        |                        |
+`{ a: c, b: b }`                                            |                       |                        |                          |                        |                        |
+`{ a: c, b: c }`                                            |                       |                        |                          |                        |                        |
+`{ c: c }`                                                  |                       |                        |                          |                        |                        |
+`{ a: a, c: c }`                                            |                       |                        |                          |                        |                        |
+`{ b: b, c: c}`                                             |                       |                        |                          |                        |                        |
+`{ a: a, b: b, c: c }`                                      |                       |                        |                          |                        |                        |      
+
+### Message: `{a: a}` / `{b: b}`
+
+CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` |  `{a: a, b: b}` / `{a}`|  `{a: a, b: b}` / `{a,b}`| `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
+------------------------------------------------------------|-----------------------|------------------------|--------------------------|------------------------|------------------------|
+`{}`                                                        |                       |                        |                          |                        |                        |
+`{ a: a }`                                                  |                       |                        |                          |                        |                        |
+`{ b: b }`                                                  |                       |                        |                          |                        |                        |
+`{ a: a, b: b }`                                            |                       |                        |                          |                        |                        |
+`{ a: c }`                                                  |                       |                        |                          |                        |                        |
+`{ b: c }`                                                  |                       |                        |                          |                        |                        |
+`{ a: c, b: b }`                                            |                       |                        |                          |                        |                        |
+`{ a: c, b: c }`                                            |                       |                        |                          |                        |                        |
+`{ c: c }`                                                  |                       |                        |                          |                        |                        |
+`{ a: a, c: c }`                                            |                       |                        |                          |                        |                        |
+`{ b: b, c: c}`                                             |                       |                        |                          |                        |                        |
+`{ a: a, b: b, c: c }`                                      |                       |                        |                          |                        |                        |      
+
+### Message:`{}` / `{a: a, b: b}`
+
+CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` |  `{a: a, b: b}` / `{a}`|  `{a: a, b: b}` / `{a,b}`| `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
+------------------------------------------------------------|-----------------------|------------------------|--------------------------|------------------------|------------------------|
+`{}`                                                        |                       |                        |                          |                        |                        |
+`{ a: a }`                                                  |                       |                        |                          |                        |                        |
+`{ b: b }`                                                  |                       |                        |                          |                        |                        |
+`{ a: a, b: b }`                                            |                       |                        |                          |                        |                        |
+`{ a: c }`                                                  |                       |                        |                          |                        |                        |
+`{ b: c }`                                                  |                       |                        |                          |                        |                        |
+`{ a: c, b: b }`                                            |                       |                        |                          |                        |                        |
+`{ a: c, b: c }`                                            |                       |                        |                          |                        |                        |
+`{ c: c }`                                                  |                       |                        |                          |                        |                        |
+`{ a: a, c: c }`                                            |                       |                        |                          |                        |                        |
+`{ b: b, c: c}`                                             |                       |                        |                          |                        |                        |
+`{ a: a, b: b, c: c }`                                      |                       |                        |                          |                        |                        |      

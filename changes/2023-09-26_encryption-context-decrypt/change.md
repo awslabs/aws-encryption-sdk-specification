@@ -28,30 +28,30 @@ in this document are to be interpreted as described in
 
 ## Summary
 
-The [Decrypt](../../client-apis/decrypt.md) API does not specify
-how it should deal with required encryption context keys it receives from the call to the
-Cryptographic Materials Manager, the encryption context it optionally takes in, and the stored
-encryption context on the message header.
+The [Decrypt](../../client-apis/decrypt.md) only requires
+that the [encryption context](../../framework/structures.md#encryption-context) that is used as
+additional authenticated data during the decryption of the input [encrypted message](#encrypted-message)
+is returned.
 
-For required encryption context keys the value in stored in the message header
-MUST equal the value in decryption materials encryption context.
+Additionally it should also return the 
+[encryption context used for authentication only](../../client-apis/decrypt.md#encryption-context-to-only-authenticate)
+if it used any during the operation.
 
-### `decrypt` API required encryption context keys and stored encryption context verification
+### `decrypt` API returns encryption context used as AAD and encryption context used for authentication only
+On encrypt the [required encryption context cmm](../../framework/required-encryption-context-cmm.md),
+is able to filter out encryption context key-value pairs that are not stored on the message.
 
-Before verifying the message header, Decrypt MUST verify
-that if a [required encryption context key](../../framework/structures.md#required-encryption-context-keys)
-exists in the message [header's AAD](../../data-format/message-header.md#aad)
-the value in the [decryption materials' encryption context](../../framework/structures.md#decryption-materials)
-MUST match what is store in the message header.
+If the required encryption context CMM filters out encryption context keys from the Additional Authenticated
+Data stored on the header, Decrypt MUST use the 
+[encryption context to only authenticate](../../client-apis/decrypt.md#encryption-context-to-only-authenticate)
+to verify the header auth tag.
 
-This verifies that the reproduced encryption context is used to decrypt the message and
-NOT some key-value pair that the underlying CMM MAY have modified.
-
-If required keys exist, match stored encryption context, AND decryption succeeds
-Decrypt MUST return the Encryption Context stored in the header AND the
-encryption context to only authenticate.
 The encryption context to only authenticate MUST be the [encryption context](../framework/structures.md#encryption-context)
 in the [decryption materials](../framework/structures.md#decryption-materials)
 filtered to only contain key value pairs listed in
 the [decryption material's](../framework/structures.md#decryption-materials)
-[required encryption context keys](../framework/structures.md#required-encryption-context-keys-1).
+[required encryption context keys](../framework/structures.md#required-encryption-context-keys-1)
+serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
+
+`decrypt` MUST return the union of the encryption context serialized into the message header and
+the [encryption context for authentication only](#encryption-context-to-only-authenticate), if available.
