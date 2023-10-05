@@ -33,16 +33,17 @@ that the [encryption context](../../framework/structures.md#encryption-context) 
 additional authenticated data during the decryption of the input [encrypted message](#encrypted-message)
 is returned.
 
-Additionally it should also return the 
+Additionally it should also return the
 [encryption context used for authentication only](../../client-apis/decrypt.md#encryption-context-to-only-authenticate)
 if it used any during the operation.
 
 ### `decrypt` API returns encryption context used as AAD and encryption context used for authentication only
+
 On encrypt the [required encryption context cmm](../../framework/required-encryption-context-cmm.md),
 is able to filter out encryption context key-value pairs that are not stored on the message.
 
 If the required encryption context CMM filters out encryption context keys from the Additional Authenticated
-Data stored on the header, Decrypt MUST use the 
+Data stored on the header, Decrypt MUST use the
 [encryption context to only authenticate](../../client-apis/decrypt.md#encryption-context-to-only-authenticate)
 to verify the header auth tag.
 

@@ -32,8 +32,7 @@ This optional encryption context MAY not be stored in the message header, but is
 If `decrypt` uses [encryption context to only authenticate](../../client-apis/decrypt.md#encryption-context-to-only-authenticate)
 to successfully decrypt a message, then the encryption context output
 MUST be the union of the encryption context serialized into the message header and
-the [encryption context for authentication only](#encryption-context-to-only-authenticate), if available. 
-
+the [encryption context for authentication only](#encryption-context-to-only-authenticate), if available.
 
 ### Can you construct message that stores different encryption context than the encryption context returned by a CMM?
 
@@ -46,8 +45,8 @@ that contradicts the encryption context in the header of the message.
 
 The `decrypt` API SHOULD not check if the encryption context that was stored on the message matches
 what it receives from the CMMs DecryptMaterials because the current implementation
-of the `encrypt` API used with the built-in CMMs is not able to write a message 
-that on `decrypt` the CMM returns "incorrect" encryption context that contradicts 
+of the `encrypt` API used with the built-in CMMs is not able to write a message
+that on `decrypt` the CMM returns "incorrect" encryption context that contradicts
 the encryption context stored in the header of the message.
 
 ### What changes to the existing Required Encryption Context CMM are required?
@@ -66,89 +65,91 @@ scenarios to accurately reason about the behavior of using the Required Encrypti
 To test the new encryption context (EC) features
 the following dimensions exists:
 
-* Stored EC -- EC stored in the header
-* Not stored EC -- EC authenticated to the header but not stored
-* CMM Material EC -- EC on the decryption material
-* Required keys -- Keys for the EC that MAY be only authenticated
-* Reproduced EC -- EC passed on decrypt
+- Stored EC -- EC stored in the header
+- Not stored EC -- EC authenticated to the header but not stored
+- CMM Material EC -- EC on the decryption material
+- Required keys -- Keys for the EC that MAY be only authenticated
+- Reproduced EC -- EC passed on decrypt
 
 Given the EC `{ a: a, b: b }`
 we break this into the following interesting options:
 
 Stored EC/Not Stored EC
-* `{a: a, b: b}` / `{}`
-* `{a: a}` / `{b: b}`
-* `{}` / `{a: a, b: b}`
+
+- `{a: a, b: b}` / `{}`
+- `{a: a}` / `{b: b}`
+- `{}` / `{a: a, b: b}`
 
 CMM Material/Required Keys
-* `{a: a, b: b}` / `{}`
-* `{a: a, b: b}` / `{a}`
-* `{a: a, b: b}` / `{a,b}`
-* `{a: a, b: c}` / `{a}`
-* `{a: a, b: b}` / `{c}`
+
+- `{a: a, b: b}` / `{}`
+- `{a: a, b: b}` / `{a}`
+- `{a: a, b: b}` / `{a,b}`
+- `{a: a, b: c}` / `{a}`
+- `{a: a, b: b}` / `{c}`
 
 Reproduced EC
-* `{}`
-* `{ a: a }`
-* `{ b: b }`
-* `{ a: a, b: b }`
-* `{ a: c }`
-* `{ b: c }`
-* `{ a: c, b: b }`
-* `{ a: c, b: c }`
-* `{ c: c }`
-* `{ a: a, c: c }`
-* `{ b: b, c: c}`
-* `{ a: a, b: b, c: c }`
 
+- `{}`
+- `{ a: a }`
+- `{ b: b }`
+- `{ a: a, b: b }`
+- `{ a: c }`
+- `{ b: c }`
+- `{ a: c, b: b }`
+- `{ a: c, b: c }`
+- `{ c: c }`
+- `{ a: a, c: c }`
+- `{ b: b, c: c}`
+- `{ a: a, b: b, c: c }`
 
 ### Message: `{a: a, b: b}` / `{}`
 
-CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` |  `{a: a, b: b}` / `{a}`|  `{a: a, b: b}` / `{a,b}`| `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
-------------------------------------------------------------|-----------------------|------------------------|--------------------------|------------------------|------------------------|
-`{}`                                                        |         pass          |         fail           |          fail            |          fail          |           fail         |
-`{ a: a }`                                                  |         pass          |         pass           |          fail            |          fail          |           fail         |
-`{ b: b }`                                                  |         pass          |         pass           |          fail            |          fail          |           fail         |
-`{ a: a, b: b }`                                            |         pass          |         pass           |          pass            |          fail          |           fail         |
-`{ a: c }`                                                  |         fail          |         fail           |          fail            |          fail          |           fail         |
-`{ b: c }`                                                  |         fail          |         fail           |          fail            |          fail          |           fail         |
-`{ a: c, b: b }`                                            |         fail          |         fail           |          fail            |          fail          |           fail         |
-`{ a: c, b: c }`                                            |         fail          |         fail           |          fail            |          fail          |           fail         |
-`{ c: c }`                                                  |         fail          |         fail           |          fail            |          fail          |           fail         |
-`{ a: a, c: c }`                                            |         fail          |         fail           |          fail            |          fail          |           fail         |
-`{ b: b, c: c}`                                             |         fail          |         fail           |          fail            |          fail          |           fail         |
-`{ a: a, b: b, c: c }`                                      |         fail          |         fail           |          fail            |          fail          |           fail         |      
+| CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` | `{a: a, b: b}` / `{a}` | `{a: a, b: b}` / `{a,b}` | `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
+| ----------------------------------------------------------- | --------------------- | ---------------------- | ------------------------ | ---------------------- | ---------------------- |
+| `{}`                                                        | pass                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a }`                                                  | pass                  | pass                   | fail                     | fail                   | fail                   |
+| `{ b: b }`                                                  | pass                  | pass                   | fail                     | fail                   | fail                   |
+| `{ a: a, b: b }`                                            | pass                  | pass                   | pass                     | fail                   | fail                   |
+| `{ a: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ b: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: c, b: b }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: c, b: c }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ c: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a, c: c }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ b: b, c: c}`                                             | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a, b: b, c: c }`                                      | fail                  | fail                   | fail                     | fail                   | fail                   |
 
 ### Message: `{a: a}` / `{b: b}`
 
-CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` |  `{a: a, b: b}` / `{a}`|  `{a: a, b: b}` / `{a,b}`| `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
-------------------------------------------------------------|-----------------------|------------------------|--------------------------|------------------------|------------------------|
-`{}`                                                        |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ a: a }`                                                  |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ b: b }`                                                  |         pass          |           fail         |         fail             |        fail            |          fail          |
-`{ a: a, b: b }`                                            |         pass          |           pass         |         pass             |        pass            |          fail          |
-`{ a: c }`                                                  |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ b: c }`                                                  |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ a: c, b: b }`                                            |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ a: c, b: c }`                                            |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ c: c }`                                                  |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ a: a, c: c }`                                            |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ b: b, c: c}`                                             |         fail          |           fail         |         fail             |        fail            |          fail          |
-`{ a: a, b: b, c: c }`                                      |         fail          |           fail         |         fail             |        fail            |          fail          |      
+| CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` | `{a: a, b: b}` / `{a}` | `{a: a, b: b}` / `{a,b}` | `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
+| ----------------------------------------------------------- | --------------------- | ---------------------- | ------------------------ | ---------------------- | ---------------------- |
+| `{}`                                                        | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ b: b }`                                                  | pass                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a, b: b }`                                            | pass                  | pass                   | pass                     | pass                   | fail                   |
+| `{ a: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ b: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: c, b: b }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: c, b: c }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ c: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a, c: c }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ b: b, c: c}`                                             | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a, b: b, c: c }`                                      | fail                  | fail                   | fail                     | fail                   | fail                   |
 
 ### Message:`{}` / `{a: a, b: b}`
 
-CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` |  `{a: a, b: b}` / `{a}`|  `{a: a, b: b}` / `{a,b}`| `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
-------------------------------------------------------------|-----------------------|------------------------|--------------------------|------------------------|------------------------|
-`{}`                                                        |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ a: a }`                                                  |         fail          |          pass          |           fail           |           fail         |          fail          |
-`{ b: b }`                                                  |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ a: a, b: b }`                                            |         pass          |          fail          |           pass           |           fail         |          fail          |
-`{ a: c }`                                                  |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ b: c }`                                                  |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ a: c, b: b }`                                            |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ a: c, b: c }`                                            |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ c: c }`                                                  |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ a: a, c: c }`                                            |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ b: b, c: c}`                                             |         fail          |          fail          |           fail           |           fail         |          fail          |
-`{ a: a, b: b, c: c }`                                      |         fail          |          fail          |           fail           |           fail         |          fail          |      
+| CMM Material/Required Keys &rarr; <br/>Reproduced EC &darr; | `{a: a, b: b}` / `{}` | `{a: a, b: b}` / `{a}` | `{a: a, b: b}` / `{a,b}` | `{a: a, b: c}` / `{a}` | `{a: a, b: b}` / `{c}` |
+| ----------------------------------------------------------- | --------------------- | ---------------------- | ------------------------ | ---------------------- | ---------------------- |
+| `{}`                                                        | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a }`                                                  | fail                  | pass                   | fail                     | fail                   | fail                   |
+| `{ b: b }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a, b: b }`                                            | pass                  | fail                   | pass                     | fail                   | fail                   |
+| `{ a: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ b: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: c, b: b }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: c, b: c }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ c: c }`                                                  | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a, c: c }`                                            | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ b: b, c: c}`                                             | fail                  | fail                   | fail                     | fail                   | fail                   |
+| `{ a: a, b: b, c: c }`                                      | fail                  | fail                   | fail                     | fail                   | fail                   |
