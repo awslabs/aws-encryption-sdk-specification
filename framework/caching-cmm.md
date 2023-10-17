@@ -5,10 +5,12 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
 
+- 0.4.0
+  - [Enforce Safe Handling of Max Plaintext Length in Caching Cryptographic Materials Manager](../changes/2020-07-13_caching-cmm-max-plaintext-length/change.md)
 - 0.3.0
   - [Specify Cache Entry Identifier Formulas for Caching Cryptographic Materials Manager](../changes/2020-07-17_cache-entry-identifier-formulas/change.md)
 - 0.2.0
@@ -135,7 +137,8 @@ The number of bytes encrypted by the [encryption](structures.md#encryption-mater
 
 ### Get Encryption Materials
 
-If the [algorithm suite](algorithm-suites.md) requested contains a [Identity KDF](algorithm-suites.md#identity-kdf),
+If the [algorithm suite](algorithm-suites.md) requested contains a [Identity KDF](algorithm-suites.md#identity-kdf)
+or if the request does not include a [Max Plaintext Length](cmm-interface.md#encryption-materials-request) value,
 the caching CMM MUST obtain the encryption materials by making a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials) function.
 
 Otherwise, the caching CMM MUST attempt to find the [encryption materials](structures.md#encryption-materials)
@@ -147,10 +150,16 @@ If a cache entry is found, the caching CMM MUST return the encryption materials 
 If a cache entry is not found or the cache entry is expired, the caching CMM MUST then attempt to obtain the encryption materials
 by making a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials).
 
-If the [algorithm suite](algorithm-suites.md) requested does not contain an [Identity KDF](algorithm-suites.md#identity-kdf),
+If the caching CMM makes a call to the underlying CMM's [Get Encryption Materials](cmm-interface.md#get-encryption-materials) operation,
+then the request MUST include a [Max Plaintext Length](cmm-interface.md#encryption-materials-request)
+with a value equal to its [Limit Bytes](#limit-bytes) value.
+
+If the [algorithm suite](algorithm-suites.md) requested does not contain an [Identity KDF](algorithm-suites.md#identity-kdf)
+and if the request includes a [Max Plaintext Length](cmm-interface.md#encryption-materials-request) value,
 the caching CMM MUST add the encryption materials obtained from the underlying CMM into the underlying CMC.
 
-If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF,
+If the [algorithm suite](algorithm-suites.md) requested contains an Identity KDF
+or if the request does not include a [Max Plaintext Length](cmm-interface.md#encryption-materials-request) value,
 the caching CMM MUST NOT store the encryption materials in the underlying CMC.
 
 ### Decrypt Materials
