@@ -1,6 +1,12 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
+# Keys Manifest
+
+## Version
+
+1.0.0
+
 ## Summary
 
 A keys manifest defines raw key materials for use in tests defined in other manifests.

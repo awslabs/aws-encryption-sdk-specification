@@ -1,14 +1,20 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
+# Decryption Manifest
+
+## Version
+
+1.0.0
+
 ## Dependencies
 
 This serves as a reference of all features that this feature depends on.
 
 | Feature                                  | Min Version | Max Version |
 | ---------------------------------------- | ----------- | ----------- |
-| [keys-description](./key-description.md) | 2           | n/a         |
-| [keys-manifest](./keys-manifest.md)      | 2           | n/a         |
+| [keys-description](./key-description.md) | 1           | n/a         |
+| [keys-manifest](./keys-manifest.md)      | 1           | n/a         |
 
 ## Summary
 
