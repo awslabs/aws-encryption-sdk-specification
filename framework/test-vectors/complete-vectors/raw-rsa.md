@@ -15,7 +15,7 @@ This describes the test cases for the [Raw RSA Keyring](../../raw-rsa-keyring.md
 
 ### Basic tests
 
-A positive key descriptions every [supported padding scheme](../../raw-rsa-keyring.md#supported-padding-schemes) MUST be generated.
+A positive key descriptions for every [supported padding scheme](../../raw-rsa-keyring.md#supported-padding-schemes) MUST be generated.
 The provider-id for each padding scheme MUST be different.
 A test MUST attempt to encrypt and decrypt
 with every available [algorithm suite](../../algorithm-suites.md#algorithm-suite-id)
