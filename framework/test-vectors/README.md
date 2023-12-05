@@ -5,7 +5,7 @@
 
 These test vectors are intended to be used to validate interoperability
 across implementations of clients in a runtime,
-for the AWS Crypto Tools AwsCryptographicMaterialProvidersLibrary (MPL).
+for the AWS Crypto Tools AWS Cryptographic Material Providers Library (MPL).
 
 They are composed of JSON manifest files that define one or more test cases,
 including sufficient information to process each test case.
