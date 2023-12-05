@@ -17,8 +17,8 @@ parent directory to the target file.
 Every manifest type definition must include a unique type name that will be used by
 test vector handlers to identify the manifest type.
 
-See https://github.com/awslabs/aws-crypto-tools-test-vector-framework for the additional information.
-That framework is much of the motivation for the work here.
+See https://github.com/awslabs/aws-crypto-tools-test-vector-framework for additional information.
+This framework is much of the motivation for this work.
 
 ## Glossary
 
