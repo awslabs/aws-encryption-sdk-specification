@@ -9,7 +9,7 @@
 
 ## Summary
 
-This describes the test cases for the [Aws Kms Keyring](../../aws-kms/aws-kms-keyring.md)
+This describes the test cases for the [AWS KMS Keyring](../../aws-kms/aws-kms-keyring.md)
 
 ## Reference-level Explanation
 
