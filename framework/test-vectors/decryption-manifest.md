@@ -31,7 +31,7 @@ We need a way of describing all scenarios that we want to cover with test vector
 This will be used for generating test vectors with an unknown implementation
 to be tested for compatibility using a known correct implementation.
 It will also help us reason about the correctness of specific features or keyrings.
-It can also used to ensure known bad vectors or incorrect configuration cannot lead to successful decryption
+It can also be used to ensure known bad vectors or incorrect configuration cannot lead to successful decryption
 by demonstrating that different configurations succeed or fail correctly.
 
 ## Guide-level Explanation
