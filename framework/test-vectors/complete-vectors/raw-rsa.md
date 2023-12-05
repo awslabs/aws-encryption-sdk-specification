@@ -9,7 +9,7 @@
 
 ## Summary
 
-This describes the test cases for the [Raw Aes Keyring](../../raw-aes-keyring.md)
+This describes the test cases for the [Raw RSA Keyring](../../raw-rsa-keyring.md)
 
 ## Reference-level Explanation
 
