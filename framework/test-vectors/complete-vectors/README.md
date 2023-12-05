@@ -8,7 +8,7 @@ there is a file that describes how this component is tested.
 This simplifies reasoning about each component.
 To find out how the DefaultCMM is tested
 look at the default-cmm.md file
-that describes how this competent is tested
+that describes how this component is tested
 and the various features can be reasoned about.
 
 The test vectors MUST compose all these individual tests together
