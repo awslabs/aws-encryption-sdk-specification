@@ -53,7 +53,7 @@ makes this proof even stronger.
 Because you can write and prove a specification
 but it may not be correct.
 This is especially true for backwards compatibility.
-But even for code reviews and understanding th impact of a change,
+But even for code reviews and understanding the impact of a change,
 looking at how test vectors are created helps reason about the edge cases of a change.
 
 ## Drawbacks
