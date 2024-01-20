@@ -483,7 +483,7 @@ If custom [encryption context](./structures.md#encryption-context-3)
 is associated with the branch key these values MUST be added to the AWS KMS encryption context.
 To avoid name collisions each added attribute from the custom [encryption context](./structures.md#encryption-context-3)
 MUST be prefixed with `aws-crypto-ec:`.
-The added values MUST be equal.
+Across all versions of a Branch Key, the custom encryption context MUST be equal.
 
 ## AWS KMS Branch Key Decryption
 
