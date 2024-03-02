@@ -20,6 +20,44 @@ test vector handlers to identify the manifest type.
 See https://github.com/awslabs/aws-crypto-tools-test-vector-framework for additional information.
 This framework is much of the motivation for this work.
 
+The manifest is meant to produce encryption and decryption materials that every
+runtime implementation can process and produce the desired output for that test vector.
+
+These test vectors are not meant to be processed by a top level client library like
+the AWS Encryption SDK or the AWS Database Encryption SDK. However; they may be able
+to use the manifest to see how to construct keyrings that they can use in their test
+vectors.
+
+```mermaid
+flowchart LR
+  subgraph MPL Encryption-Materials
+    direction LR
+    MPL-Manifest --> MPL-Java -->|MPL-TestVector|EncryptionMaterials
+    MPL-Manifest --> MPL-NET -->|MPL-TestVector|EncryptionMaterials
+    MPL-Manifest --> MPL-X -->|MPL-TestVector|EncryptionMaterials
+  end
+```
+
+```mermaid
+flowchart LR
+  subgraph MPL Decryption-Materials
+    direction LR
+    MPL-Manifest+MPL-TestVector --> MPL-Java -->|MPL-TestVector|DecryptionMaterials
+    MPL-Manifest+MPL-TestVector --> MPL-NET -->|MPL-TestVector|DecryptionMaterials
+    MPL-Manifest+MPL-TestVector --> MPL-X -->|MPL-TestVector|DecryptionMaterials
+  end
+```
+
+```mermaid
+flowchart LR
+  subgraph ESDK Usage of MPL Manifest
+    direction LR
+    MPL-Manifest-. Keyring-Construction .-> ESDK-Java --> ESDK-Manifest
+
+    MPL-Manifest-. Keyring-Construction .-> ESDK-NET --> ESDK-Manifest
+  end
+```
+
 ## Glossary
 
 - **Test Vector** : Information about a single test case. Used to either process existing data
@@ -68,7 +106,7 @@ This should represent acceptable overhead: we would need to write some amount of
 language to handle the test vectors anyway and this framework lets us define a consistent
 way of handling those test vectors while remaining simple to process.
 
-Additionally using Dafny we can lower this overhead.
+Additionally, using Dafny can lower this overhead.
 The challenge now is to compose the proper level of reusability.
 The MPL is the base library for many encryption clients
 and there may be some work to be able to reuse parts of these test vectors

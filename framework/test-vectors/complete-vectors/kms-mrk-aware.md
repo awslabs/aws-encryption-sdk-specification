@@ -17,6 +17,8 @@ This describes the test cases for the [Aws Kms Mrk Keyring](../../aws-kms/aws-km
 
 A test MUST attempt to encrypt and decrypt
 with every combination of 2 MRKs in different regions.
+A test MUST attempt to decrypt with only one of the MRKs used
+to encrypt.
 A test MUST attempt to encrypt and decrypt
 with every available [algorithm suite](../../algorithm-suites.md#algorithm-suite-id)
 A test MUST attempt every [standard encryption context](./encryption-context.md#standard-encryption-contexts).

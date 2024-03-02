@@ -19,3 +19,4 @@ MUST have an empty map.
 MUST have a small map.
 MUST have a large map.
 MUST have multibyte UTF8 characters in both the key and value.
+MUST have multibyte non-BMP characters in both the key and value.

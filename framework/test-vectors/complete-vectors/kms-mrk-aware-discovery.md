@@ -15,8 +15,8 @@ This describes the test cases for the [Aws Kms Mrk Discovery Keyring](../../aws-
 
 ### Basic tests
 
-A test MUST attempt to encrypt with both a single region key
-and a multi region key.
+A test MUST attempt to encrypt with a single region key.
+A test MUST attempt to encrypt with a multi region key.
 A test MUST attempt to decrypt with a discovery filter and without a filter.
 A test MUST attempt to encrypt and decrypt
 with every available [algorithm suite](../../algorithm-suites.md#algorithm-suite-id)

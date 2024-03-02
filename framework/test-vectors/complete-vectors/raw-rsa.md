@@ -13,6 +13,10 @@ This describes the test cases for the [Raw RSA Keyring](../../raw-rsa-keyring.md
 
 ## Reference-level Explanation
 
+## Definitions
+- positive key description: a [key description](../key-description.md) that when parsed and generated can produce
+valid encryption and decryption materials.
+
 ### Basic tests
 
 A positive key descriptions for every [supported padding scheme](../../raw-rsa-keyring.md#supported-padding-schemes) MUST be generated.
