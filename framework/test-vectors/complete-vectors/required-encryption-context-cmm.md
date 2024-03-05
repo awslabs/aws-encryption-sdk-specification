@@ -15,7 +15,7 @@ This describes the test cases for the [Required Encryption Context CMM](../../re
 
 ### Basic tests
 
-A test MUST verify that on both encrypt and decrypt the correct 
+A test MUST verify that on both encrypt and decrypt the correct
 plaintext data key is produced.
 
 A test MUST verify that an encrypt keyring that returns
@@ -24,12 +24,57 @@ an incorrect plaintext data key will fail.
 A test MUST verify that a decrypt keyring that returns
 an incorrect plaintext data key will fail.
 
-With the above tests we infer
-that all other keyring tests that are wrapped by the DefaultCMM
-will fail successfully if the materials returned are not valid.
+### Required Encryption Context CMM failures on encrypt
 
-For every non signing algorithm suite, a test MUST verify that
-no verification key is appended to the encryption context.
+For a given [encryption context](../../structures.md#encryption-context),
+every subset of the keys for this encryption context
+MUST be attempted as the `requiredEncryptionContextKeys`.
+If any of the `requiredEncryptionContextKeys` do not exist in the
+supplied encryption context, then the test MUST fail.
 
-For every signing algorithm suite, a test MUST verify that
-a verification key is appended to the encryption context.
+For example:
+
+- Given an `encryptionContext`: `{a:a, b:b, c:c}` will produce the subset
+  of `requiredEncryptionContextKeys`, `{{}, {a}, {b}, {c}, {a,b}, {a,c), {b,c}, {a,b,c}}`
+- Given a `requiredEncryptionContextKeys` consisting of `{a}` the encryption context MUST
+  have the key `{a}`.
+- Given a `requiredEncryptionContextKeys` consisting of `{a,b}` the encryption context MUST
+  have the keys `{a,b}`.
+- Given a `requiredEncryptionContextKeys` consisting of `{a,b,c}` the encryption context MUST
+  have the keys `{a,b,c}`.
+
+If there is no `requiredEncryptionContextKeys`, then the test MUST fail.
+
+### Required Encryption Context CMM failures on decrypt
+
+For a given [encryption context](../../structures.md#encryption-context),
+every subset of the keys for this encryption context
+MUST be attempted as the `requiredEncryptionContextKeys`.
+An incorrect encryption context
+MUST be attempted that differs from the correct encryption context
+by both values and keys.
+
+For example:
+
+- Given the encryption context `{a: a, b: b}` with
+  `requiredEncryptionContextKeys` set to `{a, b}`, the test
+  MUST attempt to decrypt AND fail with reproduced encryption contexts
+  `{a:b, b:a}`,`{a:a}`, `{b:b}`,`{}`, and `{a:c, b:c, c:c}`
+
+### Required Encryption Context CMM success cases
+
+For a given [encryption context](../../structures.md#encryption-context),
+every subset of the keys for this encryption context
+MUST be attempted as the `requiredEncryptionContextKeys`.
+For example, `{ a: a, b: b }` produces the complete set of keys subsets: `{ {}, { a }, { b }, { a, b } }` called `requiredEncryptionContextKeys`.
+
+For every `requiredEncryptionContextKeys` produced above
+`reproducedEncryptionContext` MUST be attempted
+for every subset of the encryption context
+who's keys fully intersect with the `requiredEncryptionContextKeys`.
+
+For example:
+
+- Given the encryption context `{a:a, b:b}` with the `requiredEncryptionContextKeys`
+  set to `{a}`, the only success case for a message to successfully decrypt will be
+  to supply the reproducedEncryptionContext `{a}`.

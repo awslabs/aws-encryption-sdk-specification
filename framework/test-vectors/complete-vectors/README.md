@@ -20,5 +20,5 @@ Unless otherwise specified, all "Basic Tests" MUST use a `DefaultCMM`
 
 By keeping every component separate is is easier to find
 and reason about the completeness of testing.
-This also allows top level clients like the ESDK or DBESDK to 
+This also allows top level clients like the ESDK or DBESDK to
 reuse the key or cmm description to avoid reinventing the wheel.

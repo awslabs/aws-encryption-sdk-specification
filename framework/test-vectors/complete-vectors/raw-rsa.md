@@ -14,8 +14,9 @@ This describes the test cases for the [Raw RSA Keyring](../../raw-rsa-keyring.md
 ## Reference-level Explanation
 
 ## Definitions
+
 - positive key description: a [key description](../key-description.md) that when parsed and generated can produce
-valid encryption and decryption materials.
+  valid encryption and decryption materials.
 
 ### Basic tests
 
