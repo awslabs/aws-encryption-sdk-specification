@@ -13,8 +13,31 @@ and [evaluating each configuration's expected result](test-vector-enumeration.md
 
 ## Input dimensions
 
-* Every [MPL input dimension](mpl-test-vector-enumeration.md#input-dimensions) is an input dimension for ESDK.
+- Every [MPL input dimension](mpl-test-vector-enumeration.md#input-dimensions) is an input dimension for ESDK.
+- plaintext: Range of [representative plaintext values](#representative-plaintext-constraints)
 
 ## Evaluation rules
 
-* Every [MPL evaluation rule](mpl-test-vector-enumeration.md#evaluation-rules) is an evaluation rule for ESDK.
+- Every [MPL evaluation rule](mpl-test-vector-enumeration.md#evaluation-rules) is an evaluation rule for ESDK.
+
+# TODO MOVEME: representative values
+
+## Representative plaintext constraints
+
+* Empty: length = 0
+* Small: all plaintexts where (1 < length ≤ 10)
+* Medium: all plaintexts where (10 < length ≤ 1000)
+* Large: all plaintexts where (1000 < length ≤ 2^32-1)
+* Largest frame: all plaintexts where (length = 2^32-1)
+* Largest frame + partial frame: all plaintexts where (length = 2^32-1 + [1 .. 2^32-1))
+* Two largest frames: all plaintexts where (length = 2*(2^32-1))
+* Many frames: all plaintexts where (length = 2*(2^32-1) + [1 .. (2^32-1)*(2^32-3)])
+
+## Concrete representative plaintext values
+
+(Should these even go in the spec?)
+
+* Empty: ""
+* Small: "abc"
+* Medium: "abcdefg12345678910"
+TODO

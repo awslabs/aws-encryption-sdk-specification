@@ -20,7 +20,6 @@ for MPL test vectors:
 - encryption context: Range of [representative encryption context values](./complete-vectors/encryption-context.md)
 - required encryption context keys: (TODO: write rule for dtermining a representative required EC input range)
 - reproduced encryption context: Permutations of encryption context and required encryption context keys as described in the [required encryption context CMM test vectors spec](./complete-vectors/required-encryption-context-cmm.md)
-- plaintext: Range of [representative plaintext values](#representative-plaintext-constraints)
 - encrypt key description: Range of all [key descriptions](./key-description.md) used to request encrypt materials
 - decrypt key description: Range of all [key description](./key-description.md) used to decrypt
 
@@ -31,24 +30,3 @@ TODO: filtering? like, do we need to test all pairings of encrypt/decrypt key de
 
 TODO: Link to MPL. A lot of these will be shared across the MPL.
 
-# TODO MOVEME: representative values
-
-## Representative plaintext constraints
-
-* Empty: length = 0
-* Small: all plaintexts where (1 < length ≤ 10)
-* Medium: all plaintexts where (10 < length ≤ 1000)
-* Large: all plaintexts where (1000 < length ≤ 2^32-1)
-* Largest frame: all plaintexts where (length = 2^32-1)
-* Largest frame + partial frame: all plaintexts where (length = 2^32-1 + [1 .. 2^32-1))
-* Two largest frames: all plaintexts where (length = 2*(2^32-1))
-* Many frames: all plaintexts where (length = 2*(2^32-1) + [1 .. (2^32-1)*(2^32-3)])
-
-## Concrete representative plaintext values
-
-(Should these even go in the spec?)
-
-* Empty: ""
-* Small: "abc"
-* Medium: "abcdefg12345678910"
-TODO
