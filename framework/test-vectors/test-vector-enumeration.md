@@ -150,7 +150,9 @@ For example,
 the [required encryption context CMM component](complete-vectors/required-encryption-context-cmm.md#required-encryption-context-cmm-failures-on-encrypt)
 defines the conditions for encryption to fail.
 This can be interpreted as an evaluation rule,
-and the test manifest generator should implement this.
+and the test manifest generator should implement this
+when generating test vectors using the required encryption context CMM
+to determine when these vectors should fail.
 
 These rules can be relatively informal in the spec,
 but ideally should be written programmatically,

@@ -77,4 +77,20 @@ For example:
 
 - Given the encryption context `{a:a, b:b}` with the `requiredEncryptionContextKeys`
   set to `{a}`, the only success case for a message to successfully decrypt will be
-  to supply the reproducedEncryptionContext `{a}`.
+  to supply the reproducedEncryptionContext `{a:a}`.
+
+## Test vector input dimensions and ranges
+
+- required encryption context keys: Range is every subset of keys in a given [encryption context](../../structures.md#encryption-context).
+- reproduced encryption context: Range is every subset of of the encryption context (TODO: plus representative nonsense values?)
+
+## Test vector evaluation rules
+
+- If any of the `requiredEncryptionContextKeys` do not exist in the
+supplied encryption context,
+then the test result MUST be `negative-encrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-encrypt)
+- If the `reproducedEncryptionContext` does not match
+the supplied encryption context on encrypt
+for every key in `requiredEncryptionContextKeys`,
+then the test result MUST be `negative-decrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-decrypt)
+- In all other cases, the test result MUST be `positive-keyring`.
