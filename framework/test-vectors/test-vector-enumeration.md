@@ -132,8 +132,7 @@ describes the reason for the scenario's failure.
 In contrast to [input configuration enumeration](#enumerating-input-configurations),
 which is a constructive multiplicative process,
 the expected result of a test
-is deterministic from the input configuration
-and is a categorical result.
+is deterministic from the input configuration.
 
 The expected result of an [input configuration](#input-configuration) can be determined
 by evaluating all relevant [evaluation rules](#expected-result-evaluation-rules) for that input configuration.
@@ -147,25 +146,17 @@ An evaluation rule reads the input configuration [input configuration](#input-co
 and determines whether the configuration is valid
 under the conditions the rule evaluates.
 
-An evaluation rule should be as specific as possible.
-
 For example,
-one evaluation rule might be that
-every key in `"requiredEncryptionContextKeys"`,
-MUST be present in the `"reproducedEncryptionContext"`,
-otherwise the scenario results in `"negative-decrypt-keyring"`.
+the [required encryption context CMM component](complete-vectors/required-encryption-context-cmm.md#required-encryption-context-cmm-failures-on-encrypt)
+defines the conditions for encryption to fail.
+This can be interpreted as an evaluation rule,
+and the test manifest generator should implement this.
 
-these rules can be relatively informal in the spec,
-but should be written somewhat programmatically,
-so a developer can write these rules in code.
+These rules can be relatively informal in the spec,
+but ideally should be written programmatically,
+so a developer can write implement these rules in test manifest generation code.
 
-for example, some failure rules:
-* reproduced encryption context does not match encryption context for requried EC CMM => fail
-* key does not match on decrypt => fail
-
-this is a good way to organize test vectors expected result.
-* maintainable: essentially a list of these rules; easy to update/delete rules.
-* every rule reads the input configuration and outputs a success/fail; evaluating rules can be programmatic
+Evaluation rules are a useful abstraction to determine a given test scenario's expected result. A list of independent rules is flexible and maintainable. A list of rules that maintain the same interface (reads input configuration; outputs success/fail) makes evaluating these rules programmable.
 
 ### Multiple errors (TODO)
 
