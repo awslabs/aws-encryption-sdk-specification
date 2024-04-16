@@ -87,10 +87,10 @@ For example:
 ## Test vector evaluation rules
 
 - If any of the `requiredEncryptionContextKeys` do not exist in the
-supplied encryption context,
+supplied encryption context on encrypt
 then the test result MUST be `negative-encrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-encrypt)
-- If the `reproducedEncryptionContext` does not match
-the supplied encryption context on encrypt
+- If the value of `reproducedEncryptionContext` on decrypt does not match
+the value of the supplied encryption context on encrypt
 for every key in `requiredEncryptionContextKeys`,
 then the test result MUST be `negative-decrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-decrypt)
 - In all other cases, the test result MUST be `positive-keyring`.
