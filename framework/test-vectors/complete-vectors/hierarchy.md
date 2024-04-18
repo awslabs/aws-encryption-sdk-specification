@@ -24,12 +24,13 @@ a test MUST attempt to encrypt and decrypt with every [standard encryption conte
 
 ### Input dimensions
 
-- encrypt key description:
+```
+encrypt key description:
     {
         type: "aws-kms-hierarchy"
         key: range of [representative branch keys](#representative-branch-keys)
     }
-- decrypt key description:
+decrypt key description:
     {
         type: "aws-kms-hierarchy"
         key: range of [representative branch keys](#representative-branch-keys)
@@ -38,19 +39,18 @@ a test MUST attempt to encrypt and decrypt with every [standard encryption conte
             "Other",  # any other logical key store name
         ]
     }
+```
 
 ### Representative branch keys
-- key: [
-    "static-branch-key-1",  # any valid branch key
-    "static-branch-key-2",  # any other valid branch key
-    "branch-key-no-permissions",  # any valid branch key where 
-    the test vector runner does not have permissions
-    for the KMS key
-    "branch-key-not-in-table",  # any branch key ID not
-    in the keystore table
-    "branch-key-no-version",  # any branch key without a version
-    "invalid-branch-key",  # any illegally mutated invalid branch key
-]
+* "static-branch-key-1",  # any valid branch key
+* "static-branch-key-2",  # any other valid branch key
+* "branch-key-no-permissions",  # any valid branch key where 
+the test vector runner does not have permissions
+for the KMS key
+* "branch-key-not-in-table",  # any branch key ID not
+in the keystore table
+* "branch-key-no-version",  # any branch key without a version
+* "invalid-branch-key",  # any illegally mutated invalid branch key
 
 ### Evaluation rules
 
