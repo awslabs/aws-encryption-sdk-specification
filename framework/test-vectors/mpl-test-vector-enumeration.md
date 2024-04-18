@@ -18,7 +18,7 @@ for MPL test vectors:
 
 - algorithm suite ID: Range of supported [Algorithm IDs](../algorithm-suites.md#algorithm-suite-id)
 - encryption context: Range of [representative encryption context values](./complete-vectors/encryption-context.md)
-- required encryption context keys: (TODO: write rule for dtermining a representative required EC input range)
+- required encryption context keys: (TODO: write rule for determining a representative required EC input range; probably all possible subsets of EC?)
 - reproduced encryption context: Permutations of encryption context and required encryption context keys as described in the [required encryption context CMM test vectors spec](./complete-vectors/required-encryption-context-cmm.md)
 - encrypt key description: Range of all [key descriptions](./key-description.md) used to request encrypt materials
 - decrypt key description: Range of all [key description](./key-description.md) used to decrypt

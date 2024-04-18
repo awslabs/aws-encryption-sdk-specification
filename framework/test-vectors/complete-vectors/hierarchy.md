@@ -21,3 +21,25 @@ with every available [algorithm suite](../../algorithm-suites.md#algorithm-suite
 
 For every available algorithm suite and static branch key,
 a test MUST attempt to encrypt and decrypt with every [standard encryption context](./encryption-context.md#standard-encryption-contexts).
+
+### Input dimensions
+
+- encrypting key type: "aws-kms-hierarchy"
+- decrypting key type: "aws-kms-hierarchy"
+- key: [
+    "static-branch-key-1",
+    "static-branch-key-2"
+]
+
+### Evaluation rules
+
+- If encrypting key type is anything other than `"aws-kms-hierarchy"`
+and decrypting key type is `"aws-kms-hierarchy"`,
+the result should be `"negative-decrypt"`.
+- If encrypting key type is `"aws-kms-hierarchy"`
+and decrypting key type is anything other than `"aws-kms-hierarchy"`,
+the result should be `"negative-decrypt"`.
+- If encrypting and decrypting key type are both `"aws-kms-hierarchy"`
+and the `"key"` is different on encrypt and decrypt,
+the result should be `"negative-decrypt"`.
+- In all other cases, the result should be `"positive"`.

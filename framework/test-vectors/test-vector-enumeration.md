@@ -15,12 +15,26 @@ This document outlines a framework
 to enumerate a set of pairings
 of input configurations to encryption and/or decryption
 and expected results of encryption and/or decryption.
-The framework constructs this set of pairings
-to be representative of all possible
+
+The framework does not enumerate
+every possible input configuration for two reasons:
+1. It is impractical to enumerate every possible input value 
+for some attributes in an input configuration
+(see ["representative values"](#selecting-a-representative-input-value)).
+2. Some input configurations with `negative` expected results
+are not as critical of test cases as others
+and are not a priority to test at this time
+(see ["filtering input configurations"](#filtering-input-configurations))
+
+As a result,
+the framework does not actually enumerate
+all possible input configurations and expected results.
+However, by carefully reasoning about
+the selection of representative values
+and the filtered test cases,
+the framework constructs a set of pairings
+that is *representative* of all *relevant*
 input configurations and expected results.
-As a result, executing all enumerated pairings' input configurations
-and receiving the pairing's expected result
-is representative of all possible input and output configurations.
 
 ## Input configuration
 
@@ -79,6 +93,9 @@ This framework of representative values
 reduces any impractically large set of test inputs
 to a practically testable size
 while maintaining reasonable test coverage.
+Its specification here documents reasoning for this framework
+for readers or users of a test vector library
+to understand the motivation for this concept.
 
 ### Modifying representative values
 
@@ -105,11 +122,76 @@ The property that a representative value may be modified within its constraints
 acts as an assertion that the representative value is not special,
 and is truly "representative" of other values in its constrained set.
 
+### Filtering input configurations
+
+Input configurations may be "filtered"
+and not be tested.
+
+This is a mechanism to identify test cases that
+may not be as important as others
+and avoid writing them to a test vector manifest.
+
+Input configurations can be filtered at any point in the vector enumeration process,
+though it is beneficial to filter as early as possible
+to make enumeration as fast as possible.
+
+#### Motivation
+
+Some input configurations produced as a result of the enumeration above
+will not be tested
+as they are not important enough
+to warrant the time spent testing them.
+
+For example,
+consider all cases where a hierarchical keyring is encrypting,
+but some raw AES key is decrypting.
+This is expected have an [expected result](#expected-results) of `negative-decrypt`,
+since a hierarchical keyring's encrypt result is incompatible with AES decryption.
+This may be worth validating once with test vectors to ensure this scenario
+fails with the expected result.
+
+However, consider that the enumeration process above
+would result in a large number of test scenarios
+with an encrypting hierarchical keyring and a decrypting raw AES key,
+but with many combinations of [input dimension](#input-dimensions) values.
+(Consider that a scenario will be written with every combination of [representative plaintext length](esdk-test-vector-enumeration.md#representative-plaintext-constraints),
+every [commitment policy](../../client-apis/client.md#commitment-policy), every [algorithm suite ID](../algorithm-suites.md#algorithm-suite-id), etc.)
+In each case, the expected result is still `negative-decrypt`,
+but the test manifest now has a large number of test scenarios
+that fail for the same reason.
+
+Testing that hierarchical keyring-encrypted messages
+cannot be decrypted by raw AES keyrings
+across all possible input configurations
+is simply not as important
+as testing one of these input configurations.
+
+Another motivation for filtering test vectors
+comes from their usage as a code testing tool.
+Developers run test vectors against their code changes
+to ensure their changes
+do not break interoperability with other libraries.
+These tests should finish in a reasonable amount of time, and
+running unimportant tests wastes time.
+
+As a result of these considerations,
+determining which enumerated input configurations
+should be tested
+becomes a matter of priorities
+for a library developer.
+This spec explicitly does not define
+what an "important" test case is,
+nor set a standard for how long test vectors should take to execute.
+Test vector manifest generation library authors
+should determine which input configurations are "important"
+and determine a reasonable execution duration for these tests.
+
 ### Enumerating input configurations
 
 One test vector input configuration can be constructed by selecting one possible value (or possible [representative value](test-vector-enumeration.md#selecting-a-representative-input-value)) from all relevant [input dimensions](test-vector-enumeration.md#input-dimensions).
 
 All test vector input configurations can be enumerated by constructing all unique input configurations.
+If a test should be [filtered](#filtering-input-configurations), it should not be enumerated.
 
 ## Expected results
 
@@ -158,19 +240,8 @@ These rules can be relatively informal in the spec,
 but ideally should be written programmatically,
 so a developer can write implement these rules in test manifest generation code.
 
-Evaluation rules are a useful abstraction to determine a given test scenario's expected result. A list of independent rules is flexible and maintainable. A list of rules that maintain the same interface (reads input configuration; outputs success/fail) makes evaluating these rules programmable.
-
-### Multiple errors (TODO)
-
-An input configuration SHOULD only be deterministic of a single error.
-If a single input configuration can result in multiple errors,
-it SHOULD NOT be written.
-For example,
-if a test scenario specifies that `decrypt` provides incorrect `reproducedEncryptionContext` to a requried encryption context CMM
-but also specifies a key that cannot decrypt the encrypted value,
-that scenario should not be specified.
-
-(Is the above accurate?
-Do we need some method to determine precedence of errors?
-ex. if the decrypt key is wrong, but the reproduced EC is also wrong,
-should that be allowed and we should just pick the first error?)
+Evaluation rules are a useful abstraction to determine a given test scenario's expected result.
+A list of independent rules is flexible and maintainable.
+A list of rules that maintain the same interface
+(reads input configuration; outputs success/fail)
+makes evaluating these rules programmable.

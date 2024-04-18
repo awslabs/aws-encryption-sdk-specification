@@ -15,6 +15,8 @@ and [evaluating each configuration's expected result](test-vector-enumeration.md
 
 - Every [MPL input dimension](mpl-test-vector-enumeration.md#input-dimensions) is an input dimension for ESDK.
 - plaintext: Range of [representative plaintext values](#representative-plaintext-constraints)
+- commitment policy: Range of allowed [commitment policies](../../client-apis/client.md#commitment-policy)
+- frame size: Range of representative [frame sizes](TODO)
 
 ## Evaluation rules
 
@@ -32,12 +34,3 @@ and [evaluating each configuration's expected result](test-vector-enumeration.md
 * Largest frame + partial frame: all plaintexts where (length = 2^32-1 + [1 .. 2^32-1))
 * Two largest frames: all plaintexts where (length = 2*(2^32-1))
 * Many frames: all plaintexts where (length = 2*(2^32-1) + [1 .. (2^32-1)*(2^32-3)])
-
-## Concrete representative plaintext values
-
-(Should these even go in the spec?)
-
-* Empty: ""
-* Small: "abc"
-* Medium: "abcdefg12345678910"
-TODO

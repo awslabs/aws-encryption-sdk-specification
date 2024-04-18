@@ -20,9 +20,6 @@ The number of the items in the empty map MUST equal 0.
 MUST have a small map.
 The number of the items in the small map MUST be between 1 and 10.
 MUST have a large map.
-The number of the items in the small map MUST be greater than 10.
+The number of the items in the large map MUST be greater than 10.
 MUST have multibyte UTF8 characters in both the key and value.
 MUST have multibyte non-BMP characters in both the key and value.
-
-(Note: Constraints on representative values should go in the spec.
-Concrete representative values probably do not need to go here.)
