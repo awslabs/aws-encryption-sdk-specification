@@ -44,17 +44,17 @@ decrypt key description:
 ### Representative branch keys
 * `"static-branch-key-1"`
   * Any valid branch key.
-* "static-branch-key-2"
+* `"static-branch-key-2"`
   * Any other valid branch key
-* "branch-key-no-permissions"
+* `"branch-key-no-permissions"`
   * Any valid branch key where 
 the test vector runner does not have permissions
 for the KMS key
-* "branch-key-not-in-table"
+* `"branch-key-not-in-table"`
   * Any branch key ID not in the keystore table
-* "branch-key-no-version"
+* `"branch-key-no-version"`
   * Any branch key without a version
-* "invalid-branch-key"
+* `"invalid-branch-key"`
   * Any illegally mutated invalid branch key
 
 ### Evaluation rules

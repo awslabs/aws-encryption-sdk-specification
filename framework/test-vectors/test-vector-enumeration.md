@@ -235,7 +235,10 @@ The expected result of an [input configuration](#input-configuration) can be det
 by evaluating all relevant [evaluation rules](#expected-result-evaluation-rules) for that input configuration.
 If no evaluation rules fail, the test scenario result should be `"positive-keyring"`.
 If one evaluation rule fails, the test scenario result should be the result of that evaluation rule.
-If multiple evaluation rules fail, the test scenario should not be written. See [below](#multiple-errors-todo).
+If more than one evaluation rule fails with a different result
+(i.e. input configuration can result in both `"negative-encrypt"` and `"negative-decrypt"`),
+the test scenario result should be `"negative-encrypt"`.
+(Encryption happens first; failure on encrypt will be encountered first.)
 
 #### Expected result evaluation rules
 

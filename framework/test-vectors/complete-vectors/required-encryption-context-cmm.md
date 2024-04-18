@@ -81,15 +81,20 @@ For example:
 
 ## Test vector input dimensions and ranges
 
-- required encryption context keys: Range is  (TODO: plus representative nonsense values?)
-- reproduced encryption context: Range is every subset of of the encryption context (TODO: plus representative nonsense values?)
+- required encryption context keys: Range is every [representative required encryption context key](#representative-required-encryption-context-keys)
+- reproduced encryption context: Range is every [representative reproduced encryption context](#representative-reproduced-encryption-context)
 
-### Representative value constraints
+### Representative values
 
-#### Required encryption context keys
+#### Representative required encryption context keys
 
 * Every subset of keys in the provided [encryption context](../../structures.md#encryption-context)
-* Any value NOT in the provided encryption context.
+* Any key NOT in the provided encryption context.
+
+#### Representative reproduced encryption context
+
+* Every subset of items in the provided [encryption context](../../structures.md#encryption-context)
+* Any item NOT in the provided encryption context.
 
 ## Test vector evaluation rules
 
