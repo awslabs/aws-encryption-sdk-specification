@@ -47,19 +47,23 @@ const fileSettings = {
   },
   //  C files
   ".c:": {
-    conditionRemove: /(\*\/)|(\/\*)/g,
+    conditionRemove:
+      /(\*\/)|(\/\*)/g,
     complianceConfig: standardComplianceParams,
   },
   ".h:": {
-    conditionRemove: /(\*\/)|(\/\*)/g,
+    conditionRemove:
+      /(\*\/)|(\/\*)/g,
     complianceConfig: standardComplianceParams,
   },
   ".cpp:": {
-    conditionRemove: /(\*\/)|(\/\*)/g,
+    conditionRemove:
+      /(\*\/)|(\/\*)/g,
     complianceConfig: standardComplianceParams,
   },
   ".txt:": {
-    conditionRemove: /(\*\/)|(\/\*)/g,
+    conditionRemove:
+      /(\*\/)|(\/\*)/g,
     complianceConfig: standardComplianceParams,
   },
 };
@@ -94,7 +98,7 @@ const [sourceGlobs, testGlobs] = process.argv.slice(2).reduce(
         throw new Error(`Unknown argument for ${arg}`);
     }
   },
-  [[], []],
+  [[], []]
 );
 
 const conditionGrep = `grep -E 'Precondition:|Postcondition(:|\\):)'`;
@@ -103,19 +107,19 @@ const complianceGrep = `grep -E '//[=#]'`;
 Promise.all([
   executeAndClean(
     sourceGlobs.map((g) => `${conditionGrep} ${g}`),
-    clean,
+    clean
   ),
   executeAndClean(
     testGlobs.map((g) => `${conditionGrep} ${g}`),
-    clean,
+    clean
   ),
   executeAndClean(
     sourceGlobs.map((g) => `${complianceGrep} ${g}`),
-    cleanCompliance,
+    cleanCompliance
   ),
   executeAndClean(
     testGlobs.map((g) => `${complianceGrep} ${g}`),
-    cleanCompliance,
+    cleanCompliance
   ),
 ]).then(([conditionSource, conditionTests, complianceCitations, complianceTests]) => {
   let issues = 0;
@@ -128,12 +132,12 @@ Promise.all([
   issues += noDuplicates(
     conditionSource,
     conditionSourceSet,
-    "Duplicate source conditions",
+    "Duplicate source conditions"
   );
   issues += noDuplicates(
     conditionTestArray,
     conditionTestSet,
-    "Duplicate test conditions",
+    "Duplicate test conditions"
   );
 
   issues += [...complianceCitationsMap.values()]
@@ -147,23 +151,23 @@ Promise.all([
   issues += noDuplicates(
     complianceCitations,
     complianceCitationsMap,
-    "Duplicate compliance citation",
+    "Duplicate compliance citation"
   );
   issues += noDuplicates(
     complianceTests,
     complianceTestsMap,
-    "Duplicate compliance test",
+    "Duplicate compliance test"
   );
 
   issues += missingRight(conditionSourceSet, conditionTestSet).map((line) =>
-    console.log(`Missing test condition for \n${line}`),
+    console.log(`Missing test condition for \n${line}`)
   ).length;
   issues += missingRight(conditionTestSet, conditionSourceSet).map((line) =>
-    console.log(`Update or change test condition \n${line}`),
+    console.log(`Update or change test condition \n${line}`)
   ).length;
 
   issues += missingRight(complianceCitationsMap, complianceTestsMap).map((line) =>
-    console.log(`Missing compliance test for \n${complianceCitationsMap.get(line)}`),
+    console.log(`Missing compliance test for \n${complianceCitationsMap.get(line)}`)
   ).length;
   issues += missingRight(complianceTestsMap, complianceCitationsMap).map((line) => {
     console.log(`Update or change compliance test \n${complianceTestsMap.get(line)}`);
@@ -194,12 +198,12 @@ function clean({ stdout }) {
     .map((rawLine) => {
       if (!rawLine) return "";
       const [match] = rawLine.match(filePathMatch);
-      try {
+      try{
         const { conditionRemove } = fileSettings[match];
-        return rawLine.split(match).pop().replace(conditionRemove, "").trim();
-      } catch (ex) {
-        console.log(filePathMatch, match);
-        throw ex;
+      return rawLine.split(match).pop().replace(conditionRemove, "").trim(); 
+      } catch(ex) {
+        console.log(filePathMatch, match)
+        throw ex
       }
     })
     .filter((line) => line !== "");
@@ -308,8 +312,8 @@ async function executeAndClean(commands, cleanFn) {
           }
           throw ex;
         })
-        .then(cleanFn),
-    ),
+        .then(cleanFn)
+    )
   );
 
   return [].concat(...results);

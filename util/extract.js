@@ -10,21 +10,27 @@
 
 const { extname, basename, resolve, dirname, join, relative } = require("path");
 const { execSync } = require("child_process");
-const { readFileSync, writeFileSync, statSync, constants, mkdirSync } = require("fs");
+const {
+  readFileSync,
+  writeFileSync,
+  statSync,
+  constants,
+  mkdirSync,
+} = require("fs");
 const ext = ".md";
 const pathToComplianceRoot = `${relative(process.cwd(), `${__dirname}/../compliance`)}`;
 
 needs(
   () => execSync("which kramdown-rfc2629"),
-  "kramdown-rfc2629 needs to be installed, try `gem install kramdown-rfc2629 -v 1.5.21`",
+  "kramdown-rfc2629 needs to be installed, try `gem install kramdown-rfc2629 -v 1.5.21`"
 );
 needs(
   () => execSync("which xml2rfc"),
-  "xml2rfc needs to be installed, try `pip install xml2rfc==3.5.0`",
+  "xml2rfc needs to be installed, try `pip install xml2rfc==3.5.0`"
 );
 needs(
   () => execSync("which duvet"),
-  "duvet needs to be installed, try `util/install-duvet`",
+  "duvet needs to be installed, try `util/install-duvet`"
 );
 
 /* May need to change this to a better parser...
@@ -64,13 +70,11 @@ function extract(filePath) {
   writeFileSync(
     markdownSpecFile,
     [header(fileName), readFileSync(filePath, { encoding: "utf8" }), footer()].join("\n"),
-    { encoding: "utf8" },
+    { encoding: "utf8" }
   );
 
   // Convert the markdown file from RFC XML
-  execSync(["kramdown-rfc2629", "-3", markdownSpecFile, ">", xmlRfcFile].join(" "), {
-    stdio: "inherit",
-  });
+  execSync(["kramdown-rfc2629", "-3", markdownSpecFile, ">", xmlRfcFile].join(" "), {stdio: 'inherit'});
 
   // An existing spec may exists, clean up first
   try {
@@ -87,31 +91,23 @@ function extract(filePath) {
   mkdirSync(complianceDir, { recursive: true });
 
   // Convert the RFC XML to a ietf rfc
-  execSync(
-    [
-      "xml2rfc",
-      "-P",
-      xmlRfcFile,
-      "-s",
-      "'Too long line found'", // Suppress warnings about long table line length
-      "-s",
-      "'Total table width'", // Suppress warnings about overall table width
-      "-o",
-      complianceSpec,
-    ].join(" "),
-    { stdio: "inherit" },
-  );
+  execSync(["xml2rfc",
+    "-P", xmlRfcFile,
+    "-s", "'Too long line found'", // Suppress warnings about long table line length
+    "-s", "'Total table width'",   // Suppress warnings about overall table width
+    "-o", complianceSpec
+  ].join(" "), {stdio: 'inherit'});
 
   const args = ["duvet", "extract", `${complianceSpec}`, "-o", "compliance"];
   // extract the specification
-  execSync(args.join(" "), { encoding: "utf8", stdio: "inherit" });
+  execSync(args.join(" "), { encoding: 'utf8', stdio: 'inherit'});
 }
 
 function extract_needs(filePath) {
   needs(extname(filePath) === ext, `Unsupported ext ${ext}`);
   needs(
     () => statSync(filePath).isFile(),
-    `Specification file ${filePath} does not exist.`,
+    `Specification file ${filePath} does not exist.`
   );
   return filePath;
 }
