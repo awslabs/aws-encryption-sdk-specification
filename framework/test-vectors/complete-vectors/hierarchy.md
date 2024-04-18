@@ -24,11 +24,32 @@ a test MUST attempt to encrypt and decrypt with every [standard encryption conte
 
 ### Input dimensions
 
-- encrypting key type: "aws-kms-hierarchy"
-- decrypting key type: "aws-kms-hierarchy"
+- encrypt key description:
+    {
+        type: "aws-kms-hierarchy"
+        key: range of [representative branch keys](#representative-branch-keys)
+    }
+- decrypt key description:
+    {
+        type: "aws-kms-hierarchy"
+        key: range of [representative branch keys](#representative-branch-keys)
+        logicalKeyStore: [
+            "Default",
+            "Other",  # any other logical key store name
+        ]
+    }
+
+### Representative branch keys
 - key: [
-    "static-branch-key-1",
-    "static-branch-key-2"
+    "static-branch-key-1",  # any valid branch key
+    "static-branch-key-2",  # any other valid branch key
+    "branch-key-no-permissions",  # any valid branch key where 
+    the test vector runner does not have permissions
+    for the KMS key
+    "branch-key-not-in-table",  # any branch key ID not
+    in the keystore table
+    "branch-key-no-version",  # any branch key without a version
+    "invalid-branch-key",  # any illegally mutated invalid branch key
 ]
 
 ### Evaluation rules
@@ -39,7 +60,24 @@ the result should be `"negative-decrypt"`.
 - If encrypting key type is `"aws-kms-hierarchy"`
 and decrypting key type is anything other than `"aws-kms-hierarchy"`,
 the result should be `"negative-decrypt"`.
-- If encrypting and decrypting key type are both `"aws-kms-hierarchy"`
-and the `"key"` is different on encrypt and decrypt,
+- If the logical key store is "Other",
+the result should be `"negative-decrypt"`.
+- If `"key"` is different on encrypt and decrypt,
+the result should be `"negative-decrypt"`.
+- If `"key"` is `"branch-key-no-permissions"` on encrypt,
+the result should be `"negative-encrypt"`.
+- If `"key"` is `"branch-key-no-permissions"` on decrypt,
+the result should be `"negative-decrypt"`.
+- If `"key"` is `"branch-key-not-in-table"` on encrypt,
+the result should be `"negative-encrypt"`.
+- If `"key"` is `"branch-key-not-in-table"` on decrypt,
+the result should be `"negative-decrypt"`.
+- If `"key"` is `"branch-key-no-version"` on encrypt,
+the result should be `"negative-encrypt"`.
+- If `"key"` is `"branch-key-no-version"` on decrypt,
+the result should be `"negative-decrypt"`.
+- If `"key"` is `"invalid-branch-key"` on encrypt,
+the result should be `"negative-encrypt"`.
+- If `"key"` is `"invalid-branch-key"` on decrypt,
 the result should be `"negative-decrypt"`.
 - In all other cases, the result should be `"positive"`.
