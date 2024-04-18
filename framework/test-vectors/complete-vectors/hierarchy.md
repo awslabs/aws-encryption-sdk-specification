@@ -24,22 +24,13 @@ a test MUST attempt to encrypt and decrypt with every [standard encryption conte
 
 ### Input dimensions
 
-```
-encrypt key description:
-    {
-        type: "aws-kms-hierarchy"
-        key: range of [representative branch keys](#representative-branch-keys)
-    }
-decrypt key description:
-    {
-        type: "aws-kms-hierarchy"
-        key: range of [representative branch keys](#representative-branch-keys)
-        logicalKeyStore: [
-            "Default",
-            "Other",  # any other logical key store name
-        ]
-    }
-```
+- encrypt key description.key: range of [representative branch keys](#representative-branch-keys)
+- decrypt key description.key: range of [representative branch keys](#representative-branch-keys)
+- decrypt key description.logicalKeyStore:
+  - "Default",
+    - Represents the logical key store name on encrypt
+  - "Other"
+    - Represents any other logical key store name
 
 ### Representative branch keys
 * `"static-branch-key-1"`
