@@ -64,20 +64,14 @@ the result should be `"negative-decrypt"`.
 the result should be `"negative-decrypt"`.
 - If `"key"` is different on encrypt and decrypt,
 the result should be `"negative-decrypt"`.
-- If `"key"` is `"branch-key-no-permissions"` on encrypt,
-the result should be `"negative-encrypt"`.
-- If `"key"` is `"branch-key-no-permissions"` on decrypt,
-the result should be `"negative-decrypt"`.
-- If `"key"` is `"branch-key-not-in-table"` on encrypt,
-the result should be `"negative-encrypt"`.
-- If `"key"` is `"branch-key-not-in-table"` on decrypt,
-the result should be `"negative-decrypt"`.
-- If `"key"` is `"branch-key-no-version"` on encrypt,
-the result should be `"negative-encrypt"`.
-- If `"key"` is `"branch-key-no-version"` on decrypt,
-the result should be `"negative-decrypt"`.
-- If `"key"` is `"invalid-branch-key"` on encrypt,
-the result should be `"negative-encrypt"`.
-- If `"key"` is `"invalid-branch-key"` on decrypt,
-the result should be `"negative-decrypt"`.
+(i.e. no key specified here is interoperable with any other key.)
+- If `"key"` is any of:
+  - `"branch-key-no-permissions"`
+  - `"branch-key-not-in-table"`
+  - `"branch-key-no-version"`
+  - `"invalid-branch-key"`
+(i.e. an "invalid" key with a particular invalid condition)
+on either encrypt or decrypt,
+the result should be either `"negative-encrypt"` or `"negative-decrypt"`, 
+depending on whether the invalid key was specified on encrypt or decrypt.
 - In all other cases, the result should be `"positive"`.

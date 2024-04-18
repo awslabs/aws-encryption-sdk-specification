@@ -131,10 +131,6 @@ This is a mechanism to identify test cases that
 may not be as important as others
 and avoid writing them to a test vector manifest.
 
-Input configurations can be filtered at any point in the vector enumeration process,
-though it is beneficial to filter as early as possible
-to make enumeration as fast as possible.
-
 #### Motivation
 
 Some input configurations produced as a result of the enumeration above
@@ -185,6 +181,25 @@ nor set a standard for how long test vectors should take to execute.
 Test vector manifest generation library authors
 should determine which input configurations are "important"
 and determine a reasonable execution duration for these tests.
+
+#### Guidance
+
+Some guidance for filtering input configurations:
+
+* Prune invalid configurations as early as possible.
+Input configurations can be filtered at any point in the vector enumeration process,
+though it is beneficial to filter as early as possible
+and prune large numbers of filtered configurations
+to make input configuration enumeration as fast as possible.
+For example, if the configuration under consideration
+has a hierarchy keyring on encrypt and a raw AES keyring on decrypt,
+the manifest generator might generate only one of these cases
+(as a smoke test),
+then skip considering all other configurations.
+In contrast, a naïve approach would consider all of these other configurations
+and deem them invalid.
+This guidance suggests short-circuiting that evaluation as much as possible
+to save time when generating vectors.
 
 ### Enumerating input configurations
 
