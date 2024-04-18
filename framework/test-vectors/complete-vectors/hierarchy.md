@@ -42,15 +42,20 @@ decrypt key description:
 ```
 
 ### Representative branch keys
-* "static-branch-key-1",  # any valid branch key
-* "static-branch-key-2",  # any other valid branch key
-* "branch-key-no-permissions",  # any valid branch key where 
+* `"static-branch-key-1"`
+  * Any valid branch key.
+* "static-branch-key-2"
+  * Any other valid branch key
+* "branch-key-no-permissions"
+  * Any valid branch key where 
 the test vector runner does not have permissions
 for the KMS key
-* "branch-key-not-in-table",  # any branch key ID not
-in the keystore table
-* "branch-key-no-version",  # any branch key without a version
-* "invalid-branch-key",  # any illegally mutated invalid branch key
+* "branch-key-not-in-table"
+  * Any branch key ID not in the keystore table
+* "branch-key-no-version"
+  * Any branch key without a version
+* "invalid-branch-key"
+  * Any illegally mutated invalid branch key
 
 ### Evaluation rules
 
