@@ -88,23 +88,23 @@ For example:
 
 #### Representative required encryption context keys
 
-* Every subset of keys in the provided [encryption context](../../structures.md#encryption-context)
-* Any key NOT in the provided encryption context.
+- Every subset of keys in the provided [encryption context](../../structures.md#encryption-context)
+- Any key NOT in the provided encryption context.
 
 #### Representative reproduced encryption context
 
-* Every subset of items in the provided [encryption context](../../structures.md#encryption-context)
-* Any item NOT in the provided encryption context.
+- Every subset of items in the provided [encryption context](../../structures.md#encryption-context)
+- Any item NOT in the provided encryption context.
 
 ## Test vector evaluation rules
 
 - If any of the `requiredEncryptionContextKeys` do not exist in the
-supplied encryption context on encrypt
-then the test result MUST be `negative-encrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-encrypt)
-- If the set of keys in `reproducedEncryptionContext` on decrypt 
-does not match the set of `requiredEncryptionContextKeys`,
-then the test result MUST be `negative-decrypt-keyring`. [source]
-- If the the value for any key in `reproducedEncryptionContext` on decrypt 
-does not match the value provided for that key on encrypt,
-then the test result MUST be `negative-decrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-decrypt)
+  supplied encryption context on encrypt
+  then the test result MUST be `negative-encrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-encrypt)
+- If the set of keys in `reproducedEncryptionContext` on decrypt
+  does not match the set of `requiredEncryptionContextKeys`,
+  then the test result MUST be `negative-decrypt-keyring`. [source]
+- If the the value for any key in `reproducedEncryptionContext` on decrypt
+  does not match the value provided for that key on encrypt,
+  then the test result MUST be `negative-decrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-decrypt)
 - In all other cases, the test result MUST be `positive-keyring`.

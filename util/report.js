@@ -5,7 +5,7 @@ const { execSync } = require("child_process");
 
 needs(
   () => execSync("which duvet"),
-  "duvet needs to be installed try `util/install-duvet`"
+  "duvet needs to be installed try `util/install-duvet`",
 );
 
 const data = execSync("git remote -v")
@@ -21,7 +21,7 @@ const data = execSync("git remote -v")
   .map((line) =>
     line.startsWith("https://")
       ? line
-      : line.replace("git@github.com:", "https://github.com/")
+      : line.replace("git@github.com:", "https://github.com/"),
   )
   /* Drop the `.git` because this is not in GitHub blob or issue urls */
   .map((line) => line.replace(".git", ""))

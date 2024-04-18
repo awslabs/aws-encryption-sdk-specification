@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Test Vector Enumeration 
+# Test Vector Enumeration
 
 ## Overview
 
@@ -18,13 +18,14 @@ and expected results of encryption and/or decryption.
 
 The framework does not enumerate
 every possible input configuration for two reasons:
-1. It is impractical to enumerate every possible input value 
-for some attributes in an input configuration
-(see ["representative values"](#selecting-a-representative-input-value)).
+
+1. It is impractical to enumerate every possible input value
+   for some attributes in an input configuration
+   (see ["representative values"](#selecting-a-representative-input-value)).
 2. Some input configurations with `negative` expected results
-are not as critical of test cases as others
-and are not a priority to test at this time
-(see ["filtering input configurations"](#filtering-input-configurations))
+   are not as critical of test cases as others
+   and are not a priority to test at this time
+   (see ["filtering input configurations"](#filtering-input-configurations))
 
 As a result,
 the framework does not actually enumerate
@@ -33,7 +34,7 @@ However, by carefully reasoning about
 the selection of representative values
 and the filtered test cases,
 the framework constructs a set of pairings
-that is *representative* of all *relevant*
+that is _representative_ of all _relevant_
 input configurations and expected results.
 
 ## Input configuration
@@ -56,7 +57,7 @@ or how to construct its range of possible values.
 
 ### Selecting a representative input value
 
-Not every input value in an [input dimension](#input-dimensions) can be practically tested, 
+Not every input value in an [input dimension](#input-dimensions) can be practically tested,
 as the number of allowed configurations as inputs to encryption is massive.
 For example, the number of possible plaintexts that can be encrypted is massive;
 it is impractical to enumerate and test all possible plaintexts.
@@ -74,18 +75,19 @@ and test it in the test vectors.
 For example, we might partition the set of all possible plaintexts
 based on the plaintext length.
 Our hypothetical "smaller sets" might be:
-* Empty: length = 0
-* Small: all plaintexts where (1 < length ≤ 10)
-* Medium: all plaintexts where (10 < length ≤ 1000)
-* Large: all plaintexts where (1000 < length ≤ 2^32-1)
-* Largest frame: all plaintexts where (length = 2^32-1)
-* Largest frame + partial frame: all plaintexts where (length = 2^32-1 + [1 .. 2^32-1))
-* Two largest frames: all plaintexts where (length = 2*(2^32-1))
-* Many frames: all plaintexts where (length = 2*(2^32-1) + [1 .. (2^32-1)*(2^32-3)])
+
+- Empty: length = 0
+- Small: all plaintexts where (1 < length ≤ 10)
+- Medium: all plaintexts where (10 < length ≤ 1000)
+- Large: all plaintexts where (1000 < length ≤ 2^32-1)
+- Largest frame: all plaintexts where (length = 2^32-1)
+- Largest frame + partial frame: all plaintexts where (length = 2^32-1 + [1 .. 2^32-1))
+- Two largest frames: all plaintexts where (length = 2\*(2^32-1))
+- Many frames: all plaintexts where (length = 2*(2^32-1) + [1 .. (2^32-1)*(2^32-3)])
 
 (The motivation for partitioning this set based on lengths of 2^32-1 comes from the ESDK message [frame size](https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/message-format.html#body-framing).)
 
-From each of these smaller sets, we select one (or more) 
+From each of these smaller sets, we select one (or more)
 concrete "representative" values that are tested in test vectors.
 For example, a representative "small" plaintext could be `"abc"`.
 
@@ -186,20 +188,20 @@ and determine a reasonable execution duration for these tests.
 
 Some guidance for filtering input configurations:
 
-* Prune invalid configurations as early as possible.
-Input configurations can be filtered at any point in the vector enumeration process,
-though it is beneficial to filter as early as possible
-and prune large numbers of filtered configurations
-to make input configuration enumeration as fast as possible.
-For example, if the configuration under consideration
-has a hierarchy keyring on encrypt and a raw AES keyring on decrypt,
-the manifest generator might generate only one of these cases
-(as a smoke test),
-then skip considering all other configurations.
-In contrast, a naïve approach would consider all of these other configurations
-and deem them invalid.
-This guidance suggests short-circuiting that evaluation as much as possible
-to save time when generating vectors.
+- Prune invalid configurations as early as possible.
+  Input configurations can be filtered at any point in the vector enumeration process,
+  though it is beneficial to filter as early as possible
+  and prune large numbers of filtered configurations
+  to make input configuration enumeration as fast as possible.
+  For example, if the configuration under consideration
+  has a hierarchy keyring on encrypt and a raw AES keyring on decrypt,
+  the manifest generator might generate only one of these cases
+  (as a smoke test),
+  then skip considering all other configurations.
+  In contrast, a naïve approach would consider all of these other configurations
+  and deem them invalid.
+  This guidance suggests short-circuiting that evaluation as much as possible
+  to save time when generating vectors.
 
 ### Enumerating input configurations
 
@@ -214,12 +216,13 @@ An expected result is a categorical value
 and an optional error description.
 
 An expected result categorical value is one of:
-* Positive (successful test scenario)
-    * `"positive-keyring"`
-* Negative encrypt (failure on encrypt)
-    * `"negative-encrypt-keyring"`
-* Negative decrypt (failure on decrypt)
-    * `"negative-decrypt-keyring"`
+
+- Positive (successful test scenario)
+  - `"positive-keyring"`
+- Negative encrypt (failure on encrypt)
+  - `"negative-encrypt-keyring"`
+- Negative decrypt (failure on decrypt)
+  - `"negative-decrypt-keyring"`
 
 The error description for negative scenarios
 describes the reason for the scenario's failure.
