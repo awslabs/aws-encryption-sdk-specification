@@ -104,8 +104,6 @@ If the [AWS KMS Configuration](#aws-kms-configuration) designates MRK ARN compat
 then two ARNs are compatible if they are equal in all parts other than the region.
 That is, they are compatible if [AWS KMS MRK Match for Decrypt](aws-kms/aws-kms-mrk-match-for-decrypt.md#implementation) returns true.
 
-
-
 ### Logical KeyStore Name
 
 This name is cryptographically bound to all data stored in this table,
