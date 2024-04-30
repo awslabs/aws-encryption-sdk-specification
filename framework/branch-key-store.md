@@ -5,10 +5,12 @@
 
 ## Version
 
-0.2.0
+0.3.0
 
 ### Changelog
 
+- 0.3.0
+  - Introduce MRK Compatibility via KMS Configuration
 - 0.2.0
   - Update keystore structure and add encryption context option
 - 0.1.0
@@ -16,8 +18,11 @@
 
 ## Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-| -------- | -------------------------------------- | ------------------------- | -------------- |
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                                                                                   |
+| -------- | -------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dafny    | 0.3.0                                  | 1.3.0                     | [AwsCryptographyKeyStoreOperations.dfy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographyKeyStore/src/AwsCryptographyKeyStoreOperations.dfy) |
+| Java     | 0.3.0                                  | 1.3.0                     | [KeyStore.java](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/java/src/main/smithy-generated/software/amazon/cryptography/keystore/KeyStore.java)     |
+| .NET     | 0.3.0                                  | 1.3.0                     | [KeyStore.cs](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/net/Generated/AwsCryptographyKeyStore/KeyStore.cs)                                        |
 
 ## Overview
 
@@ -69,13 +74,13 @@ A list of AWS KMS [grant tokens](https://docs.aws.amazon.com/kms/latest/develope
 
 The DynamoDb Client used to put and get keys from the backing DDB table.
 
-If not provided, one will be created in the region of the supplied KMS Key ARN
+If not provided, one will be created in the region of the supplied KMS Key ARN.
 
 ### KMS Client
 
 The KMS Client used when wrapping and unwrapping keys.
 
-If not provided, one will be created in the region of the supplied KMS Key ARN
+If not provided, one will be created in the region of the supplied KMS Key ARN.
 
 On initialization the KeyStore MUST append a user agent string to the AWS KMS SDK Client with the
 value `aws-kms-hierarchy`.
@@ -89,9 +94,9 @@ The table name of the DynamoDb table that backs this Keystore.
 A valid [AWS KMS Key ARN](./aws-kms/aws-kms-key-arn.md#a-valid-aws-kms-arn)
 that wraps and unwraps keys stored in Amazon DynamoDB.
 
-The KMS Configuration MUST distinguish between single region ARN compatibility and MRK ARN compatibility.
+The KMS Configuration MUST distinguish between Single Region Key ARN compatibility and Multi Region Key (MRK) ARN compatibility.
 
-Both compatibility modes are allowed with both mrk ARN's and single region ARNs.
+Both compatibility modes are allowed with both MRK ARN's and Single Region ARNs.
 
 #### AWS Key ARN Compatibility
 
