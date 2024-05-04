@@ -246,7 +246,7 @@ with asymmetric signing.
 In order to avoid an expensive cryptographic calculation,
 as well as to avoid cases where the customer may be misinterpreting
 the intent of the signature algorithm,
-the AWS KMS Keyring rejects any material containing an algorithm suite
+the AWS KMS RSA Keyring rejects any material containing an algorithm suite
 with asymmetric signing.
 
 A similar situation exists in the [Raw AES Keyring](../raw-rsa-keyring.md)
@@ -255,7 +255,7 @@ With the Raw RSA Keyring, the material used on encrypt is public,
 so there is no set up in which it makes sense to use an algorithm suite
 with asymmetric signing.
 With the Raw AES Keyring, because the Keyring requires
-the AWS symmetric key for decryption to be available in memory
+the AES symmetric key for decryption to be available in memory
 (as opposed to calling out for the decryption to happen via an HSM,
 which may have access control on it),
 decrypt access necessarially implies encrypt access.
