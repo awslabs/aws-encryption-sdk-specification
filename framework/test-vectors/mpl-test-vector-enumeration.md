@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# ESDK Test Vector Enumeration
+# MPL Test Vector Enumeration
 
 This document performs the [test vector enumeration](test-vector-enumeration.md) process for the MPL
 to construct the full suite of test vectors

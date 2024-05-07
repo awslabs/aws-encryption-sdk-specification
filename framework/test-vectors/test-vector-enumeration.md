@@ -142,15 +142,15 @@ to warrant the time spent testing them.
 
 For example,
 consider all cases where a hierarchical keyring is encrypting,
-but some raw AES key is decrypting.
-This is expected have an [expected result](#expected-results) of `negative-decrypt`,
-since a hierarchical keyring's encrypt result is incompatible with AES decryption.
+but some raw AES keyring is decrypting.
+This will have an [expected result](#expected-results) of `negative-decrypt`,
+since a hierarchical keyring's encrypt result is incompatible with an AES meyring's decryption.
 This may be worth validating once with test vectors to ensure this scenario
 fails with the expected result.
 
 However, consider that the enumeration process above
 would result in a large number of test scenarios
-with an encrypting hierarchical keyring and a decrypting raw AES key,
+with an encrypting hierarchical keyring and a decrypting raw AES keyring,
 but with many combinations of [input dimension](#input-dimensions) values.
 (Consider that a scenario will be written with every combination of [representative plaintext length](esdk-test-vector-enumeration.md#representative-plaintext-constraints),
 every [commitment policy](../../client-apis/client.md#commitment-policy), every [algorithm suite ID](../algorithm-suites.md#algorithm-suite-id), etc.)
