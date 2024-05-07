@@ -27,64 +27,89 @@ and [evaluating each configuration's expected result](test-vector-enumeration.md
 
 ### Representative frame sizes
 
-- Non-framed data: `length = 0`
-  - The representative value for non-framed data MUST have length = 0.
-- Small frame: `0 < length < 4096`
-  - The representative value for a small frame MUST have length between 0 and 4096.
-- Default frame: `length = 4096`
-  - The representative value for non-framed data MUST have length = 4096.
-- Large frame: `length > 4096`
-  - The representative value for non-framed data MUST have length greater than 4096.
-
-### Representative number of maximum encrypted data keys (EDKs)
-
-- None: `max EDKs unset`
-  - The representative value for no configured maxiumum number of EDKs MUST be an unset value.
-- Zero: `max EDKs = 0`
-  - The representative value for zero maximum EDKs MUST have length = 0.
-- One: `max EDKs = 1`
-  - The representative value for one maximum EDK MUST have length = 1.
-- Few: `1 < max EDKs < 10`
-  - The representative value for few maximum EDKs MUST have length between 1 and 10.
-- Many: `10 ≤ max EDKs`
-  - The representative value for many maximum EDKs MUST have length of at least 10.
+- Non-framed data: `frame size = 0`
+  - The representative frame size value for non-framed data
+    MUST have frame size = 0.
+- Small frame: `0 < frame size < 4096`
+  - The representative value for a small frame
+    MUST have frame size between 0 and 4096.
+- Default frame: `frame size = 4096`
+  - The representative value for the default frame size
+    MUST have frame size = 4096.
+- Large frame: `frame size > 4096`
+  - The representative value for a large frame
+    MUST have frame size greater than 4096.
 
 ### Representative plaintext constraints
 
 #### Framed data
 
-These should ONLY be used if `frame length > 0`.
+These MUST only be used if `frame length > 0`.
 
 - Empty: `length = 0`
-  - The representative value for empty framed data MUST have length = 0.
+  - The representative plaintext value for empty framed data
+    MUST have length = 0.
 - Small: `0 < length < 10`
-  - The representative value for small framed data MUST have length between 0 and 10.
+  - The representative plaintext value for small framed data
+    MUST have length between 0 and 10.
   - If `frame size < 10`, omit this.
 - Medium: `10 ≤ length < 1000`
-  - The representative value for medium framed data MUST have length of at least 10 and less than 1000.
+  - The representative plaintext value for medium framed data
+    MUST have length of at least 10 and less than 1000.
   - If `frame size < 1000`, omit this.
 - Large: `1000 ≤ length <` [frame size](#representative-frame-sizes)
-  - The representative value for large framed data MUST have length of at least 1000 and less than the configured frame size.
+  - The representative plaintext value for large framed data
+    MUST have length of at least 1000 and less than the configured frame size.
 - Largest frame: `length = frame size`
-  - The representative value for the largest frame a MUST have length equal to the configured frame size.
+  - The representative plaintext value for the largest frame
+    MUST have length equal to the configured frame size.
 - Largest frame + partial frame: `frame size < length < 2\*(frame size)`
-  - The representative value for a largest frame plus partial frame a MUST have length between the configured frame size and ((twice the configured frame size) minus one).
+  - The representative plaintext value for a largest frame plus partial frame
+    MUST have length between the configured frame size
+    and twice the configured frame size.
 - Two largest frames: `length = 2\*(frame size)`
-  - The representative value for two largest frame a MUST have length equal to twice the configured frame size.
+  - The representative plaintext value for two largest frames
+    MUST have length equal to twice the configured frame size.
 - Many frames: `2*(frame size) < length < (frame size)\*(maximum # of frames)`
-  - The representative value for many frames a MUST have length between twice the configured frame size and ((the configured maximum number of frames) times (the configured frame size)).
+  - The representative plaintext value for many frames
+    MUST have length between twice the configured frame size
+    and ((the configured maximum number of frames) times (the configured frame size)).
 - Maximum frames: `length = (frame size)\*(maximum # of frames)`
-  - The representative value for maximum frames a MUST have length equal to the configured maximum number of frames times the configured frame size.
+  - The representative plaintext value for maximum frames
+    MUST have length equal to the configured maximum number of frames times the configured frame size.
 
 #### Non-framed data
 
-These should ONLY be used if `frame length = 0`.
+These MUST only be used if `frame length = 0`.
 
 - Empty: `length = 0`
-  - The representative value for empty non-framed data MUST have length equal to 0.
+  - The representative plaintext value for empty non-framed data
+    MUST have length equal to 0.
 - Small: `0 < length < 10`
-  - The representative value for small non-framed data MUST have length between 0 and 10.
+  - The representative plaintext value for small non-framed data
+    MUST have length between 0 and 10.
 - Medium: `10 ≤ length < 1000`
-  - The representative value for empty non-framed data MUST have length of at least 10 and less than 1000.
+  - The representative plaintext value for empty non-framed data
+    MUST have length of at least 10 and less than 1000.
 - Large: `1000 < length ≤ 2^32`
-  - The representative value for empty non-framed data MUST have length of at least 1000 and less than 2^32.
+  - The representative plaintext value for empty non-framed data
+    MUST have length of at least 1000 and less than 2^32.
+
+### Representative number of maximum encrypted data keys (EDKs)
+
+- No configured value
+  - The representative value for no configured maxiumum number of EDKs
+    MUST be some unset value
+    that is interpreted as "no maximum value" by the ESDK implementation.
+- Zero: `max EDKs = 0`
+  - The representative value for zero maximum EDKs
+    MUST have length = 0.
+- One: `max EDKs = 1`
+  - The representative value for one maximum EDK
+    MUST have length = 1.
+- Few: `1 < max EDKs < 10`
+  - The representative value for few maximum EDKs
+    MUST have length between 1 and 10.
+- Many: `10 ≤ max EDKs`
+  - The representative value for many maximum EDKs
+    MUST have length of at least 10.

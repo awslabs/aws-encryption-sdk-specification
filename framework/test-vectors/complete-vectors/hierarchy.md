@@ -36,19 +36,17 @@ a test MUST attempt to encrypt and decrypt with every [standard encryption conte
 ### Representative branch keys
 
 - `"static-branch-key-1"`
-  - Any valid branch key.
+  - MUST be some valid branch key.
 - `"static-branch-key-2"`
-  - Any other valid branch key
+  - MUST be some valid branch key other than `static-branch-key-1`.
 - `"branch-key-no-permissions"`
-  - Any valid branch key where
-    the test vector runner does not have permissions
-    for the KMS key
+  - MUST be some valid branch key where the test vector runner does not have permissions for the KMS key
 - `"branch-key-not-in-table"`
-  - Any branch key ID not in the keystore table
+  - MUST be some branch key ID not in the keystore table
 - `"branch-key-no-version"`
-  - A Version of a branch key which does not exist
-- `"invalid-branch-key"`
-  - Any illegally mutated invalid branch key
+  - MUST be some branch key with an invalid version that does not exist
+- `"invalid-branch-key-material"`
+  - MUST be some branch key with illegally mutated invalid branch key material
 
 ### Evaluation rules
 
