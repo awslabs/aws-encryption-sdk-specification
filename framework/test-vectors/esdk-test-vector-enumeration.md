@@ -44,7 +44,7 @@ and [evaluating each configuration's expected result](test-vector-enumeration.md
 
 #### Framed data
 
-These MUST only be used if `frame length > 0`.
+These MUST only be used if `frame size > 0`.
 
 - Empty: `length = 0`
   - The representative plaintext value for empty framed data

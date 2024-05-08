@@ -27,6 +27,14 @@ every possible input configuration for two reasons:
    and are not a priority to test at this time
    (see ["filtering input configurations"](#filtering-input-configurations))
 
+These reasons are both motivated by test efficiency.
+It is infeasible to enumerate every possible plaintext,
+or test every invalid encryption configuration.
+By strategically identifying test cases to enumerate,
+the test vector framework employs orders of magnitude of leverage
+to have comprehensive test coverage
+with a concise suite of tests.
+
 As a result,
 the framework does not actually enumerate
 all possible input configurations and expected results.
@@ -42,6 +50,14 @@ input configurations and expected results.
 An input configuration is a list of key-value pairs
 where the key represents some [input dimension](#input-dimensions)
 and the value is one allowed value in that input dimension.
+
+Input configurations for encrypt and decrypt SHOULD be specified separately.
+In "positive" test cases, a given input dimension
+will likely have the same value in the encrypt and decrypt configurations.
+However, in "negative" test cases, a given input dimension
+will likely have different values between encrypt and decrypt.
+Specifying encrypt and decrypt configurations separately provides flexibility
+and cleanly supports negative test cases.
 
 ### Input dimensions
 
@@ -144,7 +160,7 @@ For example,
 consider all cases where a hierarchical keyring is encrypting,
 but some raw AES keyring is decrypting.
 This will have an [expected result](#expected-results) of `negative-decrypt`,
-since a hierarchical keyring's encrypt result is incompatible with an AES meyring's decryption.
+since a hierarchical keyring's encrypt result is incompatible with a Raw AES Keyring's decryption.
 This may be worth validating once with test vectors to ensure this scenario
 fails with the expected result.
 
@@ -259,7 +275,7 @@ to determine when these vectors should fail.
 
 These rules can be relatively informal in the spec,
 but ideally should be written programmatically,
-so a developer can write implement these rules in test manifest generation code.
+so a developer can implement these rules in test manifest generation code.
 
 Evaluation rules are a useful abstraction to determine a given test scenario's expected result.
 A list of independent rules is flexible and maintainable.

@@ -24,8 +24,14 @@ a test MUST attempt to encrypt and decrypt with every [standard encryption conte
 
 ### Input dimensions
 
-- encrypt key description.key: range of [representative branch keys](#representative-branch-keys)
-- decrypt key description
+#### Encrypt
+
+- key description
+  - key: range of [representative branch keys](#representative-branch-keys)
+
+#### Decrypt
+
+- key description
   - key: range of [representative branch keys](#representative-branch-keys)
   - logicalKeyStore:
     - "Default",
@@ -40,13 +46,13 @@ a test MUST attempt to encrypt and decrypt with every [standard encryption conte
 - `"static-branch-key-2"`
   - MUST be some valid branch key other than `static-branch-key-1`.
 - `"branch-key-no-permissions"`
-  - MUST be some valid branch key where the test vector runner does not have permissions for the KMS key
+  - MUST be some valid branch key where the test vector runner does not have permissions for the KMS key.
 - `"branch-key-not-in-table"`
-  - MUST be some branch key ID not in the keystore table
+  - MUST be some branch key ID not present in the keystore table.,
 - `"branch-key-no-version"`
-  - MUST be some branch key with an invalid version that does not exist
+  - MUST be some branch key that is in the table, but the configured version is not in the table.
 - `"invalid-branch-key-material"`
-  - MUST be some branch key with illegally mutated invalid branch key material
+  - MUST be some branch key with illegally mutated invalid branch key material.
 
 ### Evaluation rules
 

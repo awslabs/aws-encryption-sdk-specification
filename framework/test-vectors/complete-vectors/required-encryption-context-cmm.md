@@ -79,22 +79,32 @@ For example:
   set to `{a}`, the only success case for a message to successfully decrypt will be
   to supply the reproducedEncryptionContext `{a:a}`.
 
-## Test vector input dimensions and ranges
+## Input dimensions and ranges
 
+### Encrypt
+
+- cmm: Adds a `"RequiredEncryptionContext"` allowed value
+  - MUST add a `"RequiredEncryptionContext"` value to the `"cmm"` input dimension.
 - required encryption context keys: Range is every [representative required encryption context key](#representative-required-encryption-context-keys)
+  - MUST test the full range of representative required encryption context keys.
 - reproduced encryption context: Range is every [representative reproduced encryption context](#representative-reproduced-encryption-context)
+  - MUST test the full range of representative reproduced encryption context.
 
 ### Representative values
 
 #### Representative required encryption context keys
 
 - Every subset of keys in the provided [encryption context](../../structures.md#encryption-context)
+  - MUST test every subset of keys in the provided encryption context.
 - Any key NOT in the provided encryption context.
+  - MUST test with some additional key that is not in the provided encryption context.
 
 #### Representative reproduced encryption context
 
 - Every subset of items in the provided [encryption context](../../structures.md#encryption-context)
+  - MUST test every subset of items in the provided encryption context.
 - Any item NOT in the provided encryption context.
+  - MUST test with some additional item that is not in the provided encryption context.
 
 ## Test vector evaluation rules
 
