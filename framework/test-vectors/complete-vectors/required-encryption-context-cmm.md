@@ -90,6 +90,17 @@ For example:
 - reproduced encryption context: Range is every [representative reproduced encryption context](#representative-reproduced-encryption-context)
   - MUST test the full range of representative reproduced encryption context.
 
+### Decrypt
+
+These are the same as [Encrypt](#encrypt), but are specified separately so Duvet can link to unique lines for decrypt configuration.
+
+- cmm: Adds a `"RequiredEncryptionContext"` allowed value
+  - MUST add a `"RequiredEncryptionContext"` value to the `"cmm"` input dimension.
+- required encryption context keys: Range is every [representative required encryption context key](#representative-required-encryption-context-keys)
+  - MUST test the full range of representative required encryption context keys.
+- reproduced encryption context: Range is every [representative reproduced encryption context](#representative-reproduced-encryption-context)
+  - MUST test the full range of representative reproduced encryption context.
+
 ### Representative values
 
 #### Representative required encryption context keys
