@@ -77,4 +77,55 @@ For example:
 
 - Given the encryption context `{a:a, b:b}` with the `requiredEncryptionContextKeys`
   set to `{a}`, the only success case for a message to successfully decrypt will be
-  to supply the reproducedEncryptionContext `{a}`.
+  to supply the reproducedEncryptionContext `{a:a}`.
+
+## Input dimensions and ranges
+
+### Encrypt
+
+- cmm: Adds a `"RequiredEncryptionContext"` allowed value
+  - MUST add a `"RequiredEncryptionContext"` value to the `"cmm"` input dimension.
+- required encryption context keys: Range is every [representative required encryption context key](#representative-required-encryption-context-keys)
+  - MUST test the full range of representative required encryption context keys.
+- reproduced encryption context: Range is every [representative reproduced encryption context](#representative-reproduced-encryption-context)
+  - MUST test the full range of representative reproduced encryption context.
+
+### Decrypt
+
+These are the same as [Encrypt](#encrypt), but are specified separately so Duvet can link to unique lines for decrypt configuration.
+
+- cmm: Adds a `"RequiredEncryptionContext"` allowed value
+  - MUST add a `"RequiredEncryptionContext"` value to the `"cmm"` input dimension.
+- required encryption context keys: Range is every [representative required encryption context key](#representative-required-encryption-context-keys)
+  - MUST test the full range of representative required encryption context keys.
+- reproduced encryption context: Range is every [representative reproduced encryption context](#representative-reproduced-encryption-context)
+  - MUST test the full range of representative reproduced encryption context.
+
+### Representative values
+
+#### Representative required encryption context keys
+
+- Every subset of keys in the provided [encryption context](../../structures.md#encryption-context)
+  - MUST test every subset of keys in the provided encryption context.
+- Any key NOT in the provided encryption context.
+  - MUST test with some additional key that is not in the provided encryption context.
+
+#### Representative reproduced encryption context
+
+- Every subset of items in the provided [encryption context](../../structures.md#encryption-context)
+  - MUST test every subset of items in the provided encryption context.
+- Any item NOT in the provided encryption context.
+  - MUST test with some additional item that is not in the provided encryption context.
+
+## Test vector evaluation rules
+
+- If any of the `requiredEncryptionContextKeys` do not exist in the
+  supplied encryption context on encrypt
+  then the test result MUST be `negative-encrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-encrypt)
+- If the set of keys in `reproducedEncryptionContext` on decrypt
+  does not match the set of `requiredEncryptionContextKeys`,
+  then the test result MUST be `negative-decrypt-keyring`. [source]
+- If the the value for any key in `reproducedEncryptionContext` on decrypt
+  does not match the value provided for that key on encrypt,
+  then the test result MUST be `negative-decrypt-keyring`. [source](#required-encryption-context-cmm-failures-on-decrypt)
+- In all other cases, the test result MUST be `positive-keyring`.

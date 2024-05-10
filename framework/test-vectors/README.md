@@ -97,7 +97,7 @@ looking at how test vectors are created helps reason about the edge cases of a c
 ## Drawbacks
 
 Not every configuration can be practically tested.
-But we can expand on the test cases.
+See [test vector enumeration](test-vector-enumeration.md#selecting-a-representative-input-value) for details.
 
 We will need to write minimal clients in every language with which we want to use these test
 vectors to understand the manifests described in subsequent features.
