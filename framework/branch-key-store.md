@@ -5,7 +5,7 @@
 
 ## Version
 
-0.4.0
+0.5.0
 
 ### Changelog
 
@@ -24,9 +24,9 @@
 
 | Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                                                                                   |
 | -------- | -------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Dafny    | 0.3.0                                  | 1.3.0                     | [AwsCryptographyKeyStoreOperations.dfy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographyKeyStore/src/AwsCryptographyKeyStoreOperations.dfy) |
-| Java     | 0.3.0                                  | 1.3.0                     | [KeyStore.java](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/java/src/main/smithy-generated/software/amazon/cryptography/keystore/KeyStore.java)     |
-| .NET     | 0.3.0                                  | 1.3.0                     | [KeyStore.cs](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/net/Generated/AwsCryptographyKeyStore/KeyStore.cs)                                        |
+| Dafny    | 0.5.0                                  | 1.4.0                     | [AwsCryptographyKeyStoreOperations.dfy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographyKeyStore/src/AwsCryptographyKeyStoreOperations.dfy) |
+| Java     | 0.5.0                                  | 1.4.0                     | [KeyStore.java](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/java/src/main/smithy-generated/software/amazon/cryptography/keystore/KeyStore.java)     |
+| .NET     | 0.5.0                                  | 1.4.0                     | [KeyStore.cs](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/net/Generated/AwsCryptographyKeyStore/KeyStore.cs)                                        |
 
 ## Overview
 
@@ -34,6 +34,16 @@ A Keystore persists hierarchical data that allows customers to call AWS KMS less
 The Keystore persists branch keys in DynamoDb that wrap multiple data keys.
 This creates a hierarchy where a branch key wraps multiple data keys and facilitates caching.
 These branch keys are only generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
+
+By creating and persisting a data key to an accesbile medium,
+such as a DynamoDb table,
+distributed cryptographic agents can use a common, coordianted, data key
+as the root of a key hierarchy.
+
+This prevents distributed cryptographic agents from independently 
+generating unique data keys that COULD BE coordinated,
+which leads to poor caching performance at decryption,
+as each unqiue encrypting agent had a unqiue data key.
 
 This Keystore interface defines operations that any implementation of its specification must support and implement.
 
@@ -78,10 +88,10 @@ A list of AWS KMS [grant tokens](https://docs.aws.amazon.com/kms/latest/develope
 
 The DynamoDb Client used to put and get keys from the backing DDB table.
 
-If the AWS KMS Configuration is a KMS Key ARN,
+If the AWS KMS Configuration is KMS Key ARN or KMS MRKey ARN,
 and no DynamoDb Client is provided,
 a new DynamoDb Client MUST be created
-with the region of the supplied KMS Key ARN.
+with the region of the supplied KMS ARN.
 
 If the AWS KMS Configuration is Discovery,
 and no DynamoDb Client is provided,
@@ -97,10 +107,10 @@ with the region configured in the MRDiscovery.
 
 The KMS Client used when wrapping and unwrapping keys.
 
-If the AWS KMS Configuration is a KMS Key ARN,
+If the AWS KMS Configuration is KMS Key ARN or KMS MRKey ARN,
 and no KMS Client is provided,
 a new KMS Client MUST be created
-with the region of the supplied KMS Key ARN.
+with the region of the supplied KMS ARN.
 
 If the AWS KMS Configuration is Discovery,
 and no KMS Client is provided,
@@ -163,7 +173,7 @@ no comparison is ever made between ARNs.
 
 Discovery takes no additional information.
 
-The Keystore can use ANY KMS Key ARN already
+The Keystore MAY use the KMS Key ARNs already
 persisted to the backing DynamoDB table,
 provided they are in records created
 with an identical Logical Keystore Name.
@@ -181,7 +191,7 @@ requests will fail with KMS Exceptions.
 MRDiscovery takes an additional argument, which is a region.
 Any MRK ARN discovered will be changed to this region before use.
 
-The Keystore can use ANY KMS Key ARN already
+The Keystore MAY use the KMS Key ARNs already
 persisted to the backing DynamoDB table,
 provided they are in records created
 with an identical Logical Keystore Name.
@@ -270,14 +280,14 @@ The CreateKey caller MUST provide:
 - An optional encryption context
 
 If an optional branch key id is provided
-and no encryption context keys are provided this operation MUST fail.
+and no encryption context is provided this operation MUST fail.
+
+If the Keystore's KMS Configuration is `Discovery` or `MRDiscovery`,
+this operation MUST fail.
 
 If no branch key id is provided,
 then this operation MUST create a [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
 to be used as the branch key id.
-
-If the Keystore's KMS Configuration is `Discovery` or `MRDiscovery`,
-this operation MUST fail.
 
 This operation MUST create a [branch key](structures.md#branch-key) and a [beacon key](structures.md#beacon-key) according to
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
