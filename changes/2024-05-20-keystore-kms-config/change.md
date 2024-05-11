@@ -90,7 +90,7 @@ path.
 The goal then is to allow MPL Consumers to construct Keystore instances that
 MAY use the KMS Key ARNs already persisted to a Logical Keystore.
 
-Put another way, 
+Put another way,
 usage of Branch Keys need only consider the Keystore's Logical Name
 (and therefore, backing persistance medium, which is currently always a DynamoDB table)
 and Branch Key ID.
@@ -127,14 +127,15 @@ the Hierarchy Keyring would include the Keystore's ID,
 which, ideally, uniquely identifies it's KMS relationship.
 
 By KMS Relationship, we mean any or all of the following:
+
 - KMS Configuration
 - Credentials used when creating the KMS Client, and thus used when calling KMS
 - Other properties of the KMS Client, such as the region, or request headers
 
-The changes proposed (and comitted to) here 
+The changes proposed (and comitted to) here
 do not include such a Cache refactoring,
 as that would not address the stated goal
-of allowing one Keystore to work across multiple 
+of allowing one Keystore to work across multiple
 KMS ARNs.
 
 ## Operational Implications
@@ -151,13 +152,15 @@ adopt a "discovery Keystore" as best fits their needs.
 
 ## Reference-level Explanation
 
-### Keystore [AWS KMS Configuration](../../framework/branch-key-store.md#aws-kms-configuration) Options 
+### Keystore [AWS KMS Configuration](../../framework/branch-key-store.md#aws-kms-configuration) Options
 
 The following Options are introduced:
+
 - Discovery
 - MRDiscovery
 
 Which compliment the already exsisting options:
+
 - KMS Key ARN (Single Region Compatability)
 - KMS MRKey ARN (Multi-Region Compatability)
 

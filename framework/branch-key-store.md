@@ -40,7 +40,7 @@ such as a DynamoDb table,
 distributed cryptographic agents can use a common, coordianted, data key
 as the root of a key hierarchy.
 
-This prevents distributed cryptographic agents from independently 
+This prevents distributed cryptographic agents from independently
 generating unique data keys that COULD BE coordinated,
 which leads to poor caching performance at decryption,
 as each unqiue encrypting agent had a unqiue data key.
