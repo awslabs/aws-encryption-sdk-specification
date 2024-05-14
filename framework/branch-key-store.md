@@ -322,7 +322,7 @@ The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://do
 The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
 The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request constructed as follows:
 
-- `KeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `KeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
 - `EncryptionContext` MUST be the [encryption context for beacon keys](#beacon-key-encryption-context).
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
@@ -338,7 +338,7 @@ The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://do
 The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
 The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request constructed as follows:
 
-- `KeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured `Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `KeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
 - `EncryptionContext` MUST be the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context).
 - GenerateDataKeyWithoutPlaintext `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
@@ -351,10 +351,10 @@ The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/
 with a request constructed as follows:
 
 - `SourceEncryptionContext` MUST be the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context).
-- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured `Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `CiphertextBlob` MUST be the wrapped DECRYPT_ONLY Branch Key.
 - ReEncrypt `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured `Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `DestinationEncryptionContext` MUST be the [ACTIVE encryption context for branch keys](#active-encryption-context).
 
 If the call to AWS KMS ReEncrypt succeeds,
@@ -376,7 +376,7 @@ List of TransactWriteItem:
     - “type“ (S): "branch:version:" + `version`,
     - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS Key ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
@@ -388,7 +388,7 @@ List of TransactWriteItem:
     - “type“ (S): "branch:ACTIVE",
     - “enc” (B): wrapped ACTIVE Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS Key ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
@@ -400,7 +400,7 @@ List of TransactWriteItem:
     - “type“ (S): "beacon:ACTIVE",
     - “enc” (B): the wrapped Beacon Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS Key ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
@@ -449,7 +449,7 @@ List of TransactWriteItem:
     - “type“ (S): "branch:version:" + `version`,
     - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
@@ -461,7 +461,7 @@ List of TransactWriteItem:
     - “type“ (S): "branch:ACTIVE",
     - “enc” (B): wrapped ACTIVE Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
@@ -493,10 +493,10 @@ The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/
 with a request constructed as follows:
 
 - `SourceEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
-- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
 - `GrantTokens` MUST be the configured [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `DestinationEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 
 ### GetActiveBranchKey
@@ -634,7 +634,7 @@ The key `enc` MUST NOT exist in the constructed [encryption context](#encryption
 
 If the Keystore's [AWS KMS Configuration](#aws-kms-configuration) is `KMS Key ARN` or `KMS MRKey ARN`,
 the `kms-arn` field of the DDB response item MUST be
-[compatible with](#aws-key-arn-compatibility) the configured `KMS ARN` in
+[compatible with](#aws-key-arn-compatibility) the configured KMS Key in
 the [AWS KMS Configuration](#aws-kms-configuration) for this keystore,
 or the operation MUST fail.
 
@@ -649,7 +649,7 @@ the keystore operation MUST call with a request constructed as follows:
 
 - `KeyId`, if the KMS Configuration is Discovery, MUST be the `kms-arn` attribute value of the AWS DDB response item.
   If the KMS Configuration is MRDiscovery, `KeyId` MUST be the `kms-arn` attribute value of the AWS DDB response item, with the region replaced by the configured region.
-  Otherwise, it MUST BE the Keystore's `KMS ARN`.
+  Otherwise, it MUST BE the Keystore's configured KMS Key.
 - `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
 - `EncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
