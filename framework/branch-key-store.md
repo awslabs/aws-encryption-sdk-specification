@@ -149,6 +149,9 @@ This ARN MUST be a valid
 
 Both `KMS Key ARN` and `KMS MRKey ARN` accept MRK or regular Single Region KMS ARNs.
 
+To be clear, an KMS ARN for a Multi-Region Key MAY be provided to the `KMS Key ARN` configuration,
+and a KMS ARN for non Multi-Region Key MAY be provided to the `KMS MRKey ARN` configuration.
+
 `Discovery` does not take an additional argument.
 
 `MRDiscovery` MUST take an additional argument, which is a region.
