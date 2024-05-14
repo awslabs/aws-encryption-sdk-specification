@@ -114,7 +114,7 @@ and the provided ARN is an Alias.
 
 ### Hierarchy Keyring Caching
 
-Currently, the Hierarchy Keyring create's it's own cache.
+Currently, the Hierarchy Keyring creates its own cache.
 
 To facilitate Caching performance across Keystores/KMS Clients/KMS Keys,
 we could (optionally) break the Cache out of the Hierarchy Keyring.
@@ -124,7 +124,7 @@ an arguement during initialization.
 
 When writing to the Cache,
 the Hierarchy Keyring would include the Keystore's ID,
-which, ideally, uniquely identifies it's KMS relationship.
+which, ideally, uniquely identifies its KMS relationship.
 
 By KMS Relationship, we mean any or all of the following:
 
