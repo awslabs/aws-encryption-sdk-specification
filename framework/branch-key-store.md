@@ -201,7 +201,6 @@ with an identical Logical Keystore Name.
 The `VersionKey` and `CreateKey` Operations are NOT supported
 and will fail with a runtime exception.
 
-
 ### Logical KeyStore Name
 
 This name is cryptographically bound to all data stored in this table,
