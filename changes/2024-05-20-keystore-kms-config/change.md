@@ -72,7 +72,7 @@ Additionally, ensure a KMS Alias is not permitted as a KMS Key ARN.
 
 The (Branch) Keystore and the AWS KMS Hierarchical Keyring
 can be used to facilitate Client Side Encryption for
-a Multi-tenant environment where each tenant has a unique
+a Multi-tenant environment where each tenant has at least one
 [Branch Key](../../framework/structures.md#branch-key-materials).
 However, Tenants may want an MPL Consumer to protect
 their data with a particular KMS Key that is NOT necessarily the same

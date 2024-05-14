@@ -37,8 +37,7 @@ These branch keys are only generated using the [AWS KMS API GenerateDataKeyWitho
 
 By creating and persisting a data key to an accesbile medium,
 such as a DynamoDb table,
-distributed cryptographic agents can use a common, coordianted, data key
-as the root of a key hierarchy.
+distributed cryptographic agents can use a common, coordinated, cryptographic materials.
 
 This prevents distributed cryptographic agents from independently
 generating unique data keys that COULD BE coordinated,
@@ -199,8 +198,6 @@ with an identical Logical Keystore Name.
 The `VersionKey` and `CreateKey` Operations are NOT supported
 and will fail with a runtime exception.
 
-If a Multi-Region Key is encountered,
-the region in the ARN is replaced by the configured region.
 
 ### Logical KeyStore Name
 
@@ -351,10 +348,10 @@ The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/
 with a request constructed as follows:
 
 - `SourceEncryptionContext` MUST be the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context).
-- `SourceKeyId` be [compatible with](#aws-key-arn-compatibility) the configured `Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured `Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `CiphertextBlob` MUST be the wrapped DECRYPT_ONLY Branch Key.
 - ReEncrypt `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `DestinationKeyId` be [compatible with](#aws-key-arn-compatibility) the configured `Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured `Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `DestinationEncryptionContext` MUST be the [ACTIVE encryption context for branch keys](#active-encryption-context).
 
 If the call to AWS KMS ReEncrypt succeeds,
@@ -379,7 +376,7 @@ List of TransactWriteItem:
     - "kms-arn" (S): configured `KMS Key ARN`
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
-      MUST BE added as with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
 - PUT:
@@ -391,7 +388,7 @@ List of TransactWriteItem:
     - "kms-arn" (S): configured `KMS Key ARN`
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
-      MUST BE added as with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
 - PUT:
@@ -403,7 +400,7 @@ List of TransactWriteItem:
     - "kms-arn" (S): configured `KMS Key ARN`
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
-      MUST BE added as with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName is the configured Table Name
 
@@ -452,7 +449,7 @@ List of TransactWriteItem:
     - "kms-arn" (S): configured `KMS ARN`
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
-      MUST BE added as with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
 - PUT:
@@ -464,7 +461,7 @@ List of TransactWriteItem:
     - "kms-arn" (S): configured `KMS ARN`
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
-      MUST BE added as with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_exists(branch-key-id)`
   - TableName: the configured Table Name
 
