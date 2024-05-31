@@ -429,16 +429,13 @@ using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as th
 The `kms-arn` field of DDB response item MUST be [compatible with](#aws-key-arn-compatibility)
 the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 
-# <<<<<<< tony/feat-keystore-kms-config
-
 The `kms-arn` stored in the DDB table MUST NOT change as a result of this operation,
 even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly match the stored ARN.
 If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
-> > > > > > > master
-> > > > > > > The values on the AWS DDB response item
-> > > > > > > MUST be authenticated according to [authenticating a keystore item](#authenticating-a-keystore-item).
-> > > > > > > If the item fails to authenticate this operation MUST fail.
+The values on the AWS DDB response item
+MUST be authenticated according to [authenticating a keystore item](#authenticating-a-keystore-item).
+If the item fails to authenticate this operation MUST fail.
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
 
