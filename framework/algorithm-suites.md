@@ -95,6 +95,7 @@ the algorithm suite's encryption key length MUST equal the algorithm suite's [ke
 Specification: [RFC 5869](https://tools.ietf.org/html/rfc5869)
 
 The HMAC-based extract-and-expand key derivation function (HKDF) is a key derivation algorithm.
+For the ESDK's usage, the HKDF inputs are described in [Transitive requirements for supported formats](./transitive-requirements.md).
 
 ## Supported Formats
 
