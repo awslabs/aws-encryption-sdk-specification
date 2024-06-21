@@ -71,7 +71,7 @@ For example, `{ a: a, b: b }` produces the complete set of keys subsets: `{ {}, 
 For every `requiredEncryptionContextKeys` produced above
 `reproducedEncryptionContext` MUST be attempted
 for every subset of the encryption context
-who's keys fully intersect with the `requiredEncryptionContextKeys`.
+whose keys fully intersect with the `requiredEncryptionContextKeys`.
 
 For example:
 

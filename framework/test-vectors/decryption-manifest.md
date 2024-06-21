@@ -40,34 +40,30 @@ This type of manifest describes test vectors to create.
 Processing these test scenarios will result in [encryption materials](../structures.md#encryption-materials).
 
 Each test scenario includes all necessary instructions to construct
-an [encryption materials request](../cmm-interface.md#encryption-materials-request).
+a [decryption materials request](../cmm-interface.md#decryption-materials-request).
 This includes all necessary inputs including algorithm suite, encryption context, and keyrings/CMMs.
 
 ## Reference-level Explanation
 
-### manifest
+### Manifest
 
 Map identifying the manifest.
 
 - `type` : Identifies the manifest as an AWS Encryption SDK message encryption manifest.
-  - Must be `aws-mpl-encrypt`
+  - MUST be `aws-mpl-encrypt`
 - `version` : Identifies the version of this feature document that describes the manifest.
 
-#### keys
+#### Keys
 
 URI identifying a [keys manifest](./keys-manifest.md) to use with all tests.
 
-### tests
+### Tests
 
 Map object mapping a test case ID to a test case description
 that describes how to generate an [encryption materials request](../cmm-interface.md#encryption-materials-request).
 Optional members on [encryption materials request](../cmm-interface.md#encryption-materials-request)
 are optional in the test.
 
-Map object mapping a test case ID to a test case description
-that describes how to generate an [encryption materials request](../cmm-interface.md#encryption-materials-request).
-Optional members on [encryption materials request](../cmm-interface.md#encryption-materials-request)
-are optional in the test.
 
 - type : The type of test
   - Allowed Values

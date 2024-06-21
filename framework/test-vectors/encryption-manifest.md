@@ -37,10 +37,10 @@ by demonstrating that different configurations succeed or fail correctly.
 ## Guide-level Explanation
 
 This type of manifest describes test vectors to create.
-Processing these test scenarios will result in [decryption materials](../structures.md#decryption-materials).
+Processing these test scenarios will result in [encryption materials](../structures.md#encryption-materials).
 
 Each test scenario includes all necessary instructions to construct
-an [decryption materials request](../cmm-interface.md#decrypt-materials-request).
+an [encryption materials request](../cmm-interface.md#encryption-materials-request).
 This includes all necessary inputs including algorithm suite, encryption context, and keyrings/CMMs.
 
 ## Reference-level Explanation
@@ -50,7 +50,7 @@ This includes all necessary inputs including algorithm suite, encryption context
 Map identifying the manifest.
 
 - `type` : Identifies the manifest as an AWS Encryption SDK message encryption manifest.
-  - Must be `aws-mpl-decrypt`
+  - Must be `aws-mpl-encrypt`
 - `version` : Identifies the version of this feature document that describes the manifest.
 
 #### keys

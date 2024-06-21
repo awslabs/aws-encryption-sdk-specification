@@ -19,8 +19,8 @@ This serves as a reference of all features that this feature depends on.
 
 The Key Description structure defines a standard way of describing
 keyring configuration as part of a manifest.
-The AwsCryptographicMaterialProvidersLibrary describes a common way
-to configured key distribution.
+The MPL describes a common way
+to configure key distribution.
 These key descriptions explain how to instantiate the required [keyring](../keyring-interface.md)
 or [cmm](../cmm-interface.md).
 

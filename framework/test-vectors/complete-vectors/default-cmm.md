@@ -34,7 +34,7 @@ For example, `{ a: a, b: b }` produces the complete set of keys subsets: `{ {}, 
 For every `requiredEncryptionContextKeys` produced above
 `reproducedEncryptionContext` MUST be attempted
 for every subset of the encryption context
-who's keys fully intersect with the `requiredEncryptionContextKeys`.
+where the `requiredEncryptionContextKeys` is a subset of the attempted subset.
 
 For example:
 
@@ -50,7 +50,7 @@ For a given [encryption context](../../structures.md#encryption-context),
 every subset of the keys for this encryption context
 MUST be attempted as the `requiredEncryptionContextKeys`.
 The keys of the encryption context attempted however
-MUST NOT fully intersect with the `requiredEncryptionContextKeys`.
+where the `requiredEncryptionContextKeys` MUST NOT be a subset of the attempted subset.
 
 For example:
 
