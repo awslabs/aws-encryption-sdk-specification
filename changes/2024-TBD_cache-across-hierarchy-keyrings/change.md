@@ -37,6 +37,13 @@ to manage cryptographic materials.
 An "MPL Consumer" MAY be using an AWS Crypto Tools product,
 such as the AWS Encryption SDK or AWS Database Encryption SDK.
 
+By "KMS Relationship", we mean any or all of the following:
+
+- KMS Configuration
+- Credentials used when creating the KMS Client, and thus used when calling KMS
+- Other properties of the KMS Client, such as the region, or request headers
+
+
 ### Conventions used in this document
 
 The key words
@@ -46,6 +53,32 @@ in this document are to be interpreted as described in
 [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
 ## Summary
+
+To improve the MPL Consumer data key caching expierence,
+when using the Hierarchical Keyring,
+we need to allow caching across KeyStores/KMS Clients/KMS Keys.
+
+To facilitate Caching across KeyStores/KMS Clients/KMS Keys,
+we MUST break the Cryptographic Materials Cache (CMC)
+out of the Hierarchy Keyring.
+
+By allowing MPL Consumers to provide an already initialized CMC
+to the Hierarchy Keyring at construction,
+the CMC MAY cache Branch Keys protected by different
+KMS Relationships.
+
+This simplifies Multiple KMS Relationship MPL Consumers,
+as they do not need to stand up LRU Cache of Hierarchy Keyrings.
+
+Instead, they may maintain one CMC.
+They still create a Hierarchy Keyring instance per KMS Relationship,
+and they MUST use the correct Keyring to retrieve material
+from the Cache.
+
+But they need not maintain many Keyrings;
+only the common cache.
+
+## Motivation
 
 The Hierarchy Keyring,
 and it's component the (Branch) Keystore,
@@ -111,42 +144,23 @@ is to make the Hierarchy Keyring
 "Easy to Use" in a multiple KMS Relationship
 environment.
 
-To facilitate Caching across KeyStores/KMS Clients/KMS Keys,
-we MUST break the Cryptographic Materials Cache (CMC)
-out of the Hierarchy Keyring.
+## Relating Cache Entries (Branch Keys) to KMS Relationships
 
-By allowing MPL Consumers to provide an already initialized CMC
-to the Hierarchy Keyring at construction,
-the CMC MAY cache Branch Keys protected by different
-KMS Relationships.
-
-This simplifies Multiple KMS Relationship MPL Consumers,
-as they do not need to stand up LRU Cache of Hierarchy Keyrings.
-
-Instead, they may maintain one CMC.
-They still create a Hierarchy Keyring instance per KMS Relationship,
-and they MUST use the correct Keyring to retrieve material
-from the Cache.
-
-But they need not maintain many Keyrings;
-only the common cache.
-
-Cache misses will populate the cache via
-the Hierarchy Keyring that requested the material.
-
-However, Cache Entries MUST only be served IF
+For some MPL Consumers,
+Cache Entries SHOULD only be served IF
 the request is being served under the same KMS Relationship,
 which is the most secure condition,
 as it prevents a Confused Deputy scenario
 (detailed in **Confused Deputy 1**).
 
 To facilitate this,
-the Cache Entry Identifier MUST
+the Cache Entry Identifier SHOULD
 describe the KMS Relationship,
 as well as the Logical Key Store Name,
 Branch Key ID,
 and Branch Key Name.
 
+We can use exsisting features to accomplish this;
 The KeyStore constructor takes an optional [ID](../../framework/branch-key-store.md#keystore-id)
 parameter at construction.
 
@@ -182,7 +196,7 @@ When the Hierarchical Keyring for `X` gets garbage collected,
 the cache entries MAY remain.
 
 But to retrieve an entry,
-the MPL Consumer MUST recreate
+the MPL Consumer SHOULD recreate
 
 > a KMS Client is created that respects relationship `X`,
 > which is then used to create KeyStore Identified as `X`,
@@ -191,45 +205,26 @@ the MPL Consumer MUST recreate
 
 If the Cache Entry is still valid
 (the TTL has not expired),
-it can be served.
+it can be served without any KMS or DDB requests.
 
 If not, the recreated Hierarchy Keyring
 is used to refresh it.
+
+### Potential Helper Function: Hierarchy Keyring For KMS Relationship
 
 To push MPL Consumers in the correct direction,
 AWS Crypto Tools could write a helper method,
 that creates KeyStores with KMS Clients
 of a particular KMS Relationship,
 and sets the KeyStore's ID deterministically
-on on the properties of the KMS Relationship.
+on the properties of the KMS Relationship.
 
+## A Looser Cache Entries (Branch Keys) Restriction
+
+Some MPL Consumers MAY not need such 
 ## Out of Scope
 
 TODO
-
-## Motivation
-
-TODO
-
-### Hierarchy Keyring Caching
-
-Currently, the Hierarchy Keyring creates its own cache.
-
-To facilitate Caching performance across Keystores/KMS Clients/KMS Keys,
-we could (optionally) break the Cache out of the Hierarchy Keyring.
-
-The Hierarchy\* Keyring would instead take a constructed a Cache as
-an argument during initialization.
-
-When writing to the Cache,
-the Hierarchy Keyring would include the Keystore's ID,
-which, ideally, uniquely identifies its KMS relationship.
-
-By KMS Relationship, we mean any or all of the following:
-
-- KMS Configuration
-- Credentials used when creating the KMS Client, and thus used when calling KMS
-- Other properties of the KMS Client, such as the region, or request headers
 
 ## Operational Implications
 
