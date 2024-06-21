@@ -64,7 +64,6 @@ that describes how to generate an [encryption materials request](../cmm-interfac
 Optional members on [encryption materials request](../cmm-interface.md#encryption-materials-request)
 are optional in the test.
 
-
 - type : The type of test
   - Allowed Values
     - positive-keyring : A successful request for encrypt materials that should also result in a successful decrypt
