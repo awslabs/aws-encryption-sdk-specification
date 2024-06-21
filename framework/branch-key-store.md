@@ -5,10 +5,16 @@
 
 ## Version
 
-0.2.0
+0.5.0
 
 ### Changelog
 
+- 0.5.0
+  - Introduce KMS Configuration of MRDiscovery
+- 0.4.0
+  - Introduce KMS Configuration of Discovery
+- 0.3.0
+  - Introduce MRK Compatibility via KMS Configuration
 - 0.2.0
   - Update keystore structure and add encryption context option
 - 0.1.0
@@ -16,8 +22,11 @@
 
 ## Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-| -------- | -------------------------------------- | ------------------------- | -------------- |
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                                                                                   |
+| -------- | -------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dafny    | 0.5.0                                  | 1.4.0                     | [AwsCryptographyKeyStoreOperations.dfy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographyKeyStore/src/AwsCryptographyKeyStoreOperations.dfy) |
+| Java     | 0.5.0                                  | 1.4.0                     | [KeyStore.java](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/java/src/main/smithy-generated/software/amazon/cryptography/keystore/KeyStore.java)     |
+| .NET     | 0.5.0                                  | 1.4.0                     | [KeyStore.cs](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/net/Generated/AwsCryptographyKeyStore/KeyStore.cs)                                        |
 
 ## Overview
 
@@ -26,12 +35,21 @@ The Keystore persists branch keys in DynamoDb that wrap multiple data keys.
 This creates a hierarchy where a branch key wraps multiple data keys and facilitates caching.
 These branch keys are only generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
 
+By creating and persisting a data key to an accesbile medium,
+such as a DynamoDb table,
+distributed cryptographic agents can use a common, coordinated, cryptographic materials.
+
+This prevents distributed cryptographic agents from independently
+generating unique data keys that COULD BE coordinated,
+which leads to poor caching performance at decryption,
+as each unqiue encrypting agent had a unqiue data key.
+
 This Keystore interface defines operations that any implementation of its specification must support and implement.
 
 ## Definitions
 
 - [Branch Key(s)](../structures.md#branch-key): Data keys that are reused to wrap unique data keys for envelope encryption.
-  For security considerations on when to rotate the branch key, refer to [Appendix B](#appendix-b-security-considerations-for-branch-key-rotation).
+  For security considerations on when to rotate the branch key, refer to [Appendix B](aws-kms/aws-kms-hierarchical-keyring.md#appendix-b-security-considerations-for-branch-key-rotation).
 - [Beacon Key(s)](https://github.com/awslabs/aws-database-encryption-sdk-dynamodb-java/blob/main/specification/searchable-encryption/beacons.md#beacons):
   A root key used to then derive different beacon keys per beacon.
 - [UUID](https://www.ietf.org/rfc/rfc4122.txt): a universally unique identifier that can be represented as a byte sequence or a string.
@@ -69,16 +87,43 @@ A list of AWS KMS [grant tokens](https://docs.aws.amazon.com/kms/latest/develope
 
 The DynamoDb Client used to put and get keys from the backing DDB table.
 
-If not provided, one will be created in the region of the supplied KMS Key ARN
+If the AWS KMS Configuration is KMS Key ARN or KMS MRKey ARN,
+and no DynamoDb Client is provided,
+a new DynamoDb Client MUST be created
+with the region of the supplied KMS ARN.
+
+If the AWS KMS Configuration is Discovery,
+and no DynamoDb Client is provided,
+a new DynamoDb Client MUST be created
+with the default configuration.
+
+If the AWS KMS Configuration is MRDiscovery,
+and no DynamoDb Client is provided,
+a new DynamoDb Client MUST be created
+with the region configured in the MRDiscovery.
 
 ### KMS Client
 
 The KMS Client used when wrapping and unwrapping keys.
 
-If not provided, one will be created in the region of the supplied KMS Key ARN
+If the AWS KMS Configuration is KMS Key ARN or KMS MRKey ARN,
+and no KMS Client is provided,
+a new KMS Client MUST be created
+with the region of the supplied KMS ARN.
 
-On initialization the KeyStore MUST append a user agent string to the AWS KMS SDK Client with the
-value `aws-kms-hierarchy`.
+If the AWS KMS Configuration is Discovery,
+and no KMS Client is provided,
+a new KMS Client MUST be created
+with the default configuration.
+
+If the AWS KMS Configuration is MRDiscovery,
+and no KMS Client is provided,
+a new KMS Client MUST be created
+with the region configured in the MRDiscovery.
+
+On initialization the KeyStore SHOULD
+append a user agent string to the AWS KMS SDK Client with
+the value `aws-kms-hierarchy`.
 
 ### Table Name
 
@@ -86,8 +131,75 @@ The table name of the DynamoDb table that backs this Keystore.
 
 ### AWS KMS Configuration
 
-A valid [AWS KMS Key ARN](./aws-kms/aws-kms-key-arn.md#a-valid-aws-kms-arn)
-that wraps and unwraps keys stored in Amazon DynamoDB.
+This configures the Keystore's KMS Key ARN restrictions,
+which determines which KMS Key(s) is used
+to wrap and unwrap the keys stored in Amazon DynamoDB.
+There are four (4) options:
+
+- Discovery
+- MRDiscovery
+- Single Region Key Compatibility, denoted as `KMS Key ARN`
+- Multi Region Key Compatibility, denoted as `KMS MRKey ARN`
+
+`KMS Key ARN` and `KMS MRKey ARN` MUST take an additional argument
+that is a KMS ARN.
+This ARN MUST NOT be an Alias.
+This ARN MUST be a valid
+[AWS KMS Key ARN](./aws-kms/aws-kms-key-arn.md#a-valid-aws-kms-arn).
+
+Both `KMS Key ARN` and `KMS MRKey ARN` accept MRK or regular Single Region KMS ARNs.
+
+To be clear, an KMS ARN for a Multi-Region Key MAY be provided to the `KMS Key ARN` configuration,
+and a KMS ARN for non Multi-Region Key MAY be provided to the `KMS MRKey ARN` configuration.
+
+`Discovery` does not take an additional argument.
+
+`MRDiscovery` MUST take an additional argument, which is a region.
+Any MRK ARN discovered will be changed to this region before use.
+
+#### AWS Key ARN Compatibility
+
+For two ARNs to be compatible:
+
+If the [AWS KMS Configuration](#aws-kms-configuration) designates single region ARN compatibility,
+then two ARNs are compatible if they are exactly equal.
+
+If the [AWS KMS Configuration](#aws-kms-configuration) designates MRK ARN compatibility,
+then two ARNs are compatible if they are equal in all parts other than the region.
+That is, they are compatible if [AWS KMS MRK Match for Decrypt](aws-kms/aws-kms-mrk-match-for-decrypt.md#implementation) returns true.
+
+If the [AWS KMS Configuration](#aws-kms-configuration) is Discovery or MRDiscovery,
+no comparison is ever made between ARNs.
+
+#### Discovery
+
+Discovery takes no additional information.
+
+The Keystore MAY use the KMS Key ARNs already
+persisted to the backing DynamoDB table,
+provided they are in records created
+with an identical Logical Keystore Name.
+
+The `VersionKey` and `CreateKey` Operations are NOT supported
+and will fail with a runtime exception.
+
+There is no Multi-Region logic with this configuration;
+if a Multi-Region Key is encountered,
+and the region in the ARN is not the region of the KMS Client,
+requests will fail with KMS Exceptions.
+
+#### MRDiscovery
+
+MRDiscovery takes an additional argument, which is a region.
+Any MRK ARN discovered will be changed to this region before use.
+
+The Keystore MAY use the KMS Key ARNs already
+persisted to the backing DynamoDB table,
+provided they are in records created
+with an identical Logical Keystore Name.
+
+The `VersionKey` and `CreateKey` Operations are NOT supported
+and will fail with a runtime exception.
 
 ### Logical KeyStore Name
 
@@ -106,13 +218,13 @@ even when the table name after restoration is not exactly the same.
 
 The Keystore MUST support the following operations:
 
-- [GetKeyStoreInfo](#getKeyStoreInfo)
+- [GetKeyStoreInfo](#getkeystoreinfo)
 - [CreateKeyStore](#createkeystore)
 - [CreateKey](#createkey)
 - [VersionKey](#versionkey)
 - [GetActiveBranchKey](#getactivebranchkey)
 - [GetBranchKeyVersion](#getbranchkeyversion)
-- [GetBeaconKey](#beacon-key)
+- [GetBeaconKey](#getbeaconkey)
 
 ### GetKeyStoreInfo
 
@@ -167,17 +279,20 @@ The CreateKey caller MUST provide:
 - An optional encryption context
 
 If an optional branch key id is provided
-and no encryption context keys are provided this operation MUST fail.
+and no encryption context is provided this operation MUST fail.
+
+If the Keystore's KMS Configuration is `Discovery` or `MRDiscovery`,
+this operation MUST fail.
 
 If no branch key id is provided,
 then this operation MUST create a [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
 to be used as the branch key id.
 
-This operation MUST create a [branch key](#branch-key) and a [beacon key](#beacon-key) according to
+This operation MUST create a [branch key](structures.md#branch-key) and a [beacon key](structures.md#beacon-key) according to
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
 
 If creation of the keys are successful,
-the operation MUST call Amazon DynamoDB TransactWriteItems according to the [write key material](#writing-branch-key-and-beacon-key-to-key-store) section.
+the operation MUST call Amazon DynamoDB TransactWriteItems according to the [write key material](#writing-branch-key-and-beacon-key-to-keystore) section.
 
 If writing to the keystore succeeds,
 the operation MUST return the branch-key-id that maps to both
@@ -200,13 +315,13 @@ This operation needs to generate the following:
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
 
-To create a beacon key, this operation will continue to use the `branchKeyId` and `timestamp` as the [Branch Key](#branch-key).
+To create a beacon key, this operation will continue to use the `branchKeyId` and `timestamp` as the [Branch Key](structures.md#branch-key).
 
 The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
 The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
 The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request constructed as follows:
 
-- `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore
+- `KeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
 - `EncryptionContext` MUST be the [encryption context for beacon keys](#beacon-key-encryption-context).
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
@@ -222,7 +337,7 @@ The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://do
 The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
 The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request constructed as follows:
 
-- `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore
+- `KeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
 - `EncryptionContext` MUST be the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context).
 - GenerateDataKeyWithoutPlaintext `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
@@ -235,10 +350,10 @@ The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/
 with a request constructed as follows:
 
 - `SourceEncryptionContext` MUST be the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context).
-- `SourceKeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore
+- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `CiphertextBlob` MUST be the wrapped DECRYPT_ONLY Branch Key.
 - ReEncrypt `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `DestinationKeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore
+- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `DestinationEncryptionContext` MUST be the [ACTIVE encryption context for branch keys](#active-encryption-context).
 
 If the call to AWS KMS ReEncrypt succeeds,
@@ -260,8 +375,10 @@ List of TransactWriteItem:
     - “type“ (S): "branch:version:" + `version`,
     - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS Key ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
+    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
 - PUT:
@@ -270,8 +387,10 @@ List of TransactWriteItem:
     - “type“ (S): "branch:ACTIVE",
     - “enc” (B): wrapped ACTIVE Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS Key ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
+    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
 - PUT:
@@ -280,8 +399,10 @@ List of TransactWriteItem:
     - “type“ (S): "beacon:ACTIVE",
     - “enc” (B): the wrapped Beacon Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS Key ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
+    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName is the configured Table Name
 
@@ -298,9 +419,19 @@ On invocation, the caller:
 
 - MUST supply a `branch-key-id`
 
+If the Keystore's KMS Configuration is `Discovery` or `MRDiscovery`,
+this operation MUST immediately fail.
+
 VersionKey MUST first get the active version for the branch key from the keystore
 by calling AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
+
+The `kms-arn` field of DDB response item MUST be [compatible with](#aws-key-arn-compatibility)
+the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+
+The `kms-arn` stored in the DDB table MUST NOT change as a result of this operation,
+even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly match the stored ARN.
+If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
 The values on the AWS DDB response item
 MUST be authenticated according to [authenticating a keystore item](#authenticating-a-keystore-item).
@@ -321,8 +452,10 @@ List of TransactWriteItem:
     - “type“ (S): "branch:version:" + `version`,
     - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS Key ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
+    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
 - PUT:
@@ -331,8 +464,10 @@ List of TransactWriteItem:
     - “type“ (S): "branch:ACTIVE",
     - “enc” (B): wrapped ACTIVE Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured `KMS Key ARN`
+    - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): 1
+    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_exists(branch-key-id)`
   - TableName: the configured Table Name
 
@@ -361,10 +496,10 @@ The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/
 with a request constructed as follows:
 
 - `SourceEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
-- `SourceKeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore
+- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
 - `GrantTokens` MUST be the configured [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `DestinationKeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore
+- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `DestinationEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 
 ### GetActiveBranchKey
@@ -500,10 +635,24 @@ except the logical table name
 MUST equal the value with the same key in the AWS DDB response item.
 The key `enc` MUST NOT exist in the constructed [encryption context](#encryption-context).
 
+If the Keystore's [AWS KMS Configuration](#aws-kms-configuration) is `KMS Key ARN` or `KMS MRKey ARN`,
+the `kms-arn` field of the DDB response item MUST be
+[compatible with](#aws-key-arn-compatibility) the configured KMS Key in
+the [AWS KMS Configuration](#aws-kms-configuration) for this keystore,
+or the operation MUST fail.
+
+If the Keystore's [AWS KMS Configuration](#aws-kms-configuration) is `Discovery` or `MRDiscovery`,
+the `kms-arn` field of DDB response item MUST NOT be an Alias
+or the operation MUST fail.
+
+<!--  "For all Branch Keys created by any version of the MPL, an Alias for kms-arn is impossible." -->
+
 When calling [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html),
 the keystore operation MUST call with a request constructed as follows:
 
-- `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore
+- `KeyId`, if the KMS Configuration is Discovery, MUST be the `kms-arn` attribute value of the AWS DDB response item.
+  If the KMS Configuration is MRDiscovery, `KeyId` MUST be the `kms-arn` attribute value of the AWS DDB response item, with the region replaced by the configured region.
+  Otherwise, it MUST BE the Keystore's configured KMS Key.
 - `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
 - `EncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
@@ -579,21 +728,21 @@ The DECRYPT_ONLY version, the ACTIVE version, and a beacon key.
 
 The DECRYPT_ONLY simplified JavaScript JSON format would look like this
 
-```
+```json
 {
-  "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
-  "type" : "branch:version:83eec007-5659-4554-bf11-699b90f41ac6",
-  "enc" : "NnYwxJ/oiQCLnqRh/IcrCR2mmOnO4SAVLw2pspKJKd6rpa0H8z/4hGpGxcWozdb7VByebDFWb0VTWxaOUA8=",
-  "kms-arn" : "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
-  "create-time" : "2023-06-03T19:03:29.358Z",
-  "hierarchy-version" : "1",
-  "aws-crypto-ec:department" : "admin",
+  "branch-key-id": "bbb9baf1-03e6-4716-a586-6bf29995314b",
+  "type": "branch:version:83eec007-5659-4554-bf11-699b90f41ac6",
+  "enc": "NnYwxJ/oiQCLnqRh/IcrCR2mmOnO4SAVLw2pspKJKd6rpa0H8z/4hGpGxcWozdb7VByebDFWb0VTWxaOUA8=",
+  "kms-arn": "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
+  "create-time": "2023-06-03T19:03:29.358Z",
+  "hierarchy-version": "1",
+  "aws-crypto-ec:department": "admin"
 }
 ```
 
 The ACTIVE simplified JavaScript JSON format would look like this
 
-```
+```json
 {
   "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
   "type" : ""branch:ACTIVE",
@@ -608,14 +757,14 @@ The ACTIVE simplified JavaScript JSON format would look like this
 
 The BEACON simplified JavaScript JSON format would look like this
 
-```
+```json
 {
-  "branch-key-id" : "bbb9baf1-03e6-4716-a586-6bf29995314b",
-  "type" : "beacon:ACTIVE",
-  "enc" : "hgb2RyDQinOCpzKWdi17E+t9WB9pRExQXpD/20bsu9hxr38HjQvGvihoYpL6sKuF0Ek+37B1UE9tK3SIOiE=",
-  "kms-arn" : "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
-  "create-time" : "2023-06-03T19:03:29.358Z",
-  "hierarchy-version" : "1",
-  "aws-crypto-ec:department" : "admin",
+  "branch-key-id": "bbb9baf1-03e6-4716-a586-6bf29995314b",
+  "type": "beacon:ACTIVE",
+  "enc": "hgb2RyDQinOCpzKWdi17E+t9WB9pRExQXpD/20bsu9hxr38HjQvGvihoYpL6sKuF0Ek+37B1UE9tK3SIOiE=",
+  "kms-arn": "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
+  "create-time": "2023-06-03T19:03:29.358Z",
+  "hierarchy-version": "1",
+  "aws-crypto-ec:department": "admin"
 }
 ```
