@@ -9,6 +9,10 @@
 
 ### Changelog
 
+- 0.1.2
+
+  - Add requirements to specify that Algorithm Suite be ESDK supported
+
 - 0.1.1
 
   - Include `aws-crypto-public-key` encryption context key.
@@ -118,6 +122,7 @@ The type (hex) of this field MUST be a value that exists in the following table:
 The identifier for the algorithm suite used when generating the message.
 The value (hex) of this field MUST be a value that exists in the
 [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) table.
+This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 #### Message ID
 
@@ -137,10 +142,9 @@ The purpose of the message ID is to:
 #### AAD
 
 The Additional Authenticated Data (AAD) for the header.
-This AAD is an encoding of the [encryption context](../framework/structures.md#encryption-context).
 
-The following table describes the fields that form the AAD.
-The bytes are appended in the order shown.
+This AAD is an encoding of the [encryption context](../framework/structures.md#encryption-context).
+The bytes are appended in the order shown:
 
 | Field                                             | Length (bytes)                                                                          | Interpreted as                      |
 | ------------------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------- |
@@ -155,41 +159,11 @@ When the [encryption context](../framework/structures.md#encryption-context) is 
 
 ##### Key Value Pairs
 
-The encoding of the key-value pairs of the [encryption context](../framework/structures.md#encryption-context).
+The encoding of the key-value pairs of the [encryption context](../framework/structures.md#encryption-context),
+serialized according to it's [specification for serialization](../framework/structures.md#serialization).
+
 When the [encryption context](../framework/structures.md#encryption-context) is empty,
 this field MUST NOT be included in the [AAD](#aad).
-
-The following table describes the fields that form the Key Value Pairs.
-The bytes are appended in the order shown.
-
-| Field                                             | Length (bytes)                                                       | Interpreted as                                    |
-| ------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------- |
-| [Key Value Pair Count](#key-value-pair-count)     | 2                                                                    | UInt16                                            |
-| [Key Value Pair Entries](#key-value-pair-entries) | Variable. Determined by the count and length of each key-value pair. | [Key Value Pair Entries](#key-value-pair-entries) |
-
-###### Key Value Pair Count
-
-The number of key-value pairs within the [Key Value Pair Entries](#key-value-pair-entries) field.
-The value of this field MUST be greater than 0.
-
-###### Key Value Pair Entries
-
-A sequence of one or more key-value pair entries.
-
-This sequence MUST NOT contain duplicate entries.
-
-These entries MUST have entries sorted, by key,
-in ascending order according to the UTF-8 encoded binary value.
-
-The following table describes the fields that form each key value pair entry.
-The bytes are appended in the order shown.
-
-| Field        | Length (bytes)                                                                 | Interpreted as      |
-| ------------ | ------------------------------------------------------------------------------ | ------------------- |
-| Key Length   | 2                                                                              | UInt16              |
-| Key          | Variable. Equal to the value specified in the previous 2 bytes (Key Length).   | UTF-8 encoded bytes |
-| Value Length | 2                                                                              | UInt16              |
-| Value        | Variable. Equal to the value specified in the previous 2 bytes (Value Length). | UTF-8 encoded bytes |
 
 #### Encrypted Data Keys
 
