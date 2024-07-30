@@ -76,10 +76,10 @@ already contains the `aws-crypto-public-key` key,
 this operation MUST fail rather than overwrite the associated value.
 
 - If the [encryption materials request](cmm-interface.md#encryption-materials-request) does not contain an algorithm suite,
-  the operation MUST add the default algorithm suite for the [commitment policy](../client-apis/client.md#commitment-policy)
+  the operation MUST add the default algorithm suite for the [commitment policy](./commitment-policy.md#supported-commitment-policy-enum)
   as the algorithm suite in the encryption materials returned.
 - If the [encryption materials request](cmm-interface.md#encryption-materials-request) does contain an algorithm suite,
-  the request MUST fail if the algorithm suite is not supported by the [commitment policy](../client-apis/client.md#commitment-policy) on the request.
+  the request MUST fail if the algorithm suite is not supported by the [commitment policy](./commitment-policy.md#supported-commitment-policy-enum) on the request.
 - If the [encryption materials request](cmm-interface.md#encryption-materials-request) does contain an algorithm suite,
   the encryption materials returned MUST contain the same algorithm suite.
 
@@ -117,7 +117,7 @@ If the algorithm suite does not contain a [signing algorithm](algorithm-suites.m
 but the encryption context includes the reserved `aws-crypto-public-key` key,
 the operation MUST fail without returning any decryption materials.
 
-The request MUST fail if the algorithm suite on the request is not supported by the [commitment policy](../client-apis/client.md#commitment-policy) on the request.
+The request MUST fail if the algorithm suite on the request is not supported by the [commitment policy](./commitment-policy.md#supported-commitment-policy-enum) on the request.
 
 On each call to Decrypt Materials,
 the default CMM MUST make a call to its [keyring's](#keyring)

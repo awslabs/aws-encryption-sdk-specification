@@ -5,9 +5,14 @@
 
 ## Version
 
-0.4.0
+0.5.0
 
 ### Changelog
+
+- 0.5.0
+
+  - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
+  - Add requirements to specify that Algorithm Suite be ESDK supported
 
 - 0.4.0
 
@@ -74,6 +79,10 @@ The client MUST require exactly one of the following types of inputs:
 
 - [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md)
 - [Keyring](../framework/keyring-interface.md)
+
+The following inputs to this behavior MUST be OPTIONAL:
+
+- [Encryption Context](#encryption-context)
 
 ### Encrypted Message
 
@@ -160,6 +169,8 @@ This output MAY be satisfied by outputting a [parsed header](#parsed-header) con
 
 The [algorithm suite](../framework/algorithm-suites.md) that is used to decrypt
 the input [encrypted message](#encrypted-message).
+
+This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
@@ -248,11 +259,14 @@ MUST be constructed as follows:
   from the message header.
 - Encrypted Data Keys: This is the parsed [encrypted data keys](../data-format/message-header#encrypted-data-keys)
   from the message header.
+- Reproduced Encryption Context: This is the [input](#input) encryption context.
 
 The data key used as input for all decryption described below is a data key derived from the plaintext data key
 included in the [decryption materials](../framework/structures.md#decryption-materials).
 The algorithm suite used as input for all decryption described below is a algorithm suite
 included in the [decryption materials](../framework/structures.md#decryption-materials).
+If this algorithm suite is not [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum)
+encrypt MUST yield an error.
 If the algorithm suite is not supported by the [commitment policy](client.md#commitment-policy)
 configured in the [client](client.md) decrypt MUST yield an error.
 If the [algorithm suite](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) supports [key commitment](../framework/algorithm-suites.md#key-commitment)
@@ -274,8 +288,18 @@ this operation MUST validate the [message header body](../data-format/message-he
 by using the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
 to decrypt with the following inputs:
 
-- the AAD is the serialized [message header body](../data-format/message-header.md#header-body).
-- the IV is the value serialized in the message header's [IV field](../data-format/message-header#iv).
+- The AAD MUST be the concatenation of the serialized [message header body](../data-format/message-header.md#header-body)
+  and the serialization of encryption context to only authenticate.
+  The encryption context to only authenticate MUST be the [encryption context](../framework/structures.md#encryption-context)
+  in the [decryption materials](../framework/structures.md#decryption-materials)
+  filtered to only contain key value pairs listed in
+  the [decryption material's](../framework/structures.md#decryption-materials)
+  [required encryption context keys](../framework/structures.md#required-encryption-context-keys-1)
+  serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
+- For message format version [1.0](../data-format/message-header.md#supported-versions)
+  the IV MUST be the value serialized in the message header's [IV field](../data-format/message-header#iv).
+  For message format version [2.0](../data-format/message-header.md#supported-versions)
+  the IV MUST be 0.
 - the cipherkey is the derived data key
 - the ciphertext is an empty byte array
 - the tag is the value serialized in the message header's

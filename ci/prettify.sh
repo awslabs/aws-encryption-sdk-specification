@@ -2,7 +2,7 @@
 
 case "${1}" in
   write)
-    npx prettier --config .prettierrc.toml --write -- '**/*.md' !./history/*
+    npx prettier --config .prettierrc.toml --write -- '**/*.md' !./history/**/*
     ;;
   check)
     npx prettier --config .prettierrc.toml --check -- '**/*.md'
