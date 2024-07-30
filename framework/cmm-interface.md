@@ -32,7 +32,9 @@
 
 ## Overview
 
-The Cryptographic Materials Manager (CMM) assembles the cryptographic materials used to encrypt the [message](../data-format/message.md) and decrypt the encrypted messages.
+The Cryptographic Materials Manager (CMM) assembles the cryptographic materials
+used to encrypt and decrypt the encrypted messages
+for each [supported format](./algorithm-suites.md#supported-formats).
 The CMM interface describes the interface that all CMMs MUST implement.
 
 ## Definitions
@@ -48,6 +50,7 @@ The AWS Encryption SDK provides the following built-in CMM types:
 
 - [Default CMM](default-cmm.md)
 - [Caching CMM](caching-cmm.md)
+- [Expected Encryption Context CMM](./expected-encryption-context-cmm.md)
 
 Note: A user MAY create their own custom CMM.
 
@@ -68,11 +71,12 @@ The encryption materials request MUST include the following:
 
 - [Encryption Context](structures.md#encryption-context)
   - The encryption context provided MAY be empty.
-- [Commitment Policy](../client-apis/client.md#commitment-policy)
+- [Commitment Policy](./commitment-policy.md#supported-commitment-policy-enum)
 
 The encryption request MAY include the following:
 
-- [Algorithm Suite](algorithm-suites.md)
+- [Algorithm Suite Id](algorithm-suites.md#algorithm-suite-id)
+- Required Encryption Context Keys - a set of strings.
 - Max Plaintext Length
   - This value represents the maximum length of the plaintext to be encrypted
     using the returned materials.
@@ -84,11 +88,15 @@ This is the input to the [decrypt materials](#decrypt-materials) behavior.
 
 The decrypt materials request MUST include the following:
 
-- [Algorithm Suite](algorithm-suites.md)
-- [Commitment Policy](../client-apis/client.md#commitment-policy)
+- [Algorithm Suite Id](algorithm-suites.md#algorithm-suite-id)
+- [Commitment Policy](./commitment-policy.md#supported-commitment-policy-enum)
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
 - [Encryption Context](structures.md#encryption-context)
   - The encryption context provided MAY be empty.
+
+The decrypt materials request MAY include the following:
+
+- [Reproduced Encryption Context](structures.md#encryption-context)
 
 ### Behaviors
 
@@ -109,8 +117,9 @@ The encryption materials returned MUST include the following:
 - Plaintext Data Key
 - [Encrypted Data Keys](structures.md#encrypted-data-keys)
   - Every encrypted data key in this list MUST correspond to the above plaintext data key.
-- [Encryption Context](structures.md#encryption-context)
+- [Encryption Context](structures.md#encryption-context-1)
   - The CMM MAY modify the encryption context.
+- [Required Encryption Context Keys](structures.md#required-encryption-context-keys)
 
 If the algorithm suite contains a [signing algorithm](algorithm-suites.md#signature-algorithm):
 
@@ -129,6 +138,10 @@ The CMM MUST ensure that the encryption materials returned are valid.
 - The plaintext data key length MUST be equal to the [key derivation input length](algorithm-suites.md#key-derivation-input-length).
 - The encrypted data keys list MUST contain at least one encrypted data key.
 - If the algorithm suite contains a signing algorithm, the encryption materials returned MUST include the generated signing key.
+- For every key in [Required Encryption Context Keys](structures.md#required-encryption-context-keys)
+  there MUST be a matching key in the [Encryption Context](structures.md#encryption-context-1).
+- The [Required Encryption Context Keys](structures.md#required-encryption-context-keys) MUST be
+  a super set of the Required Encryption Context Keys in the [encryption materials request](#encryption-materials-request).
 
 #### Decrypt Materials
 
@@ -138,14 +151,35 @@ it MUST return [decryption materials](structures.md#decryption-materials) approp
 If the requested algorithm suite does not include a signing algorithm but the encryption context includes the reserved `aws-crypto-public-key` key, the operation SHOULD fail.
 Likewise, if the requested algorithm suite includes a signing algorithm but the encryption context does not include the reserved `aws-crypto-public-key` key, the operation SHOULD fail.
 
+The CMM MUST validate the [Encryption Context](structures.md#encryption-context)
+by comparing it to the customer supplied [Reproduced Encryption Context](structures.md#encryption-context)
+in [decrypt materials request](#decrypt-materials-request).
+For every key that exists in both [Reproduced Encryption Context](structures.md#encryption-context)
+and [Encryption Context](structures.md#encryption-context),
+the values MUST be equal or the operation MUST fail.
+
+The CMM MAY fail if it expects key-value pairs
+that do not exist in [Reproduced Encryption Context](structures.md#encryption-context)
+on the [decrypt materials request](#decrypt-materials-request).
+
 The decryption materials returned MUST include the following:
 
 - Plaintext Data Key
 - [Encryption Context](structures.md#encryption-context)
   - The CMM MAY modify the encryption context.
-  - The operations made on the encryption context on the Get Encryption Materials call SHOULD be inverted on the Decrypt Materials call.
+  - The operations made on the encryption context on the Get Encryption Materials call
+    SHOULD be inverted on the Decrypt Materials call.
+  - All key-value pairs that exist in [Reproduced Encryption Context](structures.md#encryption-context)
+    but do not exist in encryption context on the [decrypt materials request](#decrypt-materials-request)
+    SHOULD be appended to the decryption materials.
 - [Algorithm Suite](algorithm-suites.md)
-  - If the decrypt materials request contains an algorithm suite, the decryption materials returned SHOULD contain the same algorithm suite.
+  - If the decrypt materials request contains an algorithm suite,
+    the decryption materials returned SHOULD contain the same algorithm suite.
+- [Required Encryption Context Keys](structures.md#required-encryption-context-keys-1)
+  - This set MUST include all keys added to the decryption materials encryption context
+    that existed in the [decrypt materials request's](#decrypt-materials-request) reproduced encryption context
+    but did not exist in the [decrypt materials request's](#decrypt-materials-request) encryption context.
+  - All keys in this set MUST exist in the decryption materials encryption context.
 
 If the algorithm suite obtained from the decryption request contains a [signing algorithm](algorithm-suites.md#signature-algorithm),
 the decryption materials MUST include the [signature verification key](structures.md#verification-key).

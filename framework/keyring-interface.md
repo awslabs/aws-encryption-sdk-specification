@@ -5,9 +5,13 @@
 
 ## Version
 
-0.2.3
+0.2.4
 
 ### Changelog
+
+- 0.2.4
+
+  - Update list of AWS KMS Keyrings
 
 - 0.2.3
 
@@ -78,8 +82,8 @@ for a keyring that can fulfill this decryption contract.
 The key provider ID MUST be a binary value
 and SHOULD be equal to a UTF-8 encoding of the key namespace.
 
-This value MUST NOT be "aws-kms"
-unless this encrypted data key was produced by the [AWS KMS Keyring](kms-keyring.md).
+This value MUST NOT be or start with "aws-kms"
+unless this encrypted data key was produced by one of the [AWS KMS Keyrings](./aws-kms/).
 
 ### key provider info
 
@@ -93,7 +97,15 @@ and SHOULD be equal to a UTF-8 encoding of the key name.
 
 ## Supported Keyrings
 
-- [AWS KMS Keyring](kms-keyring.md)
+- [AWS KMS Keyrings](./aws-kms/)
+  - [AWS KMS Keyring](./aws-kms/aws-kms-keyring.md)
+  - [AWS KMS RSA Keyring](./aws-kms/aws-kms-rsa-keyring.md)
+  - [AWS KMS Multi Keyrings](./aws-kms/aws-kms-multi-keyrings.md)
+  - [AWS KMS Discovery Keyring](./aws-kms/aws-kms-discovery-keyring.md)
+  - [AWS KMS MRK Discovery Keyring](./aws-kms/aws-kms-mrk-discovery-keyring.md)
+  - [AWS KMS MRK Keyring](./aws-kms/aws-kms-mrk-keyring.md)
+  - [AWS KMS MRK Multi Keyrings](./aws-kms/aws-kms-mrk-multi-keyrings.md)
+  - [AWS KMS Hierarchical Keyring](./aws-kms/aws-kms-hierarchical-keyring.md)
 - [Multi-Keyring](multi-keyring.md)
 - [Raw AES Keyring](raw-aes-keyring.md)
 - [Raw RSA Keyring](raw-rsa-keyring.md)
@@ -102,8 +114,8 @@ and SHOULD be equal to a UTF-8 encoding of the key name.
 
 ### OnEncrypt
 
-This interface takes [encryption materials](structures.md#encryption-materials) as input
-and MAY modify it with any of the following behaviors:
+This interface MUST take [encryption materials](structures.md#encryption-materials) as input.
+It MUST modify it with at least one of the following behaviors:
 
 - [Generate data key](#generate-data-key)
 - [Encrypt data key](#encrypt-data-key)
@@ -114,13 +126,18 @@ it MUST output the modified [encryption materials](structures.md#encryption-mate
 If the keyring did not attempt any of the above behaviors, it MUST fail
 and it MUST NOT modify the [encryption materials](structures.md#encryption-materials).
 
+The keyring SHOULD NOT attempt to store the encryption context
+in the [encrypted data key's](structures.md#encrypted-data-key) properties.
+This is especially important given the `Required Encryption Context Keys`
+that exists on [encryption materials](structures.md#encryption-materials) and [decryption materials](structures.md#decryption-materials)
+
 #### Generate Data Key
 
 If the [encryption materials](structures.md#encryption-materials) do not contain a plaintext data key,
-OnEncrypt MAY generate a data key.
+OnEncrypt MUST generate a data key.
 If the encryption materials contain a plaintext data key, OnEncrypt MUST NOT generate a data key.
 
-Generate Data Key MAY modify the following fields in the [encryption materials](structures.md#encryption-materials):
+Generate Data Key MUST modify the following fields in the [encryption materials](structures.md#encryption-materials):
 
 - [plaintext data key](structures.md#plaintext-data-key)
 
@@ -137,10 +154,10 @@ perform the [Encrypt Data Key](#encrypt-data-key) behavior.
 #### Encrypt Data Key
 
 If the [encryption materials](structures.md#encryption-materials) contain a plaintext data key,
-OnEncrypt MAY encrypt a data key.
+OnEncrypt MUST encrypt a data key.
 If the encryption materials do not contain a plaintext data key, OnEncrypt MUST NOT encrypt a data key.
 
-Encrypt Data Key MAY modify the following fields in the [encryption materials](structures.md#encryption-materials):
+Encrypt Data Key MUST modify the following fields in the [encryption materials](structures.md#encryption-materials):
 
 - [encrypted data keys](structures.md#encrypted-data-keys)
 
@@ -155,9 +172,9 @@ have [ciphertexts](structures.md#ciphertext) that can be decrypted to the plaint
 
 ### OnDecrypt
 
-This interface takes [decryption materials](structures.md#decryption-materials) and
-a list of [encrypted data keys](structures.md#encrypted-data-key) as input and
-MAY modify it with the following behavior:
+This interface MUST take [decryption materials](structures.md#decryption-materials) and
+a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
+It MUST modify it with the following behavior:
 
 - [Decrypt data key](#decrypt-data-key)
 
@@ -175,16 +192,16 @@ and MUST NOT modify the [decryption materials](structures.md#decryption-material
 
 If the encryption materials do contain a plaintext data key, OnDecrypt MUST NOT decrypt a data key.
 If the [decryption materials](structures.md#decryption-materials) do not include a plaintext data key,
-OnDecrypt MAY decrypt a data key.
+OnDecrypt MUST decrypt a data key.
 
-The decrypt data key MAY modify the following fields in the [decryption materials](structures.md#decryption-materials):
+The decrypt data key MUST modify the following fields in the [decryption materials](structures.md#decryption-materials):
 
 - [Plaintext data key](structures.md#plaintext-data-key-1)
 
 To perform this behavior, the keyring attempts to retrieve a plaintext data key from the input list
 of [encrypted data keys](structures.md#encrypted-data-key).
 
-If the keyring is able to succesfully get at least one plaintext data key from any [encrypted data key](structures.md#encrypted-data-key)
+If the keyring is able to successfully get at least one plaintext data key from any [encrypted data key](structures.md#encrypted-data-key)
 and the [decryption materials](structures.md#decryption-materials) still do not include a plaintext data key,
 it SHOULD set one resulting plaintext data key on the [decryption materials](structures.md#decryption-materials).
 
@@ -206,8 +223,8 @@ the decryption is overwhelmingly likely to fail.
 Users SHOULD use a keyring that protects wrapping keys and performs cryptographic operations within a secure boundary.
 Examples are:
 
-- The built-in [AWS KMS keyring](kms-keyring.md),
-  which uses AWS Key Management Service (AWS KMS) customer master keys (CMKs) that never leave AWS KMS plaintext.
+- The built-in [AWS KMS keyrings](./aws-kms/),
+  which use AWS Key Management Service (AWS KMS) customer master keys (CMKs) that never leave AWS KMS as plaintext.
 - A custom keyring that uses wrapping keys that are stored in your hardware security modules (HSMs)
 - A custom keyring protected by another master key service.
 
@@ -221,11 +238,11 @@ however users should refer to their specification for notes on their respective 
 The following keyrings are compatible with the referenced [master key providers](master-key-provider-interface.md) or
 [master keys](master-key-interface.md) when configured to use the same wrapping key.
 
-| Keyring         | Master Key Provider: Java and Python                                                                             |
-| --------------- | ---------------------------------------------------------------------------------------------------------------- |
-| AWS KMS keyring | KMS master key (Java), KMS master key provider (Java), KMS master key (Python), KMS master key provider (Python) |
-| Raw AES keyring | When they are used with symmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                    |
-| Raw RSA keyring | When they are used with asymmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                   |
+| Keyring          | Master Key Provider: Java and Python                                                                             |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------- |
+| AWS KMS keyrings | KMS master key (Java), KMS master key provider (Java), KMS master key (Python), KMS master key provider (Python) |
+| Raw AES keyring  | When they are used with symmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                    |
+| Raw RSA keyring  | When they are used with asymmetric encryption keys: JceMasterKey (Java), RawMasterKey (Python)                   |
 
 ### Why should I use Keyrings instead of Master Key Providers and Master Keys?
 
