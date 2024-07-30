@@ -5,9 +5,14 @@
 
 ## Version
 
-0.4.0
+0.5.0
 
 ### Changelog
+
+- 0.5.0
+
+  - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
+  - Add requirements to specify that Algorithm Suite be ESDK supported
 
 - 0.3.0
 
@@ -91,6 +96,7 @@ A Keyring that implements the [keyring interface](../framework/keyring-interface
 ### Algorithm Suite
 
 The [algorithm suite](../framework/algorithm-suites.md) that SHOULD be used for encryption.
+This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 ### Frame Length
 
@@ -140,6 +146,8 @@ This output MAY be satisfied by outputting a [parsed header](#parsed-header) con
 
 The [algorithm suite](../framework/algorithm-suites.md) that is used to encrypt
 the input [plaintext ](#plaintext).
+
+This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
@@ -203,6 +211,8 @@ MUST be the algorithm suite in the [encryption materials](../framework/structure
 returned from the [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials) call.
 Note that the algorithm suite in the retrieved encryption materials MAY be different
 from the [input algorithm suite](#algorithm-suite).
+If this algorithm suite is not [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum)
+encrypt MUST yield an error.
 If this [algorithm suite](../framework/algorithm-suites.md) is not supported by the [commitment policy](client.md#commitment-policy)
 configured in the [client](client.md) encrypt MUST yield an error.
 If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys) on the [encryption materials](../framework/structures.md#encryption-materials)
@@ -214,8 +224,12 @@ The algorithm used to derive a data key from the plaintext data key MUST be
 the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-algorithm) included in the
 [algorithm suite](../framework/algorithm-suites.md) defined above.
 This document refers to the output of the key derivation algorithm as the derived data key.
-Note that if the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
-then the derived data key is the same as the plaintext data key.
+Note:
+
+- If the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
+  then the derived data key is the same as the plaintext data key.
+- If the key derivation algorithm is [HKDF](../framework/algorithm-suites.md#hkdf),
+  the derivation process is described in [HKDF Encryption Key](../transitive-requirements.md#hkdf-encryption-key).
 
 The frame length used in the procedures described below is the input [frame length](#frame-length),
 if supplied, or the default if not.
@@ -236,7 +250,10 @@ then the [message header body](../data-format/message-header.md#header-body-vers
 - [Message ID](../data-format/message-header.md#message-id): The process used to generate
   this identifier MUST use a good source of randomness to make the chance of duplicate identifiers negligible.
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
-  in the [encryption materials](../framework/structures.md#encryption-materials)
+  in the [encryption materials](../framework/structures.md#encryption-materials),
+  and this serialization MUST NOT contain any key value pairs listed in
+  the [encryption material's](../framework/structures.md#encryption-materials)
+  [required encryption context keys](../framework/structures.md#required-encryption-context-keys).
 - [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
   [encrypted data keys](../framework/structures.md#encrypted-data-keys) in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Content Type](../data-format/message-header.md#content-type): MUST be [02](../data-format/message-header.md#supported-content-types)
@@ -256,7 +273,10 @@ then the [message header body](../data-format/message-header.md#header-body-vers
 - [Message ID](../data-format/message-header.md#message-id): The process used to generate
   this identifier MUST use a good source of randomness to make the chance of duplicate identifiers negligible.
 - [AAD](../data-format/message-header.md#aad): MUST be the serialization of the [encryption context](../framework/structures.md#encryption-context)
-  in the [encryption materials](../framework/structures.md#encryption-materials)
+  in the [encryption materials](../framework/structures.md#encryption-materials),
+  and this serialization MUST NOT contain any key value pairs listed in
+  the [encryption material's](../framework/structures.md#encryption-materials)
+  [required encryption context keys](../framework/structures.md#required-encryption-context-keys).
 - [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-key-entries): MUST be the serialization of the
   [encrypted data keys](../framework/structures.md#encrypted-data-keys) in the [encryption materials](../framework/structures.md#encryption-materials)
 - [Content Type](../data-format/message-header.md#content-type): MUST be [02](../data-format/message-header.md#supported-content-types)
@@ -270,7 +290,14 @@ over the message header body.
 The value of this MUST be the output of the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
 specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
 
-- The AAD is the serialized [message header body](../data-format/message-header.md#header-body).
+- The AAD MUST be the concatenation of the serialized [message header body](../data-format/message-header.md#header-body)
+  and the serialization of encryption context to only authenticate.
+  The encryption context to only authenticate MUST be the [encryption context](../framework/structures.md#encryption-context)
+  in the [encryption materials](../framework/structures.md#encryption-materials)
+  filtered to only contain key value pairs listed in
+  the [encryption material's](../framework/structures.md#encryption-materials)
+  [required encryption context keys](../framework/structures.md#required-encryption-context-keys)
+  serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
 - The IV has a value of 0.
 - The cipherkey is the derived data key
 - The plaintext is an empty byte array
@@ -436,3 +463,9 @@ the [message body](../data-format/message-body.md) was serialized with the follo
   - The cipherkey is the derived data key
   - The plaintext is the input [plaintext ](#plaintext)
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag returned by the above encryption.
+
+### Encryption Context not stored in the message
+
+The encryption context to only authenticate is backwards compatible
+with older messages because the [encryption context serialization specification](../framework/structures.md#serialization)
+will serialize an empty encryption context as 0 bytes.
