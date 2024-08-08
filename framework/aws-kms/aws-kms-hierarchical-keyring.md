@@ -293,18 +293,18 @@ When the hierarchical keyring receives an OnEncrypt request,
 the cache entry identifier MUST be calculated as the first 32 bytes of the
 SHA-512 hash of the following byte strings, in the order listed:
 
-| Field                    | Length (bytes) | Interpreted as |
-| ------------------------ | -------------- | -------------- |
-| Length of branch-key-id  | 3              | UInt8          |
-| branch-key-id            | Variable       | UTF-8 Encoded  |
-| Null Byte                | 1              | `0x00`         |
-| Constant string "ACTIVE" | 6              | UTF-8 Encoded  |
+| Field                    | Length (bytes) | Interpreted as         |
+| ------------------------ | -------------- | -----------------------|
+| Length of branch-key-id  | 3              | UInt8                  |
+| SHA-512(branch-key-id)   | 64             | SHA-512(UTF-8 Encoded) |
+| Null Byte                | 1              | `0x00`                 |
+| Constant string "ACTIVE" | 6              | UTF-8 Encoded          |
 
 As a formula:
 
 ```
 branch-key-id = UTF8Encode(hierarchicalKeyring.BranchKeyIdentifier)
-branch-key-digest - SHA512(branch-key-id)
+branch-key-digest = SHA512(branch-key-id)
 
 ENTRY_ID = SHA512(
     LengthUint8(branch-key-id) +
@@ -328,13 +328,12 @@ it MUST calculate the cache entry identifier as the first 32 bytes of the SHA-51
 
 ```
 branch-key-id = UTF8Encode(edk.providerInfo)
-branch-key-digest - SHA512(branch-key-id)
 
 ENTRY_ID = SHA512(
     LengthUint8(branch-key-id) +
-    branch-key-digest +
+    branch-key-id +
     0x00 +
-    branch key version
+    UTF8Encode(branch-key-version)
 )[0:32]
 ```
 
