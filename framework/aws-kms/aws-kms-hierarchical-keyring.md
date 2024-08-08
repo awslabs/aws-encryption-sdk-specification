@@ -324,7 +324,7 @@ it MUST calculate the cache entry identifier as the first 32 bytes of the SHA-51
 | Length of branch-key-id | 3              | UInt8          |
 | branch-key-id           | Variable       | UTF-8 Encoded  |
 | Null Byte               | 1              | `0x00`         |
-| Branch key version      | 36             | String         |
+| branch-key-version      | 36             | UTF-8 Encoded  |
 
 ```
 branch-key-id = UTF8Encode(edk.providerInfo)
