@@ -293,12 +293,17 @@ When the hierarchical keyring receives an OnEncrypt request,
 the cache entry identifier MUST be calculated as the first 32 bytes of the
 SHA-512 hash of the following byte strings, in the order listed:
 
-| Field                    | Length (bytes) | Interpreted as         |
-| ------------------------ | -------------- | ---------------------- |
-| Length of branch-key-id  | 3              | UInt8                  |
-| SHA-512(branch-key-id)   | 64             | SHA-512(UTF-8 Encoded) |
-| Null Byte                | 1              | `0x00`                 |
-| Constant string "ACTIVE" | 6              | UTF-8 Encoded          |
+- MUST be the length of the branch key id in its uint8 interpretation
+- MUST be the SHA512 output of the UTF8 encoded branch-key-id
+- MUST be a single null byte `0x00`
+- MUST be the constant UTF8 encoded string "ACTIVE"
+
+| Field                    | Length (bytes) | Interpreted as |
+| ------------------------ | -------------- | -------------- |
+| Length of branch-key-id  | 3              | UInt8          |
+| SHA-512(branch-key-id)   | 64             | bytes          |
+| Null Byte                | 1              | `0x00`         |
+| Constant string "ACTIVE" | 6              | UTF-8 Encoded  |
 
 As a formula:
 
@@ -318,6 +323,11 @@ ENTRY_ID = SHA512(
 
 When the hierarchical keyring receives an OnDecrypt request,
 it MUST calculate the cache entry identifier as the first 32 bytes of the SHA-512 hash of the following byte strings, in the order listed:
+
+- MUST be the length of the branch key id in its uint8 interpretation
+- MUST be the UTF8 encoded branch-key-id
+- MUST be a single null byte `0x00`
+- MUST be the UTF8 encoded branch-key-version
 
 | Field                   | Length (bytes) | Interpreted as |
 | ----------------------- | -------------- | -------------- |
