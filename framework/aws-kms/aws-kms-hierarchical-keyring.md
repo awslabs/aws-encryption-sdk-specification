@@ -294,7 +294,7 @@ the cache entry identifier MUST be calculated as the first 32 bytes of the
 SHA-512 hash of the following byte strings, in the order listed:
 
 | Field                    | Length (bytes) | Interpreted as         |
-| ------------------------ | -------------- | -----------------------|
+| ------------------------ | -------------- | ---------------------- |
 | Length of branch-key-id  | 3              | UInt8                  |
 | SHA-512(branch-key-id)   | 64             | SHA-512(UTF-8 Encoded) |
 | Null Byte                | 1              | `0x00`                 |
