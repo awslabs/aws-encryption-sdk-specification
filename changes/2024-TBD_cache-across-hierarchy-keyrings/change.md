@@ -312,8 +312,8 @@ Hierarchy Keyring's cache identifier, multiple Hierarchy Keyrings
 can use a shared cache. Multiple CachingCMMs can use a
 shared cache already as mentioned in the [background](#background).
 Adding prefixes is an additional safety measure to prevent any
-possible collisions between
-Hierarchy Keyrings and CachingCMMs.
+possible collisions between a
+Hierarchy Keyring and a CachingCMM.
 
 ##### Option 2: No
 
