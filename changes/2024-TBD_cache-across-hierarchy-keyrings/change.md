@@ -53,12 +53,12 @@ By "KMS Relationship", we mean any or all of the following:
 
 ## Background
 
-A [Cryptographic Materials Cache](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/cryptographic-materials-cache.md) can be used by a Hierarchy Keyring, a Caching CMM, and the DB-ESDK.
+A [Cryptographic Materials Cache](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/cryptographic-materials-cache.md) can be used by a Hierarchy Keyring, a Caching CMM, and the DB-ESDK for Searchable Encryption.
 It can store four types of [materials](https://github.com/aws/aws-cryptographic-material-providers-library/blob/c07a51fc29ff70411f7573bca96d2a091db8c1ed/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/cryptographic-materials-cache.smithy#L89) for three different use-cases:
 
-- Hierarchy Keyring: keyStore#BranchKeyMaterials
+- Hierarchy Keyring: BranchKeyMaterials
 - CachingCMM: EncryptionMaterials and DecryptionMaterials
-- DB-ESDK: keyStore#BeaconKeyMaterials
+- DB-ESDK (Searchable Encryption): BeaconKeyMaterials
 
 These materials have certain cache identifiers for accessing
 them until a TTL. As of [today](#today), the cache identifiers
@@ -71,7 +71,7 @@ are set up such that:
   (this is for native languages, there is currently no
   CachingCMM implemented in dafny)
 - We do NOT support a shared cache between multiple
-  DB-ESDK clients.
+  Searchable Encryption Configurations.
 
 We will focus on the Hierarchy Keyring unless mentioned
 otherwise. Our aim is to support a shared cache between
@@ -147,7 +147,7 @@ environment.
 
 ## Summary
 
-Relevant sim [ticket](https://sim.amazon.com/issues/CrypTool-5311).
+Relevant [sim](https://sim.amazon.com/issues/CrypTool-5311).
 
 To improve the MPL Consumer data key caching experience,
 when using the Hierarchy Keyring,
@@ -163,20 +163,23 @@ the CMC MAY cache Branch Keys protected by different
 KMS Relationships.
 
 This simplifies Multiple KMS Relationship MPL Consumers,
-as they do not need to stand up LRU Cache of Hierarchy Keyrings.
+as they do not need to stand up a LRU Cache of Hierarchy Keyrings.
 
 Instead, they may maintain one CMC.
 They still create a Hierarchy Keyring instance per KMS Relationship,
 and they MUST use the correct Keyring to retrieve material
 from the Cache.
 
-But they only need not maintain the common cache.
+But they only need to maintain the common cache.
 
-Additionally, even though there is no CachingCMM in dafny right
-now, in addition to allowing a shared cache between multiple
-Hierarchy Keyrings, we want to create cache identifiers such
-that multiple CachingCMMs and multiple Hierarchy Keyrings can
-simultaneously use a single shared cache.
+In the future, the CachingCMM will be introduced to
+Crypto Tool's Dafny products.
+The CachingCMM and the Hierarchy Keyring both consume CMCs.
+Thus, it will be possible to provide a CMC to both a
+Hierarchy Keyring & a CachingCMM.
+This cache identifier design MUST consider
+how the cache entries of multiple Hierarchy Keyrings
+and CachingCMMs will be appropriately separated.
 
 ## Requirements
 
@@ -189,15 +192,16 @@ simultaneously use a single shared cache.
 
 ## Out of Scope
 
-- Supporting a shared CMC for multiple KMS relationships
-  in the **DB-ESDK** to fetch BeaconKeyMaterials.
+- Supporting a shared Cache in the DB-ESDK to fetch
+  BeaconKeyMaterials across multiple Searchable
+  Encryption Configurations, or across multiple KMS Relationships.
 
 ## Issues and Alternatives:
 
 Before looking at the issues, please take a quick look at
 [Hierarchy Keyring Cache Identifier formula](#hierarchy-keyring-cache-identifier-formula),
 [CachingCMM Cache Identifier formula](#cachingcmm-cache-identifier-formula), and
-[DB-ESDK Cache Identifier formula](#db-esdk-cache-identifier-formula) for more context.
+[DB-ESDK Searchable Encryption Cache Identifier formula](#db-esdk-searchable-encryption-cache-identifier-formula) for more context.
 
 Note that there are two hashings taking place.
 For example in the Hierarchy Keyring Cache Identifier formula,
@@ -240,9 +244,9 @@ from multiple Hierarchy Keyrings.
 
 Note that according to the current
 [Hierarchy Keyring Cache Identifier formula](#hierarchy-keyring-cache-identifier-formula),
-the [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials)
+the [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials)
 has branch-key-id appended in the cache identifier formula and the
-[Branch Key Materials (Encryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/aws-kms/aws-kms-hierarchical-keyring.md#encryption-materials)
+[Branch Key Materials (Encryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#encryption-materials)
 has branch-key-digest=SHA512(branch-key-id). Here we're talking
 about the internal hash.
 
@@ -326,23 +330,35 @@ Adding prefixes adds another layer of distinction between them.
 
 ### Hierarchy Keyring Cache Identifier formula
 
-- [Encrypt](https://github.com/aws/aws-cryptographic-material-providers-library/blob/c07a51fc29ff70411f7573bca96d2a091db8c1ed/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/src/Keyrings/AwsKms/AwsKmsHierarchicalKeyring.dfy#L384) - SHA512(len_branch_key + SHA512(branch_key_id_utf8) + [0x00] + activeUtf8)[0..32] [[spec]](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/aws-kms/aws-kms-hierarchical-keyring.md#encryption-materials)
+- [Encrypt](https://github.com/aws/aws-cryptographic-material-providers-library/blob/c07a51fc29ff70411f7573bca96d2a091db8c1ed/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/src/Keyrings/AwsKms/AwsKmsHierarchicalKeyring.dfy#L384) - SHA512(len_branch_key + SHA512(branch_key_id_utf8) + [0x00] + activeUtf8)[0..32] [[spec]](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#encryption-materials)
   - The SHA512(branch_key_id_utf8) is called the branch-key-digest
-- [Decrypt](https://github.com/aws/aws-cryptographic-material-providers-library/blob/c07a51fc29ff70411f7573bca96d2a091db8c1ed/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/src/Keyrings/AwsKms/AwsKmsHierarchicalKeyring.dfy#L725) - SHA512(len_branch_key + branch_key_id_utf8 + [0x00 as uint8] + UTF8.EncodeAscii(branchKeyVersion))[0..32] [[spec]](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials)
+- [Decrypt](https://github.com/aws/aws-cryptographic-material-providers-library/blob/c07a51fc29ff70411f7573bca96d2a091db8c1ed/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/src/Keyrings/AwsKms/AwsKmsHierarchicalKeyring.dfy#L725) - SHA512(len_branch_key + branch_key_id_utf8 + [0x00 as uint8] + UTF8.EncodeAscii(branchKeyVersion))[0..32] [[spec]](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials)
 - The length of cache identifier for BranchKeyMaterials
   is 32 bytes for both Encrypt and Decrypt.
 
 ### CachingCMM Cache Identifier formula
 
 - For python native (Note: There is no CachingCMM implemented in dafny yet):
-  - [Encrypt](https://github.com/aws/aws-encryption-sdk-python/blob/1a1213a31776477dcc4aab44b2a4dc2eb514113e/src/aws_encryption_sdk/caches/__init__.py#L55): as per [spec](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/caching-cmm.md#appendix-a-cache-entry-identifier-formulas)
-  - [Decrypt](https://github.com/aws/aws-encryption-sdk-python/blob/1a1213a31776477dcc4aab44b2a4dc2eb514113e/src/aws_encryption_sdk/caches/__init__.py#L101): as per [spec](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/caching-cmm.md#appendix-a-cache-entry-identifier-formulas)
+  - [Encrypt](https://github.com/aws/aws-encryption-sdk-python/blob/1a1213a31776477dcc4aab44b2a4dc2eb514113e/src/aws_encryption_sdk/caches/__init__.py#L55): as per [spec](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/caching-cmm.md#appendix-a-cache-entry-identifier-formulas)
+    - SHA512(
+      SHA512(UTF8Encode(cachingCMM.partitionId)) + 0x01 + AlgorithmSuiteId(getEncryptionMaterialsRequest.algorithmSuite) + SHA512(SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext))
+      )
+  - [Decrypt](https://github.com/aws/aws-encryption-sdk-python/blob/1a1213a31776477dcc4aab44b2a4dc2eb514113e/src/aws_encryption_sdk/caches/__init__.py#L101): as per [spec](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/caching-cmm.md#appendix-a-cache-entry-identifier-formulas)
+    - EDK_HASHES = [SHA512(SerializeEncryptedDataKey(key)) for key in decryptMaterialsRequest.encryptedDataKeys]
+    - ENTRY_ID = SHA512(
+      SHA512(UTF8Encode(cachingCMM.partitionId)) + AlgorithmSuiteId(decryptMaterialsRequest.algorithmSuite) + CONCATENATE(SORTED(EDK_HASHES)) + PADDING_OF_512_ZERO_BITS + SHA512(SerializeEncryptionContext(decryptMaterialsRequest.encryptionContext))
+      )
 - The length of cache identifier for EncryptionMaterials
   and DecryptionMaterials is 64 bytes.
 
-### DB-ESDK Cache Identifier formula
+### DB-ESDK Searchable Encryption Cache Identifier formula
 
-- For BeaconKeyMaterials in the DB-ESDK, the cache identifier for a beacon key is a key-id, which is a [string](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/b5705ee12257fb18f867478bf17ba31f50c26c8b/DynamoDbEncryption/dafny/DynamoDbEncryption/src/SearchInfo.dfy#L185), and here is an example initialization [[ref](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/b5705ee12257fb18f867478bf17ba31f50c26c8b/TestVectors/dafny/DDBEncryption/src/JsonConfig.dfy#L527)].
+- To fetch BeaconKeyMaterials from the
+  CMC for Searchable Encryption,
+  the cache identifier for a beacon key is a key-id. The key-id is a
+  [string](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/b5705ee12257fb18f867478bf17ba31f50c26c8b/DynamoDbEncryption/dafny/DynamoDbEncryption/src/SearchInfo.dfy#L185),
+  and here is an example initialization
+  [[ref](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/b5705ee12257fb18f867478bf17ba31f50c26c8b/TestVectors/dafny/DDBEncryption/src/JsonConfig.dfy#L527)].
 - The length of cache identifier for BeaconKeyMaterials is “variable” based on the key-id.
 - For single-tenant, the customer sets the key-id directly in the config. For multi-tenant, they set an attribute name, and the key comes out of that attribute of the item.
 
@@ -416,8 +432,8 @@ is used to refresh it.
 
 ## A2: Sub-requirements
 
-- We must update the cache identifier for [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials) to have a branch-key-digest=SHA512(branch-key-id) appended, instead of a branch-key-id, just like in the [Branch Key Materials (Encryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/aws-kms/aws-kms-hierarchical-keyring.md#encryption-materials) [[ref: Hierarchy Keyring Cache Identifier formula]](#hierarchy-keyring-cache-identifier-formula).
-- Minor update to the spec: The branch-key-version (which is the UUID) in the [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials) is currently mentioned to be of size 36 bytes. However, the UUID is actually only 16 bytes of randomness. We get 36 bytes when we convert the 16 bytes of randomness in UUID to UTF8 encoding. Therefore, the spec should mention that the branch-key-version has size 16 bytes [[ref: Hierarchy Keyring Cache Identifier formula]](#hierarchy-keyring-cache-identifier-formula).
+- We must update the cache identifier for [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials) to have a branch-key-digest=SHA512(branch-key-id) appended, instead of a branch-key-id, just like in the [Branch Key Materials (Encryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#encryption-materials) [[ref: Hierarchy Keyring Cache Identifier formula]](#hierarchy-keyring-cache-identifier-formula).
+- Minor update to the spec: The branch-key-version (which is the UUID) in the [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials) is currently mentioned to be of size 36 bytes. However, the UUID is actually only 16 bytes. We get 36 bytes when we convert the 16 bytes in UUID to a UTF8 encoding. Therefore, the spec should mention that the branch-key-version has size 16 bytes [[ref: Hierarchy Keyring Cache Identifier formula]](#hierarchy-keyring-cache-identifier-formula).
 
 ## A3: Information about SHA384 and Length Extension Attacks
 
