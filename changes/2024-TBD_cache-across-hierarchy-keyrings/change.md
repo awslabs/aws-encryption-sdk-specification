@@ -286,15 +286,21 @@ Both Hierarchy Keyring and CachingCMM identifiers currently
 use SHA512, but the Hierarchy Keyring cache identifier is
 truncated to 32 bytes.
 
-##### Option 1 (Recommended): Change the hashing algorithm to SHA384 in both
+##### Option 1 (Recommended): Using SHA512 for both
 
-According to CryptoBR's
-[Cryptosystems guidance](https://w.amazon.com/index.php/AWSCryptoBR/Cryptosystems)
-on Hash Function, we MUST use untrucated SHA384.
+SHA512 has more number of bits to represent the output
+of the cache identifier strings. More information about
+why this is true based on the birthday bound can be found
+[here](#birthday-bound-for-sha512-and-sha384)
+This is pending [CryptoBR guidance](https://t.corp.amazon.com/P148158466/communication).
 
-##### Option 2: Using SHA512 for both
+##### Option 2: Change the hashing algorithm to SHA384 in both
 
-We MUST NOT deviate from CryptoBR's guidance.
+SHA512 is the better choice as mentioned above.
+More information about this can be found
+[here in the appendix](#a3-information-about-sha384-and-length-extension-attacks),
+where I discuss length extension attacks and why
+SHA512 is still the better choice.
 
 ##### Option 3: Using different hashing algorithms
 
@@ -304,9 +310,10 @@ CryptoBR's guidance.
 
 #### Issue 4: Should we add a prefix to all cache identifiers in Hierarchy Keyrings and CachingCMMs?
 
-Here, by prefix we mean, adding 'hierarchy_keyring' as a
+Here, by prefix we mean, adding the UTF8 encoding
+of the string 'hierarchy_keyring' as a
 prefix to a hierarchy keyring cache identifier,
-and adding 'caching_cmm' as a prefix to a
+and adding encoding of 'caching_cmm' as a prefix to a
 CachingCMM cache identifier.
 
 ##### Option 1 (Recommended): Yes
@@ -326,6 +333,71 @@ overlap is minimal, we might get collisions between a
 Hierarchy Keyring and a CachingCMM cache identifier.
 Adding prefixes adds another layer of distinction between them.
 
+## How can we ensure cache identifiers are collision resistent?
+
+To answer this question, I will use two approaches.
+
+### Derivation from assumptions
+
+For the HKeyring and CachingCMM, ensuring that all cache
+identifiers are unique for all encrypts and decrypts
+is simple if we just study the statements in the
+[background](#background) and the fields we're
+appending to the identifiers as discussed in issues
+[1](#issue-1-how-to-update-the-cache-identifier-for-the-hierarchy-keyring-to-allow-a-shared-cache)
+and [4](#issue-4-should-we-add-a-prefix-to-all-cache-identifiers-in-hierarchy-keyrings-and-cachingcmms).
+
+Two HKeyrings WILL NOT have collisions if we append
+a keystore ID parameter to the identifier
+(per issue
+[1](#issue-1-how-to-update-the-cache-identifier-for-the-hierarchy-keyring-to-allow-a-shared-cache)).
+
+Two CachingCMMs already allow shared cache.
+
+Per issue
+[4](#issue-4-should-we-add-a-prefix-to-all-cache-identifiers-in-hierarchy-keyrings-and-cachingcmms),
+a Hierarchy Keyring and a CachingCMM idenitifier will
+be distinct if we add the UTF8 encodings of prefixes
+'hierarchy_keyring' (17 bytes) and 'caching_cmm' (11 bytes)
+to each of them respectively.
+
+### Distinct sizes of the identifiers
+
+As an additional safety measure, we look closely
+at the formulae for cache identifiers in a Hierarchy Keyring
+and a CachingCMM encrypt and decrypt (note that these will
+actually be a total of 5, since the
+[cachingCMM encrypt cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/caching-cmm.md#appendix-a-cache-entry-identifier-formulas)
+has two different formulae based on if we
+specify the algorithm suite or not).
+
+In the
+[Hierarchy Keyring Cache Identifier formula](#hierarchy-keyring-cache-identifier-formula)
+Encrypt, as discussed before, we will remove the len_branch_key.
+For Decrypt, we will remove the len_branch_key
+and use the branch-key-digest in place of the branch-key-id.
+The size of the inputs to the external hash for both these
+cases then becomes:
+
+- Encrypt: 17 (prefix) + 64 + 1 + 6 = 88 bytes
+- Decrypt: 17 + 64 + 1 + 36 = 118 bytes
+
+Similarly, after making the proposed updates in the
+[CachingCMM Cache Identifier formula](#cachingcmm-cache-identifier-formula),
+the size will be:
+
+- Encrypt without Algorithm Suite specified: 11 (prefix) + 64 + 1 + 64 = 140 bytes
+- Encrypt with Algorithm Suite specified: 11 + 64 + 1 + 2 + 64 = 142 bytes
+- Decrypt: 11 + 64 + 2 + 64\*x + 64 + 64 = 205 + 64x bytes ; where x is the number of EDKs in the decrypt string
+
+In addition to the explanations in the previous
+[subsection](#derivation-from-assumptions),
+all these input strings are also unique
+because they have different lengths. We just need
+to choose a good hashing algorithm which gives us a
+very large output space to project these strings to
+minimize collisions, and SHA512 will do the job.
+
 ## Cache Identifier Formulae
 
 ### Hierarchy Keyring Cache Identifier formula
@@ -340,9 +412,14 @@ Adding prefixes adds another layer of distinction between them.
 
 - For python native (Note: There is no CachingCMM implemented in dafny yet):
   - [Encrypt](https://github.com/aws/aws-encryption-sdk-python/blob/1a1213a31776477dcc4aab44b2a4dc2eb514113e/src/aws_encryption_sdk/caches/__init__.py#L55): as per [spec](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/caching-cmm.md#appendix-a-cache-entry-identifier-formulas)
-    - SHA512(
-      SHA512(UTF8Encode(cachingCMM.partitionId)) + 0x01 + AlgorithmSuiteId(getEncryptionMaterialsRequest.algorithmSuite) + SHA512(SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext))
-      )
+    - Encrypt without Algorithm suite specified
+      - SHA512(
+        SHA512(UTF8Encode(cachingCMM.partitionId)) + 0x00 + SHA512(SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext))
+        )
+    - Encrypt with Algorithm suite specified
+      - SHA512(
+        SHA512(UTF8Encode(cachingCMM.partitionId)) + 0x01 + AlgorithmSuiteId(getEncryptionMaterialsRequest.algorithmSuite) + SHA512(SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext))
+        )
   - [Decrypt](https://github.com/aws/aws-encryption-sdk-python/blob/1a1213a31776477dcc4aab44b2a4dc2eb514113e/src/aws_encryption_sdk/caches/__init__.py#L101): as per [spec](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/caching-cmm.md#appendix-a-cache-entry-identifier-formulas)
     - EDK_HASHES = [SHA512(SerializeEncryptedDataKey(key)) for key in decryptMaterialsRequest.encryptedDataKeys]
     - ENTRY_ID = SHA512(
@@ -361,6 +438,27 @@ Adding prefixes adds another layer of distinction between them.
   [[ref](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/b5705ee12257fb18f867478bf17ba31f50c26c8b/TestVectors/dafny/DDBEncryption/src/JsonConfig.dfy#L527)].
 - The length of cache identifier for BeaconKeyMaterials is “variable” based on the key-id.
 - For single-tenant, the customer sets the key-id directly in the config. For multi-tenant, they set an attribute name, and the key comes out of that attribute of the item.
+
+## Birthday Bound for SHA512 and SHA384
+
+A [birthday attack](https://en.wikipedia.org/wiki/Birthday_attack)
+is a bruteforce collision attack that exploits the
+mathematics behind the birthday problem in probability
+theory. This attack can be used to abuse communication
+between two or more parties. The attack depends on the
+higher likelihood of collisions found between random
+attack attempts and a fixed degree of
+permutations (pigeonholes). With a birthday attack,
+if we have a total of n bits output and therefore
+$2^n$ different outputs, it is possible to find a
+collision of a hash function with 50% chance by
+calculating approximately $sqrt(2^n) = 2^{n/2}$ hashes.
+
+To find a random collision in a SHA512 hash with
+probability 0.5, we would need to calculate
+approximately $2^256$ hashes. Similarly for SHA384,
+we would need to calculate $2^192$ hashes.
+Therefore, SHA512 is more collision resistant.
 
 ## Appendix
 
