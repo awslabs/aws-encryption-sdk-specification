@@ -9,7 +9,7 @@ This serves as a reference of all features that this change affects.
 
 | Feature                                                                                 |
 | --------------------------------------------------------------------------------------- |
-| [Keystore](../../framework/branch-key-store.md)                                         |
+| [Key Store](../../framework/branch-key-store.md)                                         |
 | [AWS KMS Hierarchical Keyring](../../framework/aws-kms/aws-kms-hierarchical-keyring.md) |
 
 ## Affected Specifications
@@ -18,7 +18,7 @@ This serves as a reference of all specification documents that this change affec
 
 | Specification                                                                           |
 | --------------------------------------------------------------------------------------- |
-| [Keystore](../../framework/branch-key-store.md)                                         |
+| [Key Store](../../framework/branch-key-store.md)                                         |
 | [AWS KMS Hierarchical Keyring](../../framework/aws-kms/aws-kms-hierarchical-keyring.md) |
 
 ## Affected Implementations
@@ -81,7 +81,7 @@ as highlighted in the next sections.
 ## Motivation
 
 The Hierarchy Keyring,
-and it's component the (Branch) Keystore,
+and it's component the (Branch) Key Store,
 allow MPL Consumers to reduce their KMS Call volume
 by persisting KMS protected cryptographic materials into
 an available medium
@@ -114,7 +114,7 @@ a Branch Key is accessed.
 
 However,
 the Hierarchy Keyring,
-and it's Keystore,
+and it's Key Store,
 have a runtime cost,
 exerting memory pressure
 and, without manual optimization,
@@ -151,9 +151,9 @@ Relevant [sim](https://sim.amazon.com/issues/CrypTool-5311).
 
 To improve the MPL Consumer data key caching experience,
 when using the Hierarchy Keyring,
-we need to allow caching across KeyStores/KMS Clients/KMS Keys.
+we need to allow caching across Key Stores/KMS Clients/KMS Keys.
 
-To facilitate Caching across KeyStores/KMS Clients/KMS Keys,
+To facilitate Caching across Key Stores/KMS Clients/KMS Keys,
 we MUST break the Cryptographic Materials Cache (CMC)
 out of the Hierarchy Keyring.
 
@@ -183,7 +183,7 @@ and CachingCMMs will be appropriately separated.
 
 ## Requirements
 
-- We must allow caching across KeyStores/KMS Clients/KMS Keys
+- We must allow caching across Key Stores/KMS Clients/KMS Keys
   for multiple Hierarchy Keyrings and CachingCMMs.
   For this, we need to strategically update the cache identifiers
   for all materials ([background](#background)) in the CMC.
@@ -216,7 +216,7 @@ We'll call these internal and external hashes.
 Note that according to the current
 [Hierarchy Keyring Cache Identifier formula](#hierarchy-keyring-cache-identifier-formula),
 if two KMS Relationships Hierarchy Keyrings are
-called with two different keystores but the same branch-key-id,
+called with two different Key Stores but the same branch-key-id,
 there will be a collision (the branch-key-version will also
 have to co-incide in case of Decryption Branch Key Materials).
 
@@ -225,7 +225,7 @@ have to co-incide in case of Decryption Branch Key Materials).
 By appending the keystore-id to the
 Hierarchy Keyring cache identifier,
 we can ensure that there are no collisions between two identifiers
-from different keystores.
+from different Key Stores.
 More context on this can be found in the
 [Appendix section A1](#a1-relating-cache-entries-branch-keys-to-kms-relationships).
 
@@ -318,7 +318,7 @@ CachingCMM cache identifier.
 
 ##### Option 1 (Recommended): Yes
 
-Note that after adding keystore ID / partition ID to a
+Note that after adding Key Store ID / partition ID to a
 Hierarchy Keyring's cache identifier, multiple Hierarchy Keyrings
 can use a shared cache. Multiple CachingCMMs can use a
 shared cache already as mentioned in the [background](#background).
@@ -348,7 +348,7 @@ appending to the identifiers as discussed in issues
 and [4](#issue-4-should-we-add-a-prefix-to-all-cache-identifiers-in-hierarchy-keyrings-and-cachingcmms).
 
 Two HKeyrings WILL NOT have collisions if we append
-a keystore ID parameter to the identifier
+a Key Store ID parameter to the identifier
 (per issue
 [1](#issue-1-how-to-update-the-cache-identifier-for-the-hierarchy-keyring-to-allow-a-shared-cache)).
 
@@ -479,13 +479,13 @@ Branch Key ID,
 and Branch Key Name.
 
 We can use existing features to accomplish this;
-The KeyStore constructor takes an optional [ID](../../framework/branch-key-store.md#keystore-id)
+The Key Store constructor takes an optional [ID](../../framework/branch-key-store.md#keystore-id)
 parameter at construction.
 
 We can use this [ID](../../framework/branch-key-store.md#keystore-id)
-to label the KMS Relationship of a particular KeyStore instance.
+to label the KMS Relationship of a particular Key Store instance.
 
-MPL Consumers who want to garbage collect KeyStore instances,
+MPL Consumers who want to garbage collect Key Store instances,
 but still retain the ability to serve cached results,
 MAY then set this [ID](../../framework/branch-key-store.md#keystore-id)
 intelligently.
@@ -503,8 +503,8 @@ only the common cache remains "in scope" indefinitely.
 
 Whenever `x'` is needed,
 a new KMS Client is created that respects relationship `X`,
-which is then used to create KeyStore Identified as `X`,
-and the KeyStore is used to create a Hierarchical Keyring
+which is then used to create Key Store Identified as `X`,
+and the Key Store is used to create a Hierarchical Keyring
 that uses the common Cache.
 
 All entries in this common Cache from that hierarchal Keyring
@@ -517,8 +517,8 @@ But to retrieve an entry,
 the MPL Consumer SHOULD recreate
 
 > a KMS Client is created that respects relationship `X`,
-> which is then used to create KeyStore Identified as `X`,
-> and the KeyStore is used to create a Hierarchical Keyring
+> which is then used to create Key Store Identified as `X`,
+> and the Key Store is used to create a Hierarchical Keyring
 > that uses the common Cache.
 
 If the Cache Entry is still valid
