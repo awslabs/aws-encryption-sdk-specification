@@ -296,10 +296,15 @@ When the hierarchical keyring receives an OnEncrypt request,
 the cache entry identifier MUST be calculated as the first 32 bytes of the
 SHA-512 hash of the following byte strings, in the order listed:
 
+- MUST be the length of the branch key id in its uint8 interpretation
+- MUST be the SHA512 output of the UTF8 encoded branch-key-id
+- MUST be a single null byte `0x00`
+- MUST be the constant UTF8 encoded string "ACTIVE"
+
 | Field                    | Length (bytes) | Interpreted as |
 | ------------------------ | -------------- | -------------- |
 | Length of branch-key-id  | 3              | UInt8          |
-| branch-key-id            | Variable       | UTF-8 Encoded  |
+| SHA-512(branch-key-id)   | 64             | bytes          |
 | Null Byte                | 1              | `0x00`         |
 | Constant string "ACTIVE" | 6              | UTF-8 Encoded  |
 
@@ -307,7 +312,7 @@ As a formula:
 
 ```
 branch-key-id = UTF8Encode(hierarchicalKeyring.BranchKeyIdentifier)
-branch-key-digest - SHA512(branch-key-id)
+branch-key-digest = SHA512(branch-key-id)
 
 ENTRY_ID = SHA512(
     LengthUint8(branch-key-id) +
@@ -322,22 +327,26 @@ ENTRY_ID = SHA512(
 When the hierarchical keyring receives an OnDecrypt request,
 it MUST calculate the cache entry identifier as the first 32 bytes of the SHA-512 hash of the following byte strings, in the order listed:
 
+- MUST be the length of the branch key id in its uint8 interpretation
+- MUST be the UTF8 encoded branch-key-id
+- MUST be a single null byte `0x00`
+- MUST be the UTF8 encoded branch-key-version
+
 | Field                   | Length (bytes) | Interpreted as |
 | ----------------------- | -------------- | -------------- |
 | Length of branch-key-id | 3              | UInt8          |
 | branch-key-id           | Variable       | UTF-8 Encoded  |
 | Null Byte               | 1              | `0x00`         |
-| Branch key version      | 36             | String         |
+| branch-key-version      | 36             | UTF-8 Encoded  |
 
 ```
 branch-key-id = UTF8Encode(edk.providerInfo)
-branch-key-digest - SHA512(branch-key-id)
 
 ENTRY_ID = SHA512(
     LengthUint8(branch-key-id) +
-    branch-key-digest +
+    branch-key-id +
     0x00 +
-    branch key version
+    UTF8Encode(branch-key-version)
 )[0:32]
 ```
 

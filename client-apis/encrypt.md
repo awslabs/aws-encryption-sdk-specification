@@ -224,8 +224,12 @@ The algorithm used to derive a data key from the plaintext data key MUST be
 the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-algorithm) included in the
 [algorithm suite](../framework/algorithm-suites.md) defined above.
 This document refers to the output of the key derivation algorithm as the derived data key.
-Note that if the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
-then the derived data key is the same as the plaintext data key.
+Note:
+
+- If the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
+  then the derived data key is the same as the plaintext data key.
+- If the key derivation algorithm is [HKDF](../framework/algorithm-suites.md#hkdf),
+  the derivation process is described in [HKDF Encryption Key](../transitive-requirements.md#hkdf-encryption-key).
 
 The frame length used in the procedures described below is the input [frame length](#frame-length),
 if supplied, or the default if not.
