@@ -9,7 +9,7 @@ This serves as a reference of all features that this change affects.
 
 | Feature                                                                                 |
 | --------------------------------------------------------------------------------------- |
-| [Key Store](../../framework/branch-key-store.md)                                         |
+| [Key Store](../../framework/branch-key-store.md)                                        |
 | [AWS KMS Hierarchical Keyring](../../framework/aws-kms/aws-kms-hierarchical-keyring.md) |
 
 ## Affected Specifications
@@ -18,7 +18,7 @@ This serves as a reference of all specification documents that this change affec
 
 | Specification                                                                           |
 | --------------------------------------------------------------------------------------- |
-| [Key Store](../../framework/branch-key-store.md)                                         |
+| [Key Store](../../framework/branch-key-store.md)                                        |
 | [AWS KMS Hierarchical Keyring](../../framework/aws-kms/aws-kms-hierarchical-keyring.md) |
 
 ## Affected Implementations
