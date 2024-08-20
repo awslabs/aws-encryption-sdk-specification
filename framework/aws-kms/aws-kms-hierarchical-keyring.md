@@ -369,7 +369,7 @@ Additionally the keyring uses a 12-byte IV for the AES-GCM-256 for key wrapping.
 We have selected to use these `salt` and `IV` parameters as they are the same parameters used
 in [AWS KMS key derivation](https://rwc.iacr.org/2018/Slides/Gueron.pdf).
 
-Overall this results in 28 bytes (224 bits) of randomness. By the birthday bound, there is a 2^{-32} chance of a key/IV collision after 
+Overall this results in 28 bytes (224 bits) of randomness. By the birthday bound, there is a 2^{-32} chance of a key/IV collision after
 
 ```
 2^{ (224 - 32) / 2 }
