@@ -369,19 +369,19 @@ Additionally the keyring uses a 12-byte IV for the AES-GCM-256 for key wrapping.
 We have selected to use these `salt` and `IV` parameters as they are the same parameters used
 in [AWS KMS key derivation](https://rwc.iacr.org/2018/Slides/Gueron.pdf).
 
-Overall this results in 28-bytes of randomness.
-
-Birthday Problem calculations for current selection:
+Overall this results in 28 bytes (224 bits) of randomness. By the birthday bound, there is a 2^{-32} chance of a key/IV collision after 
 
 ```
-16 + 12 = 28-bytes or 224-bits of randomness
+2^{ (224 - 32) / 2 }
 
-(224 - 32) / 2 = 96
+= 2^96
 
-2^96 = 7.9228163e+28 or 79,228,162,514,264,337,593,543,950,336
+= 7.9228163e+28
+
+= 79,228,162,514,264,337,593,543,950,336
 ```
 
-The above number is how many times one would have to wrap with the `derivedBranchKey` before a theoretical collision.
+derivations. In other words, you could derive 2^96 `derivedBranchKeys` before incurring a cryptographically relevant chance of reusing a AES-GCM key/IV pair.
 Given the magnitude of the result; it is recommended to rotate the `branchKey` once per year as this is also the cadence
 at which AWS KMS rotates its [AWS Managed Keys](https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html#rotate-keys-how-it-works).
 Using this combination of IV and salt for the KDF and Wrapping operations significantly extends the lifetime of the key; this allows
@@ -406,7 +406,7 @@ Birthday Problem calculations:
 2^112 = 5,192,296,858,534,827,628,530,496,329,220,096
 ```
 
-The above number is how many times one would have to wrap with the `derivedBranchKey` before a theoretical collision.
+The above number is how many times one would have to wrap with the `derivedBranchKey` before incurring a cryptographically relevant probability of a collision.
 Although this is a higher number we decided on the current selection of including a salt and an IV to not only
 lower the overhead of bytes we have to store in the [edk ciphertext](../structures.md#ciphertext) but to
 easily reason about the security properties of the key derivation since it is what AWS KMS does.
