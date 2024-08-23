@@ -277,7 +277,7 @@ This has AWS Cryptographers' approval
 
 #### Option 2: Update the Encryption cache identifier to include branch-key-id instead of the branch-key-digest=SHA512(branch-key-id)
 
-Not hashing the branch keys will mean that the input
+Not hashing the branch key IDs will mean that the input
 to the final hash function will be of variable length,
 which is hard to reason about.
 
