@@ -62,35 +62,35 @@ the UTF8 Encoded value of the version of the branch key.
 
 ## Interface
 
-The EncryptedKeyStore MUST support the following operations:
+The KeyStorageInterface MUST support the following operations:
 
-- [WriteNewKeyToStore](#writenewkeytostore)
-- [WriteNewBranchKeyVersionToKeystore](#writenewbranchkeyversiontokeystore)
+- [WriteNewEncryptedBranchKey](#writenewencryptedbranchkey)
+- [WriteNewEncryptedBranchKeyVersion](#writenewencryptedbranchkeyversion)
 - [GetEncryptedActiveBranchKey](#getencryptedactivebranchkey)
 - [GetEncryptedBranchKeyVersion](#getencryptedbranchkeyversion)
 - [GetEncryptedBeaconKey](#getencryptedbeaconkey)
-- [GetTableName](#gettablename)
+- [GetKeyStorageInfo](#getkeystorageinfo)
 
-### WriteNewKeyToStore
+### WriteNewEncryptedBranchKey
 
-The WriteNewKeyToStore caller MUST provide:
+The WriteNewEncryptedBranchKey caller MUST provide:
 
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of ActiveHierarchicalSymmetricVersion
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of HierarchicalSymmetricVersion
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of ActiveHierarchicalSymmetricBeacon
 
 All three keys need to be written together with an atomic transactional write.
-See the [default encrypted key store's write new key to store specification](./default-encrypted-key-store.md#writenewkeytostore) for more details about what storage properties are expected.
+See the [default encrypted key store's write new key to store specification](./default-key-storage-interface.md#writenewencryptedbranchkey) for more details about what storage properties are expected.
 
-### WriteNewBranchKeyVersionToKeystore
+### WriteNewEncryptedBranchKeyVersion
 
-The WriteNewBranchKeyVersionToKeystore caller MUST provide:
+The WriteNewEncryptedBranchKeyVersion caller MUST provide:
 
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of ActiveHierarchicalSymmetricVersion
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of HierarchicalSymmetricVersion
 
 Both keys need to be written together with a consistent transactional write.
-See [default encrypted key store's write new branch key version to store specification](./default-encrypted-key-store.md#writenewbranchkeyversiontokeystore) for more details about what storage properties are expected.
+See [default encrypted key store's write new branch key version to store specification](./default-key-storage-interface.md#writenewencryptedbranchkeyversion) for more details about what storage properties are expected.
 
 ### GetEncryptedActiveBranchKey
 
@@ -107,6 +107,6 @@ It MUST return an [EncryptedHierarchicalKey](#encryptedhierarchicalkey).
 The GetEncryptedBeaconKey caller MUST provide the same inputs as the [GetBeaconKey](../branch-key-store.md#getbeaconkey) operation.
 It MUST return an [EncryptedHierarchicalKey](#encryptedhierarchicalkey).
 
-### GetTableName
+### GetKeyStorageInfo
 
 It MUST return the physical table name.

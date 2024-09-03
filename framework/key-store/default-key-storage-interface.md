@@ -14,4 +14,4 @@
 
 ## Overview
 
-The Default Encrypted Key Store is the [Dynamodb Encrypted Key Store](./default-encrypted-key-store.md#overview).
+The Default Encrypted Key Store is the [Dynamodb Encrypted Key Store](./default-key-storage-interface.md#overview).
