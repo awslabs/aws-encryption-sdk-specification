@@ -148,10 +148,6 @@ environment.
 
 ## Summary
 
-<!-- TODO: Remove SIM before merging to mainline -->
-
-Relevant [sim](https://sim.amazon.com/issues/CrypTool-5311).
-
 To improve the MPL Consumer data key caching experience,
 when using the Hierarchy Keyring,
 we need to allow caching across Key Stores/KMS Clients/KMS Keys.
@@ -160,7 +156,7 @@ To facilitate Caching across Key Stores/KMS Clients/KMS Keys,
 we MUST break the Cryptographic Materials Cache (CMC)
 out of the Hierarchy Keyring.
 
-By allowing MPL Consumers to provide an already initialized CMC
+By allowing MPL Consumers to optionally provide an initialized shared CMC
 to the Hierarchy Keyring at construction,
 the CMC MAY cache Branch Keys protected by different
 KMS Relationships.
@@ -192,6 +188,9 @@ and CachingCMMs will be appropriately separated.
   for all materials ([background](#background)) in the CMC.
   The [Issues and Alternatives section](#issues-and-alternatives)
   discusses this.
+- We MUST prevent Confused Deputy cases, i.e: The Wrong Branch Key
+  Material being served
+- Our solution MUST be Easy to Use, Hard to Misuse
 
 ## Out of Scope
 
@@ -206,7 +205,7 @@ Before looking at the issues, please take a quick look at
 [CachingCMM Cache Identifier formula](#cachingcmm-cache-identifier-formula), and
 [DB-ESDK Searchable Encryption Cache Identifier formula](#db-esdk-searchable-encryption-cache-identifier-formula) for more context.
 
-Note that there are two hashings taking place.
+Note that there are currently two hashings taking place.
 For example in the Hierarchy Keyring Cache Identifier formula,
 one hash is for the branch-key-id and the other is hashing
 the entire appended string
@@ -223,209 +222,264 @@ called with two different Key Stores but the same branch-key-id,
 there will be a collision (the branch-key-version will also
 have to co-incide in case of Decryption Branch Key Materials).
 
-#### Option 1 (Recommended): Append the keystore-id to the [Hierarchy Keyring cache identifier formula](#hierarchy-keyring-cache-identifier-formula).
+#### Option 1 (Recommended): Adding a Resource ID, Scope ID, Partition ID, and Resource Suffix (recommended)
 
-By appending the [`keystore-id`](../../framework/branch-key-store.md#keystore-id) to the
-Hierarchy Keyring cache identifier,
-we can ensure that there are no collisions between two identifiers
-from different local Key Stores.
+We establish the following "words" for the
+Cache Entry Identifier formula:
 
-Key Store IDs are UUIDs that are unlikely to collide by default.
+- **Resource Identifier:**
+  A Hex value, like Algorithm Suite ID, that indicates
+  if an element is from a Caching CMM, Hierarchy Keyring,
+  or some other future resource (say Lock Box)
 
-By adding Key Store ID to the Hierarchy Keyring cache identifier,
-the customer can control cache access.
-For instance, they can choose if different
-KMS Relationships CAN hit the same identifier or not.
-They can also choose if different logical key stores
-or physical key stores can collide or not.
-But by default, because each Key Store object will have a unique UUID,
-there will be no collision.
-More context on this can be found in the
-[Appendix section A1](#a1-relating-cache-entries-branch-keys-to-kms-relationships).
+  - Caching_CMM : `0x01` (0001)
+  - Hierarchy_Keyring : `0x02` (0010)
 
-#### Option 3: Don't change anything.
+- **Scope Identifier:**
+  A Hex value, like Algorithm Suite ID, that indicates
+  if an element is used for Encryption, Decryption,
+  Searchable Encryption, or some other future
+  purpose (maybe Lock Box).
 
-As mentioned before, in-case of a shared cache,
-there will be collisions while fetching materials
-from multiple Hierarchy Keyrings.
+  - Encrypt : `0x01` (0001)
+  - Decrypt : `0x02` (0010)
+  - Searchable Encryption : `0x03` (0011)
 
-### Issue 2: Should we update the cache identifier for the Hierarchy Keyring BranchKeyMaterials to include branch-key-digest instead of branch-key-id?
+- **Partition ID:**
+  Either a String provided by user, which MUST be
+  interpreted as the bytes of UTF-8 Encoding of the
+  String, or a v4 UUID, which SHOULD be interpreted
+  as the 16 byte representation of the UUID.
+  Note: The Cache will not know if this ID is a
+  String set by the user or the UUID.
+  The constructor of the Hierarchy Keyring MUST
+  record these bytes at construction time.
+  This also makes the Hierarchy Keyring Partition ID
+  in-line with the Partition ID of the Caching CMM.
 
-Note that according to the current
-[Hierarchy Keyring Cache Identifier formula](#hierarchy-keyring-cache-identifier-formula),
-the [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials)
-has branch-key-id appended in the cache identifier formula and the
-[Branch Key Materials (Encryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#encryption-materials)
-has branch-key-digest=SHA512(branch-key-id). Here we're talking
-about the internal hash.
+- **Resource Suffix:**
+  There are, at this time, 5 resource suffixes:
+  - CCM: Encryption Materials, Without Algorithm Suite:
+    ```
+    0x00
+    + SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext)
+    ```
+  - CCM: Encryption Materials, With Algorithm Suite:
+    ```
+    0x01
+    + AlgorithmSuiteId(getEncryptionMaterialsRequest.algorithmSuite)
+    + SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext)
+    ```
+  - CCM: Decryption Materials:
+    ```
+    AlgorithmSuiteId(decryptMaterialsRequest.algorithmSuite)
+    + CONCATENATE(SORTED(EDK))
+    + SerializeEncryptionContext(decryptMaterialsRequest.encryptionContext)
+    ```
+  - H-Keyring: Encryption Materials:
+    ```
+    UTF8Encode(branchKeyId)
+    + logicalKeyStoreName
+    ```
+  - H-Keyring: Decryption Materials:
+    ```
+    UTF8Encode(branchKeyId)
+    + logicalKeyStoreName
+    + branchKeyVersion
+    ```
 
-#### Option 1 (Recommended): Update the Decryption cache identifier to include branch-key-digest=SHA512(branch-key-id) instead of the branch-key-id
+The final recommendation regarding cache identifiers
+is to join the aforementioned 4 words
+(Resource Identifier, Scope Identifier, Partition ID,
+and Resource Suffix) with the null byte, 0x00,
+and take the SHA of the result.
 
-This will make both the Hierarchy Keyring Encryption and
-Decryption cache identifiers more coherent.
-The cache identifier input would be deterministic
-irrespective of the size of branch-key-id that the
-customer provides.
-Additionally, if we're updating branch-key-id to
-branch-key-digest, we can remove the branch-key-id-length
-parameter in the formula and make it cleaner.
+#### Option 2: Using Key Store ID instead of Partition ID
 
-<!-- TODO: Remove this line before merging to mainline -->
+The Hierarchy Keyring holds the Key Store and the
+underlying CMC. The Key Store ID is a parameter of
+the keystore. Instead of saying that the
+Hierarchy Keyring uses the Key Store ID from the
+Key Store to determine if the cache is shared or not,
+we should include a partition ID
+(mentioned in the previous option), which is held directly
+by the Hierarchy Keyring. This will be easier for
+customers to reason about.
 
-This has AWS Cryptographers' approval
-[[ticket]](https://issues.amazon.com/issues/P148158466).
+This also, like I mentioned before, makes the
+Hierarchy Keyring cache identifier usage in-line with
+the Caching CMM cache identifier. which uses the
+partition ID for every caching CMM to determine
+if caches are shared or not.
 
-#### Option 2: Update the Encryption cache identifier to include branch-key-id instead of the branch-key-digest=SHA512(branch-key-id)
+Using the Key Store ID,
+a property not necessarily bound to only one
+instance of a Hierarchy Keyring,
+introduces the following risks:
 
-Not hashing the branch key IDs will mean that the input
-to the final hash function will be of variable length,
-which is hard to reason about.
+- Time-To-Live is not a property of the Key Store,
+  but of the Hierarchy Keyring. Thus, two Hierarchy
+  Keyrings with different Time-To-Live configurations
+  but the same Key Store will share entries. This is
+  mitigated elsewhere, but it is good it is prevented
+  by the identifier as well.
+- Branch Key ID Supplier is, likewise, not a property
+  of the Key Store but of the Hierarchy Keyring.
+  Thus, two Hierarchy Keyrings with the same Key Store
+  but different Branch Key ID Suppliers would share entries.
+  Though there is no threat, as the Branch Key ID Supplier
+  or statically bound Branch Key ID will prevent any out of
+  scope Branch Key IDs from being served.
 
-#### Option 3: Don't change anything.
+Ultimately,
+it appears best to have the component that reads and
+writes to the Cache identify itself,
+as compared to using an Identity of a property/component
+bound to it;
+the Key Store only determines SOME of the properties of
+the cached entries.
+The Keyring determines ALL of the properties.
 
-This would mean that the formula will remain incoherent.
+#### Option 3: Double hashing the cache identifiers
 
-### Issue 3: Which hashing algorithm (internal and external) should be used in the Hierarchy Keyring cache identifier and the CachingCMM?
+If you look at the cache identifiers right now,
+they have a pattern of double hashing.
+Double hashing, as I discuss in the next issue,
+is only done to prevent length extension attacks and
+can be mitigated by a different (more cleaner)
+technique: Using SHA384 instead of SHA512.
 
-Note that according to the
-[cache identifier formulae](#cache-identifier-formulae),
-as of [today](#today), the length of cache identifier for
-BranchKeyMaterials in Hierarchy Keyring is 32 bytes for
-both Encrypt and Decrypt and the length of cache identifier
-for EncryptionMaterials and DecryptionMaterials in the
-CachingCMM is 64 bytes.
-Both Hierarchy Keyring and CachingCMM identifiers currently
-use SHA512, but the Hierarchy Keyring cache identifier is
-truncated to 32 bytes.
+### Issue 2: SHA512 vs SHA384 and do we need double hashing of cache identifiers?
 
-#### Option 1 (Recommended): Using SHA512 for both
+Before we discuss the differences between SHA512
+and SHA384, I want to mention here that SHA384 is
+created by creating a SHA512 hash and then truncating
+to take the first 48 out of 64 bytes and ignoring
+the other 16.
 
-SHA-512 has a greater range (512 bits) than
-a truncated (to 32 bytes) SHA-512 (256 bits)
-or SHA-384 (384 bits). The greater the range,
-the less likely there is a collision.
-More information about why this is true based
-on the birthday bound can be found
-[here](#birthday-bound-for-sha512-and-sha384).
+If you look at the cache identifiers right now,
+they have a pattern of double hashing.
+For instance in the Hierarchy Keyring encrypt identifier,
+the branch-key-digest (which is SHA(branch-key-id))
+is created and appended to the length of the branch
+key and activeUtf8 (details of what is appended is
+not important for this question and is discussed in Issue 1).
+A hash of the appended blob is then taken to generate the
+cache identifier. This means that the branch-key-digest is
+hashed again after appending some other relevant bytes.
 
-<!-- TODO: Remove line before merging to mainline -->
+#### Option 1: SHA384 and no double hashing (recommended)
 
-This is pending [AWS Cryptographers' guidance](https://t.corp.amazon.com/P148158466/communication).
+SHA-384 is immune to length extension attacks and provides
+enough cryptographic security for the hash.
+Therefore, SHA384 is the preferred method.
+Choosing SHA384 also helps in resolving [this issue](#how-can-we-ensure-that-there-are-no-cache-identifier-collisions-between-the-to-be-implemented-dafny-and-native-caching-cmms).
 
-#### Option 2: Change the hashing algorithm to SHA384 in both
+#### Option 2: SHA512
 
-SHA512 is the better choice as mentioned above.
-However, AWS cryptographer's generic recommendation for
-Hash Functions is SHA-384.
-We believe they make this recommendation based on criteria
-other than collision resistance.
+SHA512 has a bigger output space [[ref](#birthday-bound-for-sha512-and-sha384)]
+since the 64 byte output hash is not truncated to 48 bytes.
+However, the additional output size doesn't add anything
+and SHA384 uses the same algorithm.
+The additional bytes can be removed to get immunity from
+length extension attacks, among other things discussed above.
 
-<!-- TODO: Once CryptoBR has confirmed SHA-512 >> SHA-384 for
-this purpose, revise this section to state "We know" instead of "We believe" -->
+### Issue 3: How to include the shared cache parameter in the Hierarchy Keyring input?
 
-More information on length extension attacks
-in SHA384 and SHA512 can be found
-[here in the appendix](#a3-information-about-sha384-and-length-extension-attacks).
+#### Option 1: Add it to the CacheType union in the [cryptographic-materials-cache.smithy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/3ffe9f801fc625381d26aead2dc66e6e5cd83f1c/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/cryptographic-materials-cache.smithy#L213) (recommended)
 
-#### Option 3: Using different hashing algorithms
+This option allows us to have only one CacheType union.
+This also gets rid of any confusions with using other types
+of caches (like in the next option).
 
-This would mean different cache identifiers will be
-unnecesserily incoherent. Also this deviates from
-AWS Cryptographers' guidance.
+#### Option 2: Add an optional input parameter to the CreateAwsKmsHierarchicalKeyringInput
 
-### Issue 4: Should we add a prefix to all cache identifiers in Hierarchy Keyrings and CachingCMMs?
+If we add an optional input parameter, the customer will
+see two optional input parameters for providing a cache,
+first for providing a cache to be used by only one
+Hierarchy Keyring, and second for providing a cache
+potentially shared across hierarchy keyrings.
+If the customer provides both, we will have to
+throw an error. Option 0 buries this error one layer
+deeper and is easier to use for the customer without
+throwing unnecessary errors. We also avoid having two
+input parameters that both take a cache, which isn't intuitive.
 
-Here, by prefix we mean, adding the UTF8 encoding
-of the string 'hierarchy_keyring' as a
-prefix to a hierarchy keyring cache identifier,
-and adding encoding of 'caching_cmm' as a prefix to a
-CachingCMM cache identifier.
+### Issue 4: What should we name the shared cache parameter in the CacheType union?
 
-#### Option 1 (Recommended): Yes
+#### Option 1: shared
 
-Note that after adding Key Store ID / partition ID to a
-Hierarchy Keyring's cache identifier, multiple Hierarchy Keyrings
-can use a shared cache. Multiple CachingCMMs can use a
-shared cache already as mentioned in the [background](#background).
-Adding prefixes is an additional safety measure to prevent any
-possible collisions between a
-Hierarchy Keyring and a CachingCMM.
+Shared cache aligns with what we want to say and it is
+more intuitive. We are introducing a shared cache across
+multiple hierarchy keyrings and should follow that
+nomenclature. How the cache is provided are details that
+we can mention in the examples / developer guide.
 
-#### Option 2: No
+#### Option 2: initialized
 
-If we don't add prefixes, even though the chance of an
-overlap is minimal, we might get collisions between a
-Hierarchy Keyring and a CachingCMM cache identifier.
-Adding prefixes adds another layer of distinction between them.
+For using the cache, the customer needs to initialize the
+cache before the creation of the hierarchy keyring, when
+in all the other cases the cache is initialized by the
+Hierarchy Keyring and the customer just specifies the type.
+One more consideration is that customers can create a
+custom CMC and provide it to the initialized cache,
+which does not need to be shared.
 
-## How can we ensure cache identifiers are collision resistent?
+## How can we ensure all the new cache identifiers are collision resistent?
 
-To answer this question, I will use two approaches.
+Based on [Option 1 in Issue 1](#option-1-recommended-adding-a-resource-id-scope-id--partition-id-and-resource-suffix-recommended),
+the Resource ID and Scope ID make the
+Caching CMM Encrypt /
+Caching CMM Decrypt /
+Hierarchy Keyring Encrypt
+/ Hierarchy Keyring Decrypt distinct.
 
-### Derivation from assumptions
+## How can we ensure that there are no cache identifier collisions between the (to-be-implemented) Dafny and native Caching CMMs?
 
-For the HKeyring and CachingCMM, ensuring that all cache
-identifiers are unique for all encrypts and decrypts
-is simple if we just study the statements in the
-[background](#background) and the fields we're
-appending to the identifiers as discussed in issues
-[1](#issue-1-how-to-update-the-cache-identifier-for-the-hierarchy-keyring-to-allow-a-shared-cache)
-and [4](#issue-4-should-we-add-a-prefix-to-all-cache-identifiers-in-hierarchy-keyrings-and-cachingcmms).
+The cache identifiers for the native Caching CMM
+use SHA512 hash which has 64 bytes of output.
+The new cache identifiers for the caching CMM use
+SHA384 hash which has 48 bytes of output.
+There will NEVER be a collision between the two.
 
-Two HKeyrings WILL NOT have collisions if we append
-a Key Store ID parameter to the identifier
-(per issue
-[1](#issue-1-how-to-update-the-cache-identifier-for-the-hierarchy-keyring-to-allow-a-shared-cache)).
+## Properties of Cryptographic Materials Cache
 
-Two CachingCMMs already allow shared cache.
+There are three element of a cryptographic cache that
+security engineers want to control:
 
-Per issue
-[4](#issue-4-should-we-add-a-prefix-to-all-cache-identifiers-in-hierarchy-keyrings-and-cachingcmms),
-a Hierarchy Keyring and a CachingCMM idenitifier will
-be distinct if we add the UTF8 encodings of prefixes
-'hierarchy_keyring' (17 bytes) and 'caching_cmm' (11 bytes)
-to each of them respectively.
+1. Time to Live (TTL)
+2. operation count
+3. total bytes through the system
 
-### Distinct sizes of the identifiers
+While we understand the importance of all these elements,
+currently, only the TTL is in-scope for this change.
+We MUST consider the other two when we look at the Caching CMM
+because a lot of the implementation there will overlap with
+that of the Hierarchy Keyring.
 
-As an additional safety measure, we look closely
-at the formulae for cache identifiers in a Hierarchy Keyring
-and a CachingCMM encrypt and decrypt (note that these will
-actually be a total of 5, since the
-[cachingCMM encrypt cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/caching-cmm.md#appendix-a-cache-entry-identifier-formulas)
-has two different formulae based on if we
-specify the algorithm suite or not).
+## What if two Hierarchy Keyrings having different TTLs share a cache?
 
-In the
-[Hierarchy Keyring Cache Identifier formula](#hierarchy-keyring-cache-identifier-formula)
-Encrypt, as discussed before, we will remove the len_branch_key.
-For Decrypt, we will remove the len_branch_key
-and use the branch-key-digest in place of the branch-key-id.
-We also add the keystore-id, which is a UUID,
-to the Hierarchy Keyring cache identifiers (per issue
-[1](#issue-1-how-to-update-the-cache-identifier-for-the-hierarchy-keyring-to-allow-a-shared-cache)).
-The size of the inputs to the external hash for both these
-cases is as follows. Here, we label the constant bytes like
-prefixes as `c` and variable bytes like branch-key-digest as `v`.
+TTL is provided as an optional parameter to a
+Hierarchy Keyring at time of initialization.
+As per the current implementation, if two Hierarchy Keyrings
+have different TTLs, the cache will set the expiry time of
+the cached material according to the TTL of the keyring that
+puts the element in the cache.
 
-- Encrypt: 17 (prefix, `c`) + 36 (keystore-id, `v`) + 64 (`v`) + 1 (`c`) + 6 (`c`) = 124 bytes
-- Decrypt: 17 (`c`) + 36 (keystore-id, `v`) + 64 (`v`) + 1 (`c`) + 36 (`v`) = 154 bytes
+Therefore, if the other keyring with a different TTL
+gets the element, the TTL will be wrong.
 
-Similarly, after making the proposed updates in the
-[CachingCMM Cache Identifier formula](#cachingcmm-cache-identifier-formula),
-the size will be:
+Let us say that we have a Hierarchy Keyrings K1 and K2 with
+TTLs 5000s and 5s. K1 populates the cache at time t = 0,
+and K2 fetches materials from the cache at t = 10s.
+Based on the current implementation, K2 will be able to
+use a material which is older than the TTL specified in K2.
 
-- Encrypt without Algorithm Suite specified: 11 (prefix, `c`) + 64 (`v`) + 1 (`c`) + 64 (`v`) = 140 bytes
-- Encrypt with Algorithm Suite specified: 11 (`c`) + 64 (`v`) + 1 (`c`) + 2 (`v`) + 64 (`v`) = 142 bytes
-- Decrypt: 11 (`c`) + 64 (`v`) + 2 (`v`) + 64\*x (`v`) + 64 (`c`) + 64 (`v`) = 205 + 64x bytes ; where x is the number of EDKs in the decrypt string
-
-In addition to the explanations in the previous
-[subsection](#derivation-from-assumptions),
-all these input strings are also unique
-because they have different lengths. We just need
-to choose a good hashing algorithm which gives us a
-very large output space to project these strings to
-minimize collisions, and SHA512 will do the job.
+We mitigate this by making sure that if the material exists
+in the cache, the TTL has not expired for the keyring getting
+the material. If it has, we basically assume that the material
+is expired, and we re-populate the cache by decrypting
+the materials again.
 
 ## Cache Identifier Formulae
 
@@ -589,25 +643,6 @@ it can be served without any KMS or DDB requests.
 If not, the recreated Hierarchy Keyring
 is used to refresh it.
 
-## A2: Sub-requirements
-
-- We must update the cache identifier for [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials) to have a branch-key-digest=SHA512(branch-key-id) appended, instead of a branch-key-id, just like in the [Branch Key Materials (Encryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#encryption-materials) [[ref: Hierarchy Keyring Cache Identifier formula]](#hierarchy-keyring-cache-identifier-formula).
-- Minor update to the spec: The branch-key-version (which is the UUID) in the [Hierarchy Keyring Branch Key Materials (Decryption) cache identifier](https://github.com/awslabs/aws-encryption-sdk-specification/tree/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb/framework/aws-kms/aws-kms-hierarchical-keyring.md#decryption-materials) is currently mentioned to be of size 36 bytes. However, the UUID is actually only 16 bytes. We get 36 bytes when we convert the 16 bytes in UUID to a UTF8 encoding. Therefore, the spec should mention that the branch-key-version has size 16 bytes [[ref: Hierarchy Keyring Cache Identifier formula]](#hierarchy-keyring-cache-identifier-formula).
-
-## A3: Information about SHA384 and Length Extension Attacks
-
-SHA384 computation speed is the same as that of SHA512 [[ref](https://news.ycombinator.com/item?id=27960348#:~:text=For%2064%2Dbit%20CPUs%20without,the%20algorithm%20is%20the%20same)].
-
-However, SHA384 is not prone to
-[Length Extension attacks](https://en.wikipedia.org/wiki/Length_extension_attack),
-unlike SHA512, which is a plus for SHA384.
-But, cache identifiers don't fall into the category
-of length extension attacks, which come into the picture
-when an attacker tries to reconstruct signatures of a
-tampered message without knowing the original message.
-Since the cache identifiers have nothing to do with signing,
-we do NOT need to use SHA384.
-
 ### Today
 
-08/12/2024
+09/05/2024
