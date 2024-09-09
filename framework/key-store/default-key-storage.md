@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Default Encrypted Key Store
+# Default Key Storage
 
 ## Version
 
@@ -14,4 +14,4 @@
 
 ## Overview
 
-The Default Encrypted Key Store is the [Dynamodb Encrypted Key Store](./default-key-storage-interface.md#overview).
+The default key storage is [DynamoDB Key Storage](./dynamodb-key-storage.md#overview).

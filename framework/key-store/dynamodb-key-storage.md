@@ -19,7 +19,7 @@
 
 ## Overview
 
-The Dynamodb Key Storage Interface is the default implementation of the [encrypted key store interface](./key-storage-interface.md#overview)
+The Dynamodb Key Storage is the default implementation of the [key storage interface](./key-storage.md#overview)
 used by the [key store](../branch-key-store.md#overview).
 It is backed by DynamoDB and can be used as a reference for customers implementing their own interface.
 
@@ -56,7 +56,7 @@ to items retrieved from the table.
 
 ## Operations
 
-The Dynamodb Key Storage Interface MUST implement the [encrypted key store interface](./key-storage-interface.md#interface).
+The Dynamodb Key Storage Interface MUST implement the [key storage interface](./key-storage.md#interface).
 
 ### WriteNewEncryptedBranchKey
 
