@@ -61,12 +61,12 @@ complicates such an ambition.
 
 # Name of the Client?
 
-Crypto Tools has a long history of good and bad names;
-it is best that we begin the bike shedding of this early.
+It is best that we bike shed on this early.
 
 The proposed name for this client is
 `the Key Store Admin Client`
-or just the Key Store Admin.
+though we may often refer to it as
+just the `Key Store Admin`.
 
 # Proposed Construction
 
