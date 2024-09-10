@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Encrypted Key Store Interface
+# Key Storage
 
 ## Version
 
@@ -19,12 +19,12 @@
 
 ## Overview
 
-This is a custom interface for customers to construct their own storage layer for the [key store](../branch-key-store.md#overview).
+Key Storage is the interface for customers to construct their own storage layer for the [key store](../branch-key-store.md#overview).
 This is useful to either customize how DynamoDB is used or stored,
 or to implement a custom storage system such as S3,
 or to consolidate keystore data access behind some remote micro-service.
 
-The encrypted key store interface is not responsible for making sure that the encrypted keys are of the appropriate types.
+The key storage interface is not responsible for making sure that the encrypted keys are of the appropriate types.
 This is the responsibility of the wrapping key store.
 
 ## Definitions
@@ -62,35 +62,35 @@ the UTF8 Encoded value of the version of the branch key.
 
 ## Interface
 
-The EncryptedKeyStore MUST support the following operations:
+The KeyStorageInterface MUST support the following operations:
 
-- [WriteNewKeyToStore](#writenewkeytostore)
-- [WriteNewBranchKeyVersionToKeystore](#writenewbranchkeyversiontokeystore)
+- [WriteNewEncryptedBranchKey](#writenewencryptedbranchkey)
+- [WriteNewEncryptedBranchKeyVersion](#writenewencryptedbranchkeyversion)
 - [GetEncryptedActiveBranchKey](#getencryptedactivebranchkey)
 - [GetEncryptedBranchKeyVersion](#getencryptedbranchkeyversion)
 - [GetEncryptedBeaconKey](#getencryptedbeaconkey)
-- [GetTableName](#gettablename)
+- [GetKeyStorageInfo](#getkeystorageinfo)
 
-### WriteNewKeyToStore
+### WriteNewEncryptedBranchKey
 
-The WriteNewKeyToStore caller MUST provide:
+The WriteNewEncryptedBranchKey caller MUST provide:
 
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of ActiveHierarchicalSymmetricVersion
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of HierarchicalSymmetricVersion
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of ActiveHierarchicalSymmetricBeacon
 
 All three keys need to be written together with an atomic transactional write.
-See the [default encrypted key store's write new key to store specification](./default-encrypted-key-store.md#writenewkeytostore) for more details about what storage properties are expected.
+See the [default key stores's write new key to store specification](./default-key-storage-interface.md#writenewencryptedbranchkey) for more details about what storage properties are expected.
 
-### WriteNewBranchKeyVersionToKeystore
+### WriteNewEncryptedBranchKeyVersion
 
-The WriteNewBranchKeyVersionToKeystore caller MUST provide:
+The WriteNewEncryptedBranchKeyVersion caller MUST provide:
 
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of ActiveHierarchicalSymmetricVersion
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of HierarchicalSymmetricVersion
 
 Both keys need to be written together with a consistent transactional write.
-See [default encrypted key store's write new branch key version to store specification](./default-encrypted-key-store.md#writenewbranchkeyversiontokeystore) for more details about what storage properties are expected.
+See [default key stores's write new branch key version to store specification](./default-key-storage-interface.md#writenewencryptedbranchkeyversion) for more details about what storage properties are expected.
 
 ### GetEncryptedActiveBranchKey
 
@@ -107,6 +107,6 @@ It MUST return an [EncryptedHierarchicalKey](#encryptedhierarchicalkey).
 The GetEncryptedBeaconKey caller MUST provide the same inputs as the [GetBeaconKey](../branch-key-store.md#getbeaconkey) operation.
 It MUST return an [EncryptedHierarchicalKey](#encryptedhierarchicalkey).
 
-### GetTableName
+### GetKeyStorageInfo
 
 It MUST return the physical table name.
