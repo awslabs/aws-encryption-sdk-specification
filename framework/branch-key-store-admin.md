@@ -234,10 +234,30 @@ as the wrapped ACTIVE Branch Key.
 
 ### VersionKey
 
-TODO
+The VersionKey caller MUST provide:
+
+- A [`KMS Identifier`](#kms-identifier)
+- A `branch-key-id`
+
+The VersionKey caller MAY provide:
+
+- An optional [Key Management Strategy](#key-management-strategy)
+
+The Operation behaves identically to the [Key Store Client's VersionKey](../branch-key-store.md#versionkey),
+with the following caveats:
+
+#### KMS Configuration
+
+Where ever the Key Store Client's CreateKey method refers to the Key Store Client's KMS Configuration,
+use the equivalent [`KMS Identifier`](#kms-identifier) expression.
+
+#### Wrapped Branch Key Creation
+
+The wrapped Branch Keys,
+DECRYPT_ONLY and ACTIVE,
+MUST be created according to [Key Store Admin Wrapped Branch Key Creation](#wrapped-branch-key-creation).
 
 <!--  LocalWords:  MRK AwsKms grantTokenList kmsClient ReEncrypt  -->
 <!--  LocalWords:  AwsKmsReEncrypt keystore AwsKmsDecryptEncrypt  -->
 <!--  LocalWords:  Admin ReEncrypt Changelog aws arn createkey -->
-<!--  LocalWords:  AwsCryptographyKeyStoreOperations versionkey GenerateDataKeyWithoutPlaintext
- -->
+<!--  LocalWords:  AwsCryptographyKeyStoreOperations versionkey GenerateDataKeyWithoutPlaintext -->

@@ -206,7 +206,7 @@ the Key Manager Strategy MUST be respected.
 
 The VersionKey caller MUST provide:
 
-- A `KMS Key ARN`
+- A `KMS Identifier`
 - A `branch-key-id`
 
 The VersionKey caller MAY provide:
