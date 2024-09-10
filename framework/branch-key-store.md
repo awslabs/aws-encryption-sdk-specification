@@ -84,20 +84,20 @@ If both [Storage](#storage) and [DynamoDb Client](#dynamodb-client) are configur
 If both [KeyManagement](#keymanagement) and [KMS Client](#kms-client) are configured initialization MUST fail.
 If both [KeyManagement](#keymanagement) and [Grant Tokens](#aws-kms-grant-tokens) are configured initialization MUST fail.
 
-If [Storage](#storage) is configured with an [EncryptedKeyStore](#encryptedkeystore)
-then this MUST be the configured [EncryptedKeyStore interface](./key-store/encrypted-key-store.md#interface).
+If [Storage](#storage) is configured with [KeyStorage](#keystorage)
+then this MUST be the configured [KeyStorage interface](./key-store/key-storage.md#interface).
 
-If [Storage](#storage) is not configured with an [EncryptedKeyStore](#encryptedkeystore)
-a [default encrypted key store](./key-store/default-encrypted-key-store.md#initialization) MUST be created.
+If [Storage](#storage) is not configured with [KeyStorage](#keystorage)
+a [default key storage](./key-store/default-key-storage.md#initialization) MUST be created.
 
-This constructed [default encrypted key store](./key-store/default-encrypted-key-store.md#overview)
+This constructed [default key storage](./key-store/default-key-storage.md#overview)
 MUST be configured with the provided [logical keystore name](#logical-keystore-name).
 
-This constructed [default encrypted key store](./key-store/default-encrypted-key-store.md#initialization)
+This constructed [default key storage](./key-store/default-key-storage.md#initialization)
 MUST be configured with either the [Table Name](#table-name) or the [DynamoDBTable](#dynamodbtable) table name
 depending on which one is configured.
 
-This constructed [default encrypted key store](./key-store/default-encrypted-key-store.md#initialization)
+This constructed [default key storage](./key-store/default-key-storage.md#initialization)
 MUST be configured with either the [DynamoDb Client](#dynamodb-client), the DDB client in the [DynamoDBTable](#dynamodbtable)
 or a constructed DDB client depending on what is configured.
 
@@ -183,16 +183,16 @@ This configures how the Keystore will get encrypted data.
 There are two valid storage options:
 
 - DynamoDBTable
-- EncryptedKeyStore
+- KeyStorage
 
 #### DynamoDBTable
 
 A DynamoDBTable configuration MUST take the DynamoDB table name.
 A DynamoDBTable configuration MAY take [DynamoDb Client](#dynamodb-client).
 
-#### EncryptedKeyStore
+#### KeyStorage
 
-An [EncryptedKeyStore interface](./key-store/encrypted-key-store.md#interface)
+A [KeyStorage interface](./key-store/key-storage.md#interface)
 
 ### KeyManagement
 
@@ -289,8 +289,8 @@ This MUST include:
 - [AWS KMS Configuration](#aws-kms-configuration)
 
 The [keystore name](#table-name) MUST be obtained
-from the configured [EncryptedKeyStore interface](./key-store/encrypted-key-store.md#interface)
-by calling [GetTableName](./key-store/encrypted-key-store.md#gettablename).
+from the configured [KeyStorage](./key-store/key-storage.md#interface)
+by calling [GetKeyStorageInfo](./key-store/key-storage.md#getkeystorageinfo).
 
 ### CreateKeyStore
 
@@ -348,8 +348,8 @@ This operation MUST create a [branch key](structures.md#branch-key) and a [beaco
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
 
 If creation of the keys are successful,
-then the key store MUST call the configured [EncryptedKeyStore interface's](./key-store/encrypted-key-store.md#interface)
-[WriteNewKeyToStore](./key-store/encrypted-key-store.md#writenewkeytostore) with these 3 [EncryptedHierarchicalKeys](./key-store/encrypted-key-store.md#encryptedhierarchicalkey).
+then the key store MUST call the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
+[WriteNewEncryptedBranchKey](./key-store/key-storage.md#writenewencryptedbranchkey) with these 3 [EncryptedHierarchicalKeys](./key-store/key-storage.md#encryptedhierarchicalkey).
 
 If writing to the keystore succeeds,
 the operation MUST return the branch-key-id that maps to both
@@ -427,11 +427,11 @@ If the Keystore's KMS Configuration is `Discovery` or `MRDiscovery`,
 this operation MUST immediately fail.
 
 VersionKey MUST first get the active version for the branch key from the keystore
-by calling the configured [EncryptedKeyStore interface's](./key-store/encrypted-key-store.md#interface)
-[GetEncryptedActiveBranchKey](./key-store/encrypted-key-store.md##getencryptedactivebranchkey)
+by calling the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
+[GetEncryptedActiveBranchKey](./key-store/key-storage.md##getencryptedactivebranchkey)
 using the `branch-key-id`.
 
-The `KmsArn` of the [EncryptedHierarchicalKey](./key-store/encrypted-key-store.md##encryptedhierarchicalkey)
+The `KmsArn` of the [EncryptedHierarchicalKey](./key-store/key-storage.md##encryptedhierarchicalkey)
 MUST be [compatible with](#aws-key-arn-compatibility)
 the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 
@@ -445,18 +445,18 @@ The `kms-arn` stored in the table MUST NOT change as a result of this operation,
 even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly match the stored ARN.
 If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
-The [EncryptedHierarchicalKey](./key-store/encrypted-key-store.md##encryptedhierarchicalkey)
+The [EncryptedHierarchicalKey](./key-store/key-storage.md##encryptedhierarchicalkey)
 MUST be authenticated according to [authenticating a keystore item](#authenticating-an-encryptedhierarchicalkey).
 If the item fails to authenticate this operation MUST fail.
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
 
 If creation of the keys are successful,
-then the key store MUST call the configured [EncryptedKeyStore interface's](./key-store/encrypted-key-store.md#interface)
-[WriteNewBranchKeyVersionToKeystore](./key-store/encrypted-key-store.md##writenewbranchkeyversiontokeystore)
-with these 2 [EncryptedHierarchicalKeys](./key-store/encrypted-key-store.md##encryptedhierarchicalkey).
+then the key store MUST call the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
+[WriteNewEncryptedBranchKeyVersion](./key-store/key-storage.md##writenewencryptedbranchkeyversion)
+with these 2 [EncryptedHierarchicalKeys](./key-store/key-storage.md##encryptedhierarchicalkey).
 
-If the [WriteNewBranchKeyVersionToKeystore](./key-store/encrypted-key-store.md##writenewbranchkeyversiontokeystore) is successful,
+If the [WriteNewEncryptedBranchKeyVersion](./key-store/key-storage.md##writenewencryptedbranchkeyversion) is successful,
 this operation MUST return a successful response containing no additional data.
 Otherwise, this operation MUST yield an error.
 
@@ -481,8 +481,8 @@ On invocation, the caller:
 - MUST supply a `branch-key-id`
 
 GetActiveBranchKey MUST get the active version for the branch key id from the keystore
-by calling the configured [EncryptedKeyStore interface's](./key-store/encrypted-key-store.md#interface)
-[GetEncryptedActiveBranchKey](./key-store/encrypted-key-store.md#getencryptedactivebranchkey)
+by calling the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
+[GetEncryptedActiveBranchKey](./key-store/key-storage.md#getencryptedactivebranchkey)
 using the supplied `branch-key-id`.
 
 Because the storage interface can be a custom implementation the key store needs to verify correctness.
@@ -508,8 +508,8 @@ On invocation, the caller:
 - MUST supply a `branchKeyVersion`
 
 GetBranchKeyVersion MUST get the requested version for the branch key id from the keystore
-by calling the configured [EncryptedKeyStore interface's](./key-store/encrypted-key-store.md#interface)
-[GetEncryptedActiveBranchKey](./key-store/encrypted-key-store.md#getencryptedbranchkeyversion)
+by calling the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
+[GetEncryptedActiveBranchKey](./key-store/key-storage.md#getencryptedbranchkeyversion)
 using the supplied `branch-key-id`.
 
 Because the storage interface can be a custom implementation the key store needs to verify correctness.
@@ -535,8 +535,8 @@ On invocation, the caller:
 - MUST supply a `branch-key-id`
 
 GetBeaconKey MUST get the requested beacon key from the keystore
-by calling the configured [EncryptedKeyStore interface's](./key-store/encrypted-key-store.md#interface)
-[GetEncryptedBeaconKey](./key-store/encrypted-key-store.md#getencryptedbeaconkey)
+by calling the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
+[GetEncryptedBeaconKey](./key-store/key-storage.md#getencryptedbeaconkey)
 using the supplied `branch-key-id`.
 
 Because the storage interface can be a custom implementation the key store needs to verify correctness.
@@ -557,7 +557,7 @@ This operation MUST return the constructed [beacon key materials](./structures.m
 ## Encryption Context
 
 This section describes how the AWS KMS encryption context is built
-from an [encrypted hierarchical key](./key-store/encrypted-key-store.md#encryptedhierarchicalkey).
+from an [encrypted hierarchical key](./key-store/key-storage.md#encryptedhierarchicalkey).
 
 The following encryption context keys are shared:
 
@@ -572,7 +572,7 @@ The following encryption context keys are shared:
 - MUST NOT have a `enc` attribute
 
 Any additionally attributes in the EncryptionContext
-of the [encrypted hierarchical key](./key-store/encrypted-key-store.md#encryptedhierarchicalkey)
+of the [encrypted hierarchical key](./key-store/key-storage.md#encryptedhierarchicalkey)
 MUST be added to the encryption context.
 
 ### ACTIVE Encryption Context

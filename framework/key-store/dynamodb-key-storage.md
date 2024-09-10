@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Dynamodb Encrypted Key Store
+# Dynamodb Key Storage
 
 ## Version
 
@@ -19,7 +19,7 @@
 
 ## Overview
 
-The Dynamodb Encrypted Key Store is the default implementation of the [encrypted key store interface](./encrypted-key-store.md#overview)
+The Dynamodb Key Storage is the default implementation of the [key storage interface](./key-storage.md#overview)
 used by the [key store](../branch-key-store.md#overview).
 It is backed by DynamoDB and can be used as a reference for customers implementing their own interface.
 
@@ -32,7 +32,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Initialization
 
-The following inputs MUST be specified to create a Default Encrypted Key Store:
+The following inputs MUST be specified to create a Dynamodb Key Storage Interface:
 
 - [DynamoDb Client](#dynamodb-client)
 - [Table Name](#table-name)
@@ -56,9 +56,9 @@ to items retrieved from the table.
 
 ## Operations
 
-The Default Encrypted Key Store MUST implement the [encrypted key store interface](./encrypted-key-store.md#interface)..
+The Dynamodb Key Storage Interface MUST implement the [key storage interface](./key-storage.md#interface).
 
-### WriteNewKeyToStore
+### WriteNewEncryptedBranchKey
 
 To add the branch keys and a beacon key to the keystore the
 operation MUST call [Amazon DynamoDB API TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
@@ -87,7 +87,7 @@ TransactWriteItemRequest:
 If DDB TransactWriteItems is successful, this operation MUST return a successful response containing no additional data.
 Otherwise, this operation MUST yield an error.
 
-### WriteNewBranchKeyVersionToKeystore
+### WriteNewEncryptedBranchKeyVersion
 
 To add the new branch key to the keystore,
 the operation MUST call [Amazon DynamoDB API TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
