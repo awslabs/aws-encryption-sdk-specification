@@ -39,14 +39,22 @@ structure KeyStoreAdminConfig {
   "The logical name for this Key Store,
   which is cryptographically bound to the keys it holds.
   This appears in the Encryption Context of KMS requests as `tablename`.
-  Logical Key Store Names SHOULD BE unique to a physical Key Store.")
+
+  There SHOULD be a one to one mapping between the Storage's physical name,
+  i.e: DynamoDB Table Names,
+  and the Logical KeyStore Name.
+  This value can be set to the DynamoDB table name itself
+  (Storage's physical name),
+  but does not need to.
+
+  Controlling this value independently enables restoring from DDB table backups
+  even when the table name after restoration is not exactly the same.")
   logicalKeyStoreName: String,
 
   @required
   @documentation("The storage configuration for this Key Store.")
   storage: aws.cryptography.keyStore#Storage
 }
-
 // KMS Arn validation MUST occur in Dafny
 union KMSIdentifier {
   @documentation(
