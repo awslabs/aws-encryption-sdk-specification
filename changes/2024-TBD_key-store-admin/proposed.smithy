@@ -55,6 +55,7 @@ structure KeyStoreAdminConfig {
   @documentation("The storage configuration for this Key Store.")
   storage: aws.cryptography.keyStore#Storage
 }
+
 // KMS Arn validation MUST occur in Dafny
 union KMSIdentifier {
   @documentation(
@@ -110,48 +111,38 @@ union KeyManagementStrategy {
   AwsKmsDecryptEncrypt: AwsKmsDecryptEncrypt
 }
 
-
-// CreateKey will create two keys to add to the key store
-// One is the branch key, which is used in the hierarchical keyring
-// The second is a beacon key that is used as a root key to
-// derive different beacon keys per beacon.
-@documentation("Create a new Branch Key in the Key Store. Additionally create a Beacon Key that is tied to this Branch Key.")
+@documentation(
+"Create a new Branch Key in the Key Store.
+Additionally create a Beacon Key that is tied to this Branch Key.")
 operation CreateKey {
   input: CreateKeyInput,
   output: CreateKeyOutput
 }
 
-//= aws-encryption-sdk-specification/framework/branch-key-store.md#createkey
-//= type=implication
-//# The CreateKey caller MUST provide:
-//# - An optional branch key id
-//# - An optional encryption context
 structure CreateKeyInput {
   @documentation("The identifier for the created Branch Key.")
   branchKeyIdentifier: String,
 
-  @documentation("Custom encryption context for the Branch Key. Required if branchKeyIdentifier is set.")
+  @documentation(
+  "Custom encryption context for the Branch Key.
+  Required if branchKeyIdentifier is set.")
   encryptionContext: aws.cryptography.keyStore#EncryptionContext
 
   @required
-  @documentation("Multi-Region or Single Region AWS KMS Key used to protect the Branch Key, but not aliases!")
+  @documentation(
+  "Multi-Region or Single Region AWS KMS Key
+  used to protect the Branch Key, but not aliases!")
   kmsArn: KMSIdentifier
 
   strategy: KeyManagementStrategy
 }
 
-@documentation("Outputs for Branch Key creation.")
 structure CreateKeyOutput {
   @required
   @documentation("A identifier for the created Branch Key.")
   branchKeyIdentifier: String
 }
 
-
-// VersionKey will create a new branch key under the 
-// provided branchKeyIdentifier and rotate the "older" material 
-// on the key store under the branchKeyIdentifier. This operation MUST NOT
-// rotate the beacon key under the branchKeyIdentifier.
 @documentation(
   "Create a new ACTIVE version of an existing Branch Key,
    along with a complementing Version (DECRYT_ONLY) in the Key Store.
@@ -166,21 +157,16 @@ operation VersionKey {
 
 @documentation("Inputs for versioning a Branch Key.")
 structure VersionKeyInput {
-
-  //= aws-encryption-sdk-specification/framework/branch-key-store.md#versionkey
-  //= type=implication
-  //# - MUST supply a `branch-key-id`
   @required
   @documentation("The identifier for the Branch Key to be versioned.")
   branchKeyIdentifier: String
 
   @required
   @documentation("Multi-Region or Single Region AWS KMS Key used to protect the Branch Key, but not aliases!")
-  kmsArn: KMSIdentifier // KMS Arn validation MUST occur in Dafny
+  kmsArn: KMSIdentifier
 
   strategy: KeyManagementStrategy
 }
 
-@documentation("Outputs for versioning a Branch Key.")
 structure VersionKeyOutput {
 }
