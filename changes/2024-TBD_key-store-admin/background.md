@@ -92,7 +92,7 @@ This ARN MAY be a Multi-Region Key (MRK) or Single Region Key.
 ## Key Management
 
 `Key Management` is a union,
-such that additional options MAY be added at a later date.
+such that additional options may be added at a later date.
 
 Members of `Key Management` are elements that
 authorize the use of Branch Key Cryptographic Materials
