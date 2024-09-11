@@ -71,7 +71,7 @@ union KMSIdentifier {
 
   @documentation(
   "If an MRK ARN is provided,
-  and the Key Store table holds an MRK ARN,
+  and the persisted Branch Key holds an MRK ARN,
   then those two ARNs may differ in region,
   although they must be otherwise equal.
   If either ARN is not an MRK ARN, then
@@ -155,7 +155,6 @@ operation VersionKey {
   errors: [aws.cryptography.keyStore#VersionRaceException]
 }
 
-@documentation("Inputs for versioning a Branch Key.")
 structure VersionKeyInput {
   @required
   @documentation("The identifier for the Branch Key to be versioned.")

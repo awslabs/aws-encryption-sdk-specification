@@ -92,9 +92,9 @@ This ARN MAY be a Multi-Region Key (MRK) or Single Region Key.
 ## Key Management
 
 `Key Management` is a union,
-such that additional options maybe added at a later date.
+such that additional options MAY be added at a later date.
 
-Members of `Kms Management` are elements that
+Members of `Key Management` are elements that
 authorize the use of Branch Key Cryptographic Materials
 by decrypting them in a manner that
 authenticates all attributes of the Branch Key.
@@ -136,7 +136,7 @@ the default KMS client is constructed via the AWS SDK.
 ## Key Management Strategy
 
 `Key Management Strategy` is a union,
-such that additional options maybe added at a later date.
+such that additional options may be added at a later date.
 
 `Key Management Strategy` determines which Operations
 of a `Key Management` are used by the Client.
@@ -194,13 +194,13 @@ The CreateKey caller MAY provide:
 
 - A Branch Key ID
 - Encryption Context
-- A Key Manager Strategy
+- A Key Management Strategy
 
 The behavior is mostly identical.
 
 However,
 during the [Wrapped Branch Key Creation](../../framework/branch-key-store.md#wrapped-branch-key-creation),
-the Key Manager Strategy MUST be respected.
+the Key Management Strategy MUST be respected.
 
 ## Version Key
 
@@ -211,13 +211,13 @@ The VersionKey caller MUST provide:
 
 The VersionKey caller MAY provide:
 
-- A Key Manager Strategy
+- A Key Management Strategy
 
 The behavior is mostly identical.
 
 However,
 during the [Wrapped Branch Key Creation](../../framework/branch-key-store.md#wrapped-branch-key-creation),
-the Key Manager Strategy MUST be respected.
+the Key Management Strategy MUST be respected.
 
 <!--  LocalWords:  MRK AwsKms grantTokenList kmsClient ReEncrypt  -->
 <!--  LocalWords:  AwsKmsReEncrypt keystore AwsKmsDecryptEncrypt  -->
