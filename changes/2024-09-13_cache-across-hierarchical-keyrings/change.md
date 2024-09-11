@@ -159,6 +159,7 @@ is to make the Hierarchical Keyring
 environment.
 
 ## Security Implications
+
 The main security implication of this change is the responsibility for
 providing the Partition ID for the Hierarchical Keyring,
 and the Logical Key Store Name of the Key Store for the
@@ -177,9 +178,11 @@ Users should make sure that they set all of Partition ID, Logical Key Store Name
 to be the same for two Hierarchical Keyrings if and only if they want them to share cache entries.
 
 ## Operational Implications
+
 This change will allow customers to share an already initialized cache across multiple
 Hierarchical Keyrings to facilitate caching across Key Stores/KMS Clients/KMS Keys.
 
 ## Examples
+
 As part of this change, we will add two examples, one each in ESDK .NET and ESDK JAVA
 demonstrating the use of `Shared` cache across Hierarchical Keyrings.

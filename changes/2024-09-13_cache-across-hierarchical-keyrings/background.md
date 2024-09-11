@@ -390,7 +390,7 @@ the BranchKeyMaterials again.
   and here is an example initialization
   [[ref](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/b5705ee12257fb18f867478bf17ba31f50c26c8b/TestVectors/dafny/DDBEncryption/src/JsonConfig.dfy#L527)].
 - The length of cache identifier for BeaconKeyMaterials is “variable” based on the key-id.
-- For single-tenant, the customer sets the key-id directly in the config. 
+- For single-tenant, the customer sets the key-id directly in the config.
   or multi-tenant, they set an attribute name, and the key comes out of that attribute of the item.
 
 ## Birthday Bound for SHA512 and SHA384
