@@ -51,11 +51,16 @@ This structure MUST include all of the following fields:
 
 A union that MUST hold the following three options
 
-- ActiveHierarchicalSymmetricVersion [HierarchicalSymmetricVersion](#hierarchicalsymmetricversion)
-- HierarchicalSymmetricVersion [HierarchicalSymmetricVersion](#hierarchicalsymmetricversion)
+- ActiveHierarchicalSymmetricVersion [ActiveHierarchicalSymmetric](#activehierarchicalsymmetric)
+- HierarchicalSymmetricVersion [HierarchicalSymmetric](#hierarchicalsymmetric)
 - ActiveHierarchicalSymmetricBeacon
 
-### HierarchicalSymmetricVersion
+### ActiveHierarchicalSymmetric
+
+A structure that MUST have one member,
+the UTF8 Encoded value of the version of the branch key.
+
+### HierarchicalSymmetric
 
 A structure that MUST have one member,
 the UTF8 Encoded value of the version of the branch key.
