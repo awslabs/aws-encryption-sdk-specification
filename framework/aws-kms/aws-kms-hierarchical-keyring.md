@@ -97,18 +97,25 @@ the [ciphertext](structures.md#ciphertext) field in
 
 This structure is formed using the 16 byte `salt` used to derive the `derivedBranchKey`
 concatenated with the AES-GCM-256 12 byte `IV`
-concatenated with the byte representation of the UUID branch key version from the AWS DDB response `version` value
+concatenated with the byte representation of the UUID branch key version from the [branch key materials](../structures.md#branch-key-materials)
 concatenated with the AES Encryption output from the [branch key wrapping](#branch-key-wrapping).
+
+The branch key version is a UUID. Converting the 36 characters UUID string into bytes yields 16 bytes.
+For details see [Branch Key and Beacon Key Creation](../branch-key-store.md#branch-key-and-beacon-key-creation).
 
 The following table describes the fields that form the ciphertext for this keyring.
 The bytes are appended in the order shown.
+The Encryption Key is variable.
+It will be whatever length is represented by the algorithm suite.
+Because all the other values are constant,
+this variability in the encryption key does not impact the format.
 
 | Field              | Length (bytes) | Interpreted as |
 | ------------------ | -------------- | -------------- |
 | Salt               | 16             | bytes          |
 | IV                 | 12             | bytes          |
 | Version            | 16             | bytes          |
-| Encrypted Key      | 32             | bytes          |
+| Encrypted Key      | Variable       | bytes          |
 | Authentication Tag | 16             | bytes          |
 
 #### Authentication Tag
