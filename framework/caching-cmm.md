@@ -5,10 +5,12 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ### Changelog
 
+- 0.4.0
+  - [Update Cache Entry Identifier Formulas for Caching Cryptographic Materials Manager](../changes/2024-09-13_cache-across-hierarchy-keyrings/change.md)
 - 0.3.0
   - [Specify Cache Entry Identifier Formulas for Caching Cryptographic Materials Manager](../changes/2020-07-17_cache-entry-identifier-formulas/change.md)
 - 0.2.0
@@ -197,24 +199,101 @@ to the denote the function that,
 given an algorithm suite as specified in a materials request,
 returns the corresponding two-byte algorithm suite ID.
 
+We establish the following definitions for the Cache Entry Identifier formula:
+
+#### Resource Identifier
+
+A Hex value that indicates if an element is from a Caching_CMM, Hierarchical_Keyring, or some other future resource.
+
+```
+Caching_CMM : 0x01  (0001)
+Hierarchical_Keyring : 0x02 (0010)
+```
+
+#### Scope Identifier
+
+A Hex value that indicates if an element is used for Encryption, Decryption, Searchable Encryption, or some other future purpose.
+
+```
+Encrypt : 0x01 (0001)
+Decrypt : 0x02 (0010)
+Searchable Encryption : 0x03 (0011)
+```
+
+#### Partition ID
+
+Partition ID of the Caching CMM.
+
+#### Resource Suffix
+
+There are, at this time, 3 resource suffixes for the Caching CMM:
+
+- Caching CMM: Encryption Materials, Without Algorithm Suite:
+  ```
+  0x00 + NULL_BYTE + SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext)
+  ```
+- Caching CMM: Encryption Materials, With Algorithm Suite:
+  ```
+  0x01 + NULL_BYTE + AlgorithmSuiteId(getEncryptionMaterialsRequest.algorithmSuite) + NULL_BYTE + SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext)
+  ```
+- Caching CMM: Decryption Materials:
+  ```
+  AlgorithmSuiteId(decryptMaterialsRequest.algorithmSuite) + NULL_BYTE + CONCATENATE(SORTED(EDK)) + NULL_BYTE + SerializeEncryptionContext(decryptMaterialsRequest.encryptionContext)
+  ```
+
+The aforementioned 4 definitions ([Resource Identifier](#resource-identifier),
+[Scope Identifier](#scope-identifier), [Partition ID](#partition-id-1),
+and [Resource Suffix](#resource-suffix)) MUST be appended together with the null byte,
+0x00, and the SHA384 of the result should be taken as the final cache identifier.
+
 ### Encryption Materials, Without Algorithm Suite
 
 If the Get Encryption Materials request does not specify an algorithm suite,
 then the cache entry identifier MUST be calculated
-as the SHA-512 hash of the concatenation of the following byte strings,
+as the SHA-384 hash of the concatenation of the following byte strings,
 in the order listed:
 
-1. The SHA-512 hash of a UTF-8 encoding of the caching CMM’s Partition ID
-2. One null byte (`0x00`)
-3. The SHA-512 hash of the serialized encryption context
+- MUST be the Resource ID for the Caching CMM (0x01)
+- MUST be the Scope ID for Encrypt (0x01)
+- MUST be the UTF-8 encoding of the caching CMM’s Partition ID
+- Resource Suffix
+  - MUST be the Algorithm Suite Hex byte `0x00` to indicate Encryption Materials Without Algorithm Suite
+  - MUST be the serialized encryption context
+
+All the above fields must be separated by a single NULL_BYTE `0x00`.
+
+| Field                      | Length (bytes) | Interpreted as |
+| -------------------------- | -------------- | -------------- |
+| Resource ID                | 1              | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Scope ID                   | 1              | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Partition ID               | Variable       | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Algorithm Suite Hex byte   | 1              | bytes (`0x00`) |
+| Null Byte                  | 1              | `0x00`         |
+| SerializeEncryptionContext | Variable       | bytes          |
 
 As a formula:
 
 ```
-ENTRY_ID = SHA512(
-    SHA512(UTF8Encode(cachingCMM.partitionId))
-    + 0x00
-    + SHA512(SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext))
+resource-id = [0x01]
+scope-id = [0x01]
+partition-id = UTF8Encode(cachingCMM.partitionId)
+algorithm-suite-hex-byte = [0x00]
+serialized-encryption-context = SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext)
+NULL_BYTE = [0x00]
+
+ENTRY_ID = SHA384(
+    resource-id
+    + NULL_BYTE
+    + scope-id
+    + NULL_BYTE
+    + partition-id
+    + NULL_BYTE
+    + algorithm-suite-hex-byte
+    + NULL_BYTE
+    + serialized-encryption-context
 )
 ```
 
@@ -222,22 +301,56 @@ ENTRY_ID = SHA512(
 
 If the Get Encryption Materials request does specify an algorithm suite,
 then the cache entry identifier MUST be calculated
-as the SHA-512 hash of the concatenation of the following byte strings,
+as the SHA-384 hash of the concatenation of the following byte strings,
 in the order listed:
 
-1.  The SHA-512 hash of a UTF-8 encoding of the caching CMM’s Partition ID
-2.  One byte with value 1 (`0x01`)
-3.  The two-byte algorithm suite ID corresponding to the algorithm suite in the request
-4.  The SHA-512 hash of the serialized encryption context
+- MUST be the Resource ID for the Caching CMM (0x01)
+- MUST be the Scope ID for Encrypt (0x01)
+- MUST be the UTF-8 encoding of the caching CMM’s Partition ID
+- Resource Suffix
+  - MUST be the Algorithm Suite Hex byte `0x01` to indicate Encryption Materials With Algorithm Suite
+  - MUST be the two-byte Algorithm Suite ID corresponding to the algorithm suite in the request
+  - MUST be the serialized encryption context
+
+All the above fields must be separated by a single NULL_BYTE `0x00`.
+
+| Field                      | Length (bytes) | Interpreted as |
+| -------------------------- | -------------- | -------------- |
+| Resource ID                | 1              | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Scope ID                   | 1              | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Partition ID               | Variable       | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Algorithm Suite Hex byte   | 1              | bytes (`0x01`) |
+| Null Byte                  | 1              | `0x00`         |
+| Algorithm Suite ID         | 2              | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| SerializeEncryptionContext | Variable       | bytes          |
 
 As a formula:
 
 ```
-ENTRY_ID = SHA512(
-    SHA512(UTF8Encode(cachingCMM.partitionId))
-    + 0x01
-    + AlgorithmSuiteId(getEncryptionMaterialsRequest.algorithmSuite)
-    + SHA512(SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext))
+resource-id = [0x01]
+scope-id = [0x01]
+partition-id = UTF8Encode(cachingCMM.partitionId)
+algorithm-suite-hex-byte = [0x01]
+algorithm-suite-id = AlgorithmSuiteId(getEncryptionMaterialsRequest.algorithmSuite)
+serialized-encryption-context = SerializeEncryptionContext(getEncryptionMaterialsRequest.encryptionContext)
+NULL_BYTE = [0x00]
+
+ENTRY_ID = SHA384(
+    resource-id
+    + NULL_BYTE
+    + scope-id
+    + NULL_BYTE
+    + partition-id
+    + NULL_BYTE
+    + algorithm-suite-hex-byte
+    + NULL_BYTE
+    + algorithm-suite-id
+    + NULL_BYTE
+    + serialized-encryption-context
 )
 ```
 
@@ -245,25 +358,56 @@ ENTRY_ID = SHA512(
 
 When the caching CMM receives a Decrypt Materials request,
 it MUST calculate the cache entry identifier as
-the SHA-512 hash of the concatenation of the following byte strings,
+the SHA-384 hash of the concatenation of the following byte strings,
 in the order listed:
 
-1.  The SHA-512 hash of a UTF-8 encoding of the caching CMM’s Partition ID
-2.  The two-byte algorithm suite ID corresponding to the algorithm suite in the request
-3.  The concatenation of the lexicographically-sorted SHA-512 hashes of the serialized encrypted data keys,
+- MUST be the Resource ID for the Caching CMM (0x01)
+- MUST be the Scope ID for Decrypt (0x02)
+- MUST be the UTF-8 encoding of the caching CMM’s Partition ID
+- Resource Suffix
+  - MUST be the two-byte Algorithm Suite ID corresponding to the algorithm suite in the request
+  - MUST be the concatenation of the lexicographically-sorted serialized encrypted data keys,
     where serialization is as defined in the [Encrypted Data Key Entries specification](../data-format/message-header.md#encrypted-data-key-entries).
-4.  A sentinel field of 512 zero bits (or equivalently, 64 null bytes), indicating the end of the key hashes
-5.  The SHA-512 hash of the serialized encryption context
+  - MUST be the serialized encryption context
+
+All the above fields must be separated by a single NULL_BYTE `0x00`.
+
+| Field                      | Length (bytes) | Interpreted as |
+| -------------------------- | -------------- | -------------- |
+| Resource ID                | 1              | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Scope ID                   | 1              | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Partition ID               | Variable       | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Algorithm Suite ID         | 2              | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| Concatenated Sorted EDKs   | variable       | bytes          |
+| Null Byte                  | 1              | `0x00`         |
+| SerializeEncryptionContext | Variable       | bytes          |
 
 As a formula:
 
 ```
-EDK_HASHES = [SHA512(SerializeEncryptedDataKey(key)) for key in decryptMaterialsRequest.encryptedDataKeys]
-ENTRY_ID = SHA512(
-    SHA512(UTF8Encode(cachingCMM.partitionId))
-    + AlgorithmSuiteId(decryptMaterialsRequest.algorithmSuite)
-    + CONCATENATE(SORTED(EDK_HASHES))
-    + PADDING_OF_512_ZERO_BITS
-    + SHA512(SerializeEncryptionContext(decryptMaterialsRequest.encryptionContext))
+resource-id = [0x01]
+scope-id = [0x02]
+partition-id = UTF8Encode(cachingCMM.partitionId)
+algorithm-suite-id = AlgorithmSuiteId(decryptMaterialsRequest.algorithmSuite)
+concatenated-sorted-edks = CONCATENATE(SORTED(EDK))
+serialized-encryption-context = SerializeEncryptionContext(decryptMaterialsRequest.encryptionContext)
+NULL_BYTE = [0x00]
+
+ENTRY_ID = SHA384(
+    resource-id
+    + NULL_BYTE
+    + scope-id
+    + NULL_BYTE
+    + partition-id
+    + NULL_BYTE
+    + algorithm-suite-id
+    + NULL_BYTE
+    + concatenated-sorted-edks
+    + NULL_BYTE
+    + serialized-encryption-context
 )
 ```

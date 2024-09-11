@@ -10,7 +10,7 @@
 ### Changelog
 
 - 0.2.0
-  - Updated cache entry formulae to support shared cache across Hierarchical Keyrings
+  - [Update Cache Entry Identifier Formulas to shared cache across multiple Hierarchical Keyrings](../../changes/2024-09-13_cache-across-hierarchy-keyrings/change.md)
   - New optional parameter `Partition ID` used to distinguish Cryptographic Material Providers (i.e: Hierarchical Keyrings) writing to a cache
 - 0.1.0
   - Initital record
@@ -324,6 +324,9 @@ in order to compute the [cache entry identifier](../cryptographic-materials-cach
 
 ### Preliminaries
 
+Each of the cache entry identifier formulas includes serialized information related to the branch key,
+as defined in the [Key Provider Info](../structures.md#key-provider-information).
+
 We establish the following definitions for the Cache Entry Identifier formula:
 
 #### Resource Identifier
@@ -375,9 +378,6 @@ The aforementioned 4 definitions ([Resource Identifier](#resource-identifier),
 [Scope Identifier](#scope-identifier), [Partition ID](#partition-id-1), and
 [Resource Suffix](#resource-suffix)) MUST be appended together with the null byte, 0x00,
 and the SHA384 of the result should be taken as the final cache identifier.
-
-Each of the cache entry identifier formulas includes serialized information related to the branch key,
-as defined in the [Key Provider Info](../structures.md#key-provider-information).
 
 ### Encryption Materials
 
