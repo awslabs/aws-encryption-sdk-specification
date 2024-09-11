@@ -10,7 +10,7 @@
 ### Changelog
 
 - 0.4.0
-  - [Update Cache Entry Identifier Formulas for Caching Cryptographic Materials Manager](../changes/2024-09-13_cache-across-hierarchy-keyrings/change.md)
+  - [Update Cache Entry Identifier Formulas for Caching Cryptographic Materials Manager](../changes/2024-09-13_cache-across-hierarchical-keyrings/change.md)
 - 0.3.0
   - [Specify Cache Entry Identifier Formulas for Caching Cryptographic Materials Manager](../changes/2020-07-17_cache-entry-identifier-formulas/change.md)
 - 0.2.0

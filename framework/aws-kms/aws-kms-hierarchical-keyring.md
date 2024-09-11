@@ -10,7 +10,7 @@
 ### Changelog
 
 - 0.2.0
-  - [Update Cache Entry Identifier Formulas to shared cache across multiple Hierarchical Keyrings](../../changes/2024-09-13_cache-across-hierarchy-keyrings/change.md)
+  - [Update Cache Entry Identifier Formulas to shared cache across multiple Hierarchical Keyrings](../../changes/2024-09-13_cache-across-hierarchical-keyrings/change.md)
   - New optional parameter `Partition ID` used to distinguish Cryptographic Material Providers (i.e: Hierarchical Keyrings) writing to a cache
 - 0.1.0
   - Initital record
@@ -363,7 +363,7 @@ It can either be a String provided by the user, which MUST be interpreted as the
 UTF-8 Encoding of the String, or a v4 UUID, which SHOULD be interpreted as the 16 byte representation of the UUID.
 
 Note: The cache will not know if the Partition ID is a String set by the user or the UUID.
-The constructor of the Hierarchy Keyring MUST record these bytes at construction time.
+The constructor of the Hierarchical Keyring MUST record these bytes at construction time.
 
 Please see [Shared Cache Considerations](#shared-cache-considerations) on how to provide the
 Partition ID and Logical Key Store Name while providing a Shared Cache to the Hierarchical Keyring.
@@ -491,7 +491,7 @@ ENTRY_ID = SHA384(
 
 ## Shared Cache Considerations
 
-If you have two or more Hierarchy Keyrings with:
+If you have two or more Hierarchical Keyrings with:
 
 - Same Partition ID
 - Same Logical Key Store Name of the Key Store for the Hierarchical Keyring
