@@ -97,7 +97,7 @@ Cache Entry Identifier formula:
   a String is provided by user, Partition ID MUST be
   interpreted as the bytes of UTF-8 Encoding of the
   String.
-  
+
   Note: The Cache will not know if this ID is a
   String set by the user or the UUID.
   The constructor of the Hierarchical Keyring MUST
