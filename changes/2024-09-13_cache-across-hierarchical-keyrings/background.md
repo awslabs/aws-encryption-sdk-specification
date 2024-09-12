@@ -92,10 +92,12 @@ Cache Entry Identifier formula:
   - Searchable Encryption : `0x03` (0011)
 
 - **Partition ID:**
-  Either a String provided by user, which MUST be
+  Either a v4 UUID, which SHOULD be interpreted
+  as the 16 byte representation of the UUID, or if
+  a String is provided by user, Partition ID MUST be
   interpreted as the bytes of UTF-8 Encoding of the
-  String, or a v4 UUID, which SHOULD be interpreted
-  as the 16 byte representation of the UUID.
+  String.
+  
   Note: The Cache will not know if this ID is a
   String set by the user or the UUID.
   The constructor of the Hierarchical Keyring MUST

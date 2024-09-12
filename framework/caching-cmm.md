@@ -226,7 +226,7 @@ Partition ID of the Caching CMM.
 
 #### Resource Suffix
 
-There are, at this time, 3 resource suffixes for the Caching CMM:
+There are three resource suffixes for the Caching CMM:
 
 - Caching CMM: Encryption Materials, Without Algorithm Suite:
   ```

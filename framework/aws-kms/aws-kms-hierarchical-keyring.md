@@ -69,17 +69,18 @@ This value MUST be greater than zero.
 
 ### Cache Type
 
-Sets the cache bound OR the type of cache scoped (created & bound) to the Hierarchical Keyring.
-By providing an already initialized `Shared` cache, users can determine the scope of the cache.
-That is, when it is garbage collected or if the cache is bound to other Cryptographic Material Providers.
-If any other type in `CacheType` is provided, the Hierarchical Keyring
-will initialize a cache of that type, to be used with only this Hierarchical Keyring.
-If not set, a `DefaultCache` is initialized to be used with only this Hierarchical Keyring with entryCapacity = 1000.
+Sets the type of cache for this Hierarchical Keyring. By providing an already initialized `Shared` cache,
+users can determine the scope of the cache. That is, if the cache is shared across other Cryptographic Material Providers,
+for instance other Hierarchical Keyrings or Caching Cryptographic Materials Managers (Caching CMMs).
+If any other type of cache in the `CacheType` union is provided, the Hierarchical Keyring will initialize a
+cache of that type, to be used with only this Hierarchical Keyring. If not set, a `DefaultCache` is initialized
+to be used with only this Hierarchical Keyring with `entryCapacity` = 1000.
 
 ### Partition ID
 
-A string that is used to avoid collisions with other Hierarchical Keyrings.
-If this parameter is not set, the Hierarchical Keyring MUST set a partition ID
+An optional string that is used to avoid collisions with other Hierarchical Keyrings.
+If this parameter is not set, the Hierarchical Keyring MUST set a partition ID to a
+v4 UUID, which is a random 16 byte representation of the UUID,
 that uniquely identifies the respective Hierarchical Keyring.
 
 The Partition ID MUST NOT be changed after initialization.
@@ -370,7 +371,7 @@ Partition ID and Logical Key Store Name while providing a Shared Cache to the Hi
 
 #### Resource Suffix
 
-There are, at this time, 2 resource suffixes for the Hierarchical Keyring:
+There are two resource suffixes for the Hierarchical Keyring:
 
 - Hierarchical Keyring: Encryption Materials:
   ```
@@ -491,14 +492,20 @@ ENTRY_ID = SHA384(
 
 ## Shared Cache Considerations
 
-If you have two or more Hierarchical Keyrings with:
+If a user has two or more Hierarchical Keyrings with:
 
 - Same Partition ID
 - Same Logical Key Store Name of the Key Store for the Hierarchical Keyring
 - Same Branch Key ID
-  then they WILL share the cache entries in the Shared Cache.
-  Please make sure that you set all of Partition ID, Logical Key Store Name and Branch Key ID
-  to be the same for two Hierarchical Keyrings only if you want them to share cache entries.
+
+then they WILL share the cache entries in the `Shared` Cache.
+
+Any keyring that has access to the `Shared` cache MAY be able to use materials
+that it MAY or MAY NOT have direct access to.
+
+Users MUST make sure that all of Partition ID, Logical Key Store Name of the Key Store for the Hierarchical Keyring
+and Branch Key ID are set to be the same for two Hierarchical Keyrings if and only they want the keyrings to share
+cache entries.
 
 Therefore, there are two important parameters that users need to carefully set while providing the shared cache:
 
@@ -517,17 +524,17 @@ which distinguishes Cryptographic Material Providers (i.e: Hierarchical Keyrings
 
 ### Logical Key Store Name
 
-> Note: You MUST NEVER have two different physical Key Stores with the same Logical Key Store Name.
+> Note: Users MUST NEVER have two different physical Key Stores with the same Logical Key Store Name.
 
 This parameter is set by the user when configuring the Key Store for
 the Hierarchical Keyring. This is a logical name for the branch key store.
 
-Suppose you have a physical Key Store on DynamoDB (K). You create two Key Store clients of K (K1 and K2).
-Now, you create two Hierarchical Keyrings (HK1 and HK2) with these Key Store clients (K1 and K2 respectively).
+Suppose there's a physical Key Store on DynamoDB (K). Two Key Store clients of K (K1 and K2) are created.
+Now, two Hierarchical Keyrings (HK1 and HK2) are created with these Key Store clients (K1 and K2 respectively).
 
-- If you want to share cache entries across these two keyrings HK1 and HK2, you should set the Logical Key Store Names
-  for both the Key Store clients (K1 and K2) to be the same.
-- If you set the Logical Key Store Names for K1 and K2 to be different, HK1 (which uses Key Store client K1)
+- If we want to share cache entries across these two keyrings HK1 and HK2, the Logical Key Store Names
+  for both the Key Store clients (K1 and K2) should be set to be the same.
+- If we set the Logical Key Store Names for K1 and K2 to be different, HK1 (which uses Key Store client K1)
   and HK2 (which uses Key Store client K2) will NOT be able to share cache entries.
 
 Notice that both K1 and K2 are clients for the same physical Key Store (K).
