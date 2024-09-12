@@ -49,6 +49,14 @@ On initialization, the caller:
 - MUST provide either a Branch Key Identifier or a [Branch Key Supplier](#branch-key-supplier)
 - MAY provide a max cache size
 
+If the cache to initialize is a [Storm Tracking Cryptographic Materials Cache](../storm-tracking-cryptographic-materials-cache.md#overview)
+then the settings on the storm tracking cache need to be rational with respect to the settings for the keyring.
+For example, a TTL that is less than the storm tracking grace period will result poor caching behavior.
+This is because all entries would be immediately within the grace period.
+
+If the cache to initialize is a [Storm Tracking Cryptographic Materials Cache](../storm-tracking-cryptographic-materials-cache.md#overview)
+then the [Grace Period](../storm-tracking-cryptographic-materials-cache.md#grace-period) MUST be less than the [cache limit TTL](#cache-limit-ttl).
+
 On initialization the Hierarchical Keyring MUST initialize a [cryptographic-materials-cache](../local-cryptographic-materials-cache.md) with the configured cache limit TTL and the max cache size.
 If no max cache size is provided, the crypotgraphic materials cache MUST be configured to a
 max cache size of 1000.
