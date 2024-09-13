@@ -78,10 +78,12 @@ to be used with only this Hierarchical Keyring with `entryCapacity` = 1000.
 
 ### Partition ID
 
-An optional string that is used to avoid collisions with other Hierarchical Keyrings.
-If this parameter is not set, the Hierarchical Keyring MUST set a partition ID to a
-v4 UUID, which is a random 16 byte representation of the UUID,
-that uniquely identifies the respective Hierarchical Keyring.
+An optional string that uniquely identifies the respective Hierarchical Keyring
+and is used to avoid collisions with other Hierarchical Keyrings.
+
+PartitionId can either be a String provided by the user, and in this case it MUST be interpreted as the bytes of
+UTF-8 Encoding of the String.
+If the PartitionId is NOT provided by the user, it MUST be set to the 16 byte representation of a v4 UUID.
 
 The Partition ID MUST NOT be changed after initialization.
 
@@ -143,10 +145,12 @@ to compute the [cache entry identifier](../cryptographic-materials-cache.md#cach
 
 If a cache entry is found and the entry's TTL has not expired, the hierarchical keyring MUST use those branch key materials for key wrapping.
 
-If using a `Shared` cache across multiple Hierarchical Keyrings, different keyrings having the same `branchKey` can have different TTLs.
+If using a `Shared` cache across multiple Hierarchical Keyrings,
+different keyrings having the same `branchKey` can have different TTLs.
 In such a case, the expiry time in the cache is set according to the Keyring that populated the cache.
-There MUST be a check to make sure that for the cache entry found, who's TTL has NOT expired,
-`time.now() - cacheEntryCreationTime <= ttlSeconds` is true and valid for TTL of the Hierarchical Keyring getting the cache entry.
+There MUST be a check (cacheEntryWithinLimits) to make sure that for the cache entry found, who's TTL has NOT expired,
+`time.now() - cacheEntryCreationTime <= ttlSeconds` is true and
+valid for TTL of the Hierarchical Keyring getting the cache entry.
 If this is NOT true, then we MUST treat the cache entry as expired.
 
 If a cache entry is not found or the cache entry is expired, the hierarchical keyring MUST attempt to obtain the branch key materials
@@ -233,10 +237,12 @@ in order to compute the [cache entry identifier](cryptographic-materials-cache.m
 
 If a cache entry is found and the entry's TTL has not expired, the hierarchical keyring MUST use those branch key materials for key unwrapping.
 
-If using a `Shared` cache across multiple Hierarchical Keyrings, different keyrings having the same `branchKey` can have different TTLs.
+If using a `Shared` cache across multiple Hierarchical Keyrings,
+different keyrings having the same `branchKey` can have different TTLs.
 In such a case, the expiry time in the cache is set according to the Keyring that populated the cache.
-There MUST be a check to make sure that for the cache entry found, who's TTL has NOT expired,
-`time.now() - cacheEntryCreationTime <= ttlSeconds` is true and valid for TTL of the Hierarchical Keyring getting the cache entry.
+There MUST be a check (cacheEntryWithinLimits) to make sure that for the cache entry found, who's TTL has NOT expired,
+`time.now() - cacheEntryCreationTime <= ttlSeconds` is true and
+valid for TTL of the Hierarchical Keyring getting the cache entry.
 If this is NOT true, then we MUST treat the cache entry as expired.
 
 If a cache entry is not found or the cache entry is expired, the hierarchical keyring
@@ -439,7 +445,8 @@ ENTRY_ID = SHA384(
 ### Decryption Materials
 
 When the hierarchical keyring receives an OnDecrypt request,
-it MUST calculate the cache entry identifier as the SHA-384 hash of the following byte strings, in the order listed:
+it MUST calculate the cache entry identifier as the
+SHA-384 hash of the following byte strings, in the order listed:
 
 - MUST be the Resource ID for the Hierarchical Keyring (0x02)
 - MUST be the Scope ID for Decrypt (0x02)
@@ -526,8 +533,10 @@ which distinguishes Cryptographic Material Providers (i.e: Hierarchical Keyrings
 
 > Note: Users MUST NEVER have two different physical Key Stores with the same Logical Key Store Name.
 
-This parameter is set by the user when configuring the Key Store for
+Logical Key Store Name is set by the user when configuring the Key Store for
 the Hierarchical Keyring. This is a logical name for the branch key store.
+Logical Key Store Name MUST be converted to UTF8 Bytes to be used in
+the cache identifiers.
 
 Suppose there's a physical Key Store on DynamoDB (K). Two Key Store clients of K (K1 and K2) are created.
 Now, two Hierarchical Keyrings (HK1 and HK2) are created with these Key Store clients (K1 and K2 respectively).
