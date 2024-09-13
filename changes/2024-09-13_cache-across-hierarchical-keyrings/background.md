@@ -5,15 +5,17 @@
 
 ## Background
 
-A [Cryptographic Materials Cache](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/cryptographic-materials-cache.md) can be used by a Hierarchical Keyring, a Caching CMM, and the DB-ESDK for Searchable Encryption.
-It can store four types of [materials](https://github.com/aws/aws-cryptographic-material-providers-library/blob/c07a51fc29ff70411f7573bca96d2a091db8c1ed/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/cryptographic-materials-cache.smithy#L89) for three different use-cases:
+A [Cryptographic Materials Cache](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/cryptographic-materials-cache.md)
+can be used by a Hierarchical Keyring, a Caching CMM, and the DB-ESDK for Searchable Encryption.
+It can store four types of [materials](https://github.com/aws/aws-cryptographic-material-providers-library/blob/c07a51fc29ff70411f7573bca96d2a091db8c1ed/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/cryptographic-materials-cache.smithy#L89)
+for three different use-cases:
 
 - Hierarchical Keyring: BranchKeyMaterials
 - CachingCMM: EncryptionMaterials and DecryptionMaterials
 - DB-ESDK (Searchable Encryption): BeaconKeyMaterials
 
 These materials have certain cache identifiers for accessing
-them until a TTL. As of the date of creation of this document (09/13/12024),
+them until their TTL expires. As of the date of creation of this document (09/13/12024),
 the cache identifiers are set up such that:
 
 - Only one Hierarchical Keyring can use one cache,

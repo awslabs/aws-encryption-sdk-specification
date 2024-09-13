@@ -102,7 +102,7 @@ and CachingCMMs will be appropriately separated.
 ## Motivation
 
 The Hierarchical Keyring,
-and it's component the (Branch) Key Store,
+and it's component the Key Store,
 allow MPL Consumers to reduce their KMS Call volume
 by persisting KMS protected cryptographic materials into
 an available medium
@@ -185,7 +185,7 @@ then the Hierarchical Keyrings WILL share cache entries in the `Shared` Cache.
 This means that the branch-key used and cached by one Hierarchical Keyring can be
 used by the other Hierarchical Keyring (within a TTL), effectively by-passing
 KMS Access Control. We recommend evaluating your threat model carefully, to
-understand and accept / mitigate this risk. By default, each Hierarchical Keyring's
+understand and mitigate this risk yourself. By default, each Hierarchical Keyring's
 Partition ID is set to a v4 UUID, which is a random 16 byte representation of the UUID.
 Unless the customer explicitly sets the Partition ID of two Hierarchical Keyrings to
 be the same, Hierarchical Keyrings will NOT by-pass KMS Access Controls.

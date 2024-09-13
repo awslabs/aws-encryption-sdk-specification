@@ -81,7 +81,7 @@ to be used with only this Hierarchical Keyring with `entryCapacity` = 1000.
 An optional string that uniquely identifies the respective Hierarchical Keyring
 and is used to avoid collisions with other Hierarchical Keyrings.
 
-PartitionId can either be a String provided by the user, and in this case it MUST be interpreted as the bytes of
+PartitionId can be a String provided by the user, and in this case it MUST be interpreted as the bytes of
 UTF-8 Encoding of the String.
 If the PartitionId is NOT provided by the user, it MUST be set to the 16 byte representation of a v4 UUID.
 
@@ -521,7 +521,7 @@ Therefore, there are two important parameters that users need to carefully set w
 Partition ID is an optional parameter provided to the Hierarchical Keyring input,
 which distinguishes Cryptographic Material Providers (i.e: Hierarchical Keyrings) writing to a cache.
 
-- (Default) If the Partition ID is not set by the user, it is initialized as a random 16-byte UUID, which makes
+- (Default) A a random 16-byte UUID, which makes
   it unique for every Hierarchical Keyring. In this case, two Hierarchical Keyrings (or another Material Provider)
   CANNOT share the same cache entries in the cache.
 - If the Partition ID is set by the user and is the same for two Hierarchical Keyrings (or another Material Provider),
