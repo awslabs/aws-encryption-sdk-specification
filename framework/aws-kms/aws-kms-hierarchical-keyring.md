@@ -81,8 +81,7 @@ to be used with only this Hierarchical Keyring with `entryCapacity` = 1000.
 An optional string that uniquely identifies the respective Hierarchical Keyring
 and is used to avoid collisions with other Hierarchical Keyrings.
 
-PartitionId can be a String provided by the user, and in this case it MUST be interpreted as the bytes of
-UTF-8 Encoding of the String.
+PartitionId can be a string provided by the user. If provided, it MUST be interpreted as UTF8 bytes.
 If the PartitionId is NOT provided by the user, it MUST be set to the 16 byte representation of a v4 UUID.
 
 The Partition ID MUST NOT be changed after initialization.
@@ -534,7 +533,7 @@ which distinguishes Cryptographic Material Providers (i.e: Hierarchical Keyrings
 > Note: Users MUST NEVER have two different physical Key Stores with the same Logical Key Store Name.
 
 Logical Key Store Name is set by the user when configuring the Key Store for
-the Hierarchical Keyring. This is a logical name for the branch key store.
+the Hierarchical Keyring. This is a logical name for the key store.
 Logical Key Store Name MUST be converted to UTF8 Bytes to be used in
 the cache identifiers.
 
