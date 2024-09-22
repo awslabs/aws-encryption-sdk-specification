@@ -5,17 +5,23 @@
 
 ## Version
 
-0.1.0
+0.2.0
 
 ### Changelog
 
+- 0.2.0
+  - [Update Cache Entry Identifier Formulas to shared cache across multiple Hierarchical Keyrings](../../changes/2024-09-13_cache-across-hierarchical-keyrings/change.md)
+  - New optional parameter `Partition ID` used to distinguish Cryptographic Material Providers (i.e: Hierarchical Keyrings) writing to a cache
 - 0.1.0
   - Initital record
 
 ## Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-| -------- | -------------------------------------- | ------------------------- | -------------- |
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                                                                                                                                                      |
+| -------- | -------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dafny    | 0.2.0                                  | 1.0.0                     | [AwsKmsHierarchicalKeyring.dfy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/src/Keyrings/AwsKms/AwsKmsHierarchicalKeyring.dfy)                                                          |
+| Java     | 0.1.0                                  | 1.0.0                     | [CreateAwsKmsHierarchicalKeyringInput.java](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/java/src/main/smithy-generated/software/amazon/cryptography/materialproviders/model/CreateAwsKmsHierarchicalKeyringInput.java) |
+| .NET     | 0.1.0                                  | 1.0.0                     | [CreateAwsKmsHierarchicalKeyringInput.cs](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/runtimes/net/Generated/AwsCryptographicMaterialProviders/CreateAwsKmsHierarchicalKeyringInput.cs)                                         |
 
 ## Overview
 
@@ -47,17 +53,41 @@ On initialization, the caller:
 - MUST provide a [Keystore](../branch-key-store.md)
 - MUST provide a [cache limit TTL](#cache-limit-ttl)
 - MUST provide either a Branch Key Identifier or a [Branch Key Supplier](#branch-key-supplier)
-- MAY provide a max cache size
+- MAY provide a [Cache Type](#cache-type)
+- MAY provide a [Partition ID](#partition-id)
 
-On initialization the Hierarchical Keyring MUST initialize a [cryptographic-materials-cache](../local-cryptographic-materials-cache.md) with the configured cache limit TTL and the max cache size.
-If no max cache size is provided, the crypotgraphic materials cache MUST be configured to a
-max cache size of 1000.
+If the Hierarchical Keyring does NOT get a `Shared` cache on initialization,
+it MUST initialize a [cryptographic-materials-cache](../local-cryptographic-materials-cache.md)
+with the user provided cache limit TTL and the entry capacity.
+If no `cache` is provided, a `DefaultCache` MUST be configured with entry capacity of 1000.
 
 ### Cache Limit TTL
 
 The maximum amount of time in seconds that an entry within the cache may be used before it MUST be evicted.
 The client MUST set a time-to-live (TTL) for [branch key materials](../structures.md#branch-key-materials) in the underlying cache.
 This value MUST be greater than zero.
+
+### Cache Type
+
+Sets the type of cache for this Hierarchical Keyring. By providing an already initialized `Shared` cache,
+users can determine the scope of the cache. That is, if the cache is shared across other Cryptographic Material Providers,
+for instance other Hierarchical Keyrings or Caching Cryptographic Materials Managers (Caching CMMs).
+If any other type of cache in the `CacheType` union is provided, the Hierarchical Keyring will initialize a
+cache of that type, to be used with only this Hierarchical Keyring. If not set, a `DefaultCache` is initialized
+to be used with only this Hierarchical Keyring with `entryCapacity` = 1000.
+
+### Partition ID
+
+An optional string that uniquely identifies the respective Hierarchical Keyring
+and is used to avoid collisions with other Hierarchical Keyrings.
+
+PartitionId can be a string provided by the user. If provided, it MUST be interpreted as UTF8 bytes.
+If the PartitionId is NOT provided by the user, it MUST be set to the 16 byte representation of a v4 UUID.
+
+The Partition ID MUST NOT be changed after initialization.
+
+Please see [Shared Cache Considerations](#shared-cache-considerations) on how to provide the
+Partition ID and Logical Key Store Name while providing a Shared Cache to the Hierarchical Keyring.
 
 ## Structure
 
@@ -69,18 +99,25 @@ the [ciphertext](structures.md#ciphertext) field in
 
 This structure is formed using the 16 byte `salt` used to derive the `derivedBranchKey`
 concatenated with the AES-GCM-256 12 byte `IV`
-concatenated with the byte representation of the UUID branch key version from the AWS DDB response `version` value
+concatenated with the byte representation of the UUID branch key version from the [branch key materials](../structures.md#branch-key-materials)
 concatenated with the AES Encryption output from the [branch key wrapping](#branch-key-wrapping).
+
+The branch key version is a UUID. Converting the 36 characters UUID string into bytes yields 16 bytes.
+For details see [Branch Key and Beacon Key Creation](../branch-key-store.md#branch-key-and-beacon-key-creation).
 
 The following table describes the fields that form the ciphertext for this keyring.
 The bytes are appended in the order shown.
+The Encryption Key is variable.
+It will be whatever length is represented by the algorithm suite.
+Because all the other values are constant,
+this variability in the encryption key does not impact the format.
 
 | Field              | Length (bytes) | Interpreted as |
 | ------------------ | -------------- | -------------- |
 | Salt               | 16             | bytes          |
 | IV                 | 12             | bytes          |
 | Version            | 16             | bytes          |
-| Encrypted Key      | 32             | bytes          |
+| Encrypted Key      | Variable       | bytes          |
 | Authentication Tag | 16             | bytes          |
 
 #### Authentication Tag
@@ -106,6 +143,14 @@ The hierarchical keyring MUST use the formulas specified in [Appendix A](#append
 to compute the [cache entry identifier](../cryptographic-materials-cache.md#cache-identifier).
 
 If a cache entry is found and the entry's TTL has not expired, the hierarchical keyring MUST use those branch key materials for key wrapping.
+
+If using a `Shared` cache across multiple Hierarchical Keyrings,
+different keyrings having the same `branchKey` can have different TTLs.
+In such a case, the expiry time in the cache is set according to the Keyring that populated the cache.
+There MUST be a check (cacheEntryWithinLimits) to make sure that for the cache entry found, who's TTL has NOT expired,
+`time.now() - cacheEntryCreationTime <= ttlSeconds` is true and
+valid for TTL of the Hierarchical Keyring getting the cache entry.
+If this is NOT true, then we MUST treat the cache entry as expired.
 
 If a cache entry is not found or the cache entry is expired, the hierarchical keyring MUST attempt to obtain the branch key materials
 by querying the backing branch keystore specified in the [retrieve OnEncrypt branch key materials](#query-branch-keystore-onencrypt) section.
@@ -190,6 +235,14 @@ The hierarchical keyring MUST use the OnDecrypt formula specified in [Appendix A
 in order to compute the [cache entry identifier](cryptographic-materials-cache.md#cache-identifier).
 
 If a cache entry is found and the entry's TTL has not expired, the hierarchical keyring MUST use those branch key materials for key unwrapping.
+
+If using a `Shared` cache across multiple Hierarchical Keyrings,
+different keyrings having the same `branchKey` can have different TTLs.
+In such a case, the expiry time in the cache is set according to the Keyring that populated the cache.
+There MUST be a check (cacheEntryWithinLimits) to make sure that for the cache entry found, who's TTL has NOT expired,
+`time.now() - cacheEntryCreationTime <= ttlSeconds` is true and
+valid for TTL of the Hierarchical Keyring getting the cache entry.
+If this is NOT true, then we MUST treat the cache entry as expired.
 
 If a cache entry is not found or the cache entry is expired, the hierarchical keyring
 MUST attempt to obtain the branch key materials by calling the backing branch key
@@ -287,56 +340,212 @@ in order to compute the [cache entry identifier](../cryptographic-materials-cach
 Each of the cache entry identifier formulas includes serialized information related to the branch key,
 as defined in the [Key Provider Info](../structures.md#key-provider-information).
 
+We establish the following definitions for the Cache Entry Identifier formula:
+
+#### Resource Identifier
+
+A Hex value that indicates if an element is from a Caching_CMM, Hierarchical_Keyring, or some other future resource.
+
+```
+Caching_CMM : 0x01  (0001)
+Hierarchical_Keyring : 0x02 (0010)
+```
+
+#### Scope Identifier
+
+A Hex value that indicates if an element is used for Encryption, Decryption, Searchable Encryption, or some other future purpose.
+
+```
+Encrypt : 0x01 (0001)
+Decrypt : 0x02 (0010)
+Searchable Encryption : 0x03 (0011)
+```
+
+#### Partition ID
+
+Partition ID is an optional parameter provided to the Hierarchical Keyring input, which distinguishes
+Cryptographic Material Providers (i.e: Hierarchical Keyrings) writing to a cache.
+It can either be a String provided by the user, which MUST be interpreted as the bytes of
+UTF-8 Encoding of the String, or a v4 UUID, which SHOULD be interpreted as the 16 byte representation of the UUID.
+
+Note: The cache will not know if the Partition ID is a String set by the user or the UUID.
+The constructor of the Hierarchical Keyring MUST record these bytes at construction time.
+
+Please see [Shared Cache Considerations](#shared-cache-considerations) on how to provide the
+Partition ID and Logical Key Store Name while providing a Shared Cache to the Hierarchical Keyring.
+
+#### Resource Suffix
+
+There are two resource suffixes for the Hierarchical Keyring:
+
+- Hierarchical Keyring: Encryption Materials:
+  ```
+  logicalKeyStoreName + NULL_BYTE + UTF8Encode(branchKeyId)
+  ```
+- Hierarchical Keyring: Decryption Materials:
+  ```
+  logicalKeyStoreName + NULL_BYTE + UTF8Encode(branchKeyId) + NULL_BYTE + UTF8Encode(branchKeyVersion)
+  ```
+
+The aforementioned 4 definitions ([Resource Identifier](#resource-identifier),
+[Scope Identifier](#scope-identifier), [Partition ID](#partition-id-1), and
+[Resource Suffix](#resource-suffix)) MUST be appended together with the null byte, 0x00,
+and the SHA384 of the result should be taken as the final cache identifier.
+
 ### Encryption Materials
 
 When the hierarchical keyring receives an OnEncrypt request,
-the cache entry identifier MUST be calculated as the first 32 bytes of the
-SHA-512 hash of the following byte strings, in the order listed:
+the cache entry identifier MUST be calculated as the
+SHA-384 hash of the following byte strings, in the order listed:
 
-| Field                    | Length (bytes) | Interpreted as |
-| ------------------------ | -------------- | -------------- |
-| Length of branch-key-id  | 3              | UInt8          |
-| branch-key-id            | Variable       | UTF-8 Encoded  |
-| Null Byte                | 1              | `0x00`         |
-| Constant string "ACTIVE" | 6              | UTF-8 Encoded  |
+- MUST be the Resource ID for the Hierarchical Keyring (0x02)
+- MUST be the Scope ID for Encrypt (0x01)
+- MUST be the Partition ID for the Hierarchical Keyring
+- Resource Suffix
+  - MUST be the UTF8 encoded Logical Key Store Name of the keystore for the Hierarchical Keyring
+  - MUST be the UTF8 encoded branch-key-id
+
+All the above fields must be separated by a single NULL_BYTE `0x00`.
+
+| Field                  | Length (bytes) | Interpreted as      |
+| ---------------------- | -------------- | ------------------- |
+| Resource ID            | 1              | bytes               |
+| Null Byte              | 1              | `0x00`              |
+| Scope ID               | 1              | bytes               |
+| Null Byte              | 1              | `0x00`              |
+| Partition ID           | Variable       | bytes               |
+| Null Byte              | 1              | `0x00`              |
+| Logical Key Store Name | Variable       | UTF-8 Encoded Bytes |
+| Null Byte              | 1              | `0x00`              |
+| Branch Key ID          | Variable       | UTF-8 Encoded Bytes |
 
 As a formula:
 
 ```
+resource-id = [0x02]
+scope-id = [0x01]
+logical-key-store-name = UTF8Encode(keystore.LogicalKeyStoreName)
 branch-key-id = UTF8Encode(hierarchicalKeyring.BranchKeyIdentifier)
-branch-key-digest - SHA512(branch-key-id)
+NULL_BYTE = [0x00]
 
-ENTRY_ID = SHA512(
-    LengthUint8(branch-key-id) +
-    branch-key-digest +
-    + 0x00
-    + UTF8Encode("ACTIVE")
-)[0:32]
+ENTRY_ID = SHA384(
+    resource-id
+    + NULL_BYTE
+    + scope-id
+    + NULL_BYTE
+    + partition-id
+    + NULL_BYTE
+    + logical-key-store-name
+    + NULL_BYTE
+    + branch-key-id
+)
 ```
 
 ### Decryption Materials
 
 When the hierarchical keyring receives an OnDecrypt request,
-it MUST calculate the cache entry identifier as the first 32 bytes of the SHA-512 hash of the following byte strings, in the order listed:
+it MUST calculate the cache entry identifier as the
+SHA-384 hash of the following byte strings, in the order listed:
 
-| Field                   | Length (bytes) | Interpreted as |
-| ----------------------- | -------------- | -------------- |
-| Length of branch-key-id | 3              | UInt8          |
-| branch-key-id           | Variable       | UTF-8 Encoded  |
-| Null Byte               | 1              | `0x00`         |
-| Branch key version      | 36             | String         |
+- MUST be the Resource ID for the Hierarchical Keyring (0x02)
+- MUST be the Scope ID for Decrypt (0x02)
+- MUST be the Partition ID for the Hierarchical Keyring
+- Resource Suffix
+  - MUST be the UTF8 encoded Logical Key Store Name of the keystore for the Hierarchical Keyring
+  - MUST be the UTF8 encoded branch-key-id
+  - MUST be the UTF8 encoded branch-key-version
+
+All the above fields must be separated by a single NULL_BYTE `0x00`.
+
+| Field                  | Length (bytes) | Interpreted as      |
+| ---------------------- | -------------- | ------------------- |
+| Resource ID            | 1              | bytes               |
+| Null Byte              | 1              | `0x00`              |
+| Scope ID               | 1              | bytes               |
+| Null Byte              | 1              | `0x00`              |
+| Partition ID           | Variable       | bytes               |
+| Null Byte              | 1              | `0x00`              |
+| Logical Key Store Name | Variable       | UTF-8 Encoded Bytes |
+| Null Byte              | 1              | `0x00`              |
+| Branch Key ID          | Variable       | UTF-8 Encoded Bytes |
+| Null Byte              | 1              | `0x00`              |
+| branch-key-version     | 36             | UTF-8 Encoded Bytes |
+
+As a formula:
 
 ```
-branch-key-id = UTF8Encode(edk.providerInfo)
-branch-key-digest - SHA512(branch-key-id)
+resource-id = [0x02]
+scope-id = [0x02]
+logical-key-store-name = UTF8Encode(keystore.LogicalKeyStoreName)
+branch-key-id = UTF8Encode(hierarchicalKeyring.BranchKeyIdentifier)
+branch-key-version = UTF8Encode(branchKeyVersion)
+NULL_BYTE = [0x00]
 
-ENTRY_ID = SHA512(
-    LengthUint8(branch-key-id) +
-    branch-key-digest +
-    0x00 +
-    branch key version
-)[0:32]
+ENTRY_ID = SHA384(
+    resource-id
+    + NULL_BYTE
+    + scope-id
+    + NULL_BYTE
+    + partition-id
+    + NULL_BYTE
+    + logical-key-store-name
+    + NULL_BYTE
+    + branch-key-id
+    + NULL_BYTE
+    + branch-key-version
+)
 ```
+
+## Shared Cache Considerations
+
+If a user has two or more Hierarchical Keyrings with:
+
+- Same Partition ID
+- Same Logical Key Store Name of the Key Store for the Hierarchical Keyring
+- Same Branch Key ID
+
+then they WILL share the cache entries in the `Shared` Cache.
+
+Any keyring that has access to the `Shared` cache MAY be able to use materials
+that it MAY or MAY NOT have direct access to.
+
+Users MUST make sure that all of Partition ID, Logical Key Store Name of the Key Store for the Hierarchical Keyring
+and Branch Key ID are set to be the same for two Hierarchical Keyrings if and only they want the keyrings to share
+cache entries.
+
+Therefore, there are two important parameters that users need to carefully set while providing the shared cache:
+
+### Partition ID
+
+Partition ID is an optional parameter provided to the Hierarchical Keyring input,
+which distinguishes Cryptographic Material Providers (i.e: Hierarchical Keyrings) writing to a cache.
+
+- (Default) A a random 16-byte UUID, which makes
+  it unique for every Hierarchical Keyring. In this case, two Hierarchical Keyrings (or another Material Provider)
+  CANNOT share the same cache entries in the cache.
+- If the Partition ID is set by the user and is the same for two Hierarchical Keyrings (or another Material Provider),
+  they CAN share the same cache entries in the cache.
+- If the Partition ID is set by the user and is different for two Hierarchical Keyrings (or another Material Provider),
+  they CANNOT share the same cache entries in the cache.
+
+### Logical Key Store Name
+
+> Note: Users MUST NEVER have two different physical Key Stores with the same Logical Key Store Name.
+
+Logical Key Store Name is set by the user when configuring the Key Store for
+the Hierarchical Keyring. This is a logical name for the key store.
+Logical Key Store Name MUST be converted to UTF8 Bytes to be used in
+the cache identifiers.
+
+Suppose there's a physical Key Store on DynamoDB (K). Two Key Store clients of K (K1 and K2) are created.
+Now, two Hierarchical Keyrings (HK1 and HK2) are created with these Key Store clients (K1 and K2 respectively).
+
+- If we want to share cache entries across these two keyrings HK1 and HK2, the Logical Key Store Names
+  for both the Key Store clients (K1 and K2) should be set to be the same.
+- If we set the Logical Key Store Names for K1 and K2 to be different, HK1 (which uses Key Store client K1)
+  and HK2 (which uses Key Store client K2) will NOT be able to share cache entries.
+
+Notice that both K1 and K2 are clients for the same physical Key Store (K).
 
 ## Branch Key Supplier
 
@@ -360,19 +569,19 @@ Additionally the keyring uses a 12-byte IV for the AES-GCM-256 for key wrapping.
 We have selected to use these `salt` and `IV` parameters as they are the same parameters used
 in [AWS KMS key derivation](https://rwc.iacr.org/2018/Slides/Gueron.pdf).
 
-Overall this results in 28-bytes of randomness.
-
-Birthday Problem calculations for current selection:
+Overall this results in 28 bytes (224 bits) of randomness. By the birthday bound, there is a 2^{-32} chance of a key/IV collision after
 
 ```
-16 + 12 = 28-bytes or 224-bits of randomness
+2^{ (224 - 32) / 2 }
 
-(224 - 32) / 2 = 96
+= 2^96
 
-2^96 = 7.9228163e+28 or 79,228,162,514,264,337,593,543,950,336
+= 7.9228163e+28
+
+= 79,228,162,514,264,337,593,543,950,336
 ```
 
-The above number is how many times one would have to wrap with the `derivedBranchKey` before a theoretical collision.
+derivations. In other words, you could derive 2^96 `derivedBranchKeys` before incurring a cryptographically relevant chance of reusing a AES-GCM key/IV pair.
 Given the magnitude of the result; it is recommended to rotate the `branchKey` once per year as this is also the cadence
 at which AWS KMS rotates its [AWS Managed Keys](https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html#rotate-keys-how-it-works).
 Using this combination of IV and salt for the KDF and Wrapping operations significantly extends the lifetime of the key; this allows
@@ -397,7 +606,7 @@ Birthday Problem calculations:
 2^112 = 5,192,296,858,534,827,628,530,496,329,220,096
 ```
 
-The above number is how many times one would have to wrap with the `derivedBranchKey` before a theoretical collision.
+The above number is how many times one would have to wrap with the `derivedBranchKey` before incurring a cryptographically relevant probability of a collision.
 Although this is a higher number we decided on the current selection of including a salt and an IV to not only
 lower the overhead of bytes we have to store in the [edk ciphertext](../structures.md#ciphertext) but to
 easily reason about the security properties of the key derivation since it is what AWS KMS does.
