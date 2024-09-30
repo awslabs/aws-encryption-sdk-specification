@@ -45,10 +45,10 @@ The implementation MUST instantiate a [Local CMC](local-cryptographic-materials-
 to do the actual caching.
 
 The settings need to be consistent.
-Here are examples of ambagious or in-consistent settings:
-All grace intervals that exceeds a given grace period are the same because only 1 attempt is made per grace interval and the grace period will end before the next interval.
-All in flight TTLs that exceeds a given grace period are the same because the grace period will expire before the in flight TTL.
-All in flight TTLs that are less than a given grace interval are the same because only 1 attempt is made per grace interval and even if the in flight TTL expires before the interval another attempt should not start.
+Here are examples of ambiguous or inconsistent settings:
+A grace interval that exceeds the grace period is inconsistent because only one attempt is made per grace interval and the grace period will end before the next interval.
+An in flight TTL that exceeds the grace period is inconsistent because the grace period will expire before the in flight TTL.
+An in flight TTL that is less than the grace interval is inconsistent because only one attempt is made per grace interval and even if the in flight TTL expires before the interval another attempt should not start.
 
 The [Grace Interval](#grace-interval) MUST be less than or equal to the [Grace Period](#grace-period).
 The [Inflight TTL](#inflight-ttl) MUST be less than or equal to the [Grace Period](#grace-period).
