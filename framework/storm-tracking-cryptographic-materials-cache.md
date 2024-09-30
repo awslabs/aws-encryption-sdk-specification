@@ -44,16 +44,6 @@ Initialization MUST also provide
 The implementation MUST instantiate a [Local CMC](local-cryptographic-materials-cache.md)
 to do the actual caching.
 
-The settings need to be consistent.
-Here are examples of ambiguous or inconsistent settings:
-A grace interval that exceeds the grace period is inconsistent because only one attempt is made per grace interval and the grace period will end before the next interval.
-An in flight TTL that exceeds the grace period is inconsistent because the grace period will expire before the in flight TTL.
-An in flight TTL that is less than the grace interval is inconsistent because only one attempt is made per grace interval and even if the in flight TTL expires before the interval another attempt should not start.
-
-The [Grace Interval](#grace-interval) MUST be less than or equal to the [Grace Period](#grace-period).
-The [Inflight TTL](#inflight-ttl) MUST be less than or equal to the [Grace Period](#grace-period).
-The [Grace Interval](#grace-interval) MUST be less than or equal to the [Inflight TTL](#inflight-ttl).
-
 ### Grace Period
 
 A number of seconds (at least 1, default 10).
@@ -89,6 +79,30 @@ A number of milliseconds (at least 1, default 20).
 If the implementation must block, and no more intelligent signaling is used,
 then the implementation should sleep for this many milliseconds before
 reexamining the state of the cache.
+
+## Consistency
+
+The settings need to be consistent within themselves,
+as well as with the `ttlSeconds` of the object of which this cache is a part,
+e.g the [AwsKmsHierarchicalKeyring](aws-kms/aws-kms-hierarchical-keyring.md).
+
+Here are examples of ambiguous or inconsistent settings:
+
+- A grace period that equals or exceeds the ttlSeconds is inconsistent because the first attempt will already
+  be within the grace period.
+- A grace interval that exceeds the grace period is inconsistent because only one attempt is made per grace interval and the grace period will end before the next interval.
+- An in flight TTL that exceeds the grace period is inconsistent because the grace period will expire before the in flight TTL.
+- An in flight TTL that is less than the grace interval is inconsistent because only one attempt is made per grace interval and even if the in flight TTL expires before the interval another attempt should not start.
+
+Therefore
+
+- The [Grace Period](#grace-period) MUST be less than or equal to the ttlSeconds.
+- The [Grace Interval](#grace-interval) MUST be less than or equal to the [Grace Period](#grace-period).
+- The [Inflight TTL](#inflight-ttl) MUST be less than or equal to the [Grace Period](#grace-period).
+- The [Grace Interval](#grace-interval) MUST be less than or equal to the [Inflight TTL](#inflight-ttl).
+
+In actual use, the ttlSeconds should be much much larger than the [Grace Period](#grace-period),
+and the [Grace Period](#grace-period) should be several times larger than the [Grace Interval](#grace-interval).
 
 ## Behaviors
 
