@@ -13,7 +13,7 @@
   - [Update Cache Entry Identifier Formulas to shared cache across multiple Hierarchical Keyrings](../../changes/2024-09-13_cache-across-hierarchical-keyrings/change.md)
   - New optional parameter `Partition ID` used to distinguish Cryptographic Material Providers (i.e: Hierarchical Keyrings) writing to a cache
 - 0.1.0
-  - Initital record
+  - Initial record
 
 ## Implementations
 
@@ -65,7 +65,7 @@ If the cache to initialize is a [Storm Tracking Cryptographic Materials Cache](.
 then the [Grace Period](../storm-tracking-cryptographic-materials-cache.md#grace-period) MUST be less than the [cache limit TTL](#cache-limit-ttl).
 
 On initialization the Hierarchical Keyring MUST initialize a [cryptographic-materials-cache](../local-cryptographic-materials-cache.md) with the configured cache limit TTL and the max cache size.
-If no max cache size is provided, the crypotgraphic materials cache MUST be configured to a
+If no max cache size is provided, the cryptographic materials cache MUST be configured to a
 max cache size of 1000.
 
 If the Hierarchical Keyring does NOT get a `Shared` cache on initialization,

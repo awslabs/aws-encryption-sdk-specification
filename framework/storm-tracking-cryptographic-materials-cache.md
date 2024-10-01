@@ -82,14 +82,10 @@ reexamining the state of the cache.
 
 ## Consistency
 
-The settings need to be consistent within themselves,
-as well as with the `ttlSeconds` of the object of which this cache is a part,
-e.g the [AwsKmsHierarchicalKeyring](aws-kms/aws-kms-hierarchical-keyring.md).
+The settings need to be consistent.
 
 Here are examples of ambiguous or inconsistent settings:
 
-- A grace period that equals or exceeds the ttlSeconds is inconsistent because the first attempt will already
-  be within the grace period.
 - A grace interval that exceeds the grace period is inconsistent because only one attempt is made per grace interval and the grace period will end before the next interval.
 - An in flight TTL that exceeds the grace period is inconsistent because the grace period will expire before the in flight TTL.
 - An in flight TTL that is less than the grace interval is inconsistent because only one attempt is made per grace interval and even if the in flight TTL expires before the interval another attempt should not start.
