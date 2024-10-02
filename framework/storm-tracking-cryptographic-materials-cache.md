@@ -92,13 +92,11 @@ Here are examples of ambiguous or inconsistent settings:
 
 Therefore
 
-- The [Grace Period](#grace-period) MUST be less than or equal to the ttlSeconds.
 - The [Grace Interval](#grace-interval) MUST be less than or equal to the [Grace Period](#grace-period).
 - The [Inflight TTL](#inflight-ttl) MUST be less than or equal to the [Grace Period](#grace-period).
 - The [Grace Interval](#grace-interval) MUST be less than or equal to the [Inflight TTL](#inflight-ttl).
 
-In actual use, the ttlSeconds should be much much larger than the [Grace Period](#grace-period),
-and the [Grace Period](#grace-period) should be several times larger than the [Grace Interval](#grace-interval).
+For most purposes, the [Grace Period](#grace-period) should be several times larger than the [Grace Interval](#grace-interval).
 
 ## Behaviors
 

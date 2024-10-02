@@ -61,6 +61,8 @@ then the settings on the storm tracking cache need to be rational with respect t
 For example, a TTL that is less than the storm tracking grace period will result poor caching behavior.
 This is because all entries would be immediately within the grace period.
 
+For most purposes, the TTL should be much much greater than the grace period.
+
 If the cache to initialize is a [Storm Tracking Cryptographic Materials Cache](../storm-tracking-cryptographic-materials-cache.md#overview)
 then the [Grace Period](../storm-tracking-cryptographic-materials-cache.md#grace-period) MUST be less than the [cache limit TTL](#cache-limit-ttl).
 
