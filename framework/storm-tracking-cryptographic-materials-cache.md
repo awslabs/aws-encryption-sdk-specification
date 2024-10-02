@@ -39,7 +39,7 @@ Initialization MUST also provide
 - [Grace Interval](#grace-interval)
 - [FanOut](#fanout)
 - [Inflight TTL](#inflight-ttl)
-- [sleepMilli](#sleepmilli).
+- [sleepMilli](#sleepmilli)
 
 The implementation MUST instantiate a [Local CMC](local-cryptographic-materials-cache.md)
 to do the actual caching.
