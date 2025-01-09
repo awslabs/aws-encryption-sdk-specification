@@ -17,6 +17,7 @@ const standardComplianceParams = {
   types: {
     test: "//= type=test",
     exception: "//= type=exception",
+    implication: "//= type=implication"
   },
 };
 const fileSettings = {
@@ -200,7 +201,7 @@ function clean({ stdout }) {
       const [match] = rawLine.match(filePathMatch);
       try{
         const { conditionRemove } = fileSettings[match];
-      return rawLine.split(match).pop().replace(conditionRemove, "").trim(); 
+      return rawLine.split(match).pop().replace(conditionRemove, "").trim();
       } catch(ex) {
         console.log(filePathMatch, match)
         throw ex
@@ -249,10 +250,17 @@ function cleanCompliance({ stdout }) {
   return compliance;
 
   function pushState({ line, file, complianceConfig, match }) {
-    // Exceptions do not have any mirror.
-    // As such, there is no correspondence to validate,
-    // so we skip these citations.
-    if (!state.lines.some((line) => line.includes(complianceConfig.types.exception))) {
+    if (state.lines.some((line) => line.includes(complianceConfig.types.exception))) {
+      // Exceptions do not have any mirror.
+      // As such, there is no correspondence to validate,
+      // so we skip these citations.
+    } else if (state.lines.some((line) => line.includes(complianceConfig.types.implication))) {
+      // Implications do not have any mirror.
+      // As such, there is no correspondence to validate,
+      // so we skip these citations.
+    } else if (0 < state.lines.length && state.lines[0].includes(".md#")) {
+    //   // This script was written before `duvet` supported markdown
+    } else {
       // This is after the test because the tests come first
       const raw = [state.file].concat(state.lines).join("\n");
       // By removing the test type it is easy to build a bi-directional map
