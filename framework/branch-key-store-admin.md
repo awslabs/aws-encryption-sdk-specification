@@ -18,7 +18,7 @@ or just "Key Store Admin".
 ## Implementations
 
 | Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
-| -------- |----------------------------------------| ------------------------- |----------------|
+| -------- | -------------------------------------- | ------------------------- | -------------- |
 | Dafny    | TBD                                    | TBD                       | TBD            |
 
 ## Overview
