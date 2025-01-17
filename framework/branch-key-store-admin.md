@@ -13,15 +13,13 @@ or just "Key Store Admin".
 ### Changelog
 
 - 1.0.0
-  - Initial record
+  - [Initial record](../changes/2025-01-17_key-store-admin/background.md)
 
 ## Implementations
 
-| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                                                                                             |
-| -------- | -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Dafny    | 1.0.0                                  | TBD                       | [AwsCryptographyKeyStoreOperations.dfy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographyKeyStoreAdmin/src/AwsCryptographyKeyStoreAdminOperations.dfy) |
-| Java     | 1.0.0                                  | TBD                       | TBD                                                                                                                                                                                                                                        |
-| .NET     | 1.0.0                                  | TBD                       | TBD                                                                                                                                                                                                                                        |
+| Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
+| -------- |----------------------------------------| ------------------------- |----------------|
+| Dafny    | TBD                                    | TBD                       | TBD            |
 
 ## Overview
 
