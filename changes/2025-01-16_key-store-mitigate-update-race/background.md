@@ -62,7 +62,7 @@ We will mitigate this via an Optimistic Lock on the cipher-text.
 
 All writes to ACTIVE,
 except those by `CreateKey`,
-would include a condition express of
+would include a condition expression of
 `attribute_exists(branch-key-id) AND enc = <old-cipher-text-value>`,
 as [expressed in DynamoDB Syntax](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html).
 
@@ -74,7 +74,7 @@ as [expressed in DynamoDB Syntax](https://docs.aws.amazon.com/amazondynamodb/lat
 - the Logical Key Store Name
 
 `enc` contains the Auth Tag from
-the AES-GCM operation execute by KMS.
+the AES-GCM operation executed by KMS.
 
 Thus, by asserting `enc` has not changed,
 the Key Store asserts that nothing has changed!

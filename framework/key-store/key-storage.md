@@ -71,8 +71,8 @@ the UTF8 Encoded value of the version of the branch key.
 
 A structure that holds two related [EncryptedHierarchicalKeys](#encryptedhierarchicalkey):
 
-- Item: an [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that will be written
-- Old: an [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that was read and is presumed to be the currently persisted item that will be replaced by `Item`.
+- Item: the [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that will be written
+- Old: the [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that was read and is presumed to be the currently persisted item that will be replaced by `Item`.
 
 ## Interface
 
