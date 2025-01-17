@@ -39,8 +39,8 @@ Key Store Client to behave in the manner described below.
 This could be a breaking change,
 and is therefore not recommended.
 
-Creating a new Key Store Admin client 
-also passively encourages customers to 
+Creating a new Key Store Admin client
+also passively encourages customers to
 consider the different permissions needed
 to administrate rather than use a Key Store.
 
