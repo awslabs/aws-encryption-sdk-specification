@@ -25,7 +25,7 @@ to implement other storage options.
 The behavior of the `WriteNewEncryptedBranchKeyVersion` operation
 leaves open a possibility for a normally benign overwrite
 of the cipher-text of a Branch Key,
-should two or more agents a Version a Branch Key simultaneously. 
+should two or more agents a Version a Branch Key simultaneously.
 
 This change mitigates this.
 
@@ -94,6 +94,7 @@ The change is to use an Optimistic Lock
 on the old cipher-text value.
 
 This refactors:
+
 - The [Branch Key Store's VersionKey](../../framework/branch-key-store.md#versionkey)
 - The [Key Storage's WriteNewEncryptedBranchKeyVersion](../../framework/key-store/key-storage.md#writenewencryptedbranchkeyversion)
 - The [Dynamodb Key Storage's WriteNewEncryptedBranchKeyVersion](../../framework/key-store/dynamodb-key-storage.md#writenewencryptedbranchkeyversion)

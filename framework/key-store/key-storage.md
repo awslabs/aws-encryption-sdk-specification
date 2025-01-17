@@ -70,6 +70,7 @@ the UTF8 Encoded value of the version of the branch key.
 ### OverWriteEncryptedHierarchicalKey
 
 A structure that holds two related [EncryptedHierarchicalKeys](#encryptedhierarchicalkey):
+
 - Item: an [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that will be written
 - Old: an [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that was read and is presumed to be the currently persisted item that will be replaced by `Item`.
 

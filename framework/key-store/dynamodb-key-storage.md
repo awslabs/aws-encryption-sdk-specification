@@ -112,7 +112,7 @@ TransactWriteItemRequest:
 
 - TransactWriteItems: List of TransactWriteItem
 
-The condition expression for the Active Input ensures 
+The condition expression for the Active Input ensures
 the Active Item in storage has not changed since it was read.
 This prevents overwrites due to a race in updating the Active Item.
 
