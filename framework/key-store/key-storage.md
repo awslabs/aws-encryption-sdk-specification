@@ -5,10 +5,12 @@
 
 ## Version
 
-0.1.0
+0.2.0
 
 ### Changelog
 
+- 0.2.0
+  - [Mitigate Update Race in the Branch Key Store](../../changes/2025-01-16_key-store-mitigate-update-race/background.md)
 - 0.1.0
   - Initial record
 
@@ -65,6 +67,12 @@ the UTF8 Encoded value of the version of the branch key.
 A structure that MUST have one member,
 the UTF8 Encoded value of the version of the branch key.
 
+### OverWriteEncryptedHierarchicalKey
+
+A structure that holds two related [EncryptedHierarchicalKeys](#encryptedhierarchicalkey):
+- Item: an [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that will be written
+- Old: an [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that was read and is presumed to be the currently persisted item that will be replaced by `Item`.
+
 ## Interface
 
 The KeyStorageInterface MUST support the following operations:
@@ -91,7 +99,7 @@ See the [default key stores's write new key to store specification](./default-ke
 
 The WriteNewEncryptedBranchKeyVersion caller MUST provide:
 
-- An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of ActiveHierarchicalSymmetricVersion
+- An [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey) with both `Item` and `Old` with [type](#type) of ActiveHierarchicalSymmetricVersion
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of HierarchicalSymmetricVersion
 
 Both keys need to be written together with a consistent transactional write.
