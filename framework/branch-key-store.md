@@ -5,10 +5,14 @@
 
 ## Version
 
-0.5.0
+0.7.0
 
 ### Changelog
 
+- 0.7.0
+  - [Mitigate Update Race in the Branch Key Store](../changes/2025-01-16_key-store-mitigate-update-race/background.md)
+- 0.6.0
+  - REVERTED: Introduce configurable storage options
 - 0.5.0
   - Introduce KMS Configuration of MRDiscovery
 - 0.4.0
@@ -468,7 +472,8 @@ List of TransactWriteItem:
     - “hierarchy-version” (N): 1
     - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
-  - ConditionExpression: `attribute_exists(branch-key-id)`
+  - ConditionExpression: `attribute_exists(branch-key-id) AND enc = :encOld`
+  - ExpressionAttributeValues: `{":encOld" := DDB.AttributeValue.B(oldCiphertextBlob)}`
   - TableName: the configured Table Name
 
 TransactWriteItemRequest:
@@ -477,6 +482,10 @@ TransactWriteItemRequest:
 
 If DDB TransactWriteItems is successful, this operation MUST return a successful response containing no additional data.
 Otherwise, this operation MUST yield an error.
+
+The condition expression for the Active Input ensures
+the Active Item in storage has not changed since it was read.
+This prevents overwrites due to a race in updating the Active Item.
 
 #### Authenticating a Keystore item
 
