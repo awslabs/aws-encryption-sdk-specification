@@ -5,10 +5,12 @@
 
 ## Version
 
-0.1.0
+0.2.0
 
 ### Changelog
 
+- 0.2.0
+  - [Mitigate Update Race in the Branch Key Store](../../changes/2025-01-16_key-store-mitigate-update-race/background.md)
 - 0.1.0
   - Initial record
 
@@ -102,12 +104,20 @@ List of TransactWriteItem:
   - TableName: the configured Table Name
 - PUT:
   - Item: A [record formatted item](#record-format) constructed from the active input
-  - ConditionExpression: `attribute_exists(branch-key-id)`
+  - ConditionExpression: `attribute_exists(branch-key-id) AND enc = :encOld`
+  - ExpressionAttributeValues: `{":encOld" := DDB.AttributeValue.B(oldCiphertextBlob)}`
   - TableName: the configured Table Name
 
 TransactWriteItemRequest:
 
 - TransactWriteItems: List of TransactWriteItem
+
+The condition expression for the Active Input ensures
+the Active Item in storage has not changed since it was read.
+This prevents overwrites due to a race in updating the Active Item.
+
+If the Write fails because of the Active Item's condition expression,
+the Storage Layer SHOULD throw a Version Race Exception.
 
 ### GetEncryptedActiveBranchKey
 

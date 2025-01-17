@@ -5,10 +5,12 @@
 
 ## Version
 
-0.6.0
+0.7.0
 
 ### Changelog
 
+- 0.7.0
+  - [Mitigate Update Race in the Branch Key Store](../changes/2025-01-16_key-store-mitigate-update-race/background.md)
 - 0.6.0
   - Introduce configurable storage options
 - 0.5.0
@@ -453,8 +455,11 @@ The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [
 
 If creation of the keys are successful,
 then the key store MUST call the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
-[WriteNewEncryptedBranchKeyVersion](./key-store/key-storage.md##writenewencryptedbranchkeyversion)
-with these 2 [EncryptedHierarchicalKeys](./key-store/key-storage.md##encryptedhierarchicalkey).
+[WriteNewEncryptedBranchKeyVersion](./key-store/key-storage.md#writenewencryptedbranchkeyversion)
+with an [OverWriteEncryptedHierarchicalKey](./key-store/key-storage.md#overwriteencryptedhierarchicalkey)
+with an `Item` that is the new ACTIVE
+and an `Old` that is the original ACTIVE,
+along with DECRYPT_ONLY.
 
 If the [WriteNewEncryptedBranchKeyVersion](./key-store/key-storage.md##writenewencryptedbranchkeyversion) is successful,
 this operation MUST return a successful response containing no additional data.

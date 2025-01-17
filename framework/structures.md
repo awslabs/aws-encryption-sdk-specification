@@ -404,7 +404,7 @@ This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this branch key.
+The [custom encryption context](#encryption-context) associated with this branch key.
 
 ## Beacon Key Materials
 
