@@ -36,8 +36,13 @@ Rather than creating a new Client/Local Service,
 Crypto Tools could refactor the existing
 Key Store Client to behave in the manner described below.
 
-This would be a breaking change,
+This could be a breaking change,
 and is therefore not recommended.
+
+Creating a new Key Store Admin client 
+also passively encourages customers to 
+consider the different permissions needed
+to administrate rather than use a Key Store.
 
 ### Static Methods on the MPL
 
@@ -75,19 +80,26 @@ The Key Store Admin requires the following arguments:
 - Storage Reference
 - Logical Key Store Name
 
-See [Key Store Persistence Changes](changes/2024-6-17_key-store-persistance/background.md) for details
+See [Key Store Persistence Changes](../../changes/2024-6-17_key-store-persistance/background.md) for details
 on Storage Reference.
 
 # Common Parameters and their defaults
 
-## `KMS Identifier`
+## `KmsSymmetricKeyArn`
 
-`KMS Identifier` is a KMS ARN which identifies the KMS Key
+`Kms Symmetric Key Arn` is a Union.
+
+The members of ``KmsSymmetricKeyArn` are a KMS ARN which identifies the KMS Key
 that will be used for the operation.
 This ARN MUST NOT be an Alias.
 This ARN MUST be a valid
-[AWS KMS Key ARN](./aws-kms/aws-kms-key-arn.md#a-valid-aws-kms-arn).
+[AWS KMS Key ARN](../../framework/aws-kms/aws-kms-key-arn.md#a-valid-aws-kms-arn).
 This ARN MAY be a Multi-Region Key (MRK) or Single Region Key.
+
+There are two members for this Union.
+
+- KMS Single Region Key ARN (`kmsKeyArn`): [See `KMS Key ARN` in the Key Store Client](../../framework/branch-key-store.md#aws-kms-configuration).
+- KMS Multi Region Key ARN (`kmsMRKeyArn`): [See `KMS MRKey ARN` in the Key Store Client](../../framework/branch-key-store.md#aws-kms-configuration).
 
 ## Key Management
 
@@ -108,7 +120,7 @@ Currently, there is only one `Key Management` option.
 `Key Management` is never used directly by the Key Store Admin.
 
 However, it was introduced into the Key Store
-as part of the [Key Store Persistence Changes](changes/2024-6-17_key-store-persistance/background.md).
+as part of the [Key Store Persistence Changes](../../changes/2024-6-17_key-store-persistance/background.md).
 It is, at least at this time,
 not visible to any MPL Consumer facing operations.
 
@@ -188,7 +200,7 @@ credentials or request headers for the KMS Operations.
 
 The CreateKey caller MUST provide:
 
-- A `KMS Identifier`
+- A `KmsSymmetricKeyArn`
 
 The CreateKey caller MAY provide:
 
@@ -196,28 +208,22 @@ The CreateKey caller MAY provide:
 - Encryption Context
 - A Key Management Strategy
 
-The behavior is mostly identical.
-
-However,
-during the [Wrapped Branch Key Creation](../../framework/branch-key-store.md#wrapped-branch-key-creation),
-the Key Management Strategy MUST be respected.
+At this time, the Key Management Strategy MUST be `AwsKmsReEncrypt`.
+The behavior is identical.
 
 ## Version Key
 
 The VersionKey caller MUST provide:
 
-- A `KMS Identifier`
-- A `branch-key-id`
+- A `KmsSymmetricKeyArn`
+- A `Identifier`
 
 The VersionKey caller MAY provide:
 
 - A Key Management Strategy
 
-The behavior is mostly identical.
-
-However,
-during the [Wrapped Branch Key Creation](../../framework/branch-key-store.md#wrapped-branch-key-creation),
-the Key Management Strategy MUST be respected.
+At this time, the Key Management Strategy MUST be `AwsKmsReEncrypt`.
+The behavior is identical.
 
 <!--  LocalWords:  MRK AwsKms grantTokenList kmsClient ReEncrypt  -->
 <!--  LocalWords:  AwsKmsReEncrypt keystore AwsKmsDecryptEncrypt  -->
