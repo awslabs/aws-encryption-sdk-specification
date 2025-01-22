@@ -25,8 +25,7 @@ are also different between usage and administration activities.
 
 As such, it makes sense to create a
 new Branch Key Store Administration Client,
-that cannot facilitate usage,
-only administrative operations.
+that only facilitates administrative operations.
 
 ## Alternatives to a new Client/Local Service?
 
@@ -42,7 +41,7 @@ and is therefore not recommended.
 Creating a new Key Store Admin client
 also passively encourages customers to
 consider the different permissions needed
-to administrate rather than use a Key Store.
+to administer rather than use a Key Store.
 
 ### Static Methods on the MPL
 
@@ -89,7 +88,7 @@ on Storage Reference.
 
 `Kms Symmetric Key Arn` is a Union.
 
-The members of ``KmsSymmetricKeyArn` are a KMS ARN which identifies the KMS Key
+The members of `KmsSymmetricKeyArn` are a KMS ARN which identifies the KMS Symmetric Key
 that will be used for the operation.
 This ARN MUST NOT be an Alias.
 This ARN MUST be a valid

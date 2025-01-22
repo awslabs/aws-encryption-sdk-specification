@@ -39,7 +39,7 @@ See [Key Store Overview](../branch-key-store.md#definitions).
 
 `Kms Symmetric Key Arn` is a Union.
 
-The members of ``KmsSymmetricKeyArn` are a KMS ARN which identifies the KMS Key
+The members of `KmsSymmetricKeyArn` are a KMS ARN which identifies the KMS Key
 that will be used for the operation.
 This ARN MUST NOT be an Alias.
 This ARN MUST be a valid
@@ -78,9 +78,10 @@ during [Wrapped Branch Key Creation](../branch-key-store.md#wrapped-branch-key-c
 
 `AwsKmsReEncrypt` is a structure that holds a [`AwsKms`](../branch-key-store.md#awskms),
 which MAY contain the KMS Client
-or Grant Tokens the Key Store,
+or Grant Tokens,
 if they are set,
-will use when calling KMS.
+the Key Store will use 
+when calling KMS.
 
 `AwsKmsReEncrypt` is the default option if
 `Key Management Strategy` is marked as optional
@@ -107,7 +108,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Initialization
 
-The Key Store Admin requires the following arguments:
+On initialization the caller MUST provide:
 
 - [Storage](../branch-key-store.md#storage)
 - [Logical Key Store Name](../branch-key-store.md##logical-keystore-name)
@@ -146,7 +147,7 @@ with the following caveats:
 
 #### KMS Configuration
 
-Where ever the Key Store Client's CreateKey method refers to the Key Store's KMS Configuration,
+Wherever the Key Store Client's CreateKey method refers to the Key Store's KMS Configuration,
 use the equivalent [`KmsSymmetricKeyArn`](#kmssymmetrickeyarn) expression.
 
 #### [Branch Key and Beacon Key Creation](./branch-key-store.md#branch-key-and-beacon-key-creation)
@@ -172,7 +173,7 @@ with the following caveats:
 
 #### KMS Configuration
 
-Where ever the Key Store Client's CreateKey method refers to the Key Store Client's KMS Configuration,
+Where ever the Key Store Client's VersionKey method refers to the Key Store Client's KMS Configuration,
 use the equivalent [`KmsSymmetricKeyArn`](#kmssymmetrickeyarn) expression.
 
 #### [Wrapped Branch Key Creation](./branch-key-store.md#wrapped-branch-key-creation)
