@@ -224,6 +224,3 @@ The VersionKey caller MAY provide:
 At this time, the Key Management Strategy MUST be `AwsKmsReEncrypt`.
 The behavior is identical.
 
-<!--  LocalWords:  MRK AwsKms grantTokenList kmsClient ReEncrypt  -->
-<!--  LocalWords:  AwsKmsReEncrypt keystore AwsKmsDecryptEncrypt  -->
-<!--  LocalWords:  Admin ReEncrypt  -->
