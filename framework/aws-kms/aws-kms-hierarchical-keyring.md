@@ -520,10 +520,10 @@ If a user has two or more Hierarchical Keyrings with:
 
 then they WILL share the cache entries in the `Shared` Cache.
 
-Any keyring that has access to the `Shared` cache MAY be able to use materials
-that it MAY or MAY NOT have direct access to.
+Any keyring that has access to the `Shared` cache may be able to use materials
+that it may or may not have direct access to.
 
-Users MUST make sure that all of Partition ID, Logical Key Store Name of the Key Store for the Hierarchical Keyring
+Users should make sure that all of Partition ID, Logical Key Store Name of the Key Store for the Hierarchical Keyring
 and Branch Key ID are set to be the same for two Hierarchical Keyrings if and only they want the keyrings to share
 cache entries.
 
@@ -535,16 +535,17 @@ Partition ID is an optional parameter provided to the Hierarchical Keyring input
 which distinguishes Cryptographic Material Providers (i.e: Hierarchical Keyrings) writing to a cache.
 
 - (Default) A a random 16-byte UUID, which makes
-  it unique for every Hierarchical Keyring. In this case, two Hierarchical Keyrings (or another Material Provider)
-  CANNOT share the same cache entries in the cache.
+  it unique for every Hierarchical Keyring.
+  In this case, two Hierarchical Keyrings (or another Material Provider)
+  WILL NOT share the same cache entries in the cache.
 - If the Partition ID is set by the user and is the same for two Hierarchical Keyrings (or another Material Provider),
   they CAN share the same cache entries in the cache.
 - If the Partition ID is set by the user and is different for two Hierarchical Keyrings (or another Material Provider),
-  they CANNOT share the same cache entries in the cache.
+  they WILL NOT share the same cache entries in the cache.
 
 ### Logical Key Store Name
 
-> Note: Users MUST NEVER have two different physical Key Stores with the same Logical Key Store Name.
+> Note: Users should not have two different physical Key Stores with the same Logical Key Store Name.
 
 Logical Key Store Name is set by the user when configuring the Key Store for
 the Hierarchical Keyring. This is a logical name for the key store.
