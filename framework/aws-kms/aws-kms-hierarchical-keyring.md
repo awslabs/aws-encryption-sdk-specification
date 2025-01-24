@@ -537,11 +537,11 @@ which distinguishes Cryptographic Material Providers (i.e: Hierarchical Keyrings
 - (Default) A a random 16-byte UUID, which makes
   it unique for every Hierarchical Keyring.
   In this case, two Hierarchical Keyrings (or another Material Provider)
-  WILL NOT share the same cache entries in the cache.
+  MUST NOT share the same cache entries in the cache.
 - If the Partition ID is set by the user and is the same for two Hierarchical Keyrings (or another Material Provider),
-  they CAN share the same cache entries in the cache.
+  they MAY share the same cache entries in the cache.
 - If the Partition ID is set by the user and is different for two Hierarchical Keyrings (or another Material Provider),
-  they WILL NOT share the same cache entries in the cache.
+  they MUST NOT share the same cache entries in the cache.
 
 ### Logical Key Store Name
 
