@@ -73,8 +73,8 @@ the UTF8 Encoded value of the version of the branch key.
 
 A structure that holds two related [EncryptedHierarchicalKeys](#encryptedhierarchicalkey):
 
-- Item: the [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that will be written
-- Old: the [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that was read and is presumed to be the currently persisted item that will be replaced by `Item`.
+- `Item`: the [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that will be written
+- `Old`: the [EncryptedHierarchicalKey](#encryptedhierarchicalkey) that was read and is presumed to be the currently persisted item that will be replaced by `Item`.
 
 Both `Item` and `Old` MUST have the same Branch Key ID and Type.
 
@@ -99,6 +99,9 @@ The members are:
 - `Input`: a binary blob, A Description of the input to initialize a Mutation
 - `CiphertextBlob`: a binary blob, which MAY be used to protect the Mutation Commitment
 
+See [Dynamodb Key Storage's Mutation Commitment DDB Item Format](./dynamodb-key-storage.md#mutation-commitment-ddb-item-format)
+for the DynamoDB Item representation.
+
 ### MutationIndex
 
 A structure holding information on
@@ -112,6 +115,9 @@ The members are:
 - `UUID`: a string, A unique identifier for the Mutation
 - `PageIndex`: a binary blob, Indirectly describes which items of the Branch Key have already been Mutated
 - `CiphertextBlob`: a binary blob, which MAY be used to protect the Mutation Index
+
+See [Dynamodb Key Storage's Mutation Index DDB Item Format](./dynamodb-key-storage.md#mutation-index-ddb-item-format)
+for the DynamoDB Item representation.
 
 ### OverWriteMutationIndex
 
@@ -164,7 +170,7 @@ The WriteNewEncryptedBranchKey caller MUST provide:
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of ActiveHierarchicalSymmetricBeacon
 
 All three keys need to be written together with an atomic transactional write.
-See the [default key stores's write new key to store specification](./default-key-storage-interface.md#writenewencryptedbranchkey) for more details about what storage properties are expected.
+See the [default key store's write new key to store specification](./default-key-storage-interface.md#writenewencryptedbranchkey) for more details about what storage properties are expected.
 
 ### WriteNewEncryptedBranchKeyVersion
 
@@ -174,7 +180,7 @@ The WriteNewEncryptedBranchKeyVersion caller MUST provide:
 - An [EncryptedHierarchicalKey](#encryptedhierarchicalkey) with a [type](#type) of HierarchicalSymmetricVersion
 
 Both keys need to be written together with a consistent transactional write.
-See [default key stores's write new branch key version to store specification](./default-key-storage-interface.md#writenewencryptedbranchkeyversion) for more details about what storage properties are expected.
+See [default key store's write new branch key version to store specification](./default-key-storage-interface.md#writenewencryptedbranchkeyversion) for more details about what storage properties are expected.
 
 ### GetEncryptedActiveBranchKey
 
@@ -225,31 +231,86 @@ along with the Mutation Commitment or Mutation Index IF they are present.
 
 The caller MUST provide:
 
-- `ActiveItem`: An [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey)
-- `BeaconItem`: An [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey)
+- `ActiveItem`: An [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey) with [type](#type) of ActiveHierarchicalSymmetricVersion
+- `BeaconItem`: An [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey) with [type](#type) of ActiveHierarchicalSymmetricBeacon
 - `Version`: An [WriteInitializeMutationVersion](#writeinitializemutationversion)
 - `MutationCommitment`: A [MutationCommitment](#mutationcommitment)
 - `MutationIndex`: A [MutationIndex](#mutationindex)
-
-If any of these are missing or malformed,
-an error MUST be thrown.
 
 All of these structures MUST have the same Branch Key ID/Identifier.
 
 The operation MUST atomically persist all 5 items
 in one write.
 
+[//]: # "- the CiphertextBlob of the Branch Key ID's Active is equal to `ActiveItem`'s `old` CiphertextBlob."
+[//]: # "- the CiphertextBlob of the Branch Key ID's Beacon is equal to `BeaconItem`'s `old` CiphertextBlob."
+[//]: # "- If the `Version` is `mutate`, the CiphertextBlob of the Version is equal to `mutate`'s `old` CiphertextBlob."
+
 The write MUST only succeed if:
 
 - there is no existing Mutation Commitment for the Branch Key ID
-- the CiphertextBlob of the Branch Key ID's Active is equal to `ActiveItem`'s `old` CipherText Blob.
-- the CiphertextBlob of the Branch Key ID's Beacon is equal to `BeaconItem`'s `old` CipherText Blob.
-- If the `Version` is `mutate`, the CiphertextBlob of the Version is equal to `mutate`'s `old` CipherText Blob.
-- If the `Version` is `rotate`, there is no Branch Key Item with the same `type` value as `rotate`
+- the ACTIVE value in Storage is the `ActiveItem`'s `old`.
+- the Beacon value in Storage is the `BeaconItem`'s `old`.
+- If the `Version` is `mutate`, the value of the Version Item in Storage is the `mutate`'s `old`.
+- If the `Version` is `rotate`, there is no Branch Key Item with the same `type` value as `rotate`.
 
 If the write does not succeed because of the above constraints,
 the operation MUST yield error;
 this error SHOULD suggest a race is occurring.
+
+The write MUST persist:
+
+- the `ActiveItem`'s `Item`
+- the `BeaconItem`'s `Item`
+- if the `Version` is `mutate`, the [EncryptedHierarchicalKey](#encryptedhierarchicalkey),
+  else the `rotate`'s `Item`
+- the `MutationCommitment`
+- the `MutationIndex`
+
+If the write fails for reasons other than the conditions,
+the operation MUST yield error;
+this error SHOULD suggest why the write failed.
+
+Otherwise, the operation MUST return a success.
+
+### WriteAtomicMutation
+
+The caller MUST provide:
+
+- `ActiveItem`: An [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey) with [type](#type) of ActiveHierarchicalSymmetricVersion
+- `BeaconItem`: An [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey) with [type](#type) of ActiveHierarchicalSymmetricBeacon
+- `Version`: An [WriteInitializeMutationVersion](#writeinitializemutationversion)
+- `Items`: A list of [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey) with [type](#type) of HierarchicalSymmetricVersion
+
+All of these structures MUST have the same Branch Key ID/Identifier.
+
+If the Storage implementation cannot write
+the size of `Items` + 3 in an atomic write,
+the operation MUST yield an error.
+
+The operation MUST issue an atomic write that ONLY succeeds if:
+
+- There is no existing Mutation Commitment for the Branch Key ID.
+- There is no existing Mutation Index for the Branch Key ID.
+- The ACTIVE value in Storage is the `ActiveItem`'s `old`.
+- The Beacon value in Storage is the `BeaconItem`'s `old`.
+- If the `Version` is `mutate`, the value of the Version Item in Storage is the `mutate`'s `old`.
+- If the `Version` is `rotate`, there is no Branch Key Item with the same `type` value as `rotate`.
+- For every [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey) in `Items`,
+  the [EncryptedHierarchicalKey](#encryptedhierarchicalkey)'s value in Storage is the `old`.
+
+If the write does not succeed because of the above constraints,
+the operation MUST yield error;
+this error SHOULD suggest a race is occurring.
+
+The atomic write MUST persist:
+
+- the `ActiveItem`'s `Item`
+- the `BeaconItem`'s `Item`
+- if the `Version` is `mutate`, the [EncryptedHierarchicalKey](#encryptedhierarchicalkey),
+  else the `rotate`'s `Item`
+- for every [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey) in `Items`,
+  the [OverWriteEncryptedHierarchicalKey](#overwriteencryptedhierarchicalkey)'s `Item`
 
 If the write fails for other reasons,
 the operation MUST yield error;
