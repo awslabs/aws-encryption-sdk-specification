@@ -266,6 +266,9 @@ These keys are used to generate symmetric signatures during encryption.
 
 If the algorithm suite does not contain a symmetric signing algorithm, this list MUST NOT be included in the materials.
 If the algorithm suite does contain a symmetric signing algorithm, this list MUST have length equal to the [encrypted data key list](#encrypted-data-keys).
+Since the symmetric signing keys value is optional,
+if the [encrypted data key list](#encrypted-data-keys) is empty
+the symmetric signing algorithm MAY be omitted.
 
 The symmetric signature keys MUST adhere to the specification for [symmetric signature algorithms](./algorithm-suites.md#symmetric-signature-algorithm)
 included in this encryption material's [algorithm suite](#algorithm-suite).
