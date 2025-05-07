@@ -10,7 +10,7 @@
 ### Changelog
 
 - 0.7.1
-  - Branch key creation only uses customer input (pre 0.5 behavior)
+  - Branch key creation only uses customer input
 - 0.7.0
   - [Mitigate Update Race in the Branch Key Store](../changes/2025-01-16_key-store-mitigate-update-race/background.md)
 - 0.6.0
