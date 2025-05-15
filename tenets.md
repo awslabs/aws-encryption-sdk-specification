@@ -31,6 +31,7 @@ our ordered set of priorities are:
 1. Readability
 1. Ease of use
 1. Performance
+1. Extensibility
 
 # Principles
 
