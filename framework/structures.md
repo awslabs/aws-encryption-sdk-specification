@@ -5,9 +5,13 @@
 
 ## Version
 
-0.6.0
+0.7.0
 
 ### Changelog
+
+- 0.7.0
+
+  - Update Branch Key Structures to include KMS ARN, Create Time, and Hierarchy Version
 
 - 0.6.0
 
@@ -386,6 +390,9 @@ This structure MUST include all of the following fields:
 - [Branch Key Id](#branch-key-id)
 - [Branch Key Version](#branch-key-version)
 - [Encryption Context](#encryption-context-3)
+- [KMS ARN](#kms-arn)
+- [Create Time](#create-time)
+- [Hierarchy Version](#hierarchy-version)
 
 ##### Branch Key
 
@@ -409,6 +416,18 @@ This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
 
 The [encryption context](#encryption-context) associated with this branch key.
 
+##### KMS ARN
+
+The AWS KMS Key ARN used to protect these materials.
+
+##### Create Time
+
+Timestamp in ISO 8601 format in UTC, to microsecond precision, that the Material was generated.
+
+##### Hierarchy Version
+
+Schema Version of the Branch Key.
+
 ## Beacon Key Materials
 
 #### Implementations
@@ -427,6 +446,9 @@ This structure MUST include the following fields:
 
 - [Beacon Key Id](#beacon-key-id)
 - [Encryption Context](#encryption-context-4)
+- [KMS ARN](#kms-arn)
+- [Create Time](#create-time)
+- [Hierarchy Version](#hierarchy-version)
 
 This structure MAY include the following fields:
 
@@ -445,7 +467,7 @@ the beacon key can be discarded.
 
 ##### Encryption Context
 
-The [custom encryption context](#encryption-context) associated with this beacon key.
+The [encryption context](#encryption-context) associated with this beacon key.
 
 ##### Beacon Key Id
 
@@ -459,3 +481,15 @@ to bytes.
 Where the string is the name of the beacon and
 the bytes are the HMAC Key derived from the beacon key
 concatenated with the UTF8 Encoding of the beacon name.
+
+##### KMS ARN
+
+The AWS KMS Key ARN used to protect these materials.
+
+##### Create Time
+
+Timestamp in ISO 8601 format in UTC, to microsecond precision, that the Material was generated.
+
+##### Hierarchy Version
+
+Schema Version of the Branch Key.
