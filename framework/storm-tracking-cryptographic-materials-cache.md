@@ -23,7 +23,7 @@ is a built-in implementation of the [CMC interface](cryptographic-materials-cach
 provided by the AWS Encryption SDK.
 
 It provides thread safe access to a [Local CMC](local-cryptographic-materials-cache.md),
-and prevents excessive parallel requests to the underlying cryptographic materials provider,
+prevents excessive parallel requests to the underlying cryptographic materials provider,
 and prevents redundant requests to the underlying cryptographic materials provider for the same key.
 
 ## Definitions
@@ -63,7 +63,7 @@ attempts will be made to refresh the cache.
 
 This should be significantly less than the TTL for any item put into the cache.
 
-The Grace Period should at least a few times larger than the Grace Interval,
+The Grace Period should be at least a few times larger than the Grace Interval,
 so that if something goes wrong with the first request, a second or third request will be made.
 
 ### Grace Interval
@@ -96,7 +96,7 @@ A request that has been in flight for this long returns an "InFlightTTL exceeded
 If a thread has been sleeping because other threads are allegedly working on the same key,
 give up and return an error after this amount of time.
 
-The Inflight TTL should at least a few times larger than the Grace Interval,
+The Inflight TTL should be at least a few times larger than the Grace Interval,
 so that if something goes wrong with the first request, a second or third request will be made.
 
 ### SleepMilli
