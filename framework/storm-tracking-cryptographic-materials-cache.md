@@ -85,7 +85,7 @@ A number (at least 1, default 20).
 The maximum number of individual keys for which lookups can be in flight.
 
 Other requests are blocked until the number of outstanding requests drops below this number,
-or until the amount of time that request has been outstanding exceeds the [Inflight TTL](#inflight-ttl)Inflight TTL.
+or until the amount of time that request has been outstanding exceeds the [Inflight TTL](#inflight-ttl).
 
 ### Inflight TTL
 
