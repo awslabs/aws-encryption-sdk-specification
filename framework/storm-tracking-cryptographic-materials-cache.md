@@ -8,6 +8,7 @@
 ### Changelog
 
 - 0.2.0
+
   - Add Time Units
   - Clarify Inflight TTL and Grace Interval
 
