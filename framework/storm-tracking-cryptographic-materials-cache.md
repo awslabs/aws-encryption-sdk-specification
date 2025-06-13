@@ -84,7 +84,7 @@ A number (at least 1, default 20).
 
 The maximum number of individual keys for which lookups can be in flight.
 
-Other requests are blocked until the number of outstanding requests drops below this number,
+Other requests are blocked until the number of unique keys with outstanding requests drops below this number,
 or until the amount of time that request has been outstanding exceeds the [Inflight TTL](#inflight-ttl).
 
 ### Inflight TTL
@@ -94,7 +94,7 @@ A number (at least 1, default 20).
 A request that has been in flight for this long returns an "InFlightTTL exceeded" error.
 
 If a thread has been sleeping because other threads are allegedly working on the same key,
-give up and return an error after this amount of time.
+it will give up and return an error after this amount of time.
 
 The Inflight TTL should be at least a few times larger than the Grace Interval,
 so that if something goes wrong with the first request, a second or third request will be made.
