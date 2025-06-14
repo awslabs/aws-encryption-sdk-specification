@@ -7,6 +7,11 @@
 
 ### Changelog
 
+- 0.2.0
+
+  - Add Time Units
+  - Clarify Inflight TTL and Grace Interval
+
 - 0.1.0
   - Initial record
   - [Thread Safe Cache](../changes/2023-06-19_thread_safe_cache/change.md)
@@ -18,7 +23,8 @@ is a built-in implementation of the [CMC interface](cryptographic-materials-cach
 provided by the AWS Encryption SDK.
 
 It provides thread safe access to a [Local CMC](local-cryptographic-materials-cache.md),
-and prevents excessive parallel requests to the underlying cryptographic materials provider.
+prevents excessive parallel requests to the underlying cryptographic materials provider,
+and prevents redundant requests to the underlying cryptographic materials provider for the same key.
 
 ## Definitions
 
@@ -41,6 +47,10 @@ Initialization MUST also provide
 - [Inflight TTL](#inflight-ttl)
 - [sleepMilli](#sleepmilli)
 
+Initialization MUST optionally accept the following values:
+
+- [timeUnits](#time units)
+
 The implementation MUST instantiate a [Local CMC](local-cryptographic-materials-cache.md)
 to do the actual caching.
 
@@ -53,12 +63,20 @@ attempts will be made to refresh the cache.
 
 This should be significantly less than the TTL for any item put into the cache.
 
+The Grace Period should be at least a few times larger than the Grace Interval,
+so that if something goes wrong with the first request, a second or third request will be made.
+
 ### Grace Interval
 
 A number of seconds (at least 1, default 1).
 
-While within the [grace period](#grace-period),
-attempts to refresh the cache are made no more often than once per interval.
+An entry that has been in flight for this long is no longer considered in flight.
+
+While within the [grace period](#grace-period), after this period another request is made.
+
+While doing the initial fetch for a key, after this period another request is made.
+
+The Grace Interval should be larger than the longest time expected for a request to the underlying cryptographic materials provider.
 
 ### FanOut
 
@@ -66,11 +84,20 @@ A number (at least 1, default 20).
 
 The maximum number of individual keys for which lookups can be in flight.
 
+Other requests are blocked until the number of unique keys with outstanding requests drops below this number,
+or until the amount of time that request has been outstanding exceeds the [Inflight TTL](#inflight-ttl).
+
 ### Inflight TTL
 
 A number (at least 1, default 20).
 
-An entry that has been in flight for this long is no longer considered in flight.
+A request that has been in flight for this long returns an "InFlightTTL exceeded" error.
+
+If a thread has been sleeping because other threads are allegedly working on the same key,
+it will give up and return an error after this amount of time.
+
+The Inflight TTL should be at least a few times larger than the Grace Interval,
+so that if something goes wrong with the first request, a second or third request will be made.
 
 ### SleepMilli
 
@@ -79,6 +106,20 @@ A number of milliseconds (at least 1, default 20).
 If the implementation must block, and no more intelligent signaling is used,
 then the implementation should sleep for this many milliseconds before
 reexamining the state of the cache.
+
+SleepMilli MUST NOT be affected by [timeUnits](#time units)
+
+### Time Units
+
+Time Units MUST be either `Seconds` or `Milliseconds` and applies to
+
+- [Grace Period](#grace-period)
+- [Grace Interval](#grace-interval)
+- [Inflight TTL](#inflight-ttl)
+
+If unset, or set to `Seconds`, the above values MUST be interpreted as seconds.
+
+If set to `Milliseconds`, the above values MUST be interpreted as milliseconds.
 
 ## Consistency
 
@@ -170,6 +211,9 @@ one thread receives NoSuchEntry, while others are blocked until an entry appears
 
 - If the key _is not_ inflight
   GetCacheEntry MUST return NoSuchEntry and mark that key as inflight at the current time.
+
+- If the key _is_ inflight
+  and the time spent so far exceeds the [Inflight TTL](#inflight-ttl), the operation MUST fail.
 
 - If the key _is_ inflight
   and the current time _is_ [within the grace interval](#within-grace-interval)
