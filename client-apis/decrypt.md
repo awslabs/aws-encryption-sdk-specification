@@ -162,6 +162,8 @@ that implementation SHOULD NOT provide an API that allows the caller to stream t
 
 The [encryption context](../framework/structures.md#encryption-context) that is used as
 additional authenticated data during the decryption of the input [encrypted message](#encrypted-message).
+Specifically, it MUST be the union of the encryption context serialized into the message header and
+the [encryption context for authentication only](#encryption-context-to-only-authenticate), if available.
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
@@ -426,6 +428,15 @@ verify the encrypted message, with the following inputs:
 Note that the message header and message body MAY have already been input during previous steps.
 
 If this verification is not successful, this operation MUST immediately halt and fail.
+
+##### Encryption Context to Only Authenticate
+
+The encryption context to only authenticate MUST be the [encryption context](../framework/structures.md#encryption-context)
+in the [decryption materials](../framework/structures.md#decryption-materials)
+filtered to only contain key value pairs listed in
+the [decryption material's](../framework/structures.md#decryption-materials)
+[required encryption context keys](../framework/structures.md#required-encryption-context-keys-1)
+serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
 
 ## Security Considerations
 
