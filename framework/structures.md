@@ -426,7 +426,7 @@ Timestamp in ISO 8601 format in UTC, to microsecond precision, that the Material
 
 ##### Hierarchy Version
 
-Schema Version of the Branch Key.
+[Schema Version of the Branch Key](branch-key-store.md#hierarchy-version).
 
 ## Beacon Key Materials
 
@@ -492,4 +492,4 @@ Timestamp in ISO 8601 format in UTC, to microsecond precision, that the Material
 
 ##### Hierarchy Version
 
-Schema Version of the Branch Key.
+[Schema Version of the Branch Key](branch-key-store.md#hierarchy-version).
