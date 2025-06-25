@@ -371,6 +371,7 @@ To create a branch key, this operation MUST take the following:
 
 - `branchKeyId`: The identifier
 - `encryptionContext`: Additional encryption context to bind to the created keys
+- `hierarchy version`: Schema Version of the Branch Key.
 
 This operation needs to generate the following:
 
