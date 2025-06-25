@@ -388,7 +388,7 @@ To create a beacon key, this operation will continue to use the `branchKeyId` an
 
 If `hierarchy version` is 1, then the operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
 If `hierarchy version` is 2, then the operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
-The call to AWS KMS GenerateDataKeyWithoutPlaintext or GenerateDataKey MUST use the configured AWS KMS client to make the call.
+The call to AWS KMS GenerateDataKeyWithoutPlaintext and GenerateDataKey MUST use the configured AWS KMS client to make the call.
 The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext or GenerateDataKey with a request constructed as follows:
 
 - `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
@@ -396,16 +396,20 @@ The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext or GenerateDataK
 - `EncryptionContext` MUST be the [encryption context for beacon keys](#beacon-key-encryption-context).
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
-If the call to AWS KMS GenerateDataKeyWithoutPlaintext succeeds,
+When `hierarchy version` is 1 and the call to AWS KMS GenerateDataKeyWithoutPlaintext succeeds,
 the operation MUST use the `CiphertextBlob` as the wrapped Beacon Key.
+
+When `hierarchy version` is 2 and the call to AWS KMS GenerateDataKey succeeds,
+the operation MUST use the `Plaintext` as the Beacon Key. This `Plaintext` is wrapped along with branch key context following [Wrapped Plain Text Tuple Creation](#wrapped-Plain-text-tuple-creation).
 
 #### Wrapped Branch Key Creation
 
-Given a `branchKeyId`, `version` and `timestamp`
+Given a `branchKeyId`, `version`, `timestamp` and `hierarchy version`
 
-The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
-The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
-The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request constructed as follows:
+If `hierarchy version` is 1, the operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
+If `hierarchy version` is 2, then the operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
+The call to AWS KMS GenerateDataKeyWithoutPlaintext and GenerateDataKey MUST use the configured AWS KMS client to make the call.
+The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext and GenerateDataKey with a request constructed as follows:
 
 - `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
@@ -570,12 +574,12 @@ and the `branchKeyId` from the returned `branch-key-id` field.
 
 This operation MUST return the constructed [beacon key materials](./structures.md#beacon-key-materials).
 
-## Encryption Context
+## Branch Key Context
 
-This section describes how the AWS KMS encryption context is built
-from an [encrypted hierarchical key](./key-store/key-storage.md#encryptedhierarchicalkey).
+Branch Key Context is a key value pair that can contain additional contextual information about the data. 
+This section describes how Branch Key Context is built from an [encrypted hierarchical key](./key-store/key-storage.md#encryptedhierarchicalkey).
 
-The following encryption context keys are shared:
+The following branch key context keys are shared:
 
 - MUST have a `branch-key-id` attribute
 - The `branch-key-id` field MUST not be an empty string
@@ -587,42 +591,45 @@ The following encryption context keys are shared:
 - MUST have a `hierarchy-version`
 - MUST NOT have a `enc` attribute
 
-Any additionally attributes in the EncryptionContext
-of the [encrypted hierarchical key](./key-store/key-storage.md#encryptedhierarchicalkey)
-MUST be added to the encryption context.
-
-### ACTIVE Encryption Context
+### ACTIVE Branch Key Context
 
 The ACTIVE branch key is a copy of the DECRYPT_ONLY with the same `version`.
 It is structured slightly differently so that the active version can be accessed quickly.
 
-In addition to the [encryption context](#encryption-context):
+In addition to the [branch key context](#encryption-context):
 
-The ACTIVE encryption context value of the `type` attribute MUST equal to `"branch:ACTIVE"`.
-The ACTIVE encryption context MUST have a `version` attribute.
+The ACTIVE branch key context value of the `type` attribute MUST equal to `"branch:ACTIVE"`.
+The ACTIVE branch key context MUST have a `version` attribute.
 The `version` attribute MUST store the branch key version formatted like `"branch:version:"` + `version`.
 
-### DECRYPT_ONLY Encryption Context
+### DECRYPT_ONLY Branch Key Context
 
-In addition to the [encryption context](#encryption-context):
+In addition to the [branch key context](#encryption-context):
 
-The DECRYPT_ONLY encryption context MUST NOT have a `version` attribute.
+The DECRYPT_ONLY branch key context MUST NOT have a `version` attribute.
 The `type` attribute MUST stores the branch key version formatted like `"branch:version:"` + `version`.
 
-### Beacon Key Encryption Context
+### Beacon Key Branch Key Context
 
-In addition to the [encryption context](#encryption-context):
+In addition to the [branch key context](#encryption-context):
 
-The Beacon key encryption context value of the `type` attribute MUST equal to `"beacon:ACTIVE"`.
-The Beacon key encryption context MUST NOT have a `version` attribute.
+The Beacon key branch key context value of the `type` attribute MUST equal to `"beacon:ACTIVE"`.
+The Beacon key branch key context MUST NOT have a `version` attribute.
 
-### Custom Encryption Context
+### Custom Branch Key Context
 
-If custom [encryption context](./structures.md#encryption-context-3)
-is associated with the branch key these values MUST be added to the AWS KMS encryption context.
-To avoid name collisions each added attribute from the custom [encryption context](./structures.md#encryption-context-3)
+If custom [branch key context](./structures.md#encryption-context-3)
+is associated with the branch key these values MUST be added to the AWS KMS branch key context.
+To avoid name collisions each added attribute from the custom [branch key context](./structures.md#encryption-context-3)
 MUST be prefixed with `aws-crypto-ec:`.
-Across all versions of a Branch Key, the custom encryption context MUST be equal.
+Across all versions of a Branch Key, the custom branch key context MUST be equal.
+
+## Encryption Context
+
+This section describes how the AWS KMS encryption context is built.
+
+If the `hierarchy-version` is 1, AWS KMS encryption context MUST be same as [branch key context](#branch-key-context).
+If the `hierarchy-version` is 2, AWS KMS encryption context MUST be the [encryption context](../structures.md#encryption-context) send by users without any transformation.
 
 ## AWS KMS Branch Key Decryption
 
