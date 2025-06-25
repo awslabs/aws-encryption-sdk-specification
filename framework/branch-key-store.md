@@ -337,6 +337,7 @@ The CreateKey caller MUST provide:
 
 - An optional branch key id
 - An optional encryption context
+- An optional hierarchy version
 
 If an optional branch key id is provided
 and no encryption context is provided this operation MUST fail.
@@ -347,6 +348,9 @@ this operation MUST fail.
 If no branch key id is provided,
 then this operation MUST create a [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
 to be used as the branch key id.
+
+If no hierarchy version is provided,
+then hierarchy version MUST default to 1
 
 This operation MUST create a [branch key](structures.md#branch-key) and a [beacon key](structures.md#beacon-key) according to
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
