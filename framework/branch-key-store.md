@@ -350,7 +350,10 @@ then this operation MUST create a [version 4 UUID](https://www.ietf.org/rfc/rfc4
 to be used as the branch key id.
 
 If no hierarchy version is provided,
-then hierarchy version MUST default to 1
+then hierarchy version MUST default to 1.
+
+If a hierarchy version is provided,
+and is other then `1` or `2` then this operation MUST fail.
 
 This operation MUST create a [branch key](structures.md#branch-key) and a [beacon key](structures.md#beacon-key) according to
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
@@ -383,9 +386,10 @@ The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [
 
 To create a beacon key, this operation will continue to use the `branchKeyId` and `timestamp` as the [Branch Key](structures.md#branch-key).
 
-The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
-The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
-The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request constructed as follows:
+If `hierarchy version` is 1, then the operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
+If `hierarchy version` is 2, then the operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
+The call to AWS KMS GenerateDataKeyWithoutPlaintext or GenerateDataKey MUST use the configured AWS KMS client to make the call.
+The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext or GenerateDataKey with a request constructed as follows:
 
 - `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
