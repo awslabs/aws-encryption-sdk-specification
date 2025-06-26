@@ -362,7 +362,7 @@ have the following requirements:
 
 | Field                      | Length (bytes)                                     | Interpreted as |
 | -------------------------- | -------------------------------------------------- | -------------- |
-| Wrapped Plaintext Data Key | The algorithm suite's encryption key length + 12   | Bytes          |
+| Wrapped Plaintext Data Key | The algorithm suite's encryption key length + 16   | Bytes          |
 | Wrapped Intermediate Key   | Determined by the keyring responsible for wrapping | Bytes          |
 
 ##### Wrapped Plaintext Data Key
