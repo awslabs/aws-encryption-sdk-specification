@@ -636,7 +636,7 @@ even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly 
 If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
 The values on the AWS DDB response item
-MUST be authenticated according to [authenticating a keystore item](#authenticating-a-keystore-item).
+MUST be authenticated according to [authenticating a keystore item for item with hierarchy version v1](#authenticating-a-keystore-item-for-item-with-hierarchy-version-v1) or [authenticating a keystore item for item with hierarchy version v2](#authenticating-a-keystore-item-for-item-with-hierarchy-version-v2) based on schema version of the item.
 If the item fails to authenticate this operation MUST fail.
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
