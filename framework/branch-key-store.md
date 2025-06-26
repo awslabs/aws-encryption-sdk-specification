@@ -423,14 +423,11 @@ the operation MUST use the `CiphertextBlob` as the wrapped Beacon Key.
 ##### Wrapped Beacon Key Creation `v2`
 
 The operation MUST generate a Map of strings,
-the [encryption context for beacon keys](#beacon-key-encryption-context),
-using the `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
+the [branch key context for beacon keys](#beacon-key-branch-key-context).
 
 The operation MUST calculate the **SHA-384 Digest for the beacon key**
 by [serializing](../structures.md#serialization) the [branch key context for beacon keys](#beacon-key-branch-key-context);
 the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
-
-**Note**: The Encryption Context sent to KMS is NOT prefixed, but the Encryption Context included in the Digest is.
 
 The operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
 The call to AWS KMS GenerateDataKey MUST use the configured AWS KMS client to make the call.
@@ -505,22 +502,19 @@ as the wrapped ACTIVE Branch Key.
 ##### Wrapped Branch Key Creation `v2`
 
 The operation MUST generate a Map of strings,
-the [`DECRYPT_ONLY` encryption context for branch keys](#decrypt_only-encryption-context),
+the [`DECRYPT_ONLY` branch key context for branch keys](#decrypt_only-branch-key-context),
 using the `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
 
 The operation MUST calculate the **SHA-384 Digest for the `DECRYPT_ONLY`**
-by [serializing](../structures.md#serialization) the [`DECRYPT_ONLY` encryption context for branch keys](#decrypt_only-encryption-context);
+by [serializing](../structures.md#serialization) the [`DECRYPT_ONLY` branch key context for branch keys](#decrypt_only-branch-key-context);
 the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
 
 The operation MUST generate a Map of strings,
-the [ACTIVE encryption context for branch keys](#active-encryption-context)
-using the `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
+the [ACTIVE branch key context for branch keys](#active-branch-key-context).
 
 The operation MUST calculate the **SHA-384 Digest for the `ACTIVE`**
 by [serializing](../structures.md#serialization) the [`ACTIVE` encryption context for branch keys](#active-encryption-context);
 the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
-
-**Note**: The Encryption Context sent to KMS is NOT prefixed, but the Encryption Context included in the Digest is.
 
 The operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
 The call to AWS KMS GenerateDataKey MUST use the configured AWS KMS client to make the call.
@@ -571,8 +565,6 @@ as the wrapped `ACTIVE` Branch Key.
 
 To add the branch keys and a beacon key to the keystore the
 operation MUST call [Amazon DynamoDB API TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
-
-**Note**: The Encryption Context sent to KMS is NOT prefixed, but the Encryption Context written to DynaomDB is.
 
 The call to Amazon DynamoDB TransactWriteItems MUST use the configured Amazon DynamoDB Client to make the call.
 The operation MUST call Amazon DynamoDB TransactWriteItems with a request constructed as follows:
@@ -689,18 +681,14 @@ On invocation, the caller:
 
 - MUST supply a `branch-key-id`
 
-GetActiveBranchKey MUST get the active version for the branch key id from the keystore
-by calling the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
-[GetEncryptedActiveBranchKey](./key-store/key-storage.md#getencryptedactivebranchkey)
-using the supplied `branch-key-id`.
+To get the active version for the branch key id from the keystore
+this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
 
-Because the storage interface can be a custom implementation the key store needs to verify correctness.
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
 
-GetActiveBranchKey MUST verify that the returned EncryptedHierarchicalKey MUST have the requested `branch-key-id`.
-GetActiveBranchKey MUST verify that the returned EncryptedHierarchicalKey is an ActiveHierarchicalSymmetricVersion.
-GetActiveBranchKey MUST verify that the returned EncryptedHierarchicalKey MUST have a logical table name equal to the configured logical table name.
-
-The operation MUST decrypt the EncryptedHierarchicalKey according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
+The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
 If the branch key fails to decrypt, GetActiveBranchKey MUST fail.
 
@@ -711,22 +699,14 @@ This operation MUST return the constructed [branch key materials](./structures.m
 
 ### GetBranchKeyVersion
 
-On invocation, the caller:
-
 - MUST supply a `branch-key-id`
 - MUST supply a `branchKeyVersion`
 
-GetBranchKeyVersion MUST get the requested version for the branch key id from the keystore
-by calling the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
-[GetEncryptedActiveBranchKey](./key-store/key-storage.md#getencryptedbranchkeyversion)
-using the supplied `branch-key-id`.
+To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and "branch:version:" + `branchKeyVersion` value as the Sort Key.
 
-Because the storage interface can be a custom implementation the key store needs to verify correctness.
-
-GetBranchKeyVersion MUST verify that the returned EncryptedHierarchicalKey MUST have the requested `branch-key-id`.
-GetBranchKeyVersion MUST verify that the returned EncryptedHierarchicalKey MUST have the requested `branchKeyVersion`.
-GetActiveBranchKey MUST verify that the returned EncryptedHierarchicalKey is an HierarchicalSymmetricVersion.
-GetBranchKeyVersion MUST verify that the returned EncryptedHierarchicalKey MUST have a logical table name equal to the configured logical table name.
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
 
 The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
@@ -743,16 +723,11 @@ On invocation, the caller:
 
 - MUST supply a `branch-key-id`
 
-GetBeaconKey MUST get the requested beacon key from the keystore
-by calling the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
-[GetEncryptedBeaconKey](./key-store/key-storage.md#getencryptedbeaconkey)
-using the supplied `branch-key-id`.
+To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and "beacon:ACTIVE" value as the Sort Key.
 
-Because the storage interface can be a custom implementation the key store needs to verify correctness.
-
-GetBeaconKey MUST verify that the returned EncryptedHierarchicalKey MUST have the requested `branch-key-id`.
-GetBeaconKey MUST verify that the returned EncryptedHierarchicalKey is an ActiveHierarchicalSymmetricBeacon.
-GetBeaconKey MUST verify that the returned EncryptedHierarchicalKey MUST have a logical table name equal to the configured logical table name.
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
 
 The operation MUST decrypt the beacon key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
@@ -817,26 +792,26 @@ Across all versions of a Branch Key, the custom branch key context MUST be equal
 
 This section describes how the AWS KMS encryption context is built.
 
-If the `hierarchy-version` is 1, AWS KMS encryption context MUST be same as [branch key context](#branch-key-context).
-If the `hierarchy-version` is 2, AWS KMS encryption context MUST be the [encryption context](../structures.md#encryption-context) send by users without any transformation.
+If the `hierarchy-version` is v1, AWS KMS encryption context MUST be same as [branch key context](#branch-key-context).
+If the `hierarchy-version` is v2, AWS KMS encryption context MUST be the [encryption context](../structures.md#encryption-context) send by users without any transformation.
 
 AWS KMS encryption context MUST be always the same encryption context send by user regardless of any variation of encryption context (i.e.: ACTIVE Encryption Context, DECRYPT_ONLY Encryption Context, Beacon Key Encryption Context and Custom Encryption Context).
 
 ### ACTIVE Encryption Context
 
-ACTIVE Encryption Context is same as [ACTIVE Branch Key Context](#active-branch-key-context)
+If the `hierarchy-version` is v1, ACTIVE Encryption Context is same as [ACTIVE Branch Key Context](#active-branch-key-context)
 
 ### DECRYPT_ONLY Encryption Context
 
-DECRYPT_ONLY Encryption Context is same as [DECRYPT_ONLY Branch Key Context](#decrypt_only-branch-key-context)
+If the `hierarchy-version` is v1, DECRYPT_ONLY Encryption Context is same as [DECRYPT_ONLY Branch Key Context](#decrypt_only-branch-key-context)
 
 ### Beacon Key Encryption Context
 
-Beacon Encryption Context is same as [Beacon Key Branch Key Context](#beacon-key-branch-key-context)
+If the `hierarchy-version` is v1, Beacon Encryption Context is same as [Beacon Key Branch Key Context](#beacon-key-branch-key-context)
 
 ### Custom Encryption Context
 
-Custom Encryption Context is same as [Beacon Key Branch Key Context](#custom-branch-key-context)
+If the `hierarchy-version` is v1, Custom Encryption Context is same as [Beacon Key Branch Key Context](#custom-branch-key-context)
 
 ## AWS KMS Branch Key Decryption
 
