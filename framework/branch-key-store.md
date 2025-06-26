@@ -439,7 +439,7 @@ The operation MUST call AWS KMS GenerateDataKey with a request constructed as fo
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If the call to AWS KMS GenerateDataKey succeeds,
-the operation MUST use the `Plaintext` from GenerateDataKey result 
+the operation MUST use the `Plaintext` from GenerateDataKey result
 as the plain-text Beacon Key.
 
 The operation MUST concatenate the **SHA-384 Digest for the beacon key**
@@ -525,7 +525,7 @@ The operation MUST call AWS KMS GenerateDataKey with a request constructed as fo
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If the call to AWS KMS GenerateDataKey succeeds,
-the operation MUST use the `Plaintext` from GenerateDataKey result 
+the operation MUST use the `Plaintext` from GenerateDataKey result
 as the plain-text Branch Key.
 
 The operation MUST concatenate the **SHA-384 Digest for the `DECRYPT_ONLY`**
@@ -782,7 +782,7 @@ This operation MUST return the constructed [beacon key materials](./structures.m
 
 ## Branch Key Context
 
-Branch Key Context is a key value pair that can contain additional contextual information about the data. 
+Branch Key Context is a key value pair that can contain additional contextual information about the data.
 This section describes how Branch Key Context is built from an [encrypted hierarchical key](./key-store/key-storage.md#encryptedhierarchicalkey).
 
 The following branch key context keys are shared:
@@ -878,10 +878,10 @@ the keystore operation MUST call with a request constructed as follows:
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 Every attribute except for `enc` on the AWS DDB response item
-MUST be authenticated in the decryption of `enc`. 
-In Hierarchy Version `v1`, when AWS KMS Decrypt succeeds this attribute gets 
-authenticated by KMS as they are included in the AWS KMS encryption context. 
-For authentication of these attributes in Hierarchy Version `v2`, 
+MUST be authenticated in the decryption of `enc`.
+In Hierarchy Version `v1`, when AWS KMS Decrypt succeeds this attribute gets
+authenticated by KMS as they are included in the AWS KMS encryption context.
+For authentication of these attributes in Hierarchy Version `v2`,
 the operation MUST match the first 48 bytes of `Plaintext` returned by AWS KMS Decrypt operation with SHA-384 Digest for the beacon key of serialization of the [branch key context](#branch-key-context).
 
 ## Record Format
