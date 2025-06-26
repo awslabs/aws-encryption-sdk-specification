@@ -625,55 +625,113 @@ If the Keystore's KMS Configuration is `Discovery` or `MRDiscovery`,
 this operation MUST immediately fail.
 
 VersionKey MUST first get the active version for the branch key from the keystore
-by calling the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
-[GetEncryptedActiveBranchKey](./key-store/key-storage.md##getencryptedactivebranchkey)
-using the `branch-key-id`.
+by calling AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
 
-The `KmsArn` of the [EncryptedHierarchicalKey](./key-store/key-storage.md##encryptedhierarchicalkey)
-MUST be [compatible with](#aws-key-arn-compatibility)
+The `kms-arn` field of DDB response item MUST be [compatible with](#aws-key-arn-compatibility)
 the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 
-Because the storage interface can be a custom implementation the key store needs to verify correctness.
-
-VersionKey MUST verify that the returned EncryptedHierarchicalKey MUST have the requested `branch-key-id`.
-VersionKey MUST verify that the returned EncryptedHierarchicalKey is an ActiveHierarchicalSymmetricVersion.
-VersionKey MUST verify that the returned EncryptedHierarchicalKey MUST have a logical table name equal to the configured logical table name.
-
-The `kms-arn` stored in the table MUST NOT change as a result of this operation,
+The `kms-arn` stored in the DDB table MUST NOT change as a result of this operation,
 even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly match the stored ARN.
 If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
-The [EncryptedHierarchicalKey](./key-store/key-storage.md##encryptedhierarchicalkey)
-MUST be authenticated according to [authenticating a keystore item](#authenticating-an-encryptedhierarchicalkey).
+The values on the AWS DDB response item
+MUST be authenticated according to [authenticating a keystore item](#authenticating-a-keystore-item).
 If the item fails to authenticate this operation MUST fail.
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
 
-If creation of the keys are successful,
-then the key store MUST call the configured [KeyStorage interface's](./key-store/key-storage.md#interface)
-[WriteNewEncryptedBranchKeyVersion](./key-store/key-storage.md#writenewencryptedbranchkeyversion)
-with an [OverWriteEncryptedHierarchicalKey](./key-store/key-storage.md#overwriteencryptedhierarchicalkey)
-with an `Item` that is the new ACTIVE
-and an `Old` that is the original ACTIVE,
-along with DECRYPT_ONLY.
+To add the new branch key to the keystore,
+the operation MUST call [Amazon DynamoDB API TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
+The call to Amazon DynamoDB TransactWriteItems MUST use the configured Amazon DynamoDB Client to make the call.
+The operation MUST call Amazon DynamoDB TransactWriteItems with a request constructed as follows:
 
-If the [WriteNewEncryptedBranchKeyVersion](./key-store/key-storage.md##writenewencryptedbranchkeyversion) is successful,
-this operation MUST return a successful response containing no additional data.
+List of TransactWriteItem:
+
+- PUT:
+  - Item:
+    - “branch-key-id” (S): `branchKeyId`,
+    - “type“ (S): "branch:version:" + `version`,
+    - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
+    - “create-time” (S): `timestamp`
+    - "kms-arn" (S): configured KMS Key
+    - “hierarchy-version” (N): 1
+    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+  - ConditionExpression: `attribute_not_exists(branch-key-id)`
+  - TableName: the configured Table Name
+- PUT:
+  - Item:
+    - “branch-key-id” (S): `branchKeyId`,
+    - “type“ (S): "branch:ACTIVE",
+    - “enc” (B): wrapped ACTIVE Branch Key `CiphertextBlob` from the KMS operation
+    - “create-time” (S): `timestamp`
+    - "kms-arn" (S): configured KMS Key
+    - “hierarchy-version” (N): 1
+    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+  - ConditionExpression: `attribute_exists(branch-key-id) AND enc = :encOld`
+  - ExpressionAttributeValues: `{":encOld" := DDB.AttributeValue.B(oldCiphertextBlob)}`
+  - TableName: the configured Table Name
+
+TransactWriteItemRequest:
+
+- TransactWriteItems: List of TransactWriteItem
+
+If DDB TransactWriteItems is successful, this operation MUST return a successful response containing no additional data.
 Otherwise, this operation MUST yield an error.
 
-#### Authenticating an EncryptedHierarchicalKey
+The condition expression for the Active Input ensures
+the Active Item in storage has not changed since it was read.
+This prevents overwrites due to a race in updating the Active Item.
+
+#### Authenticating a Keystore item for item with `hierarchy-version` v1
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
+
+Every attribute on the AWS DDB response item will be authenticated.
+
+Every key in the constructed [encryption context](#encryption-context)
+except `tableName`
+MUST exist as a string attribute in the AWS DDB response item.
+Every value in the constructed [encryption context](#encryption-context)
+except the logical table name
+MUST equal the value with the same key in the AWS DDB response item.
+The key `enc` MUST NOT exist in the constructed [encryption context](#encryption-context).
 
 The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
 with a request constructed as follows:
 
-- `SourceEncryptionContext` MUST be the [encryption context](#encryption-context) of the EncryptedHierarchicalKey to be authenticated
+- `SourceEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 - `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
-- `CiphertextBlob` MUST be the `CiphertextBlob` attribute value on the EncryptedHierarchicalKey to be authenticated
+- `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
 - `GrantTokens` MUST be the configured [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 - `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
-- `DestinationEncryptionContext` MUST be the [encryption context](#encryption-context) of the EncryptedHierarchicalKey to be authenticated
+- `DestinationEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
+
+#### Authenticating a Keystore item for item with `hierarchy-version` v2
+
+The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
+
+Every attribute on the AWS DDB response item will be authenticated.
+
+Every key in the constructed [branch key context](#branch-key-context)
+except `tableName`
+MUST exist as a string attribute in the AWS DDB response item.
+Every value in the constructed [branch key context](#branch-key-context)
+except the logical table name
+MUST equal the value with the same key in the AWS DDB response item.
+The key `enc` MUST NOT exist in the constructed [branch key context](#branch-key-context).
+
+The operation MUST call [AWS KMS API Decrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
+with a request constructed as follows:
+
+- `SourceEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
+- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
+- `GrantTokens` MUST be the configured [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
+- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `DestinationEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 
 ### GetActiveBranchKey
 
