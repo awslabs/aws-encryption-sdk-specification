@@ -476,7 +476,7 @@ The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://do
 The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
 The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request constructed as follows:
 
-- `KeyId` MUST be the `kms-arn`
+- `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
 - `EncryptionContext` MUST be the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context).
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
@@ -635,7 +635,7 @@ even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly 
 If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
 The values on the AWS DDB response item
-MUST be authenticated according to [authenticating a keystore item for item with hierarchy version v1](#authenticating-a-keystore-item-for-item-with-hierarchy-version-v1) or [authenticating a keystore item for item with hierarchy version v2](#authenticating-a-keystore-item-for-item-with-hierarchy-version-v2) based on schema version of the branch key item.
+MUST be authenticated according to [authenticating a keystore item for item with hierarchy version v1](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v1) or [authenticating a keystore item for item with hierarchy version v2](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v2) based on schema version of the branch key item.
 If the item fails to authenticate this operation MUST fail.
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
@@ -684,11 +684,11 @@ The condition expression for the Active Input ensures
 the Active Item in storage has not changed since it was read.
 This prevents overwrites due to a race in updating the Active Item.
 
-#### Authenticating a Keystore item for item with `hierarchy-version` v1
+#### Authenticating a Branch Keystore item for item with `hierarchy-version` v1
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
-Every attribute on the AWS DDB response item will be authenticated.
+Every attribute on the AWS DDB response item except `enc` attribute MUST be authenticated.
 
 Every key in the constructed [encryption context](#encryption-context)
 except `tableName`
@@ -708,7 +708,7 @@ with a request constructed as follows:
 - `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `DestinationEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 
-#### Authenticating a Keystore item for item with `hierarchy-version` v2
+#### Authenticating a Branch Keystore item for item with `hierarchy-version` v2
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
