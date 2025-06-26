@@ -156,20 +156,63 @@ If the record does not contain the defined fields, this operation MUST fail.
 A branch key record MUST include the following key-value pairs:
 
 1. `branch-key-id` : Unique identifier for a branch key; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-1. `type` : One of the following; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+2. `type` : One of the following; represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
    - The string literal `"beacon:ACTIVE"`. Then `enc` is the wrapped beacon key.
    - The string `"branch:version:"` + `version`, where `version` is the Branch Key Version. Then `enc` is the wrapped branch key.
    - The string literal `"branch:ACTIVE"`. Then `enc` is the wrapped beacon key of the active version. Then
-1. `version` : Only exists if `type` is the string literal `"branch:ACTIVE"`.
+3. `version` : Only exists if `type` is the string literal `"branch:ACTIVE"`.
    Then it is the Branch Key Version. represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-1. `enc` : Encrypted version of the key;
+4. `enc` : Encrypted version of the key;
    represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-1. `kms-arn`: The AWS KMS Key ARN used to generate the `enc` value.
+5. `kms-arn`: The AWS KMS Key ARN used to generate the `enc` value.
    represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-1. `create-time`: Timestamp in ISO 8601 format in UTC, to microsecond precision.
+6. `create-time`: Timestamp in ISO 8601 format in UTC, to microsecond precision.
    Represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
-1. `hierarchy-version`: Version of the hierarchical keyring;
+7. `hierarchy-version`: Version of the hierarchical keyring;
    represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 
 A branch key record MAY include [custom encryption context](../branch-key-store.md#custom-encryption-context) key-value pairs.
 These attributes should be prefixed with `aws-crypto-ec:` the same way they are for [AWS KMS encryption context](../branch-key-store.md#encryption-context).
+
+## Mutation Commitment DDB Item Format
+
+A Mutation Commitment DDB Item MUST include ONLY the following key-value pairs:
+
+1. `branch-key-id` : Unique identifier for a branch key;
+   represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+2. `type` : the constant `branch:MUTATION_COMMITMENT`
+   represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+3. `create-time` : Timestamp in ISO 8601 format in UTC, to microsecond precision
+   represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+4. `hierarchy-version` : Version of the hierarchical keyring;
+   represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+5. `input` : A Description of the input to initialize a Mutation;
+   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+6. `original` : A commitment of the original mutable properties of the Branch Key;
+   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+7. `terminal` : A commitment of the terminal mutable properties of the Branch Key;
+   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+8. `uuid` : A unique identifier for the Mutation
+   represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+9. `enc` : `enc` : The output of the Key Store Admin's System Key,
+   which MAY protect the record (depending on the System Key configuration);
+   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+
+## Mutation Index DDB Item Format
+
+A Mutation Index DDB Item MUST include ONLY the following key-value pairs:
+
+1. `branch-key-id` : Unique identifier for a branch key;
+   represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+2. `type` : the constant `branch:MUTATION_INDEX`
+   represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+3. `create-time` : Timestamp in ISO 8601 format in UTC, to microsecond precision
+   represented as [AWS DDB String](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+4. `hierarchy-version` : Version of the hierarchical keyring;
+   represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+5. `pageIndex` : The `type` of the latest Branch Key Item modified,
+   encoded by the Key Store Admin into a binary;
+   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
+6. `enc` : The output of the Key Store Admin's System Key,
+   which MAY protect the record (depending on the System Key configuration);
+   represented as [AWS DDB Binary](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
