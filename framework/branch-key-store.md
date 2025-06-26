@@ -713,25 +713,10 @@ with a request constructed as follows:
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
-Every attribute on the AWS DDB response item will be authenticated.
+Every attribute on the AWS DDB response item expect `enc` MUST be authenticated.
+From the AWS DDB response item, the operation MUST create a [branch key context](#branch-key-context) and [encryption context](#encryption-context).
 
-Every key in the constructed [branch key context](#branch-key-context)
-except `tableName`
-MUST exist as a string attribute in the AWS DDB response item.
-Every value in the constructed [branch key context](#branch-key-context)
-except the logical table name
-MUST equal the value with the same key in the AWS DDB response item.
-The key `enc` MUST NOT exist in the constructed [branch key context](#branch-key-context).
-
-The operation MUST call [AWS KMS API Decrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
-with a request constructed as follows:
-
-- `SourceEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
-- `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
-- `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
-- `GrantTokens` MUST be the configured [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
-- `DestinationEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
+The operation MUST call [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) to decrypt and authentication the branch key context.
 
 ### GetActiveBranchKey
 
