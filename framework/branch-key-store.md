@@ -715,7 +715,7 @@ The operation MUST use the configured `KMS SDK Client` to authenticate the value
 Every attribute on the AWS DDB response item expect `enc` MUST be authenticated.
 From the AWS DDB response item, the operation MUST create a [branch key context](#branch-key-context) and [encryption context](#encryption-context).
 
-The operation MUST call [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) to decrypt and authentication the branch key context.
+The operation MUST follow [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) to decrypt and authentication the branch key context.
 
 ### GetActiveBranchKey
 
