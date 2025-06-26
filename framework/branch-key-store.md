@@ -845,11 +845,11 @@ If the `hierarchy-version` is v1, Beacon Encryption Context is same as [Beacon K
 
 ### Custom Encryption Context
 
-If custom [encrpytion context](./structures.md#encryption-context)
-is associated with the branch key these values MUST be added to the AWS KMS encrpytion context.
-To avoid name collisions each added attribute from the custom [encrpytion context](./structures.md#encryption-context-3)
+If custom [encryption context](./structures.md#encryption-context)
+is associated with the branch key these values MUST be added to the AWS KMS encryption context.
+To avoid name collisions each added attribute from the custom [encryption context](./structures.md#encryption-context-3)
 MUST be prefixed with `aws-crypto-ec:`.
-Across all versions of a Branch Key, the custom encrpytion context MUST be equal.
+Across all versions of a Branch Key, the custom encryption context MUST be equal.
 
 ## AWS KMS Branch Key Decryption
 
