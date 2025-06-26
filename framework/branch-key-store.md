@@ -780,45 +780,47 @@ The following branch key context keys are shared:
 - MUST have a `hierarchy-version`
 - MUST NOT have a `enc` attribute
 
-### ACTIVE Branch Key Context
-
-The ACTIVE branch key is a copy of the DECRYPT_ONLY with the same `version`.
-It is structured slightly differently so that the active version can be accessed quickly.
-
-In addition to the [branch key context](#encryption-context):
-
-The ACTIVE branch key context value of the `type` attribute MUST equal to `"branch:ACTIVE"`.
-The ACTIVE branch key context MUST have a `version` attribute.
-The `version` attribute MUST store the branch key version formatted like `"branch:version:"` + `version`.
-
-### DECRYPT_ONLY Branch Key Context
-
-In addition to the [branch key context](#encryption-context):
-
-The DECRYPT_ONLY branch key context MUST NOT have a `version` attribute.
-The `type` attribute MUST stores the branch key version formatted like `"branch:version:"` + `version`.
-
-### Beacon Key Branch Key Context
-
-In addition to the [branch key context](#encryption-context):
-
-The Beacon key branch key context value of the `type` attribute MUST equal to `"beacon:ACTIVE"`.
-The Beacon key branch key context MUST NOT have a `version` attribute.
-
-### Custom Branch Key Context
-
-If custom [branch key context](./structures.md#encryption-context-3)
-is associated with the branch key these values MUST be added to the AWS KMS branch key context.
-To avoid name collisions each added attribute from the custom [branch key context](./structures.md#encryption-context-3)
-MUST be prefixed with `aws-crypto-ec:`.
-Across all versions of a Branch Key, the custom branch key context MUST be equal.
-
 ## Encryption Context
 
 This section describes how the AWS KMS encryption context is built.
 
 If the `hierarchy-version` is 1, AWS KMS encryption context MUST be same as [branch key context](#branch-key-context).
 If the `hierarchy-version` is 2, AWS KMS encryption context MUST be the [encryption context](../structures.md#encryption-context) send by users without any transformation.
+
+AWS KMS encryption context MUST be always the same encryption context send by user regardless of any variation of encryption context (i.e.: ACTIVE Encryption Context, DECRYPT_ONLY Encryption Context, Beacon Key Encryption Context and Custom Encryption Context).
+
+### ACTIVE Encryption Context
+
+The ACTIVE encryption context is a copy of the DECRYPT_ONLY with the same `version`.
+It is structured slightly differently so that the active version can be accessed quickly.
+
+In addition to the [encryption context](#encryption-context):
+
+The ACTIVE encryption context value of the `type` attribute MUST equal to `"branch:ACTIVE"`.
+The ACTIVE encryption context MUST have a `version` attribute.
+The `version` attribute MUST store the branch key version formatted like `"branch:version:"` + `version`.
+
+### DECRYPT_ONLY Encryption Context
+
+In addition to the [encryption context](#encryption-context):
+
+The DECRYPT_ONLY encryption context MUST NOT have a `version` attribute.
+The `type` attribute MUST stores the branch key version formatted like `"branch:version:"` + `version`.
+
+### Beacon Key Encryption Context
+
+In addition to the [encryption context](#encryption-context):
+
+The Beacon key encryption context value of the `type` attribute MUST equal to `"beacon:ACTIVE"`.
+The Beacon key encryption context MUST NOT have a `version` attribute.
+
+### Custom Encryption Context
+
+If custom [branch key context](./structures.md#encryption-context-3)
+is associated with the branch key these values MUST be added to the AWS KMS branch key context.
+To avoid name collisions each added attribute from the custom [branch key context](./structures.md#encryption-context-3)
+MUST be prefixed with `aws-crypto-ec:`.
+Across all versions of a Branch Key, the custom branch key context MUST be equal.
 
 ## AWS KMS Branch Key Decryption
 
