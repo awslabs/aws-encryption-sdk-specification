@@ -39,7 +39,7 @@
 A Keystore persists hierarchical data that allows customers to call AWS KMS less often.
 The Keystore persists branch keys that wrap multiple data keys.
 This creates a hierarchy where a branch key wraps multiple data keys and facilitates caching.
-These branch keys are only generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
+These branch keys are only generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) in Hierarchy Version `v1` or [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html) in Hierarchy Version `v2`.
 
 By creating and persisting a data key to an accessible medium,
 such as a DynamoDb table,
@@ -361,7 +361,7 @@ then this operation MUST create a [version 4 UUID](https://www.ietf.org/rfc/rfc4
 to be used as the branch key id.
 
 If no Hierarchy-Version is provided,
-the then this operation MUST use `v1`.
+then this operation MUST use `v1`.
 
 This operation needs to generate the following:
 
@@ -402,7 +402,7 @@ the wrapped branch keys MUST be created according to
 else the `hierarchy-version` MUST be `v2`,
 the wrapped beacon Key MUST be created according to [Wrapped Beacon Key Creation `v2`](#wrapped-beacon-key-creation-v2) and
 the wrapped branch keys MUST be created according to
-[Wrapped Branch Key Creation `v2`](#wrapped-branch-key-creation-v2),.
+[Wrapped Branch Key Creation `v2`](#wrapped-branch-key-creation-v2).
 
 ##### Wrapped Beacon Key Creation `v1`
 
@@ -422,7 +422,7 @@ the operation MUST use the `CiphertextBlob` as the wrapped Beacon Key.
 
 ##### Wrapped Beacon Key Creation `v2`
 
-The operation MUST generate a Map of strings,
+The operation MUST create a map of strings,
 the [branch key context for beacon keys](#beacon-key-branch-key-context).
 
 The operation MUST calculate the **SHA-384 Digest for the beacon key**
@@ -439,17 +439,17 @@ The operation MUST call AWS KMS GenerateDataKey with a request constructed as fo
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If the call to AWS KMS GenerateDataKey succeeds,
-the operation MUST use the GenerateDataKey results `PlaintextBlob`
+the operation MUST use the `Plaintext` from GenerateDataKey result 
 as the plain-text Beacon Key.
 
 The operation MUST concatenate the **SHA-384 Digest for the beacon key**
 with the plain-text Beacon Key,
-creating the **the beacon plain-text tuple**.
+creating the **beacon plain-text tuple**.
 
 The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html)
 with a request constructed as follows:
 
-- `Plaintext` **SHA-384 Digest for the beacon key**
+- `Plaintext` **beacon plain-text tuple**
 - `KeyId` MUST be the `kms-arn`.
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 - `EncryptionContext` MUST be the `encryption-context`
@@ -464,11 +464,11 @@ Given a `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, 
 
 ##### Wrapped Branch Key Creation `v1`
 
-The operation MUST generate a Map of strings,
+The operation MUST generate a map of strings,
 the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context),
 using the `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
 
-The operation MUST generate a Map of strings,
+The operation MUST generate a map of strings,
 the [ACTIVE encryption context for branch keys](#active-encryption-context)
 using the `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
 
@@ -501,15 +501,14 @@ as the wrapped ACTIVE Branch Key.
 
 ##### Wrapped Branch Key Creation `v2`
 
-The operation MUST generate a Map of strings,
-the [`DECRYPT_ONLY` branch key context for branch keys](#decrypt_only-branch-key-context),
-using the `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
+The operation MUST generate a map of strings,
+the [`DECRYPT_ONLY` branch key context for branch keys](#decrypt_only-branch-key-context).
 
 The operation MUST calculate the **SHA-384 Digest for the `DECRYPT_ONLY`**
 by [serializing](../structures.md#serialization) the [`DECRYPT_ONLY` branch key context for branch keys](#decrypt_only-branch-key-context);
 the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
 
-The operation MUST generate a Map of strings,
+The operation MUST generate a map of strings,
 the [ACTIVE branch key context for branch keys](#active-branch-key-context).
 
 The operation MUST calculate the **SHA-384 Digest for the `ACTIVE`**
@@ -518,7 +517,7 @@ the serialization MUST be done according to the [encryption context serializatio
 
 The operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
 The call to AWS KMS GenerateDataKey MUST use the configured AWS KMS client to make the call.
-The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request constructed as follows:
+The operation MUST call AWS KMS GenerateDataKey with a request constructed as follows:
 
 - `KeyId` MUST be the `kms-arn`
 - `NumberOfBytes` MUST be 32.
@@ -526,12 +525,12 @@ The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request c
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If the call to AWS KMS GenerateDataKey succeeds,
-the operation MUST use the GenerateDataKey results `PlaintextBlob`
+the operation MUST use the `Plaintext` from GenerateDataKey result 
 as the plain-text Branch Key.
 
 The operation MUST concatenate the **SHA-384 Digest for the `DECRYPT_ONLY`**
 with the plain-text Branch Key,
-creating the **the `DECRYPT_ONLY` plain-text tuple**.
+creating the **`DECRYPT_ONLY` plain-text tuple**.
 
 The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
 with a request constructed as follows:
@@ -636,7 +635,7 @@ even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly 
 If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
 The values on the AWS DDB response item
-MUST be authenticated according to [authenticating a keystore item for item with hierarchy version v1](#authenticating-a-keystore-item-for-item-with-hierarchy-version-v1) or [authenticating a keystore item for item with hierarchy version v2](#authenticating-a-keystore-item-for-item-with-hierarchy-version-v2) based on schema version of the item.
+MUST be authenticated according to [authenticating a keystore item for item with hierarchy version v1](#authenticating-a-keystore-item-for-item-with-hierarchy-version-v1) or [authenticating a keystore item for item with hierarchy version v2](#authenticating-a-keystore-item-for-item-with-hierarchy-version-v2) based on schema version of the branch key item.
 If the item fails to authenticate this operation MUST fail.
 
 The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
