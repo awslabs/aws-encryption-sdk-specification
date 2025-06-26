@@ -512,7 +512,7 @@ The operation MUST generate a map of strings,
 the [ACTIVE branch key context for branch keys](#active-branch-key-context).
 
 The operation MUST calculate the **SHA-384 Digest for the `ACTIVE`**
-by [serializing](../structures.md#serialization) the [`ACTIVE` encryption context for branch keys](#active-encryption-context);
+by [serializing](../structures.md#serialization) the [`ACTIVE` branch key context for branch keys](#active-branch-key-context);
 the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
 
 The operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
@@ -810,7 +810,7 @@ The `version` attribute MUST store the branch key version formatted like `"branc
 
 ### DECRYPT_ONLY Branch Key Context
 
-In addition to the [branch key context](#encryption-context):
+In addition to the [branch key context](#branch-key-context):
 
 The DECRYPT_ONLY branch key context MUST NOT have a `version` attribute.
 The `type` attribute MUST stores the branch key version formatted like `"branch:version:"` + `version`.
