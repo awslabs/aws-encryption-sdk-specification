@@ -5,10 +5,12 @@
 
 ## Version
 
-0.7.0
+0.8.0
 
 ### Changelog
 
+- 0.8.0
+  - Hierarchy Version 2
 - 0.7.1
   - Branch key creation only uses customer input
 - 0.7.0
