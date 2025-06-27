@@ -451,7 +451,7 @@ creating the **beacon plain-text tuple**.
 The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html)
 with a request constructed as follows:
 
-- `Plaintext` **beacon plain-text tuple**
+- `Plaintext` Must be the **beacon plain-text tuple**
 - `KeyId` MUST be the `kms-arn`.
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 - `EncryptionContext` MUST be the `encryption-context`
@@ -562,7 +562,7 @@ If the call to AWS KMS Encrypt succeeds,
 the operation MUST use the Encrypt result `CiphertextBlob`
 as the wrapped `ACTIVE` Branch Key.
 
-#### Writing Branch Key and Beacon Key to Keystore
+#### Writing Branch Key and Beacon Key to Branch Key Store table
 
 To add the branch keys and a beacon key to the keystore the
 operation MUST call [Amazon DynamoDB API TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
