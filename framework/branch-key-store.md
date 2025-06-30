@@ -817,7 +817,7 @@ In addition to the [branch key context](#branch-key-context):
 The DECRYPT_ONLY branch key context MUST NOT have a `version` attribute.
 The `type` attribute MUST stores the branch key version formatted like `"branch:version:"` + `version`.
 
-### Beacon Key Branch Key Context
+### Beacon Branch Key Context
 
 In addition to the [branch key context](#encryption-context):
 
