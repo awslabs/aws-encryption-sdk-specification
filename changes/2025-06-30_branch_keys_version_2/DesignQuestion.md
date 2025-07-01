@@ -5,7 +5,7 @@
 
 # Definitions
 
-See [Definitions](./background#Definitions).
+See [Definitions](./background.md#definitions).
 
 # 1 Plain-text Commitment instead of KMS Encryption Context
 
