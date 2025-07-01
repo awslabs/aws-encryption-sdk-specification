@@ -248,9 +248,6 @@ i.e: They need to update their readers before they update their writers.
 This alone is justification for the policy.
 
 **Consistent KMS Encryption Context**:  
-[Much has been said for](https://quip-amazon.com/rc9CARWxsCTT#LHG9AA64tJh) and [against the Encryption Context](https://quip-amazon.com/l5d8AHH0hgZs/Encryption-Context-Exposure-by-Dynamo-ESDK)
-witnessed by KMS in HV-1.
-
 The arguments for the HV-1 Encryption Context suggest
 users SHOULD be able to restrict their Branch Key Store clients
 to a HV-1 such that they know any IAM or KMS Key Policies
