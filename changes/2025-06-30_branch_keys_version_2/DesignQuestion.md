@@ -62,7 +62,7 @@ to verify the MAC.
 
 ## 1.3 Binding the **Branch Key Context Digest** via KMS Encrypt
 
-One option is to refactor Branch Key Creation to use `kms:GenerateDataKey` 
+One option is to refactor Branch Key Creation to use `kms:GenerateDataKey`
 to get a plain text cryptographic materials.
 
 This **Branch Key Context Digest** is then concatenated with
@@ -73,15 +73,14 @@ if this local entropy fails to be random then cryptographic integrity of the mes
 
 ## 1.4 KMS Random and then Bind the **Branch Key Context Digest** via KMS Encrypt
 
-KMS provides the kms:GenerateRandom operation, which allows to generate random data without using a specific KMS key. 
+KMS provides the kms:GenerateRandom operation, which allows to generate random data without using a specific KMS key.
 This can be useful in situations where you need to generate random data, but don't require access controls provided by KMS keys with key policy.
-Unlike operations that use KMS keys, the kms:GenerateRandom operation does not involve any specific KMS key. 
-As a result, the access control for this operation is only managed through IAM policies, which can either allow or deny the kms:GenerateRandom permission. 
+Unlike operations that use KMS keys, the kms:GenerateRandom operation does not involve any specific KMS key.
+As a result, the access control for this operation is only managed through IAM policies, which can either allow or deny the kms:GenerateRandom permission.
 
-Some customers may prefer to have a separate KMS client just for calling the kms:GenerateRandom operation, 
+Some customers may prefer to have a separate KMS client just for calling the kms:GenerateRandom operation,
 as they can't use key policy for it. However, this approach could lead to a "clunkier" interface, as it would involve managing multiple KMS clients.
 So, option 1.4 was rejected.
-
 
 ## 1.5 Use Branch Key's cryptographic material in an HMAC on the Branch Key's Metadata and Location
 
