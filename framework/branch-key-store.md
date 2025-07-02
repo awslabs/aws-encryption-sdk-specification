@@ -10,7 +10,7 @@
 ### Changelog
 
 - 0.8.0
-  - Hierarchy Version 2
+  - [Hierarchy Version 2](../changes/2025-06-30_branch_keys_version_2/background.md)
 - 0.7.1
   - Branch key creation only uses customer input
 - 0.7.0
