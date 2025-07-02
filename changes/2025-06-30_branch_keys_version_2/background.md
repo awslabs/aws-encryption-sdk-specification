@@ -266,6 +266,7 @@ the migration benefit justifies this cost.
 ## 3 Branch Key Creation
 
 UPDATE: The team decided that the Branch Key Store would create and version both HV-1 and HV-2 BKs.
+
 UPDATE: The team changed their mind; the Branch Key Store WILL support HV-2 Branch Key Creation, via a flag.
 
 Customers MUST be able to chose which `hierarchy-version`
