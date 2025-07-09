@@ -270,20 +270,6 @@ The Branch Key Store/Hierarchy Keyring is the only
 of DynamoDB items via the AWS Database Encryption SDK for DynamoDB
 (DB-ESDK).
 
-Traditionally,
-CSE is used when the data store is NOT trusted.
-
-However,
-write access to the Branch Key Store's backing table
-along with administrative control to any KMS Key is sufficient
-for a malicious actor to overwrite a tenant's Active Branch Key,
-which will induce any non-strict Branch Key Store to protect
-any new data of the tenant with the malicious KMS Key.
-
-The Branch Key Store is,
-for all customers that we know of,
-a DynamoDB table.
-
 The KMS HMAC Key is exclusively managed by the application;
 if the application does not want to trust DynamoDB/data base administrators,
 but is not the administrators of all the KMS Keys used by the Key Store
