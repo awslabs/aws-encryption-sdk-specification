@@ -167,9 +167,12 @@ AWS Services and Software-as-a-service providers integrating with KMS.
 
 ## Why not the MetaStore approach?
 
-The MetaStore was the predecessor to the Branch Key Store; it is the "caching" solution for the legacy DynamoDB Encryption Client (DDBEC). The MetaStore used the DDBEC itself to protect the hierarchical material with KMS.
-
-Which affords for some flexibility, as the MetaStore was an interface.
+The MetaStore was the predecessor to the Branch Key Store; 
+it is the "caching" solution for the legacy DynamoDB Encryption Client (DDBEC). 
+The MetaStore used the DDBEC itself to protect the hierarchical material with KMS;
+this affords for some flexibility, 
+as the MetaStore was an interface that exposes the full breadth of DDBEC functionality.
+This gives customers significant freedom on what data is bound to a Branch Key Item's material and how that binding is facilitated. 
 
 However, our customers have complained that the DB-ESDK is complicated;
 using the DB-ESDK to protect the materials used by the DB-ESDK is NOT
