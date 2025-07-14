@@ -65,7 +65,8 @@ One option is to refactor Branch Key Creation to use `kms:GenerateDataKey`
 to get a plain text cryptographic materials.
 
 This **Branch Key Context Digest** is then concatenated with
-the plain-text material in a deterministic fashion. The result of concatenation is then encrypted with KMS Encrypt
+the plain-text material in a deterministic fashion. 
+The result of concatenation is then encrypted with KMS Encrypt.
 
 The option to use local entropy instead of `kms:GenerateDataKey` was rejected primarily because
 if this local entropy fails to be random then cryptographic integrity of the message/item is compromised.
