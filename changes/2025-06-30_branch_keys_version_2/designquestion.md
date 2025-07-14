@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# How can the Branch Key's Metadata be protected without using KMS EC?
+# How can the Branch Key's Context be protected without using KMS EC?
 
 # Definitions
 
