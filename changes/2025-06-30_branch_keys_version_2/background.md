@@ -292,8 +292,6 @@ Otherwise, respect the flag.
 
 **Plumbing through `GenerateRandom`**:  
 UPDATE: `kms:GenerateDataKey` closed this negative consequence.  
-We will had to add an optional `AwsKms` input
-to supply the plain-text data key.
 
 ### 3.2 Follow the Configuration
 
