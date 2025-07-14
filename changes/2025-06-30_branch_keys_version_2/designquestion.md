@@ -22,11 +22,10 @@ The KMS RSA Keyring, in `OnEncrypt`,
 
 > 2. Taking the SHA-384 Digest of this concatenation.
 
-Except rather than working with the encryption context
-from the encryption materials,
-HV-2 will serialize the Branch Key's
-Metadata according to the
-[encryption context serialization specification](../../framework/../framework/structures.md#serialization),
+Adapting this same pattern to Branch Keys,
+rather than working with the encryption context from the encryption materials,
+HV-2 will serialize the Branch Key's Context according
+to the [encryption context serialization specification](../../framework/../framework/structures.md#serialization),
 and then take a SHA-384 Digest of these bytes,
 creating the Branch Key's **Branch Key Context Digest**.
 
