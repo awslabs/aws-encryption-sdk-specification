@@ -131,7 +131,7 @@ introduced by Mutations,
 already leaked the plain-text material to Key Store Administrative Agents;
 and the `Get*` operations always expose the plain-text material to usage agents.
 
-Additionally,
+However,
 conversations with Security Engineers have generally
 regarded any plain-text material
 access outside of KMS to be equivalent.
