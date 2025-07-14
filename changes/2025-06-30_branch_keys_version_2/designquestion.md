@@ -117,7 +117,7 @@ Thus,
 the option that affords distinction between
 Admin and Users are 1.3 & 1.4.
 
-As such, 1.4 is the recommended path.
+As such, 1.3 is the recommended path.
 
 **Doing both HAMC and a "protected digest" adds complexity but does not add value**:  
 To the author's knowledge,
