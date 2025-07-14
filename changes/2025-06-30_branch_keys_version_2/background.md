@@ -175,7 +175,7 @@ as the MetaStore was an interface that exposes the full breadth of DDBEC functio
 This gives customers significant freedom on what data is bound to a Branch Key Item's material and how that binding is facilitated. 
 
 However, our customers have complained that the DB-ESDK is complicated;
-using the DB-ESDK to protect the materials used by the DB-ESDK is NOT
+using the DB-ESDK to protect the materials used by the DB-ESDK and the ESDK is NOT
 a step towards simplification.
 
 While such a feature MAY provide the greatest flexibility to
