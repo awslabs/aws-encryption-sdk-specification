@@ -785,7 +785,6 @@ This operation MUST return the constructed [beacon key materials](./structures.m
 ## Branch Key Context
 
 Branch Key Context is a set of key value pairs (a Map) that contain contextual information about the Branch Key Item.
-This section describes how Branch Key Context is built from an [encrypted hierarchical key](./key-store/key-storage.md#encryptedhierarchicalkey).
 
 The following branch key context keys are shared:
 
