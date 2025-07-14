@@ -119,7 +119,7 @@ Admin and Users are 1.3 & 1.4.
 
 As such, 1.4 is the recommended path.
 
-**Both HAMC and 1.4 adds complexity but does not add value**:  
+**Doing both HAMC and a "protected digest" adds complexity but does not add value**:  
 To the author's knowledge,
 there is no threat mitigated by doing
 an HMAC and committing the `mac`
