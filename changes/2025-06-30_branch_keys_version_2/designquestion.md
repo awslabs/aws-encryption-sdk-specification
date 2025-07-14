@@ -72,7 +72,7 @@ if this local entropy fails to be random then cryptographic integrity of the mes
 
 ## 1.4 KMS Random and then Bind the **Branch Key Context Digest** via KMS Encrypt
 
-KMS provides the kms:GenerateRandom operation, which allows to generate random data without using a specific KMS key.
+KMS provides the kms:GenerateRandom operation, which generates random bytes without using a specific KMS key.
 This can be useful in situations where you need to generate random data, but don't require access controls provided by KMS keys with key policy.
 Unlike operations that use KMS keys, the kms:GenerateRandom operation does not involve any specific KMS key.
 As a result, the access control for this operation is only managed through IAM policies, which can either allow or deny the kms:GenerateRandom permission.
