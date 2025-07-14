@@ -133,7 +133,7 @@ and the `Get*` operations always expose the plain-text material to usage agents.
 Additionally,
 conversations with Security Engineers have generally
 regarded any plain-text material
-access outside of KMS to be equivalent[^1].
+access outside of KMS to be equivalent.
 Thus,
 considering this exposure a risk is questionable at best.
 
