@@ -96,7 +96,7 @@ These two values label the Branch Key, seperating it from all other Branch Keys.
 These values are determined by the Branch Key Creator
 or last Branch Key Mutator.
 
-In DynamoDB and in KMS Encryption Requests,
+In DynamoDB and in KMS Encryption Requests for HV-1,
 their keys are prefixed with `aws-crypto-ec:`.
 
 ```json
