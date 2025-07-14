@@ -805,20 +805,20 @@ It is structured slightly differently so that the active version can be accessed
 
 In addition to the [branch key context](#branch-key-context):
 
-The ACTIVE branch key context value of the `type` attribute MUST equal to `"branch:ACTIVE"`.
-The ACTIVE branch key context MUST have a `version` attribute.
-The `version` attribute MUST store the branch key version formatted like `"branch:version:"` + `version`.
+The ACTIVE branch key context value of the `type`key MUST equal to `"branch:ACTIVE"`.
+The ACTIVE branch key context MUST have a `version` key.
+The `version` key MUST store the branch key version formatted like `"branch:version:"` + `version`.
 
 ### DECRYPT_ONLY Branch Key Context
 
 In addition to the [branch key context](#branch-key-context):
 
-The DECRYPT_ONLY branch key context MUST NOT have a `version` attribute.
-The `type` attribute MUST stores the branch key version formatted like `"branch:version:"` + `version`.
+The DECRYPT_ONLY branch key context MUST NOT have a `version` key.
+The `type` value MUST store the branch key version formatted like `"branch:version:"` + `<version UUID>`.
 
 ### Beacon Branch Key Context
 
-In addition to the [branch key context](#encryption-context):
+In addition to the [branch key context](#branch-key-context):
 
 The Beacon key branch key context MUST includes a key `type` and the value MUST be `"beacon:ACTIVE"`.
 The Beacon key branch key context MUST NOT have a `version` key.
