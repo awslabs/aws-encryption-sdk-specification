@@ -286,7 +286,7 @@ To this operation,
 we add a flag that dictates the `hierarchy-version` to be created with.
 
 If that flag conflicts with `hierarchy-version-policy`,
-then FAIL.
+then FAIL (update: `hierarchy-version-policy` was rejected, see [section 2](#2-how-are-we-going-to-offer-operation-in-a-mixed-mode)).
 
 Otherwise, respect the flag.
 
