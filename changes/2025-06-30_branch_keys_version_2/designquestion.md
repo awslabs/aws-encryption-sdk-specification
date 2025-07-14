@@ -80,8 +80,17 @@ KMS provides the kms:GenerateRandom operation, which generates random bytes with
 Unlike operations that use KMS keys, the kms:GenerateRandom operation does not involve any specific KMS key.
 As a result, the access control for this operation is only managed through IAM policies, which can either allow or deny the kms:GenerateRandom permission.
 
-Some customers may prefer to have a separate KMS client just for calling the kms:GenerateRandom operation,
-as they can't use key policy for it. However, this approach could lead to a "clunkier" interface, as it would involve managing multiple KMS clients.
+Multi-tenant Branch Key Store users 
+MAY have an obligation to use 
+tenant specific credentials or IAM roles to access a tenant specific KMS Key.
+However, these credentials or IAM roles are unlikely to grant `kms:GenerateRandom` permission, 
+as it is not related to a KMS Key.
+Thus, 
+these multi-tenant users would need a separate KMS client,
+which would use non-tenant related credentials or IAM role.
+This approach leads to a "clunkier" interface, 
+as it involves managing more KMS clients.
+Hence, Option 1.4 is rejected. 
 So, option 1.4 was rejected.
 
 ## 1.5 Use Branch Key's cryptographic material in an HMAC on the Branch Key's Metadata and Location
