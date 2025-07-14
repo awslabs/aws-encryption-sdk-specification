@@ -92,7 +92,7 @@ the **Branch Key Context Digest** is passed to an HMAC function with the plain-t
 the result is a `MAC` (Message Authentication Code) which can be included
 on the Branch Key Item as binary field.
 
-**HMAC does not add value**:  
+**HMAC does not add value compared to a protected digest**:  
 The HMAC is created with the plain-text AES-256;
 the plain-text AES-256 is avabile to both
 Branch Key Store Admins and Branch Key Store Users.
