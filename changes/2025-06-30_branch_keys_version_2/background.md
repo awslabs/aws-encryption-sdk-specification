@@ -283,7 +283,7 @@ Currently, our library has one Branch Key Creation operations:
 - `BranchKeyStore#CreateKey`
 
 To this operation,
-we could add a flag that dictates the `hierarchy-version` to be created with.
+we add a flag that dictates the `hierarchy-version` to be created with.
 
 If that flag conflicts with `hierarchy-version-policy`,
 then FAIL.
