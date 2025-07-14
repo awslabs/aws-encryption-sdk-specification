@@ -141,10 +141,6 @@ as they have pre-existing Key Policies with their tenants
 that cannot be met if the KMS Encryption Context is populated
 by the Branch Key's Context.
 
-Finally,
-some of the users have insisted that
-Crypto Tools refactor the KMS Encryption Context
-to only be the Branch Key's Encryption Context.
 
 # Requirements
 
