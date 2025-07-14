@@ -69,7 +69,10 @@ the plain-text material in a deterministic fashion.
 The result of concatenation is then encrypted with KMS Encrypt.
 
 The option to use local entropy instead of `kms:GenerateDataKey` was rejected primarily because
-if this local entropy fails to be random then cryptographic integrity of the message/item is compromised.
+if this local entropy fails to be random then cryptographic integrity of 
+ALL the messages/items protected by the Branch Key Item is compromised.
+[//]: # "TODO: Detail more of the GDK vs Local Entropy discussion"
+
 
 ## 1.4 KMS Random and then Bind the **Branch Key Context Digest** via KMS Encrypt
 
