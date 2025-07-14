@@ -91,7 +91,6 @@ which would use non-tenant related credentials or IAM role.
 This approach leads to a "clunkier" interface, 
 as it involves managing more KMS clients.
 Hence, Option 1.4 is rejected. 
-So, option 1.4 was rejected.
 
 ## 1.5 Use Branch Key's cryptographic material in an HMAC on the Branch Key's Metadata and Location
 
