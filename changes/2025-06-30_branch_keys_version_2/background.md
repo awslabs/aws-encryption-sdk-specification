@@ -182,6 +182,9 @@ While such a feature MAY provide the greatest flexibility to
 our customers,
 it is not a simplification of the Hierarchy Keyring,
 but a complication to it.
+It also would make the DB-ESDK a dependency of the ESDK,
+and introduce a circular dependency between the MPL and the DB-ESDK. 
+
 
 # Design Questions
 
