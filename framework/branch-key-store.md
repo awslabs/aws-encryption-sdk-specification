@@ -822,7 +822,7 @@ The `type` attribute MUST stores the branch key version formatted like `"branch:
 In addition to the [branch key context](#encryption-context):
 
 The Beacon key branch key context MUST includes a key `type` and the value MUST be `"beacon:ACTIVE"`.
-The Beacon key branch key context MUST NOT have a `version` attribute.
+The Beacon key branch key context MUST NOT have a `version` key.
 
 ## Encryption Context
 
