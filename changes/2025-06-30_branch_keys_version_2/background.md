@@ -118,7 +118,7 @@ The union of the Branch Key's:
 
 # Background
 
-The current Branch Key Store's Branch Key's use KMS Encryption Context
+The current Branch Key Store's Branch Keys use KMS Encryption Context
 to cryptographically bind the Branch Key's cryptographic material to
 the Branch Key's Context.
 
