@@ -804,7 +804,7 @@ The following branch key context keys are shared:
 The ACTIVE branch key is a copy of the DECRYPT_ONLY with the same `version`.
 It is structured slightly differently so that the active version can be accessed quickly.
 
-In addition to the [branch key context](#encryption-context):
+In addition to the [branch key context](#branch-key-context):
 
 The ACTIVE branch key context value of the `type` attribute MUST equal to `"branch:ACTIVE"`.
 The ACTIVE branch key context MUST have a `version` attribute.
