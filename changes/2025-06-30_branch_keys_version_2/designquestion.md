@@ -33,7 +33,7 @@ This **Branch Key Context Digest** is 48 bytes long,
 and MUST be bound to the Branch Key Cryptographic Materials.
 
 1.3 & 1.4 talk about options that use KMS Encrypt to protect the **Branch Key Context Digest**;
-without KMS Encrypt access,
+thus, without KMS Encrypt access,
 an actor cannot modify the **Branch Key Context Digest**.
 
 1.5 considers a local HMAC operation,
