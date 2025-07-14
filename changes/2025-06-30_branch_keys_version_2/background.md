@@ -200,7 +200,7 @@ There will be no Policy (2.2).
 ### 2.1 `hierarchy-version-policy`
 
 Much like [Key Commitment](https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/concepts.html#key-commitment),
-I suggest we introduce a policy that
+we could introduce a policy that
 would allow for mixed usage or restricting to one or the other.
 
 Something like `hierarchy-version-policy`:
