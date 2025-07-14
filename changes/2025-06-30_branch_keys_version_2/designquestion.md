@@ -135,11 +135,6 @@ The plain-text AES-256 is now exposed to the Creating Agent,
 where as in HV-1 the plain-text AES-256 is never exposed
 to the Creating agent.
 
-However,
-the `KeyManagementStrategy` of Encrypt/Decrypt,
-introduced by Mutations,
-already leaked the plain-text material to Key Store Administrative Agents;
-and the `Get*` operations always expose the plain-text material to usage agents.
 
 However,
 conversations with Security Engineers have generally
