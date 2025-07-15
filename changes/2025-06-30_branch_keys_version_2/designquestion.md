@@ -65,14 +65,13 @@ One option is to refactor Branch Key Creation to use `kms:GenerateDataKey`
 to get a plain text cryptographic materials.
 
 This **Branch Key Context Digest** is then concatenated with
-the plain-text material in a deterministic fashion. 
+the plain-text material in a deterministic fashion.
 The result of concatenation is then encrypted with KMS Encrypt.
 
 The option to use local entropy instead of `kms:GenerateDataKey` was rejected primarily because
-if this local entropy fails to be random then cryptographic integrity of 
+if this local entropy fails to be random then cryptographic integrity of
 ALL the messages/items protected by the Branch Key Item is compromised.
 [//]: # "TODO: Detail more of the GDK vs Local Entropy discussion"
-
 
 ## 1.4 KMS Random and then Bind the **Branch Key Context Digest** via KMS Encrypt
 
@@ -80,17 +79,17 @@ KMS provides the kms:GenerateRandom operation, which generates random bytes with
 Unlike operations that use KMS keys, the kms:GenerateRandom operation does not involve any specific KMS key.
 As a result, the access control for this operation is only managed through IAM policies, which can either allow or deny the kms:GenerateRandom permission.
 
-Multi-tenant Branch Key Store users 
-MAY have an obligation to use 
+Multi-tenant Branch Key Store users
+MAY have an obligation to use
 tenant specific credentials or IAM roles to access a tenant specific KMS Key.
-However, these credentials or IAM roles are unlikely to grant `kms:GenerateRandom` permission, 
+However, these credentials or IAM roles are unlikely to grant `kms:GenerateRandom` permission,
 as it is not related to a KMS Key.
-Thus, 
+Thus,
 these multi-tenant users would need a separate KMS client,
 which would use non-tenant related credentials or IAM role.
-This approach leads to a "clunkier" interface, 
+This approach leads to a "clunkier" interface,
 as it involves managing more KMS clients.
-Hence, Option 1.4 is rejected. 
+Hence, Option 1.4 is rejected.
 
 ## 1.5 Use Branch Key's cryptographic material in an HMAC on the Branch Key's Metadata and Location
 
@@ -134,7 +133,6 @@ just the **Branch Key Context Digest**.
 The plain-text AES-256 is now exposed to the Creating Agent,
 where as in HV-1 the plain-text AES-256 is never exposed
 to the Creating agent.
-
 
 However,
 conversations with Security Engineers have generally

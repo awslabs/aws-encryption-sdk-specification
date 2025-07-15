@@ -289,7 +289,7 @@ then FAIL (update: `hierarchy-version-policy` was rejected, see [section 2](#2-h
 Otherwise, respect the flag.
 
 **Plumbing through `GenerateRandom`**:  
-UPDATE: `kms:GenerateDataKey` closed this negative consequence.  
+UPDATE: `kms:GenerateDataKey` closed this negative consequence.
 
 ### 3.2 Follow the Configuration
 
