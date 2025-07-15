@@ -141,7 +141,6 @@ as they have pre-existing Key Policies with their tenants
 that cannot be met if the KMS Encryption Context is populated
 by the Branch Key's Context.
 
-
 # Requirements
 
 1. Branch Key's Context be cryptographically bound to the Branch Key's Cryptographic Material
@@ -167,12 +166,12 @@ AWS Services and Software-as-a-service providers integrating with KMS.
 
 ## Why not the MetaStore approach?
 
-The MetaStore was the predecessor to the Branch Key Store; 
-it is the "caching" solution for the legacy DynamoDB Encryption Client (DDBEC). 
+The MetaStore was the predecessor to the Branch Key Store;
+it is the "caching" solution for the legacy DynamoDB Encryption Client (DDBEC).
 The MetaStore used the DDBEC itself to protect the hierarchical material with KMS;
-this affords for some flexibility, 
+this affords for some flexibility,
 as the MetaStore was an interface that exposes the full breadth of DDBEC functionality.
-This gives customers significant freedom on what data is bound to a Branch Key Item's material and how that binding is facilitated. 
+This gives customers significant freedom on what data is bound to a Branch Key Item's material and how that binding is facilitated.
 
 However, our customers have complained that the DB-ESDK is complicated;
 using the DB-ESDK to protect the materials used by the DB-ESDK and the ESDK is NOT
@@ -183,8 +182,7 @@ our customers,
 it is not a simplification of the Hierarchy Keyring,
 but a complication to it.
 It also would make the DB-ESDK a dependency of the ESDK,
-and introduce a circular dependency between the MPL and the DB-ESDK. 
-
+and introduce a circular dependency between the MPL and the DB-ESDK.
 
 # Design Questions
 
