@@ -10,7 +10,8 @@
 ### Changelog
 
 - 0.8.0
-  - revert Key store storage option [commit](https://github.com/awslabs/aws-encryption-sdk-specification/commit/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb)
+  - revert Key store storage option [commit](https://github.com/awslabs/aws-encryption-sdk-specification/commit/ffb2b0cc6a956b2cec3a33be3c3672605b6907fb).
+    This reverts changes in 0.6.0 and 0.7.0
 - 0.7.1
   - Branch key creation only uses customer input
 - 0.7.0
