@@ -609,19 +609,6 @@ List of TransactWriteItem:
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
-- PUT:
-  - Item:
-    - “branch-key-id” (S): `branchKeyId`,
-    - “type“ (S): "branch:ACTIVE",
-    - “enc” (B): wrapped ACTIVE Branch Key `CiphertextBlob` from the KMS operation
-    - “create-time” (S): `timestamp`
-    - "kms-arn" (S): configured KMS Key
-    - “hierarchy-version” (N): 1
-    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
-      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
-  - ConditionExpression: `attribute_exists(branch-key-id) AND enc = :encOld`
-  - ExpressionAttributeValues: `{":encOld" := DDB.AttributeValue.B(oldCiphertextBlob)}`
-  - TableName: the configured Table Name
 
 TransactWriteItemRequest:
 
