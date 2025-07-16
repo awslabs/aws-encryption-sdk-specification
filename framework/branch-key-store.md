@@ -10,7 +10,7 @@
 ### Changelog
 
 - 0.9.0
-  - [Hierarchy Version 2](../changes/2025-06-30_branch_keys_version_2/background.md)
+  - Add [hierarchy version 2](../changes/2025-06-30_branch_keys_version_2/background.md)
 - 0.8.0
   - Revert Key store storage option. This reverts changes in 0.6.0 and 0.7.0
 - 0.7.1
