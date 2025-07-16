@@ -621,7 +621,7 @@ List of TransactWriteItem:
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_exists(branch-key-id)`
   - TableName: the configured Table Name
-  
+
 TransactWriteItemRequest:
 
 - TransactWriteItems: List of TransactWriteItem
@@ -749,17 +749,16 @@ This operation MUST return the constructed [beacon key materials](./structures.m
 
 Branch Key Context is a set of key value pairs (a Map) that contain contextual information about the Branch Key Item.
 
-The following branch key context keys are shared:
+The Branch Key Context:
 
-- MUST have a `branch-key-id` attribute
-- The `branch-key-id` field MUST not be an empty string
-- MUST have a `type` attribute
-- The `type` field MUST not be an empty string
-- MUST have a `create-time` attribute
-- MUST have a `tablename` attribute to store the logicalKeyStoreName
-- MUST have a `kms-arn` attribute
-- MUST have a `hierarchy-version`
-- MUST NOT have a `enc` attribute
+- MUST have a `branch-key-id` key who's value MUST not be an empty string
+- MUST have a `type` key who's value MUST not be an empty string
+- MUST have a `create-time` key in ISO 8601 format in UTC
+- MUST have a `tablename` key who's value is the logicalKeyStoreName
+- MUST have a `kms-arn` key who's value is valid KMS ARN
+- MUST have a `hierarchy-version` key who's value is either "1" or "2"
+- MUST NOT have a `enc` key
+- MAY have one or more keys prefixed with `aws-crypto-ec:`
 
 ### ACTIVE Branch Key Context
 
