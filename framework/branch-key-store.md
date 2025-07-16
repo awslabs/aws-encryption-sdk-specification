@@ -5,12 +5,14 @@
 
 ## Version
 
-0.8.0
+0.9.0
 
 ### Changelog
 
-- 0.8.0
+- 0.9.0
   - [Hierarchy Version 2](../changes/2025-06-30_branch_keys_version_2/background.md)
+- 0.8.0
+  - Revert Key store storage option. This reverts changes in 0.6.0 and 0.7.0
 - 0.7.1
   - Branch key creation only uses customer input
 - 0.7.0
@@ -39,18 +41,18 @@
 ## Overview
 
 A Keystore persists hierarchical data that allows customers to call AWS KMS less often.
-The Keystore persists branch keys that wrap multiple data keys.
+The Keystore persists branch keys in DynamoDb that wrap multiple data keys.
 This creates a hierarchy where a branch key wraps multiple data keys and facilitates caching.
 These branch keys are only generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) in Hierarchy Version `v1` or [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html) in Hierarchy Version `v2`.
 
-By creating and persisting a data key to an accessible medium,
+By creating and persisting a data key to an accesbile medium,
 such as a DynamoDb table,
-distributed cryptographic agents can use common, coordinated, cryptographic materials.
+distributed cryptographic agents can use a common, coordinated, cryptographic materials.
 
 This prevents distributed cryptographic agents from independently
 generating unique data keys that COULD BE coordinated,
 which leads to poor caching performance at decryption,
-as each unique encrypting agent had a unique data key.
+as each unqiue encrypting agent had a unqiue data key.
 
 This Keystore interface defines operations that any implementation of its specification must support and implement.
 
@@ -84,63 +86,14 @@ The following inputs MAY be specified to create a KeyStore:
 
 - [ID](#keystore-id)
 - [AWS KMS Grant Tokens](#aws-kms-grant-tokens)
-- [Storage](#storage)
 - [DynamoDb Client](#dynamodb-client)
-- [Table Name](#table-name)
 - [KMS Client](#kms-client)
-- [KeyManagement](#keymanagement)
 
 The following inputs MUST be specified to create a KeyStore:
 
+- [Table Name](#table-name)
 - [AWS KMS Configuration](#aws-kms-configuration)
 - [Logical KeyStore Name](#logical-keystore-name)
-
-If neither [Storage](#storage) nor [Table Name](#table-name) is configured initialization MUST fail.
-If both [Storage](#storage) and [Table Name](#table-name) are configured initialization MUST fail.
-If both [Storage](#storage) and [DynamoDb Client](#dynamodb-client) are configured initialization MUST fail.
-If both [KeyManagement](#keymanagement) and [KMS Client](#kms-client) are configured initialization MUST fail.
-If both [KeyManagement](#keymanagement) and [Grant Tokens](#aws-kms-grant-tokens) are configured initialization MUST fail.
-
-If [Storage](#storage) is configured with [KeyStorage](#keystorage)
-then this MUST be the configured [KeyStorage interface](./key-store/key-storage.md#interface).
-
-If [Storage](#storage) is not configured with [KeyStorage](#keystorage)
-a [default key storage](./key-store/default-key-storage.md#initialization) MUST be created.
-
-This constructed [default key storage](./key-store/default-key-storage.md#overview)
-MUST be configured with the provided [logical keystore name](#logical-keystore-name).
-
-This constructed [default key storage](./key-store/default-key-storage.md#initialization)
-MUST be configured with either the [Table Name](#table-name) or the [DynamoDBTable](#dynamodbtable) table name
-depending on which one is configured.
-
-This constructed [default key storage](./key-store/default-key-storage.md#initialization)
-MUST be configured with either the [DynamoDb Client](#dynamodb-client), the DDB client in the [DynamoDBTable](#dynamodbtable)
-or a constructed DDB client depending on what is configured.
-
-If a DDB client needs to be constructed and the AWS KMS Configuration is KMS Key ARN or KMS MRKey ARN,
-a new DynamoDb client MUST be created with the region of the supplied KMS ARN.
-
-If a DDB client needs to be constructed and the AWS KMS Configuration is Discovery,
-a new DynamoDb client MUST be created with the default configuration.
-
-If a DDB client needs to be constructed and the AWS KMS Configuration is MRDiscovery,
-a new DynamoDb client MUST be created with the region configured in the MRDiscovery.
-
-If no AWS KMS client is provided one MUST be constructed.
-
-If AWS KMS client needs to be constructed and the AWS KMS Configuration is KMS Key ARN or KMS MRKey ARN,
-a new AWS KMS client MUST be created with the region of the supplied KMS ARN.
-
-If AWS KMS client needs to be constructed and the AWS KMS Configuration is Discovery,
-a new AWS KMS client MUST be created with the default configuration.
-
-If AWS KMS client needs to be constructed and the AWS KMS Configuration is MRDiscovery,
-a new AWS KMS client MUST be created with the region configured in the MRDiscovery.
-
-On initialization the KeyStore SHOULD
-append a user agent string to the AWS KMS SDK Client with
-the value `aws-kms-hierarchy`.
 
 ### Keystore ID
 
@@ -154,17 +107,48 @@ A list of AWS KMS [grant tokens](https://docs.aws.amazon.com/kms/latest/develope
 ### DynamoDb Client
 
 The DynamoDb Client used to put and get keys from the backing DDB table.
-This options is deprecated in favor of [storage](#storage)
+
+If the AWS KMS Configuration is KMS Key ARN or KMS MRKey ARN,
+and no DynamoDb Client is provided,
+a new DynamoDb Client MUST be created
+with the region of the supplied KMS ARN.
+
+If the AWS KMS Configuration is Discovery,
+and no DynamoDb Client is provided,
+a new DynamoDb Client MUST be created
+with the default configuration.
+
+If the AWS KMS Configuration is MRDiscovery,
+and no DynamoDb Client is provided,
+a new DynamoDb Client MUST be created
+with the region configured in the MRDiscovery.
 
 ### KMS Client
 
 The KMS Client used when wrapping and unwrapping keys.
-This options is deprecated in favor of [KeyManagement](#keymanagement)
+
+If the AWS KMS Configuration is KMS Key ARN or KMS MRKey ARN,
+and no KMS Client is provided,
+a new KMS Client MUST be created
+with the region of the supplied KMS ARN.
+
+If the AWS KMS Configuration is Discovery,
+and no KMS Client is provided,
+a new KMS Client MUST be created
+with the default configuration.
+
+If the AWS KMS Configuration is MRDiscovery,
+and no KMS Client is provided,
+a new KMS Client MUST be created
+with the region configured in the MRDiscovery.
+
+On initialization the KeyStore SHOULD
+append a user agent string to the AWS KMS SDK Client with
+the value `aws-kms-hierarchy`.
 
 ### Table Name
 
 The table name of the DynamoDb table that backs this Keystore.
-This options is deprecated in favor of [storage](#storage)
 
 ### AWS KMS Configuration
 
@@ -193,36 +177,6 @@ and a KMS ARN for non Multi-Region Key MAY be provided to the `KMS MRKey ARN` co
 
 `MRDiscovery` MUST take an additional argument, which is a region.
 Any MRK ARN discovered will be changed to this region before use.
-
-### Storage
-
-This configures how the Keystore will get encrypted data.
-There are two valid storage options:
-
-- DynamoDBTable
-- KeyStorage
-
-#### DynamoDBTable
-
-A DynamoDBTable configuration MUST take the DynamoDB table name.
-A DynamoDBTable configuration MAY take [DynamoDb Client](#dynamodb-client).
-
-#### KeyStorage
-
-A [KeyStorage interface](./key-store/key-storage.md#interface)
-
-### KeyManagement
-
-This configures how the Keystore will authenticate encrypted data
-or create new branch keys.
-There is one valid storage option:
-
-- AwsKms
-
-#### AwsKms
-
-An AwsKms configuration MAY take a list of AWS KMS [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-An AwsKms configuration MAY take an [AWS KMS SDK client](#awskms).
 
 #### AWS Key ARN Compatibility
 
@@ -305,13 +259,7 @@ This MUST include:
 - [AWS KMS Grant Tokens](#aws-kms-grant-tokens)
 - [AWS KMS Configuration](#aws-kms-configuration)
 
-The [keystore name](#table-name) MUST be obtained
-from the configured [KeyStorage](./key-store/key-storage.md#interface)
-by calling [GetKeyStorageInfo](./key-store/key-storage.md#getkeystorageinfo).
-
 ### CreateKeyStore
-
-If a [table Name](#table-name) was not configured then CreateKeyStore MUST fail.
 
 This operation MUST first calls the DDB::DescribeTable API with the configured `tableName`.
 
@@ -682,15 +630,11 @@ TransactWriteItemRequest:
 If DDB TransactWriteItems is successful, this operation MUST return a successful response containing no additional data.
 Otherwise, this operation MUST yield an error.
 
-The condition expression for the Active Input ensures
-the Active Item in storage has not changed since it was read.
-This prevents overwrites due to a race in updating the Active Item.
-
 #### Authenticating a Branch Keystore item for item with `hierarchy-version` v1
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
-Every attribute on the AWS DDB response item except `enc` attribute MUST be authenticated.
+Every attribute on the AWS DDB response item will be authenticated.
 
 Every key in the constructed [encryption context](#encryption-context)
 except `tableName`
@@ -732,6 +676,14 @@ using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as th
 The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
 
+To get the active version for the branch key id from the keystore
+this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
+
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
+
+The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
 If the branch key fails to decrypt, GetActiveBranchKey MUST fail.
@@ -745,6 +697,12 @@ This operation MUST return the constructed [branch key materials](./structures.m
 
 - MUST supply a `branch-key-id`
 - MUST supply a `branchKeyVersion`
+
+To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and "branch:version:" + `branchKeyVersion` value as the Sort Key.
+
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "branch:version:" + `branchKeyVersion` value as the Sort Key.
@@ -766,6 +724,12 @@ This operation MUST return the constructed [branch key materials](./structures.m
 On invocation, the caller:
 
 - MUST supply a `branch-key-id`
+
+To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and "beacon:ACTIVE" value as the Sort Key.
+
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "beacon:ACTIVE" value as the Sort Key.
@@ -856,6 +820,17 @@ Across all versions of a Branch Key, the custom encryption context MUST be equal
 
 The operation MUST use the configured `KMS SDK Client` to decrypt the value of the branch key field.
 
+Every attribute except for `enc` on the AWS DDB response item
+MUST be authenticated in the decryption of `enc`
+
+Every key in the constructed [encryption context](#encryption-context)
+except `tableName`
+MUST exist as a string attribute in the AWS DDB response item.
+Every value in the constructed [encryption context](#encryption-context)
+except the logical table name
+MUST equal the value with the same key in the AWS DDB response item.
+The key `enc` MUST NOT exist in the constructed [encryption context](#encryption-context).
+
 If the Keystore's [AWS KMS Configuration](#aws-kms-configuration) is `KMS Key ARN` or `KMS MRKey ARN`,
 the `kms-arn` field of the DDB response item MUST be
 [compatible with](#aws-key-arn-compatibility) the configured KMS Key in
@@ -874,7 +849,7 @@ the keystore operation MUST call with a request constructed as follows:
 - `KeyId`, if the KMS Configuration is Discovery, MUST be the `kms-arn` attribute value of the AWS DDB response item.
   If the KMS Configuration is MRDiscovery, `KeyId` MUST be the `kms-arn` attribute value of the AWS DDB response item, with the region replaced by the configured region.
   Otherwise, it MUST BE the Keystore's configured KMS Key.
-- `CiphertextBlob` MUST be the enc attribute value on the AWS DDB response item
+- `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
 - `EncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
