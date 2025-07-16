@@ -325,5 +325,4 @@ Unless someone can think of something else,
 
 ## 4 Branch Key Versioning (Rotation)
 
-UPDATE: The team elected for 3.5; we will Mirror 3.5.
-(BKS can VersionKey HV-1 or HV-2).
+Branch key store can VersionKey for HV-1 or HV-2 based on schema version (equivalent to hierarchical version) of the branch key item.
