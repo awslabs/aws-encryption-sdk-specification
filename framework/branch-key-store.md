@@ -633,7 +633,7 @@ Otherwise, this operation MUST yield an error.
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
-This operation MUST call AWS DDB `GetItem`. 
+This operation MUST call AWS DDB `GetItem`.
 Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs (a Map)
 which is the [encryption context](#encryption-context).
 
@@ -651,7 +651,7 @@ with a request constructed as follows:
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
-This operation MUST call AWS DDB `GetItem`. 
+This operation MUST call AWS DDB `GetItem`.
 Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs (a Map)
 which is the [branch key context](#branch-key-context). The [encryption context](#encryption-context) is built from branch key context by extracting keys with prefix `aws-crypto-ec:` and then dropping the prefix.
 
@@ -754,7 +754,7 @@ The Branch Key Context:
 - MUST have a `hierarchy-version` key who's value is either "1" or "2"
 - MUST NOT have a `enc` key
 - MAY have one or more keys prefixed with `aws-crypto-ec:` which is the encyption context send by the customer.
-The `aws-crypto-ec:` prefix is prepended by the library
+  The `aws-crypto-ec:` prefix is prepended by the library
 
 ### ACTIVE Branch Key Context
 
