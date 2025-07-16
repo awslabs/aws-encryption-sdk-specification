@@ -633,15 +633,9 @@ Otherwise, this operation MUST yield an error.
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
-Every attribute on the AWS DDB response item will be authenticated.
-
-Every key in the constructed [encryption context](#encryption-context)
-except `tableName`
-MUST exist as a string attribute in the AWS DDB response item.
-Every value in the constructed [encryption context](#encryption-context)
-except the logical table name
-MUST equal the value with the same key in the AWS DDB response item.
-The key `enc` MUST NOT exist in the constructed [encryption context](#encryption-context).
+This operation MUST call AWS DDB `GetItem`. 
+Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs (a Map)
+which is the [encryption context](#encryption-context).
 
 The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
 with a request constructed as follows:
@@ -657,8 +651,9 @@ with a request constructed as follows:
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
-Every attribute on the AWS DDB response item expect `enc` MUST be authenticated.
-From the AWS DDB response item, the operation MUST create a [branch key context](#branch-key-context) and [encryption context](#encryption-context).
+This operation MUST call AWS DDB `GetItem`. 
+Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs (a Map)
+which is the [branch key context](#branch-key-context). The [encryption context](#encryption-context) is built from branch key context by extracting keys with prefix `aws-crypto-ec:` and then dropping the prefix.
 
 The operation MUST follow [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) to decrypt and authentication the branch key context.
 
