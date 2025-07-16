@@ -753,7 +753,8 @@ The Branch Key Context:
 - MUST have a `kms-arn` key who's value is valid KMS ARN
 - MUST have a `hierarchy-version` key who's value is either "1" or "2"
 - MUST NOT have a `enc` key
-- MAY have one or more keys prefixed with `aws-crypto-ec:`
+- MAY have one or more keys prefixed with `aws-crypto-ec:` which is the encyption context send by the customer.
+The `aws-crypto-ec:` prefix is prepended by the library
 
 ### ACTIVE Branch Key Context
 
