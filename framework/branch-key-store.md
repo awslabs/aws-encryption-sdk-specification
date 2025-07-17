@@ -680,7 +680,6 @@ The AWS DDB response MUST contain the fields defined in the [branch keystore rec
 If the record does not contain the defined fields, this operation MUST fail.
 
 The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
-The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
 If the branch key fails to decrypt, GetActiveBranchKey MUST fail.
 
