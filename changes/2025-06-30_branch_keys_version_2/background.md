@@ -188,7 +188,7 @@ and introduce a circular dependency between the MPL and the DB-ESDK.
 
 ## 1 How can the Branch Key's Context be protected without using KMS EC?
 
-See [DesignQuestion.md](./DesignQuestion.md).
+See [protect_branch_key_without_kms_ec.md](./protect_branch_key_without_kms_ec.md).
 
 ## 2 How are we going to offer operation in a mixed mode?
 
