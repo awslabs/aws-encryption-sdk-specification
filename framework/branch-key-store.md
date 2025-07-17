@@ -339,6 +339,9 @@ To create a branch key, this operation MUST take the following:
 - `encryptionContext`: Additional encryption context to bind to the created keys
 - `kms-arn`: The KMS-ARN determined by the KMS Configuration
 - `hierarchy-version`: The hierarchy-version determined by the input
+
+This operation needs to generate the following:
+
 - `version`: a new guid. This guid MUST be [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
 - `timestamp`: a timestamp for the current time.
   This timestamp MUST be in ISO 8601 format in UTC, to microsecond precision (e.g. “YYYY-MM-DDTHH:mm:ss.ssssssZ“)
