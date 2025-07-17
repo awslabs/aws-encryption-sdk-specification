@@ -337,7 +337,6 @@ To create a branch key, this operation MUST take the following:
 
 - `branchKeyId`: The identifier
 - `encryptionContext`: Additional encryption context to bind to the created keys
-- `kms-arn`: The KMS-ARN determined by the KMS Configuration
 - `hierarchy-version`: The hierarchy-version determined by the input
 
 This operation needs to generate the following:
