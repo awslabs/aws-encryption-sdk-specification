@@ -339,8 +339,6 @@ To create a branch key, this operation MUST take the following:
 - `encryptionContext`: Additional encryption context to bind to the created keys
 - `hierarchy-version`: The hierarchy-version determined by the input
 
-The wrapped Branch Key Items, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
-
 If the `hierarchy-version` is `v1`,
 the wrapped beacon key MUST be created according to [Wrapped Beacon Key Creation `v1`](#wrapped-beacon-key-creation-v1) and
 the wrapped branch keys MUST be created according to
