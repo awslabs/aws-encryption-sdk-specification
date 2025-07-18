@@ -339,12 +339,6 @@ To create a branch key, this operation MUST take the following:
 - `encryptionContext`: Additional encryption context to bind to the created keys
 - `hierarchy-version`: The hierarchy-version determined by the input
 
-This operation needs to generate the following:
-
-- `version`: a new guid. This guid MUST be [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
-- `timestamp`: a timestamp for the current time.
-  This timestamp MUST be in ISO 8601 format in UTC, to microsecond precision (e.g. “YYYY-MM-DDTHH:mm:ss.ssssssZ“)
-
 The wrapped Branch Key Items, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
 
 If the `hierarchy-version` is `v1`,
