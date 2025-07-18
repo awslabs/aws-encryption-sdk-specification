@@ -404,11 +404,7 @@ If the call to AWS KMS Encrypt succeeds,
 the operation MUST use the Encrypt result `CiphertextBlob`
 as the wrapped Beacon Key.
 
-#### Wrapped Branch Key Creation
-
-Given a `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
-
-##### Wrapped Branch Key Creation `v1`
+#### Wrapped Branch Key Creation `v1`
 
 The operation MUST generate a map of strings,
 the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context),
@@ -445,7 +441,7 @@ If the call to AWS KMS ReEncrypt succeeds,
 the operation MUST use the ReEncrypt result `CiphertextBlob`
 as the wrapped ACTIVE Branch Key.
 
-##### Wrapped Branch Key Creation `v2`
+#### Wrapped Branch Key Creation `v2`
 
 The operation MUST generate a map of strings,
 the [`DECRYPT_ONLY` branch key context for branch keys](#decrypt_only-branch-key-context).
