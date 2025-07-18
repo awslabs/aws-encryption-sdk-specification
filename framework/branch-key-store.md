@@ -298,7 +298,7 @@ The CreateKey caller MUST provide:
 
 - An optional branch key id
 - An optional encryption context
-- An optional Hierarchy-Version
+- An optional hierarchy-version
 
 If an optional branch key id is provided
 and no encryption context is provided this operation MUST fail.
