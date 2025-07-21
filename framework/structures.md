@@ -127,7 +127,7 @@ an identifier into a key store that will return the plaintext data key.
 #### Structure
 
 The encryption context is a key-value mapping of arbitrary, non-secret, UTF-8 encoded strings.
-It is used by the user during [encryption](../client-apis/encrypt.md), [decryption](../client-apis/decrypt.md) and [createKey](branch-key-store.md#createkey) to provide additional authenticated data (AAD).
+It is used during [encryption](../client-apis/encrypt.md) and [decryption](../client-apis/decrypt.md) to provide additional authenticated data (AAD).
 
 Users SHOULD use the encryption context to store:
 
