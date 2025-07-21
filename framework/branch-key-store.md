@@ -778,7 +778,7 @@ The Beacon key branch key context MUST NOT have a `version` key.
 This section describes how the AWS KMS encryption context is built.
 
 If the `hierarchy-version` is v1, AWS KMS encryption context MUST be same as [branch key context](#branch-key-context).
-If the `hierarchy-version` is v2, AWS KMS encryption context MUST be the [encryption context](../structures.md#encryption-context) send by users without any transformation.
+If the `hierarchy-version` is v2, AWS KMS encryption context MUST be the [encryption context](../structures.md#encryption-context) sent by users without any transformation.
 
 If the `hierarchy-version` is v2, the encryption context send to AWS KMS MUST always match the encryption context originally sent by the user, without any transformations. This requirement applies regardless of the type of encryption context being used, whether it is the ACTIVE encryption context, the DECRYPT_ONLY encryption context, the Beacon Key encryption context, or a custom encryption context.
 
