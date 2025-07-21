@@ -64,6 +64,10 @@ This Keystore interface defines operations that any implementation of its specif
   A root key used to then derive different beacon keys per beacon.
 - [UUID](https://www.ietf.org/rfc/rfc4122.txt): a universally unique identifier that can be represented as a byte sequence or a string.
 
+#### kms-arn
+
+`kms-arn` is the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+
 #### Hierarchy Version
 
 Schema Version of the Branch Key.
