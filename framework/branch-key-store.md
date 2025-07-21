@@ -578,7 +578,10 @@ The values on the AWS DDB response item
 MUST be authenticated according to [authenticating a keystore item for item with hierarchy version v1](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v1) or [authenticating a keystore item for item with hierarchy version v2](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v2) based on schema version of the branch key item.
 If the item fails to authenticate this operation MUST fail.
 
-The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
+If the `hierarchy-version` is `v1`,
+the wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Beacon Key Creation `v1`](#wrapped-beacon-key-creation-v1);
+else the `hierarchy-version` MUST be `v2`,
+[Wrapped Branch Key Creation `v2`](#wrapped-branch-key-creation-v2).
 
 To add the new branch key to the keystore,
 the operation MUST call [Amazon DynamoDB API TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
