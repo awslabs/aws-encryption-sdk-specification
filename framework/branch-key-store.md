@@ -340,7 +340,7 @@ Otherwise, this operation MUST yield an error.
 To create a branch key, this operation MUST take the following:
 
 - `branchKeyId`: The identifier
-- `encryptionContext`: Additional encryption context to bind to the created keys
+- `encryption-context`: Additional encryption context to bind to the created keys
 - `hierarchy-version`: The hierarchy-version determined by the input
 
 If the `hierarchy-version` is `v1`,
