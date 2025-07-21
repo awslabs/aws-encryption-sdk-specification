@@ -864,7 +864,7 @@ A branch key record MUST include the following key-value pairs:
    represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 
 A branch key record MAY include [custom encryption context](#custom-encryption-context) key-value pairs.
-These attributes MUST be always prefixed with `aws-crypto-ec:` regardless of the item's `hierarchy-version`.
+These attributes MUST always be prefixed with `aws-crypto-ec:` regardless of the item's `hierarchy-version`.
 
 ### Branch Key Materials From Authenticated Encryption Context
 
