@@ -468,7 +468,7 @@ the beacon key can be discarded.
 
 ##### Encryption Context
 
-The [custom encryption context](#encryption-context) associated with this beacon key.
+The [encryption context](#encryption-context) associated with this beacon key.
 
 ##### KMS ARN
 
