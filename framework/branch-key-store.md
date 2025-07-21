@@ -757,7 +757,7 @@ In addition to the [branch key context](#branch-key-context):
 
 The ACTIVE branch key context value of the `type`key MUST equal to `"branch:ACTIVE"`.
 The ACTIVE branch key context MUST have a `version` key.
-The `version` key MUST store the branch key version formatted like `"branch:version:"` + `version`.
+The `version` key MUST store the branch key version formatted like `"branch:version:"` + `<version UUID>`.
 
 ### DECRYPT_ONLY Branch Key Context
 
@@ -806,6 +806,8 @@ Across all versions of a Branch Key, the custom encryption context MUST be equal
 
 The operation MUST use the configured `KMS SDK Client` to decrypt the value of the branch key field.
 
+To get attributes in branch key item from the keystore 
+this operation MUST call AWS DDB `GetItem`.
 Every attribute except for `enc` on the AWS DDB response item
 MUST be authenticated in the decryption of `enc`
 
@@ -839,12 +841,8 @@ the keystore operation MUST call with a request constructed as follows:
 - `EncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
-Every attribute except for `enc` on the AWS DDB response item
-MUST be authenticated in the decryption of `enc`.
-In Hierarchy Version `v1`, when AWS KMS Decrypt succeeds this attribute gets
-authenticated by KMS as they are included in the AWS KMS encryption context.
-For authentication of these attributes in Hierarchy Version `v2`,
-the operation MUST match the first 48 bytes of `Plaintext` returned by AWS KMS Decrypt operation with SHA-384 Digest for the beacon key of serialization of the [branch key context](#branch-key-context).
+For authentication of attributes except for `enc` on AWS DDB response item in Hierarchy Version `v2`,
+the operation MUST match the first 48 bytes of `Plaintext` returned by AWS KMS Decrypt operation with SHA-384 Digest for the branch key of serialization of the [branch key context](#branch-key-context).
 
 ## Record Format
 
