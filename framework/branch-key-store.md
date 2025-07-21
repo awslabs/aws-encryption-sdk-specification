@@ -646,7 +646,7 @@ The operation MUST use the configured `KMS SDK Client` to authenticate the value
 
 This operation MUST call AWS DDB `GetItem`.
 Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs (a Map)
-which is the [branch key context](#branch-key-context). The [encryption context](#encryption-context) MUST be built from branch key context by extracting keys with prefix `aws-crypto-ec:` and then dropping the prefix.
+which is the [branch key context](#branch-key-context). Every key in the constructed branch key context except tableName MUST exist as a string attribute in the AWS DDB response item. The [encryption context](#encryption-context) MUST be built from branch key context by extracting keys with prefix `aws-crypto-ec:` and then dropping the prefix.
 
 The operation MUST follow [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) to decrypt and authentication the branch key context.
 
