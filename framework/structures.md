@@ -423,7 +423,7 @@ The AWS KMS Key ARN used to protect these materials.
 
 ##### Create Time
 
-Timestamp in ISO 8601 format in UTC, to microsecond precision, that the Material was generated.
+Timestamp in ISO 8601 format in UTC, to microsecond precision, of when the material was generated.
 
 ##### Hierarchy Version
 
