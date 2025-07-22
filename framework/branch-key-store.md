@@ -10,7 +10,7 @@
 ### Changelog
 
 - 0.9.0
-  - Re-add [Mitigate Update Race in the Branch Key Store](../changes/2025-01-16_key-store-mitigate-update-race/background.md) for DynamoDB as the only storage option
+  - Re-add [Mitigate Update Race in the Branch Key Store](../changes/2025-01-16_key-store-mitigate-update-race/background.md) with DynamoDB as the only branch key storage option
 - 0.8.0
   - Revert Key store storage option. This reverts changes in 0.6.0 and 0.7.0
 - 0.7.1
