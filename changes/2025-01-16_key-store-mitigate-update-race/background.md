@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Mitigate Update Race in Branch Key Store
+# Mitigate Version Race Condition in Branch Key Store
 
 # Definitions
 
@@ -18,11 +18,9 @@ interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 # Background
 
 The [branch key store](../../framework/branch-key-store.md) needs to persist branch key versions.
-DynamoDB was selected as an easy-to-use option,
-with an interface later introduced to allow customers
-to implement other storage options.
+As of July 22, 2025, DynamoDB is the only option of storage for branch key storage.
 
-The behavior of the `WriteNewEncryptedBranchKeyVersion` operation
+The behavior of the `VersionKey` operation
 leaves open a possibility for a normally benign overwrite
 of the cipher-text of a Branch Key,
 should two or more agents a Version a Branch Key simultaneously.
@@ -96,8 +94,6 @@ on the old cipher-text value.
 This refactors:
 
 - The [Branch Key Store's VersionKey](../../framework/branch-key-store.md#versionkey)
-- The [Key Storage's WriteNewEncryptedBranchKeyVersion](../../framework/key-store/key-storage.md#writenewencryptedbranchkeyversion)
-- The [Dynamodb Key Storage's WriteNewEncryptedBranchKeyVersion](../../framework/key-store/dynamodb-key-storage.md#writenewencryptedbranchkeyversion)
 
 These refactors are to use the old Active's cipher-text
 as the optimistic lock.
