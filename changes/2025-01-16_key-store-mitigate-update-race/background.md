@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Mitigate Update Race in Branch Key Store
+# Mitigate Version Race Condition in Branch Key Store
 
 # Definitions
 
