@@ -18,7 +18,7 @@ interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 # Background
 
 The [branch key store](../../framework/branch-key-store.md) needs to persist branch key versions.
-As of 22nd July, 2025 DynamoDB is the only option of storage for branch key storage.
+As of July 22, 2025, DynamoDB is the only option of storage for branch key storage.
 
 The behavior of the `VersionKey` operation
 leaves open a possibility for a normally benign overwrite
