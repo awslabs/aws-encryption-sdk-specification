@@ -745,13 +745,14 @@ The Branch Key Context:
 
 - MUST have a `branch-key-id` key who's value MUST not be an empty string
 - MUST have a `type` key who's value MUST not be an empty string
-- MUST have a `create-time` key in ISO 8601 format in UTC
+- MUST have a `create-time` key with a value in ISO 8601 format in UTC
 - MUST have a `tablename` key who's value is the logicalKeyStoreName
 - MUST have a `kms-arn` key who's value is valid KMS ARN
 - MUST have a `hierarchy-version` key who's value is either "1" or "2"
 - MUST NOT have a `enc` key
 - MAY have one or more keys prefixed with `aws-crypto-ec:` which is the encyption context send by the customer.
   The `aws-crypto-ec:` prefix is prepended by the library
+- MUST NOT have any other keys apart from the ones mentioned above if `hierarchy-version` is "2"
 
 ### ACTIVE Branch Key Context
 
