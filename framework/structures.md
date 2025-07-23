@@ -414,8 +414,7 @@ This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
 
 ##### Encryption Context
 
-The [encryption context](./structures.md#encryption-context) is a key-value pair provided by users and is associated with the branch key.
-The key of this encryption context is alway prepended with `aws-crypto-ec:`.
+The [encryption context](./structures.md#encryption-context) associated with all the items of this Branch Key.
 
 ##### KMS ARN
 
@@ -468,7 +467,7 @@ the beacon key can be discarded.
 
 ##### Encryption Context
 
-The [encryption context](#encryption-context) associated with this beacon key.
+The [encryption context](./structures.md#encryption-context) is a key-value pair provided by users and is associated with the beacon key.
 
 ##### KMS ARN
 

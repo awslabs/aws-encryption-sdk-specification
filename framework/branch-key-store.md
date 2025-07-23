@@ -522,7 +522,7 @@ List of TransactWriteItem:
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
-    - Every key-value pair in the [encryption context](./structures.md#encryption-context) provided by users and is associated with the branch key
+    - Every key-value pair in the input `encryption-context`
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
@@ -534,7 +534,7 @@ List of TransactWriteItem:
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
-    - Every key-value pair in the [encryption context](./structures.md#encryption-context) provided by users and is associated with the branch key
+    - Every key-value pair in the input `encryption-context`
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
@@ -546,7 +546,7 @@ List of TransactWriteItem:
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
-    - Every key-value pair in the [encryption context](./structures.md#encryption-context) provided by users and is associated with the branch key
+    - Every key-value pair in the input `encryption-context`
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName is the configured Table Name
@@ -602,8 +602,7 @@ List of TransactWriteItem:
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
     - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
-    - Every key-value pair in the [encryption context](./structures.md#encryption-context) provided by users and is associated with the branch key
-      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+    - Every other key-value pair in the [branch key context](./structures.md#branch-key-context).
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
 - PUT:
@@ -652,7 +651,7 @@ This operation MUST call AWS DDB `GetItem`.
 Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs (a Map)
 which is the [branch key context](#branch-key-context).
 Every key in the constructed branch key context except tableName MUST exist as a string attribute in the AWS DDB response item.
-The [AWS KMS Encryption Context](#aws-kms-encryption-context) MUST be built from branch key context by extracting keys with prefix `aws-crypto-ec:` and then dropping the prefix.
+The [AWS KMS Encryption Context](#aws-kms-encryption-context) MUST be the [encryption context](#encryption-context), which is built from the branch key context by extracting the keys with prefix `aws-crypto-ec:` and then dropping the prefix. See [Encryption Context From Authenticated Branch Key Context](#encryption-context-from-authenticated-branch-key-context).
 
 The operation MUST follow [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) to decrypt and authentication the branch key context.
 
@@ -782,7 +781,7 @@ The Beacon key branch key context MUST NOT have a `version` key.
 ## AWS KMS Encryption Context
 
 If the `hierarchy-version` is v1, AWS KMS encryption context MUST be same as [branch key context](#branch-key-context).
-If the `hierarchy-version` is v2, AWS KMS encryption context MUST be the [encryption context](./structures.md#encryption-context) sent by users without any transformation. This requirement applies regardless of the Branch Key Item's `type`.
+If the `hierarchy-version` is v2, AWS KMS encryption context MUST be the [encryption context from authenticated branch key context](#encryption-context-from-authenticated-branch-key-context) without any transformation. This requirement applies regardless of the Branch Key Item's `type`.
 
 ## AWS KMS Branch Key Decryption
 
@@ -795,7 +794,9 @@ MUST be authenticated in the decryption of `enc`
 
 Every key in the constructed [branch key context](#branch-key-context)
 except `tableName`
-MUST exist as a string attribute in the AWS DDB response item.
+MUST exist as a attribute in the AWS DDB response item. 
+All attributes in the AWS DynamoDB response item MUST be of type string, 
+with the exception of hierarchy-version, which MUST be of type number.
 Every value in the constructed [branch key context](#branch-key-context)
 except the logical table name
 MUST equal the value with the same key in the AWS DDB response item.
@@ -820,7 +821,7 @@ the keystore operation MUST call with a request constructed as follows:
   If the KMS Configuration is MRDiscovery, `KeyId` MUST be the `kms-arn` attribute value of the AWS DDB response item, with the region replaced by the configured region.
   Otherwise, it MUST BE the Keystore's configured KMS Key.
 - `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
-- `EncryptionContext` MUST be the [AWS KMS Encryption Context](#aws-kms-encryption-context) constructed above
+- `EncryptionContext` MUST be the [encryption context from authenticated branch key context](#encryption-context-from-authenticated-branch-key-context)
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 For authentication of attributes except for `enc` on AWS DDB response item in Hierarchy Version `v2`,
@@ -874,10 +875,10 @@ The [encryption context](./structures.md#encryption-context) is stored as map of
 
 For every key in the [encryption context](./structures.md#encryption-context)
 the string `aws-crypto-ec:` + the UTF8 decode of this key
-MUST exist as a key in the authenticated encryption context.
+MUST exist as a key in the authenticated branch key context.
 Also, the value in the [encryption context](./structures.md#encryption-context) for this key
-MUST equal the value in the authenticated encryption context
-for the constructed key.
+MUST equal the value in the authenticated branch key context
+for the prefixed key.
 
 ### Example
 
