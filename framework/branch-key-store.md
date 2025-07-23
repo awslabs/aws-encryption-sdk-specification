@@ -795,8 +795,8 @@ MUST be authenticated in the decryption of `enc`
 
 Every key in the constructed [branch key context](#branch-key-context)
 except `tableName`
-MUST exist as a attribute in the AWS DDB response item. 
-All attributes in the AWS DynamoDB response item MUST be of type string, 
+MUST exist as a attribute in the AWS DDB response item.
+All attributes in the AWS DynamoDB response item MUST be of type string,
 with the exception of hierarchy-version, which MUST be of type number.
 Every value in the constructed [branch key context](#branch-key-context)
 except the logical table name
