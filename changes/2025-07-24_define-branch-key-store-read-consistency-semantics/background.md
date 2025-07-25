@@ -59,8 +59,14 @@ will be able to find the created keys.
 Similarly,
 key rotation and re-encryption operations
 performed due to key compromise
-MUST use consistent reads to ensure that
+MAY want use consistent reads to ensure that
 the encryption operations utilize the new branch key version.
+For this to work local caches would need to be flushed as well.
+So this may be prohibitively complicated.
+
+However, trying to pick and chose which read operations need consistent reads
+creates sharp edges in complicated customer systems.
+So all operations MUST use the same configuration setting.
 
 # Changes
 
