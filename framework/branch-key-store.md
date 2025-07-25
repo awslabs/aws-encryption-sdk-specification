@@ -264,6 +264,7 @@ This MUST include:
 - [logical Keystore name](#logical-keystore-name)
 - [AWS KMS Grant Tokens](#aws-kms-grant-tokens)
 - [AWS KMS Configuration](#aws-kms-configuration)
+- [Require Consistent Reads](#require-consistent-reads)
 
 ### CreateKeyStore
 
@@ -452,6 +453,10 @@ this operation MUST immediately fail.
 VersionKey MUST first get the active version for the branch key from the keystore
 by calling AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
+
+The [Require Consistent Reads](#require-consistent-reads) configuration MUST be honored
+by setting `ConsistentRead` to `true`
+when consistent reads are required.
 
 The `kms-arn` field of DDB response item MUST be [compatible with](#aws-key-arn-compatibility)
 the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
