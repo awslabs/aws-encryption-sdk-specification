@@ -33,8 +33,8 @@ The S3EC provides client-side encryption for Amazon S3.
 ## AWS SDK Compatibility
 
 The S3EC MUST adhere to the same interface for API operations as the conventional AWS SDK S3 client. 
-In other words, the SDK's conventional S3 client MUST be able to be substituted for the S3EC. 
-The S3EC MAY (and in practice, always will) provide a different set of configuration options than the conventional S3 client.
+In other words, the SDK's conventional S3 client is able to be substituted for the S3EC. 
+The S3EC MUST provide a different set of configuration options than the conventional S3 client.
 
 ## Configuration
 
@@ -55,27 +55,27 @@ It is considered deprecated, meaning it will be removed in the next major versio
 #### Enable Legacy Wrapping Algorithms
 
 The S3EC MUST support the option to enable or disable legacy wrapping algorithms. 
-This option MUST be set to false by default. 
+The option to enable legacy wrapping algorithms MUST be set to false by default. 
 When enabled, the S3EC MUST be able to decrypt objects encrypted with all supported wrapping algorithms (both legacy and fully supported).
 When disabled, the S3EC MUST NOT decrypt objects encrypted using legacy wrapping algorithms.
 
 #### Enable Legacy Unauthenticated Modes
 
 The S3EC MUST support the option to enable or disable legacy unauthenticated modes (content encryption algorithms).
-This option MUST be set to false by default. 
+The option to enable legacy unauthenticated modes MUST be set to false by default. 
 When enabled, the S3EC MUST be able to decrypt objects encrypted with all content encryption algorithms (both legacy and fully supported).
 When disabled, the S3EC MUST NOT decrypt objects encrypted using legacy content encryption algorithms.
 
 #### Enable Delayed Authentication
 
 The S3EC MUST support the option to enable or disable Delayed Authentication mode.
-This option MUST be set to false by default. 
+Delayed Authentication mode MUST be set to false by default. 
 When enabled, the S3EC MAY release plaintext from a stream which has not been authenticated.
 When disabled the S3EC MUST NOT release plaintext from a stream which has not been authenticated. 
 
 #### Set Buffer Size
 
-The buffer size refers to the maximum ciphertext length to store in memory when delayed authentication mode is disabled.
+The S3EC SHOULD accept a configurable buffer size which refers to the maximum ciphertext length to store in memory when delayed authentication mode is disabled.
 
 ### Wrapped S3 Client(s)
 
@@ -91,8 +91,9 @@ In this case, the Instruction File Configuration SHOULD be optional, such that i
 
 The S3EC MAY support directly configuring the wrapped SDK clients through its initialization.
 For example, the S3EC MAY accept a credentials provider instance during its initialization. 
-If the S3EC accepts SDK client configuration, the configuration MUST be applied to all wrapped SDK clients, including the KMS client.
-If the S3EC accepts any SDK client configuration options, then the S3EC SHOULD support all possible configuration options. 
+If the S3EC accepts SDK client configuration, the configuration MUST be applied to all wrapped S3 clients.
+If the S3EC accepts SDK client configuration, the configuration MUST be applied to all wrapped SDK clients including the KMS client.
+If the S3EC accepts any SDK client configuration options, then the S3EC should support all possible configuration options. 
 
 ### Other Dependencies
 
@@ -103,17 +104,31 @@ The inclusion of a source of randomness is subject to language availability.
 
 ## API Operations
 
-The S3EC MUST provide implementations for the following S3 operations:
-* GetObject
-* PutObject
-* DeleteObject
-* DeleteObjects
+The S3EC must provide implementations for the following S3 operations:
+* GetObject MUST be implemented by the S3EC.
+  * GetObject MUST decrypt data received from the S3 server and return it as plaintext. 
+* PutObject MUST be implemented by the S3EC.
+  * PutObject MUST encrypt its input data before it is uploaded to S3.
+* DeleteObject MUST be implemented by the S3EC.
+  * DeleteObject MUST delete the given object key.
+  * DeleteObject MUST delete the associated instruction file using the default instruction file suffix.
+* DeleteObjects MUST be implemented by the S3EC.
+  * DeleteObjects MUST delete each of the given objects.
+  * DeleteObjects MUST delete each of the corresponding instruction files using the default instruction file suffix.
 
-The S3EC MAY provide implementations for the following S3 operations:
-* CreateMultipartUpload
-* UploadPart
-* CompleteMultipartUpload
-* AbortMultipartUpload
+The S3EC may provide implementations for the following S3 operations:
+* CreateMultipartUpload MAY be implemented by the S3EC.
+  * If implemented, CreateMultipartUpload MUST initiate a multipart upload.
+* UploadPart MAY be implemented by the S3EC.
+  * UploadPart MUST encrypt each part.
+  * Each part MUST be encrypted in sequence.
+  * Each part MUST be encrypted using the same cipher instance for each part.
+* CompleteMultipartUpload MAY be implemented by the S3EC.
+  * CompleteMultipartUpload MUST complete the multipart upload.
+* AbortMultipartUpload MAY be implemented by the S3EC.
+  * AbortMultipartUpload MUST abort the multipart upload.
 
-The S3EC MAY provide implementations for the following S3EC-specific operation(s):
-* ReEncryptInstructionFile
+The S3EC may provide implementations for the following S3EC-specific operation(s):
+* ReEncryptInstructionFile MAY be implemented by the S3EC. 
+  * ReEncryptInstructionFile MUST decrypt the instruction file's encrypted data key for the given object using the client's CMM.
+  * ReEncryptInstructionFile MUST re-encrypt the plaintext data key with a provided keyring.
