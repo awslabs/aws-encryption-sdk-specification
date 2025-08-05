@@ -47,18 +47,18 @@ The Keystore persists branch keys in DynamoDb that wrap multiple data keys.
 This creates a hierarchy where a branch key wraps multiple data keys and facilitates caching.
 These branch keys are generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) in Hierarchy Version `v1` or [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html) in Hierarchy Version `v2`.
 
-By creating and persisting a data key to an accesbile medium,
+By creating and persisting a data key to an accessible medium,
 such as a DynamoDb table,
 distributed cryptographic agents can use a common, coordinated, cryptographic materials.
 
 This prevents distributed cryptographic agents from independently
 generating unique data keys that COULD BE coordinated,
 which leads to poor caching performance at decryption,
-as each unqiue encrypting agent had a unqiue data key.
+as each unique encrypting agent had a unique data key.
 
 This Keystore interface defines operations that any implementation of its specification must support and implement.
 
-## Definitions
+### Definitions
 
 - [Branch Key(s)](../structures.md#branch-key): Data keys that are reused to wrap unique data keys for envelope encryption.
   For security considerations on when to rotate the branch key, refer to [Appendix B](aws-kms/aws-kms-hierarchical-keyring.md#appendix-b-security-considerations-for-branch-key-rotation).
@@ -329,7 +329,7 @@ This operation MUST create a [branch key](structures.md#branch-key) and a [beaco
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
 
 If creation of the keys are successful,
-the operation MUST call Amazon DynamoDB TransactWriteItems according to the [write key material](#writing-branch-key-and-beacon-key-to-keystore) section.
+the operation MUST call Amazon DynamoDB TransactWriteItems according to the [write key material](#writing-branch-key-and-beacon-key-to-branch-key-store-table) section.
 
 If writing to the keystore succeeds,
 the operation MUST return the branch-key-id that maps to both
@@ -373,10 +373,10 @@ the operation MUST use the `CiphertextBlob` as the wrapped Beacon Key.
 ##### Wrapped Beacon Key Creation `v2`
 
 The operation MUST create a map of strings,
-the [branch key context for beacon keys](#beacon-key-branch-key-context).
+the [branch key context for beacon keys](#beacon-branch-key-context).
 
 The operation MUST calculate the **SHA-384 Digest for the beacon key**
-by [serializing](../structures.md#serialization) the [branch key context for beacon keys](#beacon-key-branch-key-context);
+by [serializing](../structures.md#serialization) the [branch key context for beacon keys](#beacon-branch-key-context);
 the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
 
 The operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
@@ -658,7 +658,7 @@ This operation MUST call AWS DDB `GetItem`.
 Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs (a Map)
 which is the [branch key context](#branch-key-context).
 Every key in the constructed branch key context except tableName MUST exist as a string attribute in the AWS DDB response item.
-The [AWS KMS Encryption Context](#aws-kms-encryption-context) MUST be the [encryption context](#encryption-context), which is built from the branch key context by extracting the keys with prefix `aws-crypto-ec:` and then dropping the prefix. See [Encryption Context From Authenticated Branch Key Context](#encryption-context-from-authenticated-branch-key-context).
+The [AWS KMS Encryption Context](#aws-kms-encryption-context) MUST be the [encryption context](./structures.md##encryption-context), which is built from the branch key context by extracting the keys with prefix `aws-crypto-ec:` and then dropping the prefix. See [Encryption Context From Authenticated Branch Key Context](#encryption-context-from-authenticated-branch-key-context).
 
 The operation MUST follow [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) to decrypt and authentication the branch key context.
 
@@ -757,7 +757,7 @@ The Branch Key Context:
 - MUST have a `kms-arn` key who's value is valid KMS ARN
 - MUST have a `hierarchy-version` key who's value is either "1" or "2"
 - MUST NOT have a `enc` key
-- MAY have one or more keys prefixed with `aws-crypto-ec:` which is the encyption context send by the customer.
+- MAY have one or more keys prefixed with `aws-crypto-ec:` which is the encryption context send by the customer.
   The `aws-crypto-ec:` prefix is prepended by the library
 - MUST NOT have any other keys apart from the ones mentioned above if `hierarchy-version` is "2"
 
