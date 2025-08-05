@@ -763,7 +763,7 @@ The Branch Key Context:
 
 ### ACTIVE Branch Key Context
 
-The ACTIVE branch key is a copy of the DECRYPT_ONLY with the same `version`.
+The ACTIVE branch key is a copy of a DECRYPT_ONLY with the same `version`.
 It is structured slightly differently so that the active version can be accessed quickly.
 
 In addition to the [branch key context](#branch-key-context):
