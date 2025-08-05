@@ -34,6 +34,7 @@ The S3EC provides client-side encryption for Amazon S3.
 
 The S3EC MUST adhere to the same interface for API operations as the conventional AWS SDK S3 client. 
 In other words, the SDK's conventional S3 client is able to be substituted for the S3EC. 
+The S3EC SHOULD support invoking operations unrelated to client-side encryption e.g. CopyObject as the conventional AWS SDK S3 client would.
 The S3EC MUST provide a different set of configuration options than the conventional S3 client.
 
 ## Configuration
@@ -57,14 +58,14 @@ It is considered deprecated, meaning it will be removed in the next major versio
 The S3EC MUST support the option to enable or disable legacy wrapping algorithms. 
 The option to enable legacy wrapping algorithms MUST be set to false by default. 
 When enabled, the S3EC MUST be able to decrypt objects encrypted with all supported wrapping algorithms (both legacy and fully supported).
-When disabled, the S3EC MUST NOT decrypt objects encrypted using legacy wrapping algorithms.
+When disabled, the S3EC MUST NOT decrypt objects encrypted using legacy wrapping algorithms; it MUST throw an exception when attempting to decrypt an object encrypted with a legacy wrapping algorithm.
 
 #### Enable Legacy Unauthenticated Modes
 
 The S3EC MUST support the option to enable or disable legacy unauthenticated modes (content encryption algorithms).
 The option to enable legacy unauthenticated modes MUST be set to false by default. 
 When enabled, the S3EC MUST be able to decrypt objects encrypted with all content encryption algorithms (both legacy and fully supported).
-When disabled, the S3EC MUST NOT decrypt objects encrypted using legacy content encryption algorithms.
+When disabled, the S3EC MUST NOT decrypt objects encrypted using legacy content encryption algorithms; it MUST throw an exception when attempting to decrypt an object encrypted with a legacy content encryption algorithm.
 
 #### Enable Delayed Authentication
 
@@ -80,6 +81,7 @@ The S3EC SHOULD accept a configurable buffer size which refers to the maximum ci
 ### Wrapped S3 Client(s)
 
 The S3EC MUST support the option to provide an SDK S3 client instance during its initialization.
+The S3EC MUST NOT support use of S3EC as the provided S3 client during its initialization; it MUST throw an exception in this case.
 
 ### Instruction File Configuration
 
