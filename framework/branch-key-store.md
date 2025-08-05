@@ -768,7 +768,7 @@ It is structured slightly differently so that the active version can be accessed
 
 In addition to the [branch key context](#branch-key-context):
 
-The ACTIVE branch key context value of the `type`key MUST equal to `"branch:ACTIVE"`.
+The ACTIVE branch key context value of the key `type` MUST equal to `"branch:ACTIVE"`.
 The ACTIVE branch key context MUST have a `version` key.
 The `version` key MUST store the branch key version formatted like `"branch:version:"` + `<version UUID>`.
 
@@ -804,7 +804,8 @@ Every key in the constructed [branch key context](#branch-key-context)
 except `tableName`
 MUST exist as a attribute in the AWS DDB response item.
 All attributes in the AWS DynamoDB response item MUST be of type string,
-with the exception of hierarchy-version, which MUST be of type number.
+with the exception of hierarchy-version, which MUST be of type number,
+and `enc`, which MUST be of type binary.
 Every value in the constructed [branch key context](#branch-key-context)
 except the logical table name
 MUST equal the value with the same key in the AWS DDB response item.
