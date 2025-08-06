@@ -580,8 +580,12 @@ The `kms-arn` stored in the DDB table MUST NOT change as a result of this operat
 even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly match the stored ARN.
 If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
-The values on the AWS DDB response item
-MUST be authenticated according to [authenticating a keystore item for item with hierarchy version v1](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v1) or [authenticating a keystore item for item with hierarchy version v2](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v2) based on schema version of the branch key item.
+If the `hierarchy-version` is `v1`, the values on the AWS DDB response item MUST be authenticated according to
+[authenticating a keystore item for item with hierarchy version v1](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v1).
+
+If the `hierarchy-version` is `v2`, the values on the AWS DDB response item MUST be authenticated according to
+[authenticating a keystore item for item with hierarchy version v2](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v2).
+
 If the item fails to authenticate this operation MUST fail.
 
 If the `hierarchy-version` is `v1`,
@@ -756,7 +760,7 @@ The Branch Key Context:
 - MUST have a `tablename` key who's value is the logicalKeyStoreName
 - MUST have a `kms-arn` key who's value is valid KMS ARN
 - MUST have a `hierarchy-version` key who's value is either "1" or "2"
-- MUST NOT have a `enc` key
+- MUST NOT have an `enc` key
 - MAY have one or more keys prefixed with `aws-crypto-ec:` which is the encryption context send by the customer.
   The `aws-crypto-ec:` prefix is prepended by the library
 - MUST NOT have any other keys apart from the ones mentioned above if `hierarchy-version` is "2"
