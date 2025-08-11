@@ -22,11 +22,11 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 ### Key Material
 
 An AES or RSA key, or a valid AWS KMS key identifier.
+Details on key material encoding can be found in the respective keyring specifications.
 
 ### Client Initialization
 
 Client initialization refers to the process by which a new S3EC instance is created.
-Depending on the language, this could be a builder (using the Builder pattern) or a constructor.
 
 ## Overview
 
@@ -79,7 +79,9 @@ When disabled the S3EC MUST NOT release plaintext from a stream which has not be
 
 #### Set Buffer Size
 
-The S3EC SHOULD accept a configurable buffer size which refers to the maximum ciphertext length to store in memory when delayed authentication mode is disabled.
+The S3EC SHOULD accept a configurable buffer size which refers to the maximum ciphertext length in bytes to store in memory when Delayed Authentication mode is disabled.
+If Delayed Authentication mode is enabled, and the buffer size has been set to a value other than its default, the S3EC MUST throw an exception.
+If Delayed Authentication mode is disabled, and no buffer size is provided, the S3EC MUST set the buffer size to a reasonable default.
 
 ### Wrapped S3 Client(s)
 
@@ -109,6 +111,8 @@ The inclusion of a source of randomness is subject to language availability.
 
 ## API Operations
 
+### Required API Operations
+
 The S3EC must provide implementations for the following S3 operations:
 
 - GetObject MUST be implemented by the S3EC.
@@ -121,6 +125,8 @@ The S3EC must provide implementations for the following S3 operations:
 - DeleteObjects MUST be implemented by the S3EC.
   - DeleteObjects MUST delete each of the given objects.
   - DeleteObjects MUST delete each of the corresponding instruction files using the default instruction file suffix.
+
+### Optional API Operations
 
 The S3EC may provide implementations for the following S3 operations:
 
