@@ -349,7 +349,8 @@ If the `hierarchy-version` is `v1`,
 the wrapped beacon key MUST be created according to [Wrapped Beacon Key Creation `v1`](#wrapped-beacon-key-creation-v1) and
 the wrapped branch keys MUST be created according to
 [Wrapped Branch Key Creation `v1`](#wrapped-branch-key-creation-v1);
-else the `hierarchy-version` MUST be `v2`,
+
+If the `hierarchy-version` is be `v2`,
 the wrapped beacon Key MUST be created according to [Wrapped Beacon Key Creation `v2`](#wrapped-beacon-key-creation-v2) and
 the wrapped branch keys MUST be created according to
 [Wrapped Branch Key Creation `v2`](#wrapped-branch-key-creation-v2).
@@ -399,10 +400,10 @@ creating the **beacon plain-text tuple**.
 The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html)
 with a request constructed as follows:
 
-- `Plaintext` Must be the **beacon plain-text tuple**
+- `Plaintext` MUST be the **beacon plain-text tuple**.
 - `KeyId` MUST be the `kms-arn`.
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `EncryptionContext` MUST be the `encryption-context`
+- `EncryptionContext` MUST be the `encryption-context`.
 
 If the call to AWS KMS Encrypt succeeds,
 the operation MUST use the Encrypt result `CiphertextBlob`
@@ -787,7 +788,7 @@ The `type` value MUST store the branch key version formatted like `"branch:versi
 
 In addition to the [branch key context](#branch-key-context):
 
-The Beacon key branch key context MUST includes a key `type` and the value MUST be `"beacon:ACTIVE"`.
+The Beacon key branch key context MUST include a key `type` and the value MUST be `"beacon:ACTIVE"`.
 The Beacon key branch key context MUST NOT have a `version` key.
 
 ## AWS KMS Encryption Context
