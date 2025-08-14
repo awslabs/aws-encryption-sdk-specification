@@ -24,11 +24,10 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 The S3EC SHOULD implement an S3 Keyring to consolidate validation and other functionality common to all S3 Keyrings.
 If implemented, the S3 Keyring MUST implement the Keyring interface.
 If implemented, the S3 Keyring MUST NOT be able to be instantiated as a Keyring instance.
-If implemented, all Keyrings MUST inherit or otherwise depend on the functionality implemented in the S3 Keyring.
 
 ### Abstract Methods
 
-In addition to the methods defined in the Keyring interface, the S3 Keyring MUST define the following:
+In addition to the methods defined in the Keyring interface, the S3 Keyring must define or support the following:
 - The S3 Keyring MUST define an abstract method GenerateDataKey.
 - The S3 Keyring MUST define an abstract method EncryptDataKey.
 - The S3 Keyring MUST define an abstract method DecryptDataKey.
