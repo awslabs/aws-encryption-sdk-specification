@@ -377,8 +377,8 @@ The operation MUST create a map of strings,
 the [branch key context for beacon keys](#beacon-branch-key-context).
 
 The operation MUST calculate the **SHA-384 Digest for the beacon key**
-by [serializing](../structures.md#serialization) the [branch key context for beacon keys](#beacon-branch-key-context);
-the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
+by [serializing](../structures.md#serialization) the [branch key context for beacon keys](#beacon-branch-key-context),
+according to the [encryption context serialization specification](../structures.md#serialization).
 
 The operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
 The call to AWS KMS GenerateDataKey MUST use the configured AWS KMS client to make the call.
@@ -479,13 +479,13 @@ The operation MUST concatenate the **SHA-384 Digest for the `DECRYPT_ONLY`**
 with the plain-text Branch Key,
 creating the **`DECRYPT_ONLY` plain-text tuple**.
 
-The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
+The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html)
 with a request constructed as follows:
 
-- `Plaintext` **the `DECRYPT_ONLY` plain-text tuple**
+- `Plaintext` MUST be **the `DECRYPT_ONLY` plain-text tuple**.
 - `KeyId` MUST be the `kms-arn`.
-- `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `EncryptionContext` MUST be the `encryption-context`
+- `GrantTokens` MUST be the [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token) of this keystore.
+- `EncryptionContext` MUST be the `encryption-context`.
 
 If the call to AWS KMS Encrypt succeeds,
 the operation MUST use the Encrypt result `CiphertextBlob`
@@ -498,10 +498,10 @@ creating the **the `ACTIVE` plain-text tuple**.
 The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html)
 with a request constructed as follows:
 
-- `Plaintext` **the `ACTIVE` plain-text tuple**
+- `Plaintext` MUST be **the `ACTIVE` plain-text tuple**.
 - `KeyId` MUST be the `kms-arn`.
-- `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `EncryptionContext` MUST be the `encryption-context`
+- `GrantTokens` MUST be the [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token) of this keystore.
+- `EncryptionContext` MUST be the `encryption-context`.
 
 If the call to AWS KMS Encrypt succeeds,
 the operation MUST use the Encrypt result `CiphertextBlob`
