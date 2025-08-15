@@ -28,6 +28,7 @@ If implemented, the S3 Keyring MUST NOT be able to be instantiated as a Keyring 
 ### Abstract Methods
 
 In addition to the methods defined in the Keyring interface, the S3 Keyring must define or support the following:
+
 - The S3 Keyring MUST define an abstract method GenerateDataKey.
 - The S3 Keyring MUST define an abstract method EncryptDataKey.
 - The S3 Keyring MUST define an abstract method DecryptDataKey.
