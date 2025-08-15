@@ -111,6 +111,8 @@ The inclusion of a source of randomness is subject to language availability.
 
 ## API Operations
 
+The S3EC provides various API operations.
+
 ### Required API Operations
 
 The S3EC must provide implementations for the following S3 operations:
