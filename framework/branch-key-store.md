@@ -590,8 +590,10 @@ If the `hierarchy-version` is `v2`, the values on the AWS DDB response item MUST
 If the item fails to authenticate this operation MUST fail.
 
 If the `hierarchy-version` is `v1`,
-the wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Beacon Key Creation `v1`](#wrapped-beacon-key-creation-v1);
-else the `hierarchy-version` MUST be `v2`,
+the wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Beacon Key Creation `v1`](#wrapped-beacon-key-creation-v1).
+
+If the `hierarchy-version` is `v2`,
+the wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to
 [Wrapped Branch Key Creation `v2`](#wrapped-branch-key-creation-v2).
 
 To add the new branch key to the keystore,
