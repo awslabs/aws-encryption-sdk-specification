@@ -624,7 +624,7 @@ List of TransactWriteItem:
     - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
     - Every key-value pair in the [encryption context](./structures.md#encryption-context) provided by users and is associated with the branch key
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
-  - ConditionExpression: `attribute_exists(branch-key-id) AND enc = :encOld`
+  - ConditionExpression: `enc = :encOld`
   - ExpressionAttributeValues: `{":encOld" := DDB.AttributeValue.B(oldCiphertextBlob)}`
   - TableName: the configured Table Name
 
