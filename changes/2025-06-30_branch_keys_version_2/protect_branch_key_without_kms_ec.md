@@ -39,6 +39,8 @@ an actor cannot modify the **Branch Key Context Digest**.
 1.5 considers a local HMAC operation,
 with the plain-text AES-256 being the key.
 
+See [Un-modeled Branch Key Context Key Values](./un-modeled_branch_key_context_key_values.md) for what did we do about un-prefixed context of a Branch Key.
+
 ## 1.2 Getting Branch Keys
 
 The Branch Key Item is read from DDB table;
