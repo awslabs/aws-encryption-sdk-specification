@@ -15,7 +15,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Interface
 
-The KmsKeyring MUST implement the [Keyring interface](keyring-interface.md#interface) and include the behavior described in the [S3 Keyring](s3-keyring.md).
+The KmsKeyring MUST implement the [Keyring interface](keyrings.md#interface) and include the behavior described in the [S3 Keyring](s3-keyring.md).
 
 ## Initialization
 

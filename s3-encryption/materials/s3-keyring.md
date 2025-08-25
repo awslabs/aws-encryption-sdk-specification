@@ -40,6 +40,7 @@ In addition to the methods defined in the Keyring interface, the S3 Keyring must
 If the Plaintext Data Key in the input EncryptionMaterials is null, the S3 Keyring MUST call the GenerateDataKey method using the materials.
 If the materials returned from GenerateDataKey contain an EncryptedDataKey, the S3 Keyring MUST return the materials.
 If the materials returned from GenerateDataKey do not contain an EncryptedDataKey, the S3 Keyring MUST call the EncryptDataKey method using the materials.
+The OnEncrypt operation is responsible for ensuring that the EncryptionMaterials are valid and contain valid plaintext and encrypted data keys.
 
 #### OnDecrypt
 
@@ -47,3 +48,5 @@ If the input DecryptionMaterials contains a Plaintext Data Key, the S3 Keyring M
 If the input collection of EncryptedDataKey instances contains any number of EDKs other than 1, the S3 Keyring MUST throw an exception.
 The S3 Keyring MAY validate that the Key Provider ID of the Encrypted Data Key matches the expected default Key Provider ID value.
 The S3 Keyring MUST call the DecryptDataKey method using the materials and add the resulting plaintext data key to the materials.
+The OnDecrypt operation is responsible for ensuring that the DecryptionMaterials contain valid plaintext and encrypted data keys.
+The OnDecrypt operation is also responsible for ensuring that the DecryptionMaterials are valid and contain valid plaintext and encrypted data keys.
