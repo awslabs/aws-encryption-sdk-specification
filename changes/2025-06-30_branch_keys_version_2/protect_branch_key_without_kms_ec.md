@@ -9,7 +9,7 @@ See [Definitions](./background.md#definitions).
 
 # 1 Plain-text Commitment instead of KMS Encryption Context
 
-The KMS RSA Keyring has already solved the need
+The KMS RSA Keyring and ECDH Keyrings has already solved the need
 to substitute KMS Encryption Context;
 we need only adapt that solution and apply it here.
 
