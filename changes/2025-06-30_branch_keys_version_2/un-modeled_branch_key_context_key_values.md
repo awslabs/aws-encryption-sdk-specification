@@ -11,7 +11,7 @@ See [background](./background.md) for an introduction to Hierarchy Version 2 (HV
 
 The issue at hand is what to do about un-prefixed context of a Branch Key.
 
-These are any members of the Branch Key's Context who's key is not prefixed by aws-crypto-ec: OR another reserved Branch Key Context Key Name, such as kms-arn or hierarchy-version.
+These are any members of the Branch Key's Context whose key is not prefixed by aws-crypto-ec: OR another reserved Branch Key Context Key Name, such as kms-arn or hierarchy-version.
 Such Key-Value pairs were NOT added to a Branch Key Item by a Crypto Tools product.
 But they could have been added by an MPL Consumer manually.
 As long as this is done properly, the AWS KMS Hierarchical Keyring will use these manually modified Branch Keys.
@@ -20,7 +20,7 @@ As long as this is done properly, the AWS KMS Hierarchical Keyring will use thes
 
 ### HV-2 Obs 1: Digest makes out-of-library changes more difficult
 
-Hierarchy Version 2 makes out-of-library changes more difficult, as the Branch Key Context is not protected by KMS Encryption Context, but by a Digest on a canonicalization of the Branch Key Context.
+Hierarchy Version 2 makes out-of-library changes more difficult, as the Branch Key Context is not protected by KMS Encryption Context, but by a digest on a canonicalization of the Branch Key Context.
 Thus, changing an HV-2 Branch Key can only be done by using the library or a specification compliant implementation.
 
 ### HV-2 Obs 2: No prefix to KMS removes an incentive
@@ -33,7 +33,7 @@ Hierarchy Version 2 does not call KMS with this prefix; thus, this motivation is
 
 ## Option 1: Entirely Prevent this in HV-2
 
-Hierarchy Version 2 addresses a strong motivation for MPL Consumers to remove the prefix; while there might be other motivations (for example, GSI in DDB), Crypto Tools is un-aware of them.
+Hierarchy Version 2 addresses a strong motivation for MPL Consumers to remove the prefix; while there might be other motivations (for example, GSI in DDB), Crypto Tools is unaware of them.
 Thus, it seems reasonable for Hierarchy Version 2 to have a much stricter data model than Hierarchy Version 1.
 This data model would ensure that every Branch Key Context Key Name of a Branch Key Item is either:
 
