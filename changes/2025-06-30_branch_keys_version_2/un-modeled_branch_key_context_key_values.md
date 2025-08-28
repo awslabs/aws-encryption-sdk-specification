@@ -11,7 +11,7 @@ See [background](./background.md) for an introduction to Hierarchy Version 2 (HV
 
 The issue at hand is what to do about un-prefixed context of a Branch Key.
 
-These are any members of the Branch Key's Context whose key is not prefixed by `aws-crypto-ec:` OR another reserved Branch Key Context Key Name, such as `kms-arn` or `hierarchy-version`.
+These are any members of the Branch Key's Context whose key is not prefixed by `aws-crypto-ec:` OR not another reserved Branch Key Context Key Name, such as `kms-arn` or `hierarchy-version`.
 Such Key-Value pairs were NOT added to a Branch Key Item by a Crypto Tools product.
 But they could have been added by an AWS Cryptographic Material Providers Library (MPL) Consumer manually.
 As long as this is done properly, the AWS KMS Hierarchical Keyring will use these manually modified Branch Keys.
