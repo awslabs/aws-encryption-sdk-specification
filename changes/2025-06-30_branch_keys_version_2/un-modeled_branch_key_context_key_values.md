@@ -43,7 +43,7 @@ This data model would ensure that every Branch Key Context Key Name of a Branch 
 However, when/if a feature to mutate the Branch Key scheme ever exists then this means that Hierarchy Version 1 Branch Keys that were modified outside of the library cannot be "Mutated" to Hierarchy Version 2 unless the modification is reverted.
 
 Risk:
-Crypto Tools (CT) knows that at least one CT customer are pursuing out-of-library changes. If CT goes with this option, CT SHOULD clearly document:
+Crypto Tools (CT) knows that at least one CT customer is pursuing out-of-library changes. If CT goes with this option, CT SHOULD clearly document:
 
 1. HV-2 has a stricter data model
 2. In general, CT products do not support out-of-library behavior
@@ -53,7 +53,7 @@ Despite the risk, the author considers this Option the best path forward, and wi
 ## Option 2: Prevent but preserve
 
 If a feature to mutate the Branch Key schema ever exists, mutations to HV-2 could preserve the un-prefixed context, if they were present on the HV-1 Branch Key.
-However, there is no way for MPL Consumers to modify this un-prefixed context, as the relatively simple kms:ReEncrypt pattern to make the out-of-library change will not update the digest in HV-2, and therefore Branch Key modified this way will be considered by the library to be invalid.
+However, there is no way for MPL Consumers to modify this un-prefixed context, as the relatively simple `kms:ReEncrypt` pattern to make the out-of-library change will not update the digest in HV-2, and therefore Branch Key modified this way will be considered by the library to be invalid.
 
 The way HV-2 puts Encryption Context In Digest also advocates for not maintaining an out-of-library change.
 As such, CT should implement Option 1.
