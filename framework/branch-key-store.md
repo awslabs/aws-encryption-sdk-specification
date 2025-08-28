@@ -45,7 +45,7 @@
 A Keystore persists hierarchical data that allows customers to call AWS KMS less often.
 The Keystore persists branch keys in DynamoDb that wrap multiple data keys.
 This creates a hierarchy where a branch key wraps multiple data keys and facilitates caching.
-These branch keys are generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) in Hierarchy Version `v1` or [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html) in Hierarchy Version `v2`.
+These branch keys are generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) in Hierarchy Version `v1` and [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html) in Hierarchy Version `v2`.
 
 By creating and persisting a data key to an accessible medium,
 such as a DynamoDb table,
