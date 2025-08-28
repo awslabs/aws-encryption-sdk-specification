@@ -138,8 +138,8 @@ KMS Key Grants can have restricted but unique conditions.
 Many potential Branch Key Customers are prevented from using
 the Hierarchy Keyring,
 as they have pre-existing Key Policies with their tenants
-that cannot be met if the KMS Encryption Context is populated
-by the Branch Key's Context.
+that cannot be met if the KMS Encryption Context is transformed
+by the Branch Key Store.
 
 # Requirements
 
