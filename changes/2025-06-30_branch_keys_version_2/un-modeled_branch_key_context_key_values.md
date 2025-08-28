@@ -55,7 +55,7 @@ Despite the risk, the author considers this Option the best path forward, and wi
 If a feature to mutate the Branch Key schema ever exists, mutations to HV-2 could preserve the un-prefixed context, if they were present on the HV-1 Branch Key.
 However, there is no way for MPL Consumers to modify this un-prefixed context, as the relatively simple `kms:ReEncrypt` pattern to make the out-of-library change will not update the digest in HV-2, and therefore Branch Key modified this way will be considered by the library to be invalid.
 
-The way HV-2 puts Encryption Context In Digest also advocates for not maintaining an out-of-library change.
+The way HV-2 puts Encryption Context in digest also advocates for not maintaining an out-of-library change.
 As such, CT should implement Option 1.
 
 ## Option 3: Reverse the prefix
