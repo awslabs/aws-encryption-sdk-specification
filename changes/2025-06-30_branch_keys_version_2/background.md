@@ -17,7 +17,7 @@ The Branch Key Store's Branch Keys are designated as `"hierarchy-version" : "1"`
 
 This document proposes changes to theses Branch Keys;
 when HV-1 is written,
-we mean a Branch Key Item written by the Branch Key Store prior to this change, which will always describe it's self as  `"hierarchy-version" : "1"`.
+we mean a Branch Key Item written by the Branch Key Store prior to this change, which will always describe it's self as `"hierarchy-version" : "1"`.
 
 ## Branch Key's Cryptographic Material
 
