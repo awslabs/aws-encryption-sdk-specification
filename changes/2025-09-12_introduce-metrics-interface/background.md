@@ -15,23 +15,91 @@ in this document are to be interpreted as described in
 
 ## Issues and Alternatives
 
-###  collecting metrics from customers?
-
 Crypto Tools (CT) publishes software libraries. The latest
 versions of these libraries have no logging or metrics publishing
 to either a local application or to an observability service like AWS CloudWatch.
 
+As client side encryption libraries emitting metrics must be done carefully as
+to avoid accidentally [leaking](https://github.com/aws/aws-encryption-sdk-python/pull/105/files) any information related to the plaintext that could lead to a
+loss of customer trust.
 
+A popular feature request has been for in depth insights into CT libraries. Many customers
+ask for suggestions on how to reduce network calls to AWS Key Management Service (AWS KMS) and
+followup questions around cache performance.
 
+CT offers solutions to reduce network calls to AWS KMS through the Caching CMM and the AWS KMS Hierarchical Keyring.
+Today, there is no CT solution for customers to extract the performance metrics customers are looking for.
+This can lead to frustrating debugging sessions and escalations that
+could have been resolved with additional information.
 
-### Why should supported libraries collect metrics?
+Recent customer demand has allowed CT to re-evaluate client side metrics to offer
+a better customer experience.
 
-Metrics collection has long been an outstanding feature request
-that has been 
+### Issue 1: What will be the default behavior?
 
-### Default Behavior?
+As a client-side encryption library CT should be as cautious as possible.
+Customers of CT libraries should be on the driver seat and determine for
+themselves if their application could benefit from emitting metrics.
+Making that decision for customers can erode customer trust.
 
+For CT to be comfortable with allowing metrics, CT must consider that
+this process must not affect the availability of the consumer of the library.
 
-### Should Data Plane APIs fail if metrics fail to publish?
+#### Opt-In (recommended)
 
+By not emitting metrics by default existing customer workflows do not change.
 
+This allows customers to test how their applications behave when they start to emit
+metrics. Customers can then ask for updates to the implementations
+CT provides or customers can go an implement their own interfaces that are fine-tuned
+to their use cases.
+
+#### Always
+
+This option implies that CT guarantees that the availability of an application
+will not change. Perhaps a bold implication this is ultimately what the customer
+will feel like; getting no choice on the matter and opting to not upgrade.
+Going from never emitting metrics to always emitting them says to customers
+that their application no matter its use case will always benefit from metrics.
+Without letting customers make that choice, CT looses hard earned customer trust.
+
+This also forces customers to make a choice, start collecting metrics and pick up
+additional updates CT provides or get stuck in a version of the library that will
+become unsupported.
+
+Additionally, requiring customers to start emitting metrics
+almost certainly guarantees a breaking change across supported libraries.
+
+### Issue 2: Should Data Plane APIs fail if metrics fail to publish?
+
+#### No (recommended)
+
+Metrics publishing must not impact application availability.
+
+CT should allow for a fail-open approach when metrics fail to publish.
+This will prevent metric publishing issues from impacting the
+core functionality of the application.
+
+CT can consider this a two-way door with initially not attempting to retry
+to publish failed metrics and add this functionality later on.
+
+#### Yes
+
+This will become a problem for the libraries and will undoubtedly result
+in customer friction and failing adoption rates.
+Failing operations due to metrics not being published leaves the availability
+of the application to rest on the implementation of the metrics interface.
+This should not be the case, metrics should aid the customer application
+not restrict it.
+
+### Issue 3: How will customers interact with the libraries to emit metrics?
+
+#### Provide an Interface
+
+Keeping in line with the rest of CT features, a well defined interface with out
+of the box implementations should satisfy the feature request.
+
+Out of the box implementations should cover publishing metrics to an
+existing observability service like AWS CloudWatch and to the local file system.
+These implementations should offer customers a guide into implementing their own
+if they wish to do so.
