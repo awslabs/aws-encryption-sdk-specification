@@ -3,11 +3,11 @@
 
 # Adding a Metrics Interface
 
-***NOTE: This document will be used to gain alignment on
+**_NOTE: This document will be used to gain alignment on
 this interface should look like and how it could be integrated with
 existing operations. This document will not seek to specify
 a Metrics implementation or specify which metrics will be collected
-from impacted APIs or configurations.***
+from impacted APIs or configurations._**
 
 ## Affected APIs or Client Configurations
 
@@ -15,23 +15,23 @@ This serves as a reference of all APIs and Client Configurations that this chang
 This list is not exhaustive. Any downstream consumer of any API or client configuration SHOULD
 also be updated as part of this proposed changed.
 
-| API/ Configuration                                                                      |
-| --------------------------------------------------------------------------------------- |
-| [Encrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/client-apis/encrypt.md) |
-| [Decrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/client-apis/decrypt.md) |
-| [GetEncryptionMaterials](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/cmm-interface.md#get-encryption-materials)|
-| [DecryptionMaterials](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/cmm-interface.md#decrypt-materials)|
-| [OnEncrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/keyring-interface.md#onencrypt)|
-| [OnDecrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/keyring-interface.md#ondecrypt)|
-| [DynamoDB Table Encryption Config](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/main/specification/dynamodb-encryption-client/ddb-table-encryption-config.md)|
+| API/ Configuration                                                                                                                                                                |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Encrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/client-apis/encrypt.md)                                                                         |
+| [Decrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/client-apis/decrypt.md)                                                                         |
+| [GetEncryptionMaterials](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/cmm-interface.md#get-encryption-materials)                             |
+| [DecryptionMaterials](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/cmm-interface.md#decrypt-materials)                                       |
+| [OnEncrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/keyring-interface.md#onencrypt)                                                     |
+| [OnDecrypt](https://github.com/awslabs/aws-encryption-sdk-specification/blob/master/framework/keyring-interface.md#ondecrypt)                                                     |
+| [DynamoDB Table Encryption Config](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/main/specification/dynamodb-encryption-client/ddb-table-encryption-config.md) |
 
 ## Affected Libraries
 
-| Library  | Version Introduced  | Implementation |
-| -------- | ------------------- | -------------- |
-| ESDK     | T.B.D               | [ESDK.smithy](https://github.com/aws/aws-encryption-sdk/blob/mainline/AwsEncryptionSDK/dafny/AwsEncryptionSdk/Model/esdk.smithy)|
-| MPL      | T.B.D               | [material-provider.smithy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/material-provider.smithy)|
-| DB-ESDK  | T.B.D               | [DynamoDbEncryption.smithy](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/main/DynamoDbEncryption/dafny/DynamoDbEncryption/Model/DynamoDbEncryption.smithy)|
+| Library | Version Introduced | Implementation                                                                                                                                                                                                     |
+| ------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ESDK    | T.B.D              | [ESDK.smithy](https://github.com/aws/aws-encryption-sdk/blob/mainline/AwsEncryptionSDK/dafny/AwsEncryptionSdk/Model/esdk.smithy)                                                                                   |
+| MPL     | T.B.D              | [material-provider.smithy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/material-provider.smithy) |
+| DB-ESDK | T.B.D              | [DynamoDbEncryption.smithy](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/main/DynamoDbEncryption/dafny/DynamoDbEncryption/Model/DynamoDbEncryption.smithy)                                     |
 
 ## Definitions
 
@@ -46,7 +46,7 @@ in this document are to be interpreted as described in
 ## Summary
 
 Existing users of Crypto Tools (CT) libraries do no have any insights as to
-how the librar(y/ies) behave(s) in their application. 
+how the librar(y/ies) behave(s) in their application.
 This can lead to frustrating debugging sessions where users
 are required to have explicit tests to assert they are using a particular feature
 correctly, or if customers are using any of the KMS keyrings users have to have
@@ -54,7 +54,7 @@ AWS Cloudwatch open to verify their application is sending values users expect.
 This can be seen as a best practice and users may find this a good exercise;
 however, CT's libraries do not make debugging an easy task.
 
-A feature which allows customers to get real-time telemetry of their application's 
+A feature which allows customers to get real-time telemetry of their application's
 integration with CT's libraries would be welcomed by users and will deliver on the
 "easy to use and hard to misuse" tenet.
 
@@ -81,17 +81,17 @@ To collect metrics across CT's library stack multiple points of integration
 are needed in order to collect metrics across CT's libraries.
 Generally, CT's libraries work as follows:
 
-*Note: Not every Client supports the Material Provider Library.
-The Diagram below assumes it to help the mental model.*
+_Note: Not every Client supports the Material Provider Library.
+The Diagram below assumes it to help the mental model._
 
 ```mermaid
 sequenceDiagram
     participant Client
-    box Material Provider Library 
+    box Material Provider Library
       participant CMM
       participant Keyring
     end
-    loop Content Encryption 
+    loop Content Encryption
         Client->>Client: Content Encryption
     end
     Client<<->>CMM: GetEncryption/Decryption Materials
@@ -104,6 +104,7 @@ a Metrics Agent. This will allow customers to define and supply one top
 level Metrics Agent; this agent will get plumbed throughout CT's stack.
 
 For example, in the ESDK for Java this would look like:
+
 ```java
 final AwsCrypto crypto = AwsCrypto.builder().build();
 // Create a Keyring

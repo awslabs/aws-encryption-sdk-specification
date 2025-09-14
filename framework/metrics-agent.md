@@ -3,7 +3,7 @@
 
 # Metrics Agent Interface
 
-*NOTE: Still in draft but in a state to receive feedback on 9-15-2025*
+_NOTE: Still in draft but in a state to receive feedback on 9-15-2025_
 
 ## Version
 
@@ -12,22 +12,21 @@
 ### Changelog
 
 - 1.0.0
-
   - Initial record
 
 ## Implementations
 
-| Library  | Version Introduced  | Implementation |
-| -------- | ------------------- | -------------- |
-| ESDK     | T.B.D               | [ESDK.smithy](https://github.com/aws/aws-encryption-sdk/blob/mainline/AwsEncryptionSDK/dafny/AwsEncryptionSdk/Model/esdk.smithy)|
-| MPL      | T.B.D               | [material-provider.smithy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/material-provider.smithy)|
-| DB-ESDK  | T.B.D               | [DynamoDbEncryption.smithy](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/main/DynamoDbEncryption/dafny/DynamoDbEncryption/Model/DynamoDbEncryption.smithy)|
+| Library | Version Introduced | Implementation                                                                                                                                                                                                     |
+| ------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ESDK    | T.B.D              | [ESDK.smithy](https://github.com/aws/aws-encryption-sdk/blob/mainline/AwsEncryptionSDK/dafny/AwsEncryptionSdk/Model/esdk.smithy)                                                                                   |
+| MPL     | T.B.D              | [material-provider.smithy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/material-provider.smithy) |
+| DB-ESDK | T.B.D              | [DynamoDbEncryption.smithy](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/main/DynamoDbEncryption/dafny/DynamoDbEncryption/Model/DynamoDbEncryption.smithy)                                     |
 
 ## Overview
 
 The Metrics Agent defines defines operations that allow messages
 to be published to a destination.
-The Metrics Agent interface describes the interface that all 
+The Metrics Agent interface describes the interface that all
 Metrics Agents MUST implement.
 
 ## Definitions
@@ -66,7 +65,6 @@ context to a particular label.
 A transactionId is a string that
 is used to coalasce multiple metric requests
 for a given client request.
-
 
 ## Supported Metrics Agents
 
@@ -145,27 +143,32 @@ The MetricsAgent Interface MUST support the following behaviors:
 - [AddProperty](#addproperty)
 
 #### AddDate
+
 Used to record a specific time value with the same metric name.
 
 #### AddTime
+
 Used to aggregate a sum from multiple time values with the same metric name.
 
 #### AddCount
+
 Used to aggregate a sum from multiple count values with the same metric name.
 
 #### AddProperty
+
 Used to add context/metadata in the form of a key-value pair related to a Metrics instance
 
 ## Proposed Smithy Model
+
 ```smithy
 use aws.polymorph#extendable
 
 @extendable
 resource MetricsAgent {
   operations: [
-    AddDate, 
-    AddTime, 
-    AddCount, 
+    AddDate,
+    AddTime,
+    AddCount,
     AddProperty
   ]
 }
