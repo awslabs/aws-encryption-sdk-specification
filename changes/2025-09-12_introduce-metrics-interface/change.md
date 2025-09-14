@@ -75,177 +75,94 @@ ensure the following.
 
 1. MUST NOT block the application's execution thread.
 
-## Interface
-
-### Inputs
-
-The inputs to the MetricsAgent are groups of related fields, referred to as:
-
-- [AddDate Input](adddate-input)
-- [AddTime Input](#addtime-input)
-- [AddCount Input](#addcount-input)
-- [AddProperty Input](#addproperty-input)
-
-#### AddDate Input
-
-This is the input to the [AddDate](#adddate) behavior.
-
-The add date input MUST include the following:
-
-- A label
-- A date
-
-The add date input MAY include the following:
-
-- A transactionId
-
-#### AddTime Input
-
-This is the input to the [AddTime](#addtime) behavior.
-
-The add time input MUST include the following:
-
-- A label
-- A duration 
-
-The add time input MAY include the following:
-
-- A transactionId
-
-#### AddCount Input
-
-This is the input to the [AddCount](#addcount) behavior.
-
-The add count input MUST include the following:
-
-- A label
-- A date 
-
-The add count input MAY include the following:
-
-- A transactionId
-
-#### AddProperty Input
-
-This is the input to the [AddProperty](#addproperty) behavior.
-
-The add property input MUST include the following:
-
-- A label
-- A value
-
-The add property input MAY include the following:
-
-- a transactionId
-
-### Behaviors
-
-The MetricsAgent Interface MUST support the following behaviors:
-
-- [AddDate](#adddate)
-- [AddTime](#addtime)
-- [AddCount](#addcount)
-- [AddProperty](#addproperty)
-
-
-#### AddDate
-
-
-#### AddTime
-
-
-#### AddCount
-
-
-#### AddProperty
-
-
 ## Points of Integration
 
+To collect metrics across CT's library stack multiple points of integration
+are needed in order to collect metrics across CT's libraries.
+Generally, CT's libraries work as follows:
 
-## Proposed Smithy Model
-```smithy
-use aws.polymorph#extendable
+*Note: Not every Client supports the Material Provider Library.
+The Diagram below assumes it to help the mental model.*
 
-@extendable
-resource MetricsLogger {
-  operations: [
-    AddDate, 
-    AddTime, 
-    AddCount, 
-    AddProperty
-  ]
-}
+```mermaid
+sequenceDiagram
+    participant Client
+    box Material Provider Library 
+      participant CMM
+      participant Keyring
+    end
+    loop Content Encryption 
+        Client->>Client: Content Encryption
+    end
+    Client<<->>CMM: GetEncryption/Decryption Materials
+    CMM<<->>Keyring: OnEncrypt/OnDecrypt
+```
 
-// Operations for different metric types
-operation AddDate {
-  input: AddDateInput,
-  output: AddOutput,
-  errors: [MetricsPutError]
-}
+To optionally emit metrics from a top level client,
+all customer facing APIs MUST be changed to optionally accept
+a Metrics Agent. This will allow customers to define and supply one top
+level Metrics Agent; this agent will get plumbed throughout CT's stack.
 
-operation AddTime {
-  input: AddTimeInput,
-  output: AddOutput,
-  errors: [MetricsPutError]
-}
+For example, in the ESDK for Java this would look like:
+```java
+final AwsCrypto crypto = AwsCrypto.builder().build();
+// Create a Keyring
+final MaterialProviders matProv =
+  MaterialProviders.builder()
+      .MaterialProvidersConfig(MaterialProvidersConfig.builder().build())
+      .build();
 
-operation AddCount {
-  input: AddCountInput,
-  output: AddOutput,
-  errors: [MetricsPutError]
-}
+final IKeyring rawAesKeyring = matProv.CreateRawAesKeyring(keyringInput);
+final Map<String, String> encryptionContext =
+    Collections.singletonMap("ExampleContextKey", "ExampleContextValue");
 
-operation AddProperty {
-  input: AddPropertyInput,
-  output: AddOutput,
-  errors: [MetricsPutError]
-}
+// Create a Metrics Agent
+final IMetricsAgent metrics = matProv.CreateSimpleMetricsAgent(metricsAgentInput);
+// 4. Encrypt the data
+final CryptoResult<byte[], ?> encryptResult =
+    crypto.encryptData(rawAesKeyring, metrics, EXAMPLE_DATA, encryptionContext);
+final byte[] ciphertext = encryptResult.getResult();
+```
 
-// Input structures for each operation with flattened values
-structure AddDateInput {
+This change will allow Crypto Tools to introduce a Metrics Agent in a
+non-breaking way as the Metrics Agent will be an optional parameter
+at customer facing API call sites.
+
+Currently, the ESDK client APIs models are defined [here](https://github.com/aws/aws-encryption-sdk/blob/mainline/AwsEncryptionSDK/dafny/AwsEncryptionSdk/Model/esdk.smithy#L60-L126).
+This change would see that the client APIs be changed as follows:
+
+```diff
+structure EncryptInput {
   @required
-  label: String,
-  @required
-  date: Timestamp,
-  transactionId: String
+  plaintext: Blob,
+
+  encryptionContext: aws.cryptography.materialProviders#EncryptionContext,
+
+  // One of keyring or CMM are required
+  materialsManager: aws.cryptography.materialProviders#CryptographicMaterialsManagerReference,
+  keyring: aws.cryptography.materialProviders#KeyringReference,
+
+  algorithmSuiteId: aws.cryptography.materialProviders#ESDKAlgorithmSuiteId,
+
+  frameLength: FrameLength,
+
++  metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
 }
+...
+structure DecryptInput {
+  @required
+  ciphertext: Blob,
 
-structure AddTimeInput {
-  @required
-  label: String,
-  @required
-  duration: Long,  // Duration in milliseconds
-  transactionId: String
+  // One of keyring or CMM are required
+  materialsManager: aws.cryptography.materialProviders#CryptographicMaterialsManagerReference,
+  keyring: aws.cryptography.materialProviders#KeyringReference,
+  //= aws-encryption-sdk-specification/client-apis/keyring-interface.md#onencrypt
+  //= type=implication
+  //# The following inputs to this behavior MUST be OPTIONAL:
+  // (blank line for duvet)
+  //# - [Encryption Context](#encryption-context)
+  encryptionContext: aws.cryptography.materialProviders#EncryptionContext,
+
++  metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
 }
-
-structure AddCountInput {
-  @required
-  label: String,
-  @required
-  count: Long,
-  transactionId: String
-}
-
-structure AddPropertyInput {
-  @required
-  label: String,
-  @required
-  value: String,
-  transactionId: String
-}
-
-// Common output structure
-structure AddOutput {}
-
-// Error structure
-@error("client")
-structure MetricsPutError {
-  @required
-  message: String
-}
-
-@aws.polymorph#reference(resource: MetricsLogger)
-structure MetricsLoggerReference {}
-
 ```
