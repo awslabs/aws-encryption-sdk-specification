@@ -156,7 +156,7 @@ Used to aggregate a sum from multiple count values with the same metric name.
 
 #### AddProperty
 
-Used to add context/metadata in the form of a key-value pair related to a Metrics instance
+Used to add context/metadata in the form of a key-value pair related to a Metrics reference. 
 
 ## Proposed Smithy Model
 
