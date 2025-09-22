@@ -14,7 +14,7 @@
 ### Definitions
 
 - MapKey/mapkey
-  - To distinguish the keys of a map (as in, key - value pairs), the term MapKey/mapkey is used to denote such a key 
+  - To distinguish the keys of a map (as in, key - value pairs), the term MapKey/mapkey is used to denote such a key
 
 ## Overview
 
@@ -213,23 +213,23 @@ The V3 format uses compression here such that each wrapping algorithm is represe
 The valid values and their mapping to pre-existing values are:
 
 - 01
-    - AESWrap
-    - The wrapping algorithm value "01" MUST be translated to AESWrap upon retrieval, and vice versa on write.
+  - AESWrap
+  - The wrapping algorithm value "01" MUST be translated to AESWrap upon retrieval, and vice versa on write.
 - 02
-    - AES/GCM
-    - The wrapping algorithm value "02" MUST be translated to AES/GCM upon retrieval, and vice versa on write.
+  - AES/GCM
+  - The wrapping algorithm value "02" MUST be translated to AES/GCM upon retrieval, and vice versa on write.
 - 11
-    - kms
-    - The wrapping algorithm value "11" MUST be translated to kms upon retrieval, and vice versa on write.
+  - kms
+  - The wrapping algorithm value "11" MUST be translated to kms upon retrieval, and vice versa on write.
 - 12
-    - kms+context
-    - The wrapping algorithm value "12" MUST be translated to kms+context upon retrieval, and vice versa on write.
+  - kms+context
+  - The wrapping algorithm value "12" MUST be translated to kms+context upon retrieval, and vice versa on write.
 - 21
-    - RSA/ECB/OAEPWithSHA-256AndMGF1Padding
-    - The wrapping algorithm value "21" MUST be translated to RSA/ECB/OAEPWithSHA-256AndMGF1Padding upon retrieval, and vice versa on write.
+  - RSA/ECB/OAEPWithSHA-256AndMGF1Padding
+  - The wrapping algorithm value "21" MUST be translated to RSA/ECB/OAEPWithSHA-256AndMGF1Padding upon retrieval, and vice versa on write.
 - 22
-    - RSA-OAEP-SHA1 
-    - The wrapping algorithm value "22" MUST be translated to RSA-OAEP-SHA1 upon retrieval, and vice versa on write.
+  - RSA-OAEP-SHA1
+  - The wrapping algorithm value "22" MUST be translated to RSA-OAEP-SHA1 upon retrieval, and vice versa on write.
 
 _x-amz-d_
 
