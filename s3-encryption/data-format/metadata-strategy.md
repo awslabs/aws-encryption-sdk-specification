@@ -1,6 +1,8 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
+# Content Metadata Strategy
+
 ## Version
 
 0.1
@@ -43,7 +45,7 @@ There are currently two supported content metadata strategies:
 
 ### Differences Between Metadata Strategies
 
-Certain metadata strategies MAY support certain features.
+The difference in metadata strategy can influence which features are supported.
 Feature support is dependent on the nature of the metadata strategy's implementation.
 Features:
 
@@ -62,7 +64,7 @@ If the S3EC does not support decoding the S3 Server's "double encoding" then it 
 
 Instruction Files are a separate S3 object which contain content metadata.
 The S3EC MUST support writing some or all (depending on format) content metadata to an Instruction File.
-The content metadata MUST be serialized to a JSON string.
+The content metadata stored in the Instruction File MUST be serialized to a JSON string.
 The serialized JSON string MUST be the only contents of the Instruction File.
 
 Instruction File writes MUST NOT be enabled by default.
@@ -83,11 +85,11 @@ In the V1/V2 message format, all of the content metadata MUST be stored in the I
 In the V3 message format, only the content metadata related to the encrypted data is stored in the Instruction File.
 In the V3 message format, the content metadata related to the encrypted content is stored in the Object Metadata.
 
-- The V3 message format MUST store the mapkey "x-amz-c" and its value in the Object Metadata.
+- The V3 message format MUST store the mapkey "x-amz-c" and its value in the Object Metadata when writing with an Instruction File.
 - The V3 message format MUST NOT store the mapkey "x-amz-c" and its value in the Instruction File.
-- The V3 message format MUST store the mapkey "x-amz-d" and its value in the Object Metadata.
+- The V3 message format MUST store the mapkey "x-amz-d" and its value in the Object Metadata when writing with an Instruction File.
 - The V3 message format MUST NOT store the mapkey "x-amz-d" and its value in the Instruction File.
-- The V3 message format MUST store the mapkey "x-amz-i" and its value in the Object Metadata.
+- The V3 message format MUST store the mapkey "x-amz-i" and its value in the Object Metadata when writing with an Instruction File.
 - The V3 message format MUST NOT store the mapkey "x-amz-i" and its value in the Instruction File.
 
 - The V3 message format MUST store the mapkey "x-amz-3" and its value in the Instruction File.
