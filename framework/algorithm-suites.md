@@ -10,9 +10,11 @@
 ### Changelog
 
 - 0.5.0
+
   - Add new Algorithm Suite to S3EC
 
 - 0.4.0
+
   - Reframe "supported libraries" as "supported formats"
   - Add suites with symmetric signing
   - Add DBE as supported format
