@@ -260,24 +260,24 @@ The following table includes commitment information for supported algorithm suit
 These values are only relevant to algorithm suites that support [key commitment](#key-commitment).
 
 | Algorithm Suite ENUM                                                     | Key Derivation Input Length (bits) | Key Derivation Output Length (bits) | Algorithm | Hash Function | Salt Length (bits) |
-| ------------------------------------------------------------------------ | ---------------------------------- | ---------------------------------- | --------- | ------------- | ------------------ |
-| DBE.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            | 256                                | 256                                | HKDF      | SHA-512       | N/A                |
-| DBE.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 | 256                                | 256                                | HKDF      | SHA-512       | N/A                |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                   | 256                                | 256                                | HKDF      | SHA-512       | 256                |
-| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                              | 256                                | 256                                | HKDF      | SHA-512       | 256                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                   | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                   | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                   | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                              | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                              | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                              | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                   | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                   | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                   | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                         | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                   | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                   | N/A                                | N/A                                | N/A       | N/A           | N/A                |
-| S3EC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                              | 256                                | 224                                | HKDF      | SHA-512       | 224                |
+| ------------------------------------------------------------------------ | ---------------------------------- | ----------------------------------- | --------- | ------------- | ------------------ |
+| DBE.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_SYMSIG_HMAC_SHA384            | 256                                | 256                                 | HKDF      | SHA-512       | N/A                |
+| DBE.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384_SYMSIG_HMAC_SHA384 | 256                                | 256                                 | HKDF      | SHA-512       | N/A                |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY_ECDSA_P384                   | 256                                | 256                                 | HKDF      | SHA-512       | 256                |
+| ESDK.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                              | 256                                | 256                                 | HKDF      | SHA-512       | 256                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                   | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA384_ECDSA_P384                   | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256_ECDSA_P256                   | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_HKDF_SHA256                              | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_HKDF_SHA256                              | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_HKDF_SHA256                              | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                   | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_192_GCM_IV12_TAG16_NO_KDF                                   | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                   | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                         | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                   | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                   | N/A                                | N/A                                 | N/A       | N/A           | N/A                |
+| S3EC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                              | 256                                | 224                                 | HKDF      | SHA-512       | 224                |
 
 ## Algorithm Suites Signature Settings
 
