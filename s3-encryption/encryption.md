@@ -53,6 +53,6 @@ The client MUST append the GCM auth tag to the ciphertext if the underlying cryp
 #### ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY
 
 This algorithm suite supports Key Commitment and therefore requires deriving a key commitment value and a derived encryption key.
-The client MUST use HKDF to derive the key commitment value and the derived encrypting key as described in [Key Derivation](key-derivation.md)
+The client MUST use HKDF to derive the key commitment value and the derived encrypting key as described in [Key Derivation](key-derivation.md).
 The derived key commitment value MUST be set or returned from the encryption process such that it can be included in the content metadata.
 The client MUST append the GCM auth tag to the ciphertext if the underlying crypto provider does not do so automatically.

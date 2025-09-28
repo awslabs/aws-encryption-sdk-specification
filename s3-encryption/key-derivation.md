@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Encryption
+# Key Derivation
 
 ## Version
 
@@ -21,7 +21,7 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 
 ### HKDF Operation
 
-When the algorithm suite is key committing, the S3EC MUST use HKDF with the following specifics using the generated IV as the Message ID:
+When the algorithm suite is key committing, the S3EC uses HKDF with the following specifics using the generated IV as the Message ID:
 
 For the extract step:
 
@@ -38,9 +38,8 @@ For the expand step:
   - The input info MUST be a concatenation of the algorithm suite ID as bytes followed by the string DERIVEKEY as UTF8 encoded bytes.
 - For the Commit Key:
   - The input pseudorandom key MUST be the output from the extract step.
-  - The length of the output keying material MUST equal the algorithm suite data length specified by the supported algorithm suites. This will always be 224 bits.
+  - The length of the output keying material MUST equal the commit key length specified by the supported algorithm suites.
   - The input info MUST be a concatenation of the algorithm suite ID as bytes followed by the string COMMITKEY as UTF8 encoded bytes.
 
 The client MUST initialize the cipher, or call an AES-GCM encryption API, with the derived encryption key, an IV containing only zeros, and the tag length defined in the Algorithm Suite when encrypting with ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY.
 The client MUST set the AAD to the Algorithm Suite ID represented as bytes.
-The client MUST append the GCM auth tag to the ciphertext if the underlying crypto provider does not do so automatically.
