@@ -570,7 +570,6 @@ Where the contents are stored is determined by the message format.
 
 #### Supported Algorithm Suite Data Lengths
 
-- 28
 - 32
 
 ## Security Considerations
