@@ -24,14 +24,21 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 Once the requisite encryption materials have been provided, the client proceeds to encrypting the plaintext object content.
 
 The client MUST validate that the length of the plaintext bytes does not exceed the algorithm suite's cipher's maximum content length in bytes.
-The client MUST generate an IV using the length of the IV defined in the algorithm suite.
-The generated IV MUST be set or returned from the encryption process such that it can be included in the content metadata.
+
+For algorithm suites which support Key Commitment, a fixed IV is used for GCM content encryption.
+Instead of generating an IV, committing algorithm suites use a Message ID which is used as input to the HKDF.
+Otherwise, the IV and the Message ID are similar in some ways.
+For example, the Message ID, like the IV, is stored in the persisted content metadata.
+When implementing the S3EC, it is useful to generate the Message ID by the same process that generates the IV in non-committing algorithm suites.
+The client MUST generate an IV or Message ID using the length of the IV or Message ID defined in the algorithm suite.
+
+The generated IV or Message ID MUST be set or returned from the encryption process such that it can be included in the content metadata.
 
 ### Cipher Initialization
 
-The client SHOULD validate that the generated IV is not zeros.
-There is an astoundingly small chance that an IV is generated as all zeros.
-An IV containing all zeros is valid, but it is more likely that the IV was not initialized or generated correctly.
+The client SHOULD validate that the generated IV or Message ID is not zeros.
+There is an astoundingly small chance that an IV or Message ID is generated as all zeros.
+An IV or Message ID containing all zeros is valid, but it is more likely that the IV/Message ID was not initialized or generated correctly.
 
 The rest of the cipher initialization depends on the algorithm suite:
 
