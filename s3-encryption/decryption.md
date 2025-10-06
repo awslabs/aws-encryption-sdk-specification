@@ -41,7 +41,7 @@ If the S3EC is not configured to enable legacy unauthenticated content decryptio
 
 #### ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY
 
-When using ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY, the client MUST verify that the derived key commitment contains the same bytes as the stored key commitment retrieved from the stored object's metadata.
+When using ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY, the client MUST verify that the [derived key commitment](./key-derivation.md#hkdf-operation) contains the same bytes as the stored key commitment retrieved from the stored object's metadata.
 When using ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY, the verification of the derived key commitment value MUST be done in constant time.
 When using ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY, the client MUST throw an exception when the derived key commitment value and stored key commitment value do not match.
-When using ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY, the client MUST verify the key commitment values match before deriving the derived encryption key.
+When using ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY, the client MUST verify the key commitment values match before deriving the [derived encryption key](./key-derivation.md#hkdf-operation).
