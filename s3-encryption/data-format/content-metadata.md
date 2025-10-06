@@ -238,3 +238,17 @@ The base64-encoded bytes representing the Key Commitment associated with the enc
 _x-amz-i_
 
 The base64-encoded bytes representing the Message ID associated with the encrypted object.
+
+### Algorithm Suite and Message Format Version Compatibility
+
+The S3EC supports encryption with various content encryption Algorithm Suites:
+
+- ALG_AES_256_CBC_IV16_NO_KDF
+- ALG_AES_256_GCM_IV12_TAG16_NO_KDF
+- ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY
+
+The mapping of Algorithm Suite to Message Format Versions follows:
+
+Objects encrypted with ALG_AES_256_CBC_IV16_NO_KDF MAY use either the V1 or V2 message format version.
+Objects encrypted with ALG_AES_256_GCM_IV12_TAG16_NO_KDF MUST use the V2 message format version only.
+Objects encrypted with ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY MUST use the V3 message format version only.
