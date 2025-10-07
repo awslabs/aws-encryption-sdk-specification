@@ -33,11 +33,11 @@ For the extract step:
 For the expand step:
 
 - For the Derived Encryption Key:
-  - The input pseudorandom key MUST be the output from the extract step.
+  - The DEK input pseudorandom key MUST be the output from the extract step.
   - The length of the output keying material MUST equal the encryption key length specified by the algorithm suite encryption settings.
   - The input info MUST be a concatenation of the algorithm suite ID as bytes followed by the string DERIVEKEY as UTF8 encoded bytes.
 - For the Commit Key:
-  - The input pseudorandom key MUST be the output from the extract step.
+  - The CK input pseudorandom key MUST be the output from the extract step.
   - The length of the output keying material MUST equal the commit key length specified by the supported algorithm suites.
   - The input info MUST be a concatenation of the algorithm suite ID as bytes followed by the string COMMITKEY as UTF8 encoded bytes.
 
