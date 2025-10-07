@@ -21,6 +21,8 @@ in this document are to be interpreted as described in [RFC2119](https://tools.i
 
 ## Content Encryption
 
+The S3EC MUST use the encryption algorithm configured during [client](./client.md) initialization.
+
 Once the requisite encryption materials have been provided, the client proceeds to encrypting the plaintext object content.
 
 The client MUST validate that the length of the plaintext bytes does not exceed the algorithm suite's cipher's maximum content length in bytes.

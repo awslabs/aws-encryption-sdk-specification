@@ -102,6 +102,12 @@ If the S3EC accepts SDK client configuration, the configuration MUST be applied 
 If the S3EC accepts SDK client configuration, the configuration MUST be applied to all wrapped SDK clients including the KMS client.
 If the S3EC accepts any SDK client configuration options, then the S3EC should support all possible configuration options.
 
+### Encryption Algorithm
+
+The S3EC MUST support configuration of the encryption algorithm (or algorithm suite) during its initialization.
+The S3EC MUST validate that the configured encryption algorithm is not legacy.
+If the configured encryption algorithm is legacy, then the S3EC MUST throw an exception.
+
 ### Key Commitment
 
 The S3EC MUST support configuration of the [Key Commitment policy](./key-commitment.md) during its initialization.
