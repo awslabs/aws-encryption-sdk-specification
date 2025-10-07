@@ -194,16 +194,16 @@ The valid values are:
 _x-amz-m_
 
 A JSON string representing the Material Description of the key material used to encrypt the data key.
-This string MAY be encoded by the esoteric double-encoding scheme used by the S3 web server.
-The Material Description MUST only be read when there is no Encryption Context.
-The default Material Description value MUST be set to an empty map (`{}`).
+This material description string MAY be encoded by the esoteric double-encoding scheme used by the S3 web server.
+The Material Description MUST be used for wrapping algorithms `AES/GCM`, `RSA-OAEP-SHA1` or `02`, `22`.
+If set the default Material Description value MUST be set to an empty map (`{}`).
 See TODO-link for more details on the S3 double-encoding scheme.
 
 _x-amz-t_
 
 A JSON string representing the AWS KMS Encryption Context associated with the encrypted object.
-This string MAY be encoded by the esoteric double-encoding scheme used by the S3 web server.
-The Encryption Context value MUST take precedence over Material Description when decoding.
+This encryption context string MAY be encoded by the esoteric double-encoding scheme used by the S3 web server.
+The Encryption Context value MUST be used for wrapping algorithm `kms+context` or `12`.
 See TODO-link for more details on the S3 double-encoding scheme.
 
 _x-amz-w_
@@ -212,21 +212,12 @@ The wrapping algorithm used to encrypt the data key.
 The V3 format uses compression here such that each wrapping algorithm is represented by a two digit string.
 The valid values and their mapping to pre-existing values are:
 
-- 01
-  - AESWrap
-  - The wrapping algorithm value "01" MUST be translated to AESWrap upon retrieval, and vice versa on write.
 - 02
   - AES/GCM
   - The wrapping algorithm value "02" MUST be translated to AES/GCM upon retrieval, and vice versa on write.
-- 11
-  - kms
-  - The wrapping algorithm value "11" MUST be translated to kms upon retrieval, and vice versa on write.
 - 12
   - kms+context
   - The wrapping algorithm value "12" MUST be translated to kms+context upon retrieval, and vice versa on write.
-- 21
-  - RSA/ECB/OAEPWithSHA-256AndMGF1Padding
-  - The wrapping algorithm value "21" MUST be translated to RSA/ECB/OAEPWithSHA-256AndMGF1Padding upon retrieval, and vice versa on write.
 - 22
   - RSA-OAEP-SHA1
   - The wrapping algorithm value "22" MUST be translated to RSA-OAEP-SHA1 upon retrieval, and vice versa on write.
