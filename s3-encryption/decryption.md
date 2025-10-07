@@ -39,6 +39,12 @@ This behavior indicates that this is a "multipart download" which is currently n
 The S3EC MUST NOT decrypt objects encrypted using legacy unauthenticated algorithm suites unless specifically configured to do so.
 If the S3EC is not configured to enable legacy unauthenticated content decryption, the client MUST throw an exception when attempting to decrypt an object encrypted with a legacy unauthenticated algorithm suite.
 
+### Key Commitment
+
+The S3EC supports algorithm suite(s) which provide [key commitment](./key-commitment.md).
+The S3EC MUST validate the algorithm suite used for decryption against the key commitment policy before attempting to decrypt the content ciphertext.
+If the commitment policy requires decryption using a committing algorithm suite, and the algorithm suite associated with the object does not support key commitment, then the S3EC MUST throw an exception.
+
 #### ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY
 
 When using ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY, the client MUST verify that the [derived key commitment](./key-derivation.md#hkdf-operation) contains the same bytes as the stored key commitment retrieved from the stored object's metadata.
