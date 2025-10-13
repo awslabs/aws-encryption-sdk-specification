@@ -204,9 +204,9 @@ Algorithm Suite ID MUST be a unique hex value across all supported algorithm sui
 | ESDK.ALG_AES_128_GCM_IV12_TAG16_NO_KDF                                   | 00 14                    | 1.0                    | N/A                                 |
 | S3EC.ALG_AES_256_CBC_IV16_NO_KDF                                         | 00 70                    | 1.0                    | N/A                                 |
 | S3EC.ALG_AES_256_CTR_IV16_TAG16_NO_KDF                                   | 00 71                    | 2.0                    | N/A                                 |
-| S3EC.ALG_AES_256_CTR_HKDF_SHA512_COMMIT_KEY                              | 00 74                    | 3.0                    | 28*                                 |
+| S3EC.ALG_AES_256_CTR_HKDF_SHA512_COMMIT_KEY                              | 00 74                    | 3.0                    | 28\*                                |
 | S3EC.ALG_AES_256_GCM_IV12_TAG16_NO_KDF                                   | 00 72                    | 2.0                    | N/A                                 |
-| S3EC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                              | 00 73                    | 3.0                    | 28*                                 |
+| S3EC.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY                              | 00 73                    | 3.0                    | 28\*                                |
 
 \* - The S3EC stores the key commitment in its content metadata, which is not the same as the ESDK's algorithm suite data field.
 
