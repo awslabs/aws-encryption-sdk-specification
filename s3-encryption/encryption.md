@@ -47,11 +47,20 @@ The rest of the cipher initialization depends on the algorithm suite:
 #### ALG_AES_256_CTR_IV16_TAG16_NO_KDF
 
 Encryption using AES-CTR is not supported.
+This algorithm suite is only used to decrypt ranges of a ciphertext encrypted using AES-GCM.
 Attempts to encrypt using AES-CTR MUST fail.
+
+#### ALG_AES_256_CTR_HKDF_SHA512_COMMIT_KEY
+
+Encryption using AES-CTR is not supported.
+This algorithm suite is only used to decrypt ranges of a ciphertext encrypted using key committing AES-GCM.
+Attempts to encrypt using key committing AES-CTR MUST fail.
 
 #### ALG_AES_256_CBC_IV16_NO_KDF
 
 TODO: Spec CBC encryption.
+CBC encryption is no longer supported.
+Decryption of ciphertexts encrypted using CBC is supported as an optional legacy behavior.
 
 #### ALG_AES_256_GCM_IV12_TAG16_NO_KDF
 
