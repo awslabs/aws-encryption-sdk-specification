@@ -49,7 +49,6 @@ If the commitment policy requires decryption using a committing algorithm suite,
 
 #### Decrypting With Commitment
 
-
 When using an algorithm suite which supports key commitment, the client MUST verify that the [derived key commitment](./key-derivation.md#hkdf-operation) contains the same bytes as the stored key commitment retrieved from the stored object's metadata.
 When using an algorithm suite which supports key commitment, the verification of the derived key commitment value MUST be done in constant time.
 When using an algorithm suite which supports key commitment, the client MUST throw an exception when the derived key commitment value and stored key commitment value do not match.
