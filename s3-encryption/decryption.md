@@ -49,7 +49,6 @@ If the commitment policy requires decryption using a committing algorithm suite,
 
 #### Decrypting With Commitment
 
-The algorithm suites ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY and ALG_AES_256_CTR_HKDF_SHA512_COMMIT_KEY support key commitment.
 
 When using an algorithm suite which supports key commitment, the client MUST verify that the [derived key commitment](./key-derivation.md#hkdf-operation) contains the same bytes as the stored key commitment retrieved from the stored object's metadata.
 When using an algorithm suite which supports key commitment, the verification of the derived key commitment value MUST be done in constant time.
