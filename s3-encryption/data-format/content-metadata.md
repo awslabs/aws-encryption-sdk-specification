@@ -195,7 +195,7 @@ _x-amz-m_
 
 A JSON string representing the Material Description of the key material used to encrypt the data key.
 This material description string MAY be encoded by the esoteric double-encoding scheme used by the S3 web server.
-The Material Description MUST be used for wrapping algorithms `AES/GCM` (`02`) and `RSA-OAEP-SHA1` (`22`)
+The Material Description MUST be used for wrapping algorithms `AES/GCM` (`02`) and `RSA-OAEP-SHA1` (`22`).
 If the mapkey is not present, the default Material Description value MUST be set to an empty map (`{}`).
 See TODO-link for more details on the S3 double-encoding scheme.
 
