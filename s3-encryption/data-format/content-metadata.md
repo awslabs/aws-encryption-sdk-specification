@@ -79,10 +79,10 @@ The V3 format uses the following mapkeys:
 - The mapkey "x-amz-3" MUST be present for V3 format objects.
   - This mapkey ("x-amz-3") SHOULD be represented by a constant named "ENCRYPTED_DATA_KEY_V3" or similar in the implementation code.
   - This mapkey is the V3 version of the "x-amz-key" and "x-amz-key-v2" mapkeys.
-- The mapkey "x-amz-m" SHOULD be present for V3 format objects.
+- The mapkey "x-amz-m" SHOULD be present for V3 format objects that use Raw Keyring Material Description.
   - This mapkey ("x-amz-m") SHOULD be represented by a constant named "MAT_DESC_V3" or similar in the implementation code.
   - This mapkey is the V3 version of the "x-amz-matdesc" mapkey.
-- The mapkey "x-amz-t" SHOULD be present for V3 format objects.
+- The mapkey "x-amz-t" SHOULD be present for V3 format objects that use KMS Encryption Context.
   - This mapkey ("x-amz-t") SHOULD be represented by a constant named "ENCRYPTION_CONTEXT_V3" or similar in the implementation code.
   - This mapkey is new for V3 and serves to distinguish KMS Encryption Context from Raw Keyring Material Description.
 - The mapkey "x-amz-w" MUST be present for V3 format objects.
