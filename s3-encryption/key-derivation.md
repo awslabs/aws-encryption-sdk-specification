@@ -42,8 +42,9 @@ For the expand step:
   - The input info MUST be a concatenation of the algorithm suite ID as bytes followed by the string COMMITKEY as UTF8 encoded bytes.
 
 When encrypting or decrypting with ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY,
-the IV used in the AES-GCM content encryption/decryption MUST contain only ones of the length defined in the algorithm suite.
-The client MUST initialize the cipher, or call an AES-GCM encryption API, with the derived encryption key, an IV containing only ones,
+the IV used in the AES-GCM content encryption/decryption MUST consist entirely of bytes with the value 0x01.
+The IV's total length MUST match the IV length defined by the algorithm suite.
+The client MUST initialize the cipher, or call an AES-GCM encryption API, with the derived encryption key, an IV containing only bytes with the value 0x01,
 and the tag length defined in the Algorithm Suite when encrypting or decrypting with ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY.
-This means that the IV would be `[0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 ]`
+This means that the IV for ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY, which is 12 bytes long, would be `[0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 ]`.
 The client MUST set the AAD to the Algorithm Suite ID represented as bytes.
