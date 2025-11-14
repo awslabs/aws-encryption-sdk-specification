@@ -2,11 +2,17 @@
 class GitHubDashboard {
     constructor() {
         this.config = window.GitHubConfig;
-        this.currentSection = 'pull-requests';
-        this.currentRepository = null; // Changed from 'all' to null
+        this.currentSection = 'dashboard'; // Start with dashboard
+        this.currentRepository = null; // For detailed views
         this.cache = new Map();
         this.isAuthenticated = false;
         this.rateLimitInfo = null;
+        
+        // Dashboard data cache
+        this.dashboardCache = {
+            data: null,
+            timestamp: null
+        };
         
         // Issue filtering properties
         this.issueFilters = {
@@ -32,7 +38,7 @@ class GitHubDashboard {
     }
 
     setupEventListeners() {
-        // Navigation menu
+        // Sidebar navigation
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 const section = e.currentTarget.dataset.section;
@@ -40,15 +46,21 @@ class GitHubDashboard {
             });
         });
 
-        // Repository filter
-        document.getElementById('repositorySelect').addEventListener('change', (e) => {
-            this.currentRepository = e.target.value;
-            
-            // Clear both types of filters when switching repositories
-            this.clearAllIssueFilters();
-            this.clearAllPullRequestFilters();
-            
-            this.loadSection(this.currentSection);
+        // Repository filters for detailed views
+        const repoSelects = ['repositorySelect', 'issuesRepositorySelect', 'actionsRepositorySelect'];
+        repoSelects.forEach(selectId => {
+            const select = document.getElementById(selectId);
+            if (select) {
+                select.addEventListener('change', (e) => {
+                    this.currentRepository = e.target.value;
+                    
+                    // Clear filters when switching repositories
+                    this.clearAllIssueFilters();
+                    this.clearAllPullRequestFilters();
+                    
+                    this.loadSection(this.currentSection);
+                });
+            }
         });
 
         // Refresh button
@@ -58,7 +70,7 @@ class GitHubDashboard {
 
         // Handle browser back/forward
         window.addEventListener('hashchange', () => {
-            const section = window.location.hash.slice(1) || 'pull-requests';
+            const section = window.location.hash.slice(1) || 'dashboard';
             if (section !== this.currentSection) {
                 this.switchSection(section);
             }
@@ -67,7 +79,7 @@ class GitHubDashboard {
         // Load initial hash
         if (window.location.hash) {
             const section = window.location.hash.slice(1);
-            if (['pull-requests', 'issues', 'actions'].includes(section)) {
+            if (['dashboard', 'pull-requests', 'issues', 'actions', 'duvet'].includes(section)) {
                 this.currentSection = section;
             }
         }
@@ -78,19 +90,24 @@ class GitHubDashboard {
     }
 
     populateRepositorySelect() {
-        const select = document.getElementById('repositorySelect');
+        const selects = ['repositorySelect', 'issuesRepositorySelect', 'actionsRepositorySelect'];
         
-        // Clear existing options except "All Repositories"
-        while (select.children.length > 1) {
-            select.removeChild(select.lastChild);
-        }
+        selects.forEach(selectId => {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            // Clear existing options except the first one (placeholder)
+            while (select.children.length > 1) {
+                select.removeChild(select.lastChild);
+            }
 
-        // Add repository options
-        this.config.repositories.forEach(repo => {
-            const option = document.createElement('option');
-            option.value = repo.id;
-            option.textContent = repo.displayName;
-            select.appendChild(option);
+            // Add repository options
+            this.config.repositories.forEach(repo => {
+                const option = document.createElement('option');
+                option.value = repo.id;
+                option.textContent = repo.displayName;
+                select.appendChild(option);
+            });
         });
     }
 
@@ -107,35 +124,38 @@ class GitHubDashboard {
         // Update section
         this.currentSection = section;
         
-        // Update section title
-        const titles = {
-            'pull-requests': 'Pull Requests',
-            'issues': 'Issues',
-            'actions': 'GitHub Actions'
-        };
-        document.getElementById('sectionTitle').textContent = titles[section];
+        // Hide all sections first
+        document.querySelectorAll('.section').forEach(s => {
+            s.style.display = 'none';
+        });
 
-        // Clear previous content immediately when switching sections
-        this.clearContent();
-
-        // Show/hide section-specific filters
-        if (section === 'issues') {
-            this.showIssueFilters();
-            this.hidePullRequestFilters();
-        } else if (section === 'pull-requests') {
-            this.showPullRequestFilters();
-            this.hideIssueFilters();
-        } else {
-            this.hideIssueFilters();
-            this.hidePullRequestFilters();
+        // Show current section
+        const sectionElement = document.getElementById(`${section}Section`);
+        if (sectionElement) {
+            sectionElement.style.display = 'block';
         }
+
+        // Clear shared elements
+        this.hideLoading();
+        this.hideError();
+        this.hideEmptyState();
 
         // Load section data
         this.loadSection(section);
     }
 
     async loadSection(section) {
-        // Check if repository is selected
+        if (section === 'dashboard') {
+            await this.loadDashboard();
+            return;
+        }
+
+        if (section === 'duvet') {
+            // Duvet section is static, no data loading needed
+            return;
+        }
+
+        // For detailed views, check if repository is selected
         if (!this.currentRepository) {
             this.showRepositorySelectionState(section);
             return;
@@ -176,13 +196,136 @@ class GitHubDashboard {
                 data.sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
             }
 
-            this.renderData(section, data);
-            this.updateDataInfo(data.length);
+            this.renderSectionData(section, data);
+            this.updateSectionDataInfo(section, data.length);
             
         } catch (error) {
             console.error('Error loading section:', error);
             this.showError(`Failed to load ${section.replace('-', ' ')}`);
         }
+    }
+
+    async loadDashboard() {
+        const cacheDuration = this.getCacheDuration();
+        
+        // Check dashboard cache first
+        if (this.dashboardCache.data && this.dashboardCache.timestamp && 
+            Date.now() - this.dashboardCache.timestamp < cacheDuration) {
+            this.renderDashboard(this.dashboardCache.data);
+            return;
+        }
+
+        this.showLoading();
+        
+        try {
+            // Fetch data for all repositories in parallel
+            const dashboardData = await Promise.all(
+                this.config.repositories.map(async (repo) => {
+                    const [openPRs, openIssues, mergedPRs] = await Promise.all([
+                        this.fetchDataForRepository('pull-requests', repo).catch(() => []),
+                        this.fetchDataForRepository('issues', repo).catch(() => []),
+                        this.fetchMergedPRsLastWeek(repo).catch(() => [])
+                    ]);
+
+                    return {
+                        repository: repo,
+                        openPRs: openPRs.length,
+                        openIssues: openIssues.filter(issue => !issue.pull_request).length, // Exclude PRs from issues
+                        mergedPRs: mergedPRs.length
+                    };
+                })
+            );
+
+            // Cache the results
+            this.dashboardCache = {
+                data: dashboardData,
+                timestamp: Date.now()
+            };
+
+            this.renderDashboard(dashboardData);
+            
+        } catch (error) {
+            console.error('Error loading dashboard:', error);
+            this.showError('Failed to load dashboard data');
+        }
+    }
+
+    async fetchMergedPRsLastWeek(repository) {
+        // Calculate date for one week ago
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const since = oneWeekAgo.toISOString();
+
+        const url = `${this.config.apiBase}/repos/${repository.owner}/${repository.name}/pulls?state=closed&sort=updated&direction=desc&since=${since}&per_page=100`;
+        const data = await this.fetchAllPages(url);
+
+        // Filter to only merged PRs from the last week
+        return data.filter(pr => {
+            if (!pr.merged_at) return false;
+            const mergedDate = new Date(pr.merged_at);
+            return mergedDate >= oneWeekAgo;
+        });
+    }
+
+    renderDashboard(dashboardData) {
+        // Calculate totals
+        const totals = dashboardData.reduce((acc, repo) => ({
+            openPRs: acc.openPRs + repo.openPRs,
+            openIssues: acc.openIssues + repo.openIssues,
+            mergedPRs: acc.mergedPRs + repo.mergedPRs
+        }), { openPRs: 0, openIssues: 0, mergedPRs: 0 });
+
+        // Update summary cards
+        document.getElementById('totalOpenPRs').textContent = totals.openPRs;
+        document.getElementById('totalOpenIssues').textContent = totals.openIssues;
+        document.getElementById('totalMergedPRs').textContent = totals.mergedPRs;
+
+        // Render repository-specific metrics
+        const metricsContainer = document.getElementById('repositoryMetrics');
+        metricsContainer.innerHTML = dashboardData.map(repoData => 
+            this.createRepositoryMetricCard(repoData)
+        ).join('');
+
+        // Update last updated time
+        document.getElementById('dashboardLastUpdated').textContent = new Date().toLocaleTimeString();
+
+        this.hideLoading();
+        this.hideError();
+        this.hideEmptyState();
+    }
+
+    createRepositoryMetricCard(repoData) {
+        const { repository, openPRs, openIssues, mergedPRs } = repoData;
+        
+        return `
+            <div class="repo-metric-card">
+                <div class="repo-header">
+                    <div class="repo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                        </svg>
+                    </div>
+                    <div class="repo-info">
+                        <h3>${repository.displayName}</h3>
+                        <p>${repository.owner}/${repository.name}</p>
+                    </div>
+                </div>
+                <div class="repo-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value ${openPRs > 10 ? 'warning' : ''}">${openPRs}</div>
+                        <div class="metric-label">Open PRs</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value ${openIssues > 15 ? 'warning' : ''}">${openIssues}</div>
+                        <div class="metric-label">Open Issues</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value ${mergedPRs > 0 ? 'success' : ''}">${mergedPRs}</div>
+                        <div class="metric-label">Merged This Week</div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     async fetchDataForRepository(section, repository) {
@@ -205,13 +348,15 @@ class GitHubDashboard {
         try {
             switch (section) {
                 case 'pull-requests':
-                    url = `${this.config.apiBase}/repos/${repository.owner}/${repository.name}/pulls?state=open`;
-                    data = await this.fetchFromGitHub(url);
+                    url = `${this.config.apiBase}/repos/${repository.owner}/${repository.name}/pulls?state=open&per_page=100`;
+                    data = await this.fetchAllPages(url);
                     break;
                 
                 case 'issues':
-                    url = `${this.config.apiBase}/repos/${repository.owner}/${repository.name}/issues?state=open`;
-                    data = await this.fetchFromGitHub(url);
+                    url = `${this.config.apiBase}/repos/${repository.owner}/${repository.name}/issues?state=open&per_page=100`;
+                    const allIssues = await this.fetchAllPages(url);
+                    // Filter out pull requests from issues (GitHub API returns both)
+                    data = allIssues.filter(issue => !issue.pull_request);
                     break;
                 
                 case 'actions':
@@ -222,15 +367,18 @@ class GitHubDashboard {
                         break;
                     }
                     
-                    url = `${this.config.apiBase}/repos/${repository.owner}/${repository.name}/actions/runs?per_page=20`;
-                    const runs = await this.fetchFromGitHub(url);
-                    const allRuns = runs.workflow_runs || [];
+                    url = `${this.config.apiBase}/repos/${repository.owner}/${repository.name}/actions/runs?per_page=100`;
+                    const runs = await this.fetchAllPages(url);
+                    const allRuns = runs.workflow_runs ? runs : { workflow_runs: runs };
                     
                     // Filter workflow runs by configured workflow names (case-insensitive)
                     const configuredWorkflows = repository.workflows.map(w => w.toLowerCase());
-                    data = allRuns.filter(run => 
+                    data = (allRuns.workflow_runs || runs).filter(run => 
                         run.name && configuredWorkflows.includes(run.name.toLowerCase())
                     );
+                    
+                    // Limit actions to recent runs to avoid performance issues
+                    data = data.slice(0, 50);
                     
                     // Enhanced sorting: first by date (newest), then by workflow name (alphabetical)
                     data.sort((a, b) => {
@@ -267,7 +415,53 @@ class GitHubDashboard {
         }
     }
 
-    async fetchFromGitHub(url) {
+    async fetchAllPages(baseUrl) {
+        let allData = [];
+        let url = baseUrl;
+        let pageCount = 0;
+        const maxPages = 10; // Safety limit to prevent infinite loops
+
+        try {
+            while (url && pageCount < maxPages) {
+                console.log(`Fetching page ${pageCount + 1} from: ${url}`);
+                
+                const response = await this.fetchFromGitHubRaw(url);
+                const data = response.data;
+                
+                // Handle different response formats
+                if (Array.isArray(data)) {
+                    allData = allData.concat(data);
+                } else if (data.workflow_runs) {
+                    // GitHub Actions API returns wrapped data
+                    allData = allData.concat(data.workflow_runs);
+                } else {
+                    // Fallback: assume it's an array or convert to array
+                    allData = allData.concat(Array.isArray(data) ? data : [data]);
+                }
+
+                // Check for next page in Link header
+                const linkHeader = response.linkHeader;
+                url = this.getNextPageUrl(linkHeader);
+                pageCount++;
+
+                // If we got less than per_page items, we're at the end
+                if (Array.isArray(data) && data.length < 100) {
+                    break;
+                } else if (data.workflow_runs && data.workflow_runs.length < 100) {
+                    break;
+                }
+            }
+
+            console.log(`Fetched ${allData.length} items across ${pageCount} pages`);
+            return allData;
+
+        } catch (error) {
+            console.error('Error in fetchAllPages:', error);
+            return allData; // Return what we've got so far
+        }
+    }
+
+    async fetchFromGitHubRaw(url) {
         // Build headers conditionally based on token availability
         const headers = {
             'Accept': 'application/vnd.github.v3+json',
@@ -308,7 +502,40 @@ class GitHubDashboard {
             }
         }
 
-        return response.json();
+        const data = await response.json();
+        const linkHeader = response.headers.get('Link');
+
+        return {
+            data,
+            linkHeader
+        };
+    }
+
+    getNextPageUrl(linkHeader) {
+        if (!linkHeader) return null;
+
+        // Parse the Link header to find the "next" URL
+        // Link header format: <url>; rel="next", <url>; rel="last"
+        const links = linkHeader.split(',');
+        
+        for (const link of links) {
+            const parts = link.trim().split(';');
+            if (parts.length >= 2) {
+                const url = parts[0].trim().replace(/^<|>$/g, ''); // Remove < >
+                const rel = parts[1].trim();
+                
+                if (rel.includes('rel="next"')) {
+                    return url;
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    async fetchFromGitHub(url) {
+        const result = await this.fetchFromGitHubRaw(url);
+        return result.data;
     }
 
     renderData(section, data) {
@@ -465,15 +692,22 @@ class GitHubDashboard {
     }
 
     showLoading() {
-        document.getElementById('loadingSpinner').style.display = 'flex';
-        document.getElementById('contentGrid').style.display = 'none';
+        const spinner = document.getElementById('loadingSpinner');
+        const grid = document.getElementById('contentGrid');
+        
+        if (spinner) spinner.style.display = 'flex';
+        if (grid) grid.style.display = 'none';
+        
         this.hideError();
         this.hideEmptyState();
     }
 
     hideLoading() {
-        document.getElementById('loadingSpinner').style.display = 'none';
-        document.getElementById('contentGrid').style.display = 'grid';
+        const spinner = document.getElementById('loadingSpinner');
+        const grid = document.getElementById('contentGrid');
+        
+        if (spinner) spinner.style.display = 'none';
+        if (grid) grid.style.display = 'grid';
     }
 
     showError(message) {
@@ -684,9 +918,64 @@ class GitHubDashboard {
         document.getElementById('lastUpdated').textContent = 'Never';
     }
 
+    // Helper methods for section-specific rendering
+    renderSectionData(section, data) {
+        const grids = {
+            'pull-requests': 'pullRequestsGrid',
+            'issues': 'issuesGrid',
+            'actions': 'actionsGrid'
+        };
+        
+        const gridId = grids[section];
+        const container = document.getElementById(gridId);
+        
+        if (!container) return;
+        
+        if (data.length === 0) {
+            this.showEmptyState(section);
+            return;
+        }
+
+        container.innerHTML = '';
+        
+        // Apply actions-layout class for GitHub Actions to use row-based layout
+        if (section === 'actions') {
+            container.classList.add('actions-layout');
+            this.renderActionsWithSections(container, data);
+        } else {
+            container.classList.remove('actions-layout');
+            data.forEach(item => {
+                const card = this.createCard(section, item);
+                container.appendChild(card);
+            });
+        }
+
+        this.hideLoading();
+        this.hideError();
+        this.hideEmptyState();
+    }
+
+    updateSectionDataInfo(section, count) {
+        const infoElements = {
+            'pull-requests': { count: 'dataCount', updated: 'lastUpdated' },
+            'issues': { count: 'issuesDataCount', updated: 'issuesLastUpdated' },
+            'actions': { count: 'actionsDataCount', updated: 'actionsLastUpdated' }
+        };
+        
+        const elements = infoElements[section];
+        if (elements) {
+            const countElement = document.getElementById(elements.count);
+            const updatedElement = document.getElementById(elements.updated);
+            
+            if (countElement) countElement.textContent = `${count} items`;
+            if (updatedElement) updatedElement.textContent = new Date().toLocaleTimeString();
+        }
+    }
+
     refreshData() {
-        // Clear cache
+        // Clear all caches
         this.cache.clear();
+        this.dashboardCache = { data: null, timestamp: null };
         
         // Reload current section
         this.loadSection(this.currentSection);

@@ -7,15 +7,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>AWS Crypto Tools GitHub Dashboard</h1>
-            <div class="header-controls">
-                <div class="repository-filter">
-                    <select id="repositorySelect" class="repo-select">
-                        <option value="" disabled selected>Select a repository...</option>
-                    </select>
-                </div>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>AWS Crypto Tools</h1>
                 <button id="refreshBtn" class="refresh-btn" title="Refresh Data">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
@@ -24,130 +20,302 @@
                     </svg>
                 </button>
             </div>
-        </header>
-
-        <nav class="navigation">
-            <button class="nav-item active" data-section="pull-requests">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="18" cy="18" r="3"/>
-                    <circle cx="6" cy="6" r="3"/>
-                    <path d="M18 6V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v1"/>
-                    <path d="M6 9v9"/>
-                    <path d="M18 9v3"/>
-                </svg>
-                Pull Requests
-            </button>
-            <button class="nav-item" data-section="issues">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 6v6"/>
-                    <path d="M12 16h.01"/>
-                </svg>
-                Issues
-            </button>
-            <button class="nav-item" data-section="actions">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"/>
-                    <path d="M12 1v6"/>
-                    <path d="M12 17v6"/>
-                    <path d="M4.22 4.22l4.24 4.24"/>
-                    <path d="M15.54 15.54l4.24 4.24"/>
-                    <path d="M1 12h6"/>
-                    <path d="M17 12h6"/>
-                    <path d="M4.22 19.78l4.24-4.24"/>
-                    <path d="M15.54 8.46l4.24-4.24"/>
-                </svg>
-                GitHub Actions
-            </button>
-        </nav>
-
-        <div class="auth-status-bar" id="authStatus" style="display: none;">
-            <!-- Authentication and rate limit info will be inserted here by JavaScript -->
-        </div>
-
-        <div class="auth-suggestion" id="authSuggestion" style="display: none;">
-            <!-- Authentication suggestion will be inserted here by JavaScript -->
-        </div>
-
-        <main class="main-content">
-            <div class="section-header">
-                <h2 id="sectionTitle">Pull Requests</h2>
-                <div class="data-info">
-                    <span id="dataCount">-</span>
-                    <span class="last-updated">Last updated: <span id="lastUpdated">Never</span></span>
+            
+            <nav class="sidebar-nav">
+                <!-- Repository Insights Section -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Repository Insights</h3>
+                    <ul class="nav-list">
+                        <li>
+                            <button class="nav-item active" data-section="dashboard">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <path d="M9 9h6v6H9z"/>
+                                </svg>
+                                Dashboard
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-section="pull-requests">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="18" cy="18" r="3"/>
+                                    <circle cx="6" cy="6" r="3"/>
+                                    <path d="M18 6V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v1"/>
+                                    <path d="M6 9v9"/>
+                                    <path d="M18 9v3"/>
+                                </svg>
+                                Pull Requests
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-section="issues">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v6"/>
+                                    <path d="M12 16h.01"/>
+                                </svg>
+                                Issues
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-section="actions">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M12 1v6"/>
+                                    <path d="M12 17v6"/>
+                                    <path d="M4.22 4.22l4.24 4.24"/>
+                                    <path d="M15.54 15.54l4.24 4.24"/>
+                                    <path d="M1 12h6"/>
+                                    <path d="M17 12h6"/>
+                                    <path d="M4.22 19.78l4.24-4.24"/>
+                                    <path d="M15.54 8.46l4.24-4.24"/>
+                                </svg>
+                                GitHub Actions
+                            </button>
+                        </li>
+                    </ul>
                 </div>
+
+                <!-- Duvet Coverage Section -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Duvet Coverage</h3>
+                    <ul class="nav-list">
+                        <li>
+                            <button class="nav-item" data-section="duvet">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14,2 14,8 20,8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10,9 9,9 8,9"/>
+                                </svg>
+                                Coverage Reports
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-container">
+            <div class="auth-status-bar" id="authStatus" style="display: none;">
+                <!-- Authentication and rate limit info will be inserted here by JavaScript -->
             </div>
 
-            <div class="filters" id="issueFilters" style="display: none;">
-                <div class="filter-group">
-                    <label for="sortSelect">Sort by:</label>
-                    <select id="sortSelect" class="filter-select">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="userFilter">Created by:</label>
-                    <div class="user-filter-container">
-                        <input type="text" id="userFilter" class="filter-input" placeholder="Filter by user...">
-                        <button id="clearUserFilter" class="clear-filter-btn" title="Clear user filter">×</button>
+            <div class="auth-suggestion" id="authSuggestion" style="display: none;">
+                <!-- Authentication suggestion will be inserted here by JavaScript -->
+            </div>
+
+            <main class="main-content">
+                <!-- Dashboard Section -->
+                <div class="section" id="dashboardSection">
+                    <div class="section-header">
+                        <h2>Dashboard</h2>
+                        <div class="data-info">
+                            <span class="last-updated">Last updated: <span id="dashboardLastUpdated">Never</span></span>
+                        </div>
                     </div>
-                    <div id="userSuggestions" class="user-suggestions"></div>
-                </div>
-                <div class="filter-group">
-                    <button id="clearAllFilters" class="clear-all-btn">Clear All Filters</button>
-                </div>
-            </div>
-
-            <div class="filters" id="pullRequestFilters" style="display: none;">
-                <div class="filter-group">
-                    <label for="prSortSelect">Sort by:</label>
-                    <select id="prSortSelect" class="filter-select">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="prUserFilter">Created by:</label>
-                    <div class="user-filter-container">
-                        <input type="text" id="prUserFilter" class="filter-input" placeholder="Filter by user...">
-                        <button id="prClearUserFilter" class="clear-filter-btn" title="Clear user filter">×</button>
+                    
+                    <div class="dashboard-content">
+                        <div class="summary-cards">
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="18" cy="18" r="3"/>
+                                        <circle cx="6" cy="6" r="3"/>
+                                        <path d="M18 6V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v1"/>
+                                        <path d="M6 9v9"/>
+                                        <path d="M18 9v3"/>
+                                    </svg>
+                                </div>
+                                <div class="summary-content">
+                                    <div class="summary-title">Open Pull Requests</div>
+                                    <div class="summary-value" id="totalOpenPRs">-</div>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 6v6"/>
+                                        <path d="M12 16h.01"/>
+                                    </svg>
+                                </div>
+                                <div class="summary-content">
+                                    <div class="summary-title">Open Issues</div>
+                                    <div class="summary-value" id="totalOpenIssues">-</div>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20,6 9,17 4,12"/>
+                                    </svg>
+                                </div>
+                                <div class="summary-content">
+                                    <div class="summary-title">Merged This Week</div>
+                                    <div class="summary-value" id="totalMergedPRs">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="repository-metrics" id="repositoryMetrics">
+                            <!-- Repository-specific metrics will be inserted here -->
+                        </div>
                     </div>
-                    <div id="prUserSuggestions" class="user-suggestions"></div>
                 </div>
-                <div class="filter-group">
-                    <button id="prClearAllFilters" class="clear-all-btn">Clear All Filters</button>
+
+                <!-- Repository Insights Sections -->
+                <div class="section" id="pullRequestsSection" style="display: none;">
+                    <div class="section-header">
+                        <h2>Pull Requests</h2>
+                        <div class="header-controls">
+                            <div class="repository-filter">
+                                <select id="repositorySelect" class="repo-select">
+                                    <option value="" disabled selected>Select a repository...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="data-info">
+                            <span id="dataCount">-</span>
+                            <span class="last-updated">Last updated: <span id="lastUpdated">Never</span></span>
+                        </div>
+                    </div>
+
+                    <div class="filters" id="pullRequestFilters" style="display: none;">
+                        <div class="filter-group">
+                            <label for="prSortSelect">Sort by:</label>
+                            <select id="prSortSelect" class="filter-select">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="prUserFilter">Created by:</label>
+                            <div class="user-filter-container">
+                                <input type="text" id="prUserFilter" class="filter-input" placeholder="Filter by user...">
+                                <button id="prClearUserFilter" class="clear-filter-btn" title="Clear user filter">×</button>
+                            </div>
+                            <div id="prUserSuggestions" class="user-suggestions"></div>
+                        </div>
+                        <div class="filter-group">
+                            <button id="prClearAllFilters" class="clear-all-btn">Clear All Filters</button>
+                        </div>
+                    </div>
+
+                    <div class="content-grid" id="pullRequestsGrid">
+                        <!-- Pull requests content will be inserted here -->
+                    </div>
                 </div>
-            </div>
 
-            <div class="loading-spinner" id="loadingSpinner">
-                <div class="spinner"></div>
-                <span>Loading...</span>
-            </div>
+                <div class="section" id="issuesSection" style="display: none;">
+                    <div class="section-header">
+                        <h2>Issues</h2>
+                        <div class="header-controls">
+                            <div class="repository-filter">
+                                <select id="issuesRepositorySelect" class="repo-select">
+                                    <option value="" disabled selected>Select a repository...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="data-info">
+                            <span id="issuesDataCount">-</span>
+                            <span class="last-updated">Last updated: <span id="issuesLastUpdated">Never</span></span>
+                        </div>
+                    </div>
 
-            <div class="error-message" id="errorMessage" style="display: none;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 8v4"/>
-                    <path d="M12 16h.01"/>
-                </svg>
-                <span id="errorText">Failed to load data</span>
-            </div>
+                    <div class="filters" id="issueFilters" style="display: none;">
+                        <div class="filter-group">
+                            <label for="sortSelect">Sort by:</label>
+                            <select id="sortSelect" class="filter-select">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="userFilter">Created by:</label>
+                            <div class="user-filter-container">
+                                <input type="text" id="userFilter" class="filter-input" placeholder="Filter by user...">
+                                <button id="clearUserFilter" class="clear-filter-btn" title="Clear user filter">×</button>
+                            </div>
+                            <div id="userSuggestions" class="user-suggestions"></div>
+                        </div>
+                        <div class="filter-group">
+                            <button id="clearAllFilters" class="clear-all-btn">Clear All Filters</button>
+                        </div>
+                    </div>
 
-            <div class="content-grid" id="contentGrid">
-                <!-- Dynamic content will be inserted here -->
-            </div>
+                    <div class="content-grid" id="issuesGrid">
+                        <!-- Issues content will be inserted here -->
+                    </div>
+                </div>
 
-            <div class="empty-state" id="emptyState" style="display: none;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 6v6"/>
-                    <path d="M12 16h.01"/>
-                </svg>
-                <h3>No items found</h3>
-                <p id="emptyStateMessage">No open pull requests found for the selected repository.</p>
-            </div>
-        </main>
+                <div class="section" id="actionsSection" style="display: none;">
+                    <div class="section-header">
+                        <h2>GitHub Actions</h2>
+                        <div class="header-controls">
+                            <div class="repository-filter">
+                                <select id="actionsRepositorySelect" class="repo-select">
+                                    <option value="" disabled selected>Select a repository...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="data-info">
+                            <span id="actionsDataCount">-</span>
+                            <span class="last-updated">Last updated: <span id="actionsLastUpdated">Never</span></span>
+                        </div>
+                    </div>
+
+                    <div class="content-grid actions-layout" id="actionsGrid">
+                        <!-- Actions content will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="section" id="duvetSection" style="display: none;">
+                    <div class="section-header">
+                        <h2>Duvet Coverage</h2>
+                    </div>
+                    
+                    <div class="coming-soon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6"/>
+                            <path d="M16 10l-4 4-4-4"/>
+                        </svg>
+                        <h3>Coming Soon</h3>
+                        <p>Duvet coverage reporting is currently being developed and will be available soon.</p>
+                    </div>
+                </div>
+
+                <!-- Shared elements -->
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner"></div>
+                    <span>Loading...</span>
+                </div>
+
+                <div class="error-message" id="errorMessage" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 8v4"/>
+                        <path d="M12 16h.01"/>
+                    </svg>
+                    <span id="errorText">Failed to load data</span>
+                </div>
+
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6"/>
+                        <path d="M12 16h.01"/>
+                    </svg>
+                    <h3>No items found</h3>
+                    <p id="emptyStateMessage">No items found for the selected repository.</p>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script src="config.js"></script>
