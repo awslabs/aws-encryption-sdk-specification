@@ -111,61 +111,17 @@
                 <!-- Dashboard Section -->
                 <div class="section" id="dashboardSection">
                     <div class="section-header">
-                        <h2>Dashboard</h2>
+                        <h2>At a Glance</h2>
                         <div class="data-info">
                             <span class="last-updated">Last updated: <span id="dashboardLastUpdated">Never</span></span>
                         </div>
                     </div>
                     
-                    <div class="dashboard-content">
-                        <div class="summary-cards">
-                            <div class="summary-card">
-                                <div class="summary-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="18" cy="18" r="3"/>
-                                        <circle cx="6" cy="6" r="3"/>
-                                        <path d="M18 6V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v1"/>
-                                        <path d="M6 9v9"/>
-                                        <path d="M18 9v3"/>
-                                    </svg>
-                                </div>
-                                <div class="summary-content">
-                                    <div class="summary-title">Open Pull Requests</div>
-                                    <div class="summary-value" id="totalOpenPRs">-</div>
-                                </div>
-                            </div>
-                            
-                            <div class="summary-card">
-                                <div class="summary-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <path d="M12 6v6"/>
-                                        <path d="M12 16h.01"/>
-                                    </svg>
-                                </div>
-                                <div class="summary-content">
-                                    <div class="summary-title">Open Issues</div>
-                                    <div class="summary-value" id="totalOpenIssues">-</div>
-                                </div>
-                            </div>
-                            
-                            <div class="summary-card">
-                                <div class="summary-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="20,6 9,17 4,12"/>
-                                    </svg>
-                                </div>
-                                <div class="summary-content">
-                                    <div class="summary-title">Merged This Week</div>
-                                    <div class="summary-value" id="totalMergedPRs">-</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="repository-metrics" id="repositoryMetrics">
-                            <!-- Repository-specific metrics will be inserted here -->
-                        </div>
+                <div class="dashboard-content">
+                    <div id="badgeTableContainer">
+                        <!-- Badge table will be inserted here -->
                     </div>
+                </div>
                 </div>
 
                 <!-- Repository Insights Sections -->

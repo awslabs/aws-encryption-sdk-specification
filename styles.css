@@ -956,6 +956,165 @@ body {
     color: #dc2626;
 }
 
+/* Badge table styling */
+.badge-table {
+    width: 50%; /* Take up half the page width */
+    min-width: 400px; /* Ensure minimum usable width */
+    max-width: 800px; /* Don't get too large on very wide screens */
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    table-layout: fixed; /* Fixed layout for consistent column widths */
+    margin: 0;
+}
+
+.badge-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.badge-table th {
+    padding: 12px 16px; /* Comfortable padding */
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.badge-table th:first-child {
+    width: 40%; /* Repository name column */
+}
+
+.badge-table th:not(:first-child) {
+    width: 30%; /* Badge columns */
+    text-align: center;
+}
+
+.badge-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+}
+
+.badge-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.badge-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.badge-table td {
+    padding: 12px 16px; /* Comfortable padding */
+    vertical-align: middle;
+}
+
+.badge-table .repo-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #1e293b;
+    white-space: nowrap;
+}
+
+.badge-table .badge-cell {
+    text-align: center;
+    padding: 12px 8px;
+}
+
+.badge-table .badge-cell img {
+    display: inline-block;
+    width: 100px; /* Fixed width for consistency */
+    height: 50px; /* Fixed height for consistency */
+    vertical-align: middle;
+    transition: opacity 0.2s ease;
+    object-fit: contain; /* Maintain aspect ratio while fitting in the container */
+}
+
+.badge-table .badge-cell img[src*="data:image"] {
+    opacity: 0.6;
+}
+
+/* Wrapper for additional table functionality */
+.badge-table-wrapper {
+    position: relative;
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* Compact mode for smaller screens */
+.badge-table.compact-mode {
+    font-size: 13px;
+}
+
+.badge-table.compact-mode th,
+.badge-table.compact-mode td {
+    padding: 10px 8px;
+}
+
+.badge-table.compact-mode .repo-name {
+    font-size: 14px;
+}
+
+.badge-table.compact-mode .badge-cell img {
+    max-width: 70px;
+    height: auto;
+}
+
+/* Loading and loaded states for images */
+.badge-table .badge-cell img {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.badge-table .badge-cell img.loaded {
+    opacity: 1;
+}
+
+/* Dynamic column width support */
+.badge-table {
+    --repo-column-width: auto;
+}
+
+.badge-table .repo-name {
+    width: var(--repo-column-width, 1%);
+}
+
+/* Responsive table enhancements */
+@media (max-width: 600px) {
+    .badge-table-wrapper {
+        margin: -16px -20px 0 -20px; /* Extend to edges on mobile */
+        border-radius: 0;
+    }
+    
+    .badge-table {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .badge-table th,
+    .badge-table td {
+        padding: 8px 12px;
+    }
+    
+    .badge-table th {
+        font-size: 11px;
+    }
+    
+    .badge-table .repo-name {
+        font-size: 12px;
+    }
+    
+    .badge-table .badge-cell img {
+        max-width: 60px;
+    }
+}
+
 /* Coming soon section */
 .coming-soon {
     text-align: center;
@@ -1104,6 +1263,25 @@ body {
         align-items: flex-start;
         gap: 8px;
     }
+    
+    /* Badge table responsive styling */
+    .badge-table th,
+    .badge-table td {
+        padding: 12px 16px;
+    }
+    
+    .badge-table th {
+        font-size: 13px;
+    }
+    
+    .badge-table .repo-name {
+        font-size: 14px;
+        min-width: 140px;
+    }
+    
+    .badge-table .badge-cell {
+        width: 100px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1158,5 +1336,33 @@ body {
     
     .main-content {
         padding: 16px;
+    }
+    
+    /* Badge table mobile styling */
+    .badge-table {
+        font-size: 14px;
+    }
+    
+    .badge-table th,
+    .badge-table td {
+        padding: 10px 12px;
+    }
+    
+    .badge-table th {
+        font-size: 12px;
+    }
+    
+    .badge-table .repo-name {
+        font-size: 13px;
+        min-width: 120px;
+    }
+    
+    .badge-table .badge-cell {
+        width: 80px;
+    }
+    
+    .badge-table .badge-cell img {
+        max-width: 80px;
+        height: auto;
     }
 }

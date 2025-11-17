@@ -129,8 +129,9 @@ class GitHubDashboard {
             s.style.display = 'none';
         });
 
-        // Show current section
-        const sectionElement = document.getElementById(`${section}Section`);
+        // Show current section - convert kebab-case to camelCase
+        const sectionId = section.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase()) + 'Section';
+        const sectionElement = document.getElementById(sectionId);
         if (sectionElement) {
             sectionElement.style.display = 'block';
         }
@@ -206,47 +207,15 @@ class GitHubDashboard {
     }
 
     async loadDashboard() {
-        const cacheDuration = this.getCacheDuration();
-        
-        // Check dashboard cache first
-        if (this.dashboardCache.data && this.dashboardCache.timestamp && 
-            Date.now() - this.dashboardCache.timestamp < cacheDuration) {
-            this.renderDashboard(this.dashboardCache.data);
-            return;
-        }
-
         this.showLoading();
         
         try {
-            // Fetch data for all repositories in parallel
-            const dashboardData = await Promise.all(
-                this.config.repositories.map(async (repo) => {
-                    const [openPRs, openIssues, mergedPRs] = await Promise.all([
-                        this.fetchDataForRepository('pull-requests', repo).catch(() => []),
-                        this.fetchDataForRepository('issues', repo).catch(() => []),
-                        this.fetchMergedPRsLastWeek(repo).catch(() => [])
-                    ]);
-
-                    return {
-                        repository: repo,
-                        openPRs: openPRs.length,
-                        openIssues: openIssues.filter(issue => !issue.pull_request).length, // Exclude PRs from issues
-                        mergedPRs: mergedPRs.length
-                    };
-                })
-            );
-
-            // Cache the results
-            this.dashboardCache = {
-                data: dashboardData,
-                timestamp: Date.now()
-            };
-
-            this.renderDashboard(dashboardData);
+            // For shields.io badges, we don't need to fetch data - badges are live
+            this.renderDashboard();
             
         } catch (error) {
             console.error('Error loading dashboard:', error);
-            this.showError('Failed to load dashboard data');
+            this.showError('Failed to load dashboard');
         }
     }
 
@@ -268,23 +237,8 @@ class GitHubDashboard {
     }
 
     renderDashboard(dashboardData) {
-        // Calculate totals
-        const totals = dashboardData.reduce((acc, repo) => ({
-            openPRs: acc.openPRs + repo.openPRs,
-            openIssues: acc.openIssues + repo.openIssues,
-            mergedPRs: acc.mergedPRs + repo.mergedPRs
-        }), { openPRs: 0, openIssues: 0, mergedPRs: 0 });
-
-        // Update summary cards
-        document.getElementById('totalOpenPRs').textContent = totals.openPRs;
-        document.getElementById('totalOpenIssues').textContent = totals.openIssues;
-        document.getElementById('totalMergedPRs').textContent = totals.mergedPRs;
-
-        // Render repository-specific metrics
-        const metricsContainer = document.getElementById('repositoryMetrics');
-        metricsContainer.innerHTML = dashboardData.map(repoData => 
-            this.createRepositoryMetricCard(repoData)
-        ).join('');
+        // Create shields.io badge table
+        this.createBadgeTable();
 
         // Update last updated time
         document.getElementById('dashboardLastUpdated').textContent = new Date().toLocaleTimeString();
@@ -294,38 +248,154 @@ class GitHubDashboard {
         this.hideEmptyState();
     }
 
-    createRepositoryMetricCard(repoData) {
-        const { repository, openPRs, openIssues, mergedPRs } = repoData;
+    createBadgeTable() {
+        const container = document.getElementById('badgeTableContainer');
         
-        return `
-            <div class="repo-metric-card">
-                <div class="repo-header">
-                    <div class="repo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                        </svg>
-                    </div>
-                    <div class="repo-info">
-                        <h3>${repository.displayName}</h3>
-                        <p>${repository.owner}/${repository.name}</p>
-                    </div>
-                </div>
-                <div class="repo-metrics">
-                    <div class="metric-item">
-                        <div class="metric-value ${openPRs > 10 ? 'warning' : ''}">${openPRs}</div>
-                        <div class="metric-label">Open PRs</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-value ${openIssues > 15 ? 'warning' : ''}">${openIssues}</div>
-                        <div class="metric-label">Open Issues</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-value ${mergedPRs > 0 ? 'success' : ''}">${mergedPRs}</div>
-                        <div class="metric-label">Merged This Week</div>
-                    </div>
-                </div>
+        const tableHTML = `
+            <div class="badge-table-wrapper">
+                <table class="badge-table" id="badgeTable">
+                    <thead>
+                        <tr>
+                            <th>Repository</th>
+                            <th>Open Issues</th>
+                            <th>Open Pull Requests</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.config.repositories.map(repo => `
+                            <tr>
+                                <td class="repo-name">${repo.displayName}</td>
+                                <td class="badge-cell">
+                                    <img src="https://img.shields.io/github/issues/${repo.owner}/${repo.name}?style=flat" 
+                                         alt="Open Issues for ${repo.displayName}" 
+                                         loading="lazy"
+                                         onload="this.classList.add('loaded')"
+                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
+                                </td>
+                                <td class="badge-cell">
+                                    <img src="https://img.shields.io/github/issues-pr/${repo.owner}/${repo.name}?style=flat&label=PRs" 
+                                         alt="Open Pull Requests for ${repo.displayName}" 
+                                         loading="lazy"
+                                         onload="this.classList.add('loaded')"
+                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
             </div>
         `;
+        
+        container.innerHTML = tableHTML;
+        
+        // Add dynamic table functionality
+        this.enhanceBadgeTable();
+    }
+
+    enhanceBadgeTable() {
+        const table = document.getElementById('badgeTable');
+        if (!table) return;
+
+        // Add responsive behavior
+        this.makeTableResponsive(table);
+        
+        // Add loading states and error handling
+        this.enhanceBadgeImages(table);
+        
+        // Optimize column widths
+        this.optimizeTableLayout(table);
+    }
+
+    makeTableResponsive(table) {
+        // Add resize observer to handle dynamic layout changes
+        if (window.ResizeObserver) {
+            const resizeObserver = new ResizeObserver(() => {
+                this.optimizeTableLayout(table);
+            });
+            resizeObserver.observe(table);
+        }
+        
+        // Handle window resize for older browsers
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.optimizeTableLayout(table);
+            }, 150);
+        });
+    }
+
+    enhanceBadgeImages(table) {
+        const images = table.querySelectorAll('img');
+        
+        images.forEach(img => {
+            // Add loading indicator
+            img.style.opacity = '0.5';
+            img.style.transition = 'opacity 0.3s ease';
+            
+            // Handle successful load
+            img.addEventListener('load', () => {
+                img.style.opacity = '1';
+                img.classList.add('loaded');
+            });
+            
+            // Handle error with retry mechanism
+            img.addEventListener('error', () => {
+                if (!img.hasAttribute('data-retried')) {
+                    img.setAttribute('data-retried', 'true');
+                    // Retry after 2 seconds
+                    setTimeout(() => {
+                        const originalSrc = img.src.split('?')[0]; // Remove any query params
+                        img.src = `${originalSrc}?retry=${Date.now()}`;
+                    }, 2000);
+                }
+            });
+        });
+    }
+
+    optimizeTableLayout(table) {
+        if (!table) return;
+        
+        const container = table.closest('.badge-table-wrapper') || table.parentElement;
+        const containerWidth = container.offsetWidth;
+        
+        // Dynamic column sizing based on container width
+        if (containerWidth < 600) {
+            // Mobile: Stack badges vertically or make them smaller
+            table.classList.add('compact-mode');
+        } else {
+            table.classList.remove('compact-mode');
+        }
+        
+        // Calculate optimal widths
+        const repoNameCells = table.querySelectorAll('.repo-name');
+        let maxRepoNameWidth = 0;
+        
+        repoNameCells.forEach(cell => {
+            const textWidth = this.getTextWidth(cell.textContent, cell);
+            maxRepoNameWidth = Math.max(maxRepoNameWidth, textWidth);
+        });
+        
+        // Set minimum column widths to prevent overcrowding
+        const minRepoWidth = Math.min(maxRepoNameWidth + 40, containerWidth * 0.5);
+        
+        // Apply dynamic styles
+        if (containerWidth > 600) {
+            const style = table.style;
+            style.setProperty('--repo-column-width', `${minRepoWidth}px`);
+        }
+    }
+
+    getTextWidth(text, element) {
+        // Create a temporary element to measure text width
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        
+        // Get computed styles from the element
+        const computedStyle = window.getComputedStyle(element);
+        context.font = `${computedStyle.fontWeight} ${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+        
+        return context.measureText(text).width;
     }
 
     async fetchDataForRepository(section, repository) {
@@ -693,10 +763,15 @@ class GitHubDashboard {
 
     showLoading() {
         const spinner = document.getElementById('loadingSpinner');
-        const grid = document.getElementById('contentGrid');
         
         if (spinner) spinner.style.display = 'flex';
-        if (grid) grid.style.display = 'none';
+        
+        // Hide all section-specific grids
+        const grids = ['pullRequestsGrid', 'issuesGrid', 'actionsGrid'];
+        grids.forEach(gridId => {
+            const grid = document.getElementById(gridId);
+            if (grid) grid.style.display = 'none';
+        });
         
         this.hideError();
         this.hideEmptyState();
@@ -704,10 +779,21 @@ class GitHubDashboard {
 
     hideLoading() {
         const spinner = document.getElementById('loadingSpinner');
-        const grid = document.getElementById('contentGrid');
         
         if (spinner) spinner.style.display = 'none';
-        if (grid) grid.style.display = 'grid';
+        
+        // Show the appropriate section grid
+        const grids = {
+            'pull-requests': 'pullRequestsGrid',
+            'issues': 'issuesGrid',
+            'actions': 'actionsGrid'
+        };
+        
+        const gridId = grids[this.currentSection];
+        if (gridId) {
+            const grid = document.getElementById(gridId);
+            if (grid) grid.style.display = 'grid';
+        }
     }
 
     showError(message) {
@@ -747,7 +833,20 @@ class GitHubDashboard {
         
         message.textContent = messageText;
         emptyState.style.display = 'block';
-        document.getElementById('contentGrid').style.display = 'none';
+        
+        // Hide the appropriate section grid
+        const grids = {
+            'pull-requests': 'pullRequestsGrid',
+            'issues': 'issuesGrid',
+            'actions': 'actionsGrid'
+        };
+        
+        const gridId = grids[section];
+        if (gridId) {
+            const gridElement = document.getElementById(gridId);
+            if (gridElement) gridElement.style.display = 'none';
+        }
+        
         this.hideLoading();
     }
 
@@ -820,6 +919,9 @@ class GitHubDashboard {
     }
 
     showRepositorySelectionState(section) {
+        // Ensure the section header is visible first
+        this.ensureSectionHeaderVisible(section);
+        
         const emptyState = document.getElementById('emptyState');
         const message = document.getElementById('emptyStateMessage');
         
@@ -834,13 +936,69 @@ class GitHubDashboard {
             Choose a repository from the dropdown above to get started.
         `;
         emptyState.style.display = 'block';
-        document.getElementById('contentGrid').style.display = 'none';
+        
+        // Use section-specific grid IDs
+        const grids = {
+            'pull-requests': 'pullRequestsGrid',
+            'issues': 'issuesGrid',
+            'actions': 'actionsGrid'
+        };
+        
+        const gridId = grids[section];
+        const gridElement = document.getElementById(gridId);
+        if (gridElement) {
+            gridElement.style.display = 'none';
+        }
+        
         document.getElementById('loadingSpinner').style.display = 'none';
         this.hideError();
         
-        // Reset data info
-        document.getElementById('dataCount').textContent = '-';
-        document.getElementById('lastUpdated').textContent = 'Never';
+        // Reset section-specific data info
+        const infoElements = {
+            'pull-requests': { count: 'dataCount', updated: 'lastUpdated' },
+            'issues': { count: 'issuesDataCount', updated: 'issuesLastUpdated' },
+            'actions': { count: 'actionsDataCount', updated: 'actionsLastUpdated' }
+        };
+        
+        const elements = infoElements[section];
+        if (elements) {
+            const countElement = document.getElementById(elements.count);
+            const updatedElement = document.getElementById(elements.updated);
+            
+            if (countElement) countElement.textContent = '-';
+            if (updatedElement) updatedElement.textContent = 'Never';
+        }
+    }
+
+    ensureSectionHeaderVisible(section) {
+        // Force display of section headers and repository dropdowns - convert kebab-case to camelCase
+        const sectionId = section.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase()) + 'Section';
+        const sectionElement = document.getElementById(sectionId);
+        if (sectionElement) {
+            const sectionHeader = sectionElement.querySelector('.section-header');
+            const headerControls = sectionElement.querySelector('.header-controls');
+            const repositoryFilter = sectionElement.querySelector('.repository-filter');
+            
+            if (sectionHeader) sectionHeader.style.display = 'flex';
+            if (headerControls) headerControls.style.display = 'flex';
+            if (repositoryFilter) repositoryFilter.style.display = 'block';
+            
+            // Ensure the specific repository select is visible
+            const selectIds = {
+                'pull-requests': 'repositorySelect',
+                'issues': 'issuesRepositorySelect', 
+                'actions': 'actionsRepositorySelect'
+            };
+            
+            const selectId = selectIds[section];
+            if (selectId) {
+                const selectElement = document.getElementById(selectId);
+                if (selectElement) {
+                    selectElement.style.display = 'block';
+                    selectElement.style.visibility = 'visible';
+                }
+            }
+        }
     }
 
     updateDataInfo(count) {
