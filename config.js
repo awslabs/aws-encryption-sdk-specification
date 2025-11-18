@@ -9,6 +9,7 @@ const REPOSITORIES = [
         owner: 'awslabs',
         name: 'aws-encryption-sdk-specification',
         displayName: 'AWS Encryption SDK Specification',
+        
     },
     {
         id: 'aws-cryptographic-material-providers-library',
@@ -18,6 +19,141 @@ const REPOSITORIES = [
         workflows: [
             'Daily CI',
             'Dafny Nightly'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
+        id: 'amazon-s3-encryption-client-go',
+        owner: 'aws',
+        name: 'amazon-s3-encryption-client-go',
+        displayName: 'Amazon S3 Encryption Client for Go',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
+        id: 'amazon-s3-encryption-client-java',
+        owner: 'aws',
+        name: 'amazon-s3-encryption-client-java',
+        displayName: 'Amazon S3 Encryption Client for Java',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'ci-workflow'
+        ]
+    },
+    {
+        id: 'aws-encryption-sdk',
+        owner: 'aws',
+        name: 'aws-encryption-sdk',
+        displayName: 'AWS Encryption SDK for .NET/Rust/Go',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
+        id: 'aws-database-encryption-sdk-dynamodb',
+        owner: 'aws',
+        name: 'aws-database-encryption-sdk-dynamodb',
+        displayName: 'AWS Database Encryption SDK for DynamoDB Java/.NET/Rust',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
+        id: 'aws-encryption-sdk-java',
+        owner: 'aws',
+        name: 'aws-encryption-sdk-java',
+        displayName: 'AWS Encryption SDK for Java',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'ci'
+        ]
+    },
+    {
+        id: 'aws-encryption-sdk-javascript',
+        owner: 'aws',
+        name: 'aws-encryption-sdk-javascript',
+        displayName: 'AWS Encryption SDK for JavaScript',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
+        id: 'aws-encryption-sdk-python',
+        owner: 'aws',
+        name: 'aws-encryption-sdk-python',
+        displayName: 'AWS Encryption SDK for Python',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
+        id: 'aws-encryption-sdk-cli',
+        owner: 'aws',
+        name: 'aws-encryption-sdk-cli',
+        displayName: 'AWS Encryption SDK for CLI',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
+        id: 'aws-encryption-sdk-c',
+        owner: 'aws',
+        name: 'aws-encryption-sdk-c',
+        displayName: 'AWS Encryption SDK for C',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
+        id: 'aws-dynamodb-encryption-java',
+        owner: 'aws',
+        name: 'aws-dynamodb-encryption-java',
+        displayName: 'DynamoDB Encryption Client for Java',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'run-codebuild-ci'
+        ]
+    },
+    {
+        id: 'aws-dynamodb-encryption-python',
+        owner: 'aws',
+        name: 'aws-dynamodb-encryption-python',
+        displayName: 'DynamoDB Encryption Client for Python',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'ci_integration'
         ]
     }
 ];

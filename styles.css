@@ -958,9 +958,9 @@ body {
 
 /* Badge table styling */
 .badge-table {
-    width: 50%; /* Take up half the page width */
+    width: auto; /* Dynamic width based on content */
     min-width: 400px; /* Ensure minimum usable width */
-    max-width: 800px; /* Don't get too large on very wide screens */
+    max-width: 95%; /* Don't exceed container width */
     border-collapse: collapse;
     background: #ffffff;
     border-radius: 10px;
@@ -969,6 +969,20 @@ body {
     border: 1px solid #e2e8f0;
     table-layout: fixed; /* Fixed layout for consistent column widths */
     margin: 0;
+    
+    /* Dynamic column width support */
+    --repo-column-width: 200px; /* Default fallback */
+    --badge-column-width: 120px; /* Default fallback */
+}
+
+/* Smooth transitions for table optimization */
+.badge-table.optimizing th,
+.badge-table.optimizing td {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.badge-table.optimizing {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .badge-table thead {
@@ -988,11 +1002,11 @@ body {
 }
 
 .badge-table th:first-child {
-    width: 40%; /* Repository name column */
+    width: var(--repo-column-width, 200px); /* Dynamic repository name column */
 }
 
 .badge-table th:not(:first-child) {
-    width: 30%; /* Badge columns */
+    width: var(--badge-column-width, 120px); /* Dynamic badge columns */
     text-align: center;
 }
 
@@ -1029,7 +1043,7 @@ body {
 .badge-table .badge-cell img {
     display: inline-block;
     width: 100px; /* Fixed width for consistency */
-    height: 50px; /* Fixed height for consistency */
+    height: 20px; /* Fixed height to match shields.io standard */
     vertical-align: middle;
     transition: opacity 0.2s ease;
     object-fit: contain; /* Maintain aspect ratio while fitting in the container */

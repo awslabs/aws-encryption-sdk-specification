@@ -259,28 +259,65 @@ class GitHubDashboard {
                             <th>Repository</th>
                             <th>Open Issues</th>
                             <th>Open Pull Requests</th>
+                            <th>Daily CI Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.config.repositories.map(repo => `
-                            <tr>
-                                <td class="repo-name">${repo.displayName}</td>
-                                <td class="badge-cell">
-                                    <img src="https://img.shields.io/github/issues/${repo.owner}/${repo.name}?style=flat" 
-                                         alt="Open Issues for ${repo.displayName}" 
+                        ${this.config.repositories.map(repo => {
+                            // Generate DailyCI Status badge
+                            let dailyCIBadge = '';
+                            if (repo.badgeWorkflows && repo.badgeWorkflows.length > 0) {
+                                // Find Daily CI workflow (prioritize exact match, then partial)
+                                const dailyCIWorkflow = repo.badgeWorkflows.find(w => 
+                                    w.toLowerCase() === 'daily ci' || 
+                                    w.toLowerCase().includes('daily') || 
+                                    w.toLowerCase().includes('ci')
+                                ) || repo.workflows[0]; // Fallback to first workflow
+                                
+                                // Convert workflow name to filename (replace spaces with hyphens, add .yml)
+                                const workflowFile = dailyCIWorkflow.toLowerCase().replace(/\s+/g, '-') + '.yml';
+                                console.log(repo.name + " " + workflowFile);
+                                
+                                dailyCIBadge = `
+                                    <img src="https://img.shields.io/github/actions/workflow/status/${repo.owner}/${repo.name}/${workflowFile}?style=flat&label=CI" 
+                                         alt="Daily CI Status for ${repo.displayName}" 
                                          loading="lazy"
                                          onload="this.classList.add('loaded')"
-                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
-                                </td>
-                                <td class="badge-cell">
-                                    <img src="https://img.shields.io/github/issues-pr/${repo.owner}/${repo.name}?style=flat&label=PRs" 
-                                         alt="Open Pull Requests for ${repo.displayName}" 
+                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjOTk5Ii8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPk4vQTwvdGV4dD4KPHN2Zz4K'" />
+                                `;
+                            } else {
+                                // No workflows configured - show N/A badge
+                                dailyCIBadge = `
+                                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjOTk5Ii8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPk4vQTwvdGV4dD4KPHN2Zz4K" 
+                                         alt="NA" 
                                          loading="lazy"
-                                         onload="this.classList.add('loaded')"
-                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
-                                </td>
-                            </tr>
-                        `).join('')}
+                                         onload="this.classList.add('loaded')" />
+                                `;
+                            }
+                            
+                            return `
+                                <tr>
+                                    <td class="repo-name">${repo.displayName}</td>
+                                    <td class="badge-cell">
+                                        <img src="https://img.shields.io/github/issues/${repo.owner}/${repo.name}?style=flat" 
+                                             alt="Open Issues for ${repo.displayName}" 
+                                             loading="lazy"
+                                             onload="this.classList.add('loaded')"
+                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
+                                    </td>
+                                    <td class="badge-cell">
+                                        <img src="https://img.shields.io/github/issues-pr/${repo.owner}/${repo.name}?style=flat&label=PRs" 
+                                             alt="Open Pull Requests for ${repo.displayName}" 
+                                             loading="lazy"
+                                             onload="this.classList.add('loaded')"
+                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
+                                    </td>
+                                    <td class="badge-cell">
+                                        ${dailyCIBadge}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
                     </tbody>
                 </table>
             </div>
@@ -363,26 +400,51 @@ class GitHubDashboard {
         if (containerWidth < 600) {
             // Mobile: Stack badges vertically or make them smaller
             table.classList.add('compact-mode');
+            // On mobile, use a simpler layout with smaller fixed widths
+            table.style.setProperty('--repo-column-width', '140px');
+            table.style.setProperty('--badge-column-width', 'auto');
         } else {
             table.classList.remove('compact-mode');
+            
+            // Calculate optimal repository column width
+            const optimalRepoWidth = this.calculateOptimalRepositoryColumnWidth();
+            
+            // Calculate remaining space for badge columns
+            const reservedSpace = 100; // Reserve space for borders, padding, etc.
+            const availableWidth = containerWidth - optimalRepoWidth - reservedSpace;
+            const badgeColumnWidth = Math.max(100, Math.floor(availableWidth / 3)); // Three badge columns
+            
+            // Apply dynamic styles with smooth transitions
+            table.style.setProperty('--repo-column-width', `${optimalRepoWidth}px`);
+            table.style.setProperty('--badge-column-width', `${badgeColumnWidth}px`);
+            
+            // Add transition class for smooth width changes
+            table.classList.add('optimizing');
+            
+            // Remove the transition class after animation completes
+            setTimeout(() => {
+                table.classList.remove('optimizing');
+            }, 300);
         }
         
-        // Calculate optimal widths
-        const repoNameCells = table.querySelectorAll('.repo-name');
-        let maxRepoNameWidth = 0;
+        // Ensure table maintains good proportions
+        this.validateTableProportions(table, containerWidth);
+    }
+
+    validateTableProportions(table, containerWidth) {
+        // Ensure the table doesn't exceed container width and maintains good UX
+        const repoWidth = parseInt(table.style.getPropertyValue('--repo-column-width') || '140');
+        const badgeWidth = parseInt(table.style.getPropertyValue('--badge-column-width') || '100');
+        const totalEstimatedWidth = repoWidth + (badgeWidth * 3) + 60; // Add margin for borders/padding
         
-        repoNameCells.forEach(cell => {
-            const textWidth = this.getTextWidth(cell.textContent, cell);
-            maxRepoNameWidth = Math.max(maxRepoNameWidth, textWidth);
-        });
-        
-        // Set minimum column widths to prevent overcrowding
-        const minRepoWidth = Math.min(maxRepoNameWidth + 40, containerWidth * 0.5);
-        
-        // Apply dynamic styles
-        if (containerWidth > 600) {
-            const style = table.style;
-            style.setProperty('--repo-column-width', `${minRepoWidth}px`);
+        if (totalEstimatedWidth > containerWidth * 0.95) {
+            // If table would be too wide, scale it down proportionally
+            const scaleFactor = (containerWidth * 0.95) / totalEstimatedWidth;
+            const newRepoWidth = Math.floor(repoWidth * scaleFactor);
+            const newBadgeWidth = Math.floor(badgeWidth * scaleFactor);
+            
+            table.style.setProperty('--repo-column-width', `${newRepoWidth}px`);
+            table.style.setProperty('--badge-column-width', `${newBadgeWidth}px`);
         }
     }
 
@@ -391,11 +453,50 @@ class GitHubDashboard {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         
-        // Get computed styles from the element
-        const computedStyle = window.getComputedStyle(element);
-        context.font = `${computedStyle.fontWeight} ${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+        // Get computed styles from the element or use defaults
+        if (element) {
+            const computedStyle = window.getComputedStyle(element);
+            context.font = `${computedStyle.fontWeight} ${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+        } else {
+            // Use default font settings for badge table repository names
+            context.font = '600 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+        }
         
-        return context.measureText(text).width;
+        return Math.ceil(context.measureText(text).width);
+    }
+
+    calculateOptimalRepositoryColumnWidth() {
+        // Calculate the optimal width for repository name column based on content
+        let maxWidth = 0;
+        let minWidth = 140; // Minimum usable width
+        let maxAllowedWidth = 300; // Maximum width to prevent excessive column size
+        
+        // Check if we have a cached result that's still valid
+        if (this.repositoryColumnCache && 
+            this.repositoryColumnCache.timestamp > Date.now() - 30000) { // Cache for 30 seconds
+            return this.repositoryColumnCache.width;
+        }
+        
+        // Calculate width needed for each repository name
+        this.config.repositories.forEach(repo => {
+            const textWidth = this.getTextWidth(repo.displayName);
+            maxWidth = Math.max(maxWidth, textWidth);
+        });
+        
+        // Add padding (32px total - 16px each side)
+        const paddingWidth = 32;
+        const calculatedWidth = maxWidth + paddingWidth;
+        
+        // Apply constraints
+        const finalWidth = Math.max(minWidth, Math.min(maxAllowedWidth, calculatedWidth));
+        
+        // Cache the result
+        this.repositoryColumnCache = {
+            width: finalWidth,
+            timestamp: Date.now()
+        };
+        
+        return finalWidth;
     }
 
     async fetchDataForRepository(section, repository) {
