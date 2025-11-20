@@ -1,5 +1,5 @@
 // GitHub Dashboard Configuration
-// GitHub token will be loaded dynamically from AWS Secrets Manager
+// GitHub token will be managed through session storage
 let GITHUB_TOKEN = null;
 
 // Repository configuration - easily extensible
@@ -167,49 +167,56 @@ const GITHUB_API_BASE = 'https://api.github.com';
 // Cache configuration (in milliseconds)
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-// AWS Secrets Manager configuration
-const AWS_CONFIG = {
-    secretName: 'github-token', // Your secret name in AWS Secrets Manager
-    region: 'us-east-1', // Your AWS region
-    lambdaApiUrl: 'https://your-api-gateway-id.execute-api.us-east-1.amazonaws.com/prod/github-token' // Lambda API Gateway URL
-};
+// Session storage key for GitHub token
+const SESSION_TOKEN_KEY = 'github-dashboard-session-token';
 
-// Function to load GitHub token from AWS Secrets Manager via Lambda
-async function loadGitHubToken() {
+// Session storage helper functions
+function getSessionToken() {
     try {
-        console.log('Fetching GitHub token from Lambda API...');
-        
-        const response = await fetch(AWS_CONFIG.lambdaApiUrl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
-            throw new Error(`Lambda API error: ${response.status} - ${errorData.message || response.statusText}`);
-        }
-        
-        const data = await response.json();
-        
-        if (!data.token) {
-            throw new Error('No token received from Lambda function');
-        }
-        
-        GITHUB_TOKEN = data.token;
-        
-        // Update the global config
-        window.GitHubConfig.token = GITHUB_TOKEN;
-        
-        console.log(`GitHub token loaded successfully from AWS Secrets Manager (${data.source})`);
-        return GITHUB_TOKEN;
-        
+        return sessionStorage.getItem(SESSION_TOKEN_KEY);
     } catch (error) {
-        console.error('Error loading GitHub token:', error);
-        throw new Error(`Failed to load GitHub token: ${error.message}`);
+        console.warn('Error accessing session storage:', error);
+        return null;
     }
+}
+
+function setSessionToken(token) {
+    try {
+        if (token && token.trim()) {
+            sessionStorage.setItem(SESSION_TOKEN_KEY, token.trim());
+            GITHUB_TOKEN = token.trim();
+            window.GitHubConfig.token = GITHUB_TOKEN;
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.warn('Error setting session storage:', error);
+        return false;
+    }
+}
+
+function clearSessionToken() {
+    try {
+        sessionStorage.removeItem(SESSION_TOKEN_KEY);
+        GITHUB_TOKEN = null;
+        window.GitHubConfig.token = null;
+        return true;
+    } catch (error) {
+        console.warn('Error clearing session storage:', error);
+        return false;
+    }
+}
+
+// Load token from session storage on page load
+function loadSessionToken() {
+    const token = getSessionToken();
+    if (token) {
+        GITHUB_TOKEN = token;
+        window.GitHubConfig.token = token;
+        console.log('GitHub token loaded from session storage');
+        return token;
+    }
+    return null;
 }
 
 // Export configuration for use in dashboard.js
@@ -219,6 +226,8 @@ window.GitHubConfig = {
     username: GITHUB_USERNAME,
     apiBase: GITHUB_API_BASE,
     cacheDuration: CACHE_DURATION,
-    aws: AWS_CONFIG,
-    loadToken: loadGitHubToken
+    getSessionToken: getSessionToken,
+    setSessionToken: setSessionToken,
+    clearSessionToken: clearSessionToken,
+    loadSessionToken: loadSessionToken
 };

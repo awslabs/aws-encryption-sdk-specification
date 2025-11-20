@@ -94,6 +94,29 @@
                         </li>
                     </ul>
                 </div>
+
+                <!-- Settings Section -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Configuration</h3>
+                    <ul class="nav-list">
+                        <li>
+                            <button class="nav-item" data-section="settings">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M12 1v6"/>
+                                    <path d="M12 17v6"/>
+                                    <path d="M4.22 4.22l4.24 4.24"/>
+                                    <path d="M15.54 15.54l4.24 4.24"/>
+                                    <path d="M1 12h6"/>
+                                    <path d="M17 12h6"/>
+                                    <path d="M4.22 19.78l4.24-4.24"/>
+                                    <path d="M15.54 8.46l4.24-4.24"/>
+                                </svg>
+                                Settings
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </nav>
         </aside>
 
@@ -243,6 +266,116 @@
                         </svg>
                         <h3>Coming Soon</h3>
                         <p>Duvet coverage reporting is currently being developed and will be available soon.</p>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="section" id="settingsSection" style="display: none;">
+                    <div class="section-header">
+                        <h2>Settings</h2>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <!-- Authentication Status Card -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3>Authentication Status</h3>
+                                <div class="auth-status-indicator" id="authStatusIndicator">
+                                    <span class="status-dot" id="authStatusDot"></span>
+                                    <span id="authStatusText">Public API</span>
+                                </div>
+                            </div>
+                            <div class="settings-card-content">
+                                <div class="auth-info" id="authInfo">
+                                    <p>Currently using GitHub's public API with a limit of <strong>60 requests per hour</strong>.</p>
+                                    <p>Add a personal access token to increase the limit to <strong>5,000 requests per hour</strong>.</p>
+                                </div>
+                                <div class="rate-limit-info" id="rateLimitInfo" style="display: none;">
+                                    <div class="rate-limit-display">
+                                        <span>Requests remaining: <strong id="requestsRemaining">-</strong></span>
+                                        <span>Resets at: <strong id="resetTime">-</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GitHub Token Configuration -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3>GitHub Personal Access Token</h3>
+                            </div>
+                            <div class="settings-card-content">
+                                <div class="token-form">
+                                    <div class="form-group">
+                                        <label for="githubToken">Personal Access Token</label>
+                                        <div class="token-input-container">
+                                            <input type="password" id="githubToken" class="token-input" placeholder="Enter your GitHub personal access token...">
+                                            <button type="button" id="toggleTokenVisibility" class="toggle-visibility-btn" title="Show/Hide Token">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                    <circle cx="12" cy="12" r="3"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div class="form-help">
+                                            <p>Enter a GitHub personal access token to increase API rate limits. The token is stored only for this browser session.</p>
+                                            <p><strong>Required permissions:</strong> No specific scopes needed for public repositories.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="token-validation" id="tokenValidation" style="display: none;">
+                                        <div class="validation-message" id="validationMessage"></div>
+                                        <div class="validation-details" id="validationDetails"></div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="button" id="saveToken" class="btn btn-primary">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="20,6 9,17 4,12"/>
+                                            </svg>
+                                            Save Token
+                                        </button>
+                                        <button type="button" id="testToken" class="btn btn-secondary">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                                <polyline points="22,4 12,14.01 9,11.01"/>
+                                            </svg>
+                                            Test Token
+                                        </button>
+                                        <button type="button" id="clearToken" class="btn btn-danger" style="display: none;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="3,6 5,6 21,6"/>
+                                                <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+                                            </svg>
+                                            Clear Token
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Help Section -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3>How to Create a Personal Access Token</h3>
+                            </div>
+                            <div class="settings-card-content">
+                                <div class="help-content">
+                                    <ol>
+                                        <li>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Developer settings → Personal access tokens</a></li>
+                                        <li>Click "Generate new token (classic)"</li>
+                                        <li>Give it a descriptive name (e.g., "GitHub Dashboard")</li>
+                                        <li>Set an expiration date (recommended: 90 days)</li>
+                                        <li>For public repositories, no scopes are required</li>
+                                        <li>Click "Generate token" and copy the token</li>
+                                        <li>Paste it in the field above and click "Save Token"</li>
+                                    </ol>
+                                    <div class="security-note">
+                                        <strong>Security Note:</strong> The token is stored only in your browser's session and will be cleared when you close this tab. It is never sent to any server except GitHub's API.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

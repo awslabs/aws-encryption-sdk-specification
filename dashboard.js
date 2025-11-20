@@ -32,9 +32,25 @@ class GitHubDashboard {
     }
 
     init() {
+        // Load session token if available
+        this.loadSessionToken();
         this.setupEventListeners();
         this.populateRepositorySelect();
         this.loadSection(this.currentSection);
+        
+        // Update settings page with current token status
+        this.updateSettingsDisplay();
+    }
+
+    loadSessionToken() {
+        const token = this.config.loadSessionToken();
+        if (token) {
+            this.isAuthenticated = true;
+            console.log('Session token loaded and ready');
+        } else {
+            this.isAuthenticated = false;
+            console.log('No session token found, using public API');
+        }
     }
 
     setupEventListeners() {
@@ -1798,8 +1814,421 @@ class GitHubDashboard {
         this.hidePRUserSuggestions();
         this.updatePRFilterActiveState();
     }
-}
+    // Settings page functionality
+    updateSettingsDisplay() {
+        // Update authentication status
+        const authStatusIndicator = document.getElementById('authStatusIndicator');
+        const authStatusDot = document.getElementById('authStatusDot');
+        const authStatusText = document.getElementById('authStatusText');
+        const authInfo = document.getElementById('authInfo');
+        const rateLimitInfo = document.getElementById('rateLimitInfo');
+        const clearTokenBtn = document.getElementById('clearToken');
 
+        if (authStatusIndicator) {
+            if (this.isAuthenticated) {
+                authStatusIndicator.classList.add('authenticated');
+                if (authStatusDot) authStatusDot.style.background = '#22c55e';
+                if (authStatusText) authStatusText.textContent = 'Personal Token';
+                if (clearTokenBtn) clearTokenBtn.style.display = 'inline-flex';
+                
+                if (authInfo) {
+                    authInfo.innerHTML = `
+                        <p>Using your personal access token with a limit of <strong>5,000 requests per hour</strong>.</p>
+                        <p>Token is stored in session storage and will be cleared when you close this tab.</p>
+                    `;
+                }
+                
+                // Show rate limit info if available
+                if (this.rateLimitInfo && rateLimitInfo) {
+                    rateLimitInfo.style.display = 'block';
+                    this.updateRateLimitSettings();
+                }
+            } else {
+                authStatusIndicator.classList.remove('authenticated');
+                if (authStatusDot) authStatusDot.style.background = '#94a3b8';
+                if (authStatusText) authStatusText.textContent = 'Public API';
+                if (clearTokenBtn) clearTokenBtn.style.display = 'none';
+                
+                if (authInfo) {
+                    authInfo.innerHTML = `
+                        <p>Currently using GitHub's public API with a limit of <strong>60 requests per hour</strong>.</p>
+                        <p>Add a personal access token to increase the limit to <strong>5,000 requests per hour</strong>.</p>
+                    `;
+                }
+                
+                if (rateLimitInfo) {
+                    rateLimitInfo.style.display = 'none';
+                }
+            }
+        }
+    }
+
+    updateRateLimitSettings() {
+        const requestsRemaining = document.getElementById('requestsRemaining');
+        const resetTime = document.getElementById('resetTime');
+        
+        if (this.rateLimitInfo && requestsRemaining && resetTime) {
+            requestsRemaining.textContent = `${this.rateLimitInfo.remaining}/${this.rateLimitInfo.limit}`;
+            const resetDate = new Date(this.rateLimitInfo.reset * 1000);
+            resetTime.textContent = resetDate.toLocaleTimeString();
+        }
+    }
+
+    setupSettingsEventListeners() {
+        const tokenInput = document.getElementById('githubToken');
+        const toggleVisibilityBtn = document.getElementById('toggleTokenVisibility');
+        const saveTokenBtn = document.getElementById('saveToken');
+        const testTokenBtn = document.getElementById('testToken');
+        const clearTokenBtn = document.getElementById('clearToken');
+
+        // Toggle token visibility
+        if (toggleVisibilityBtn && tokenInput) {
+            toggleVisibilityBtn.addEventListener('click', () => {
+                const isPassword = tokenInput.type === 'password';
+                tokenInput.type = isPassword ? 'text' : 'password';
+                
+                const svg = toggleVisibilityBtn.querySelector('svg');
+                if (isPassword) {
+                    // Show eye-off icon
+                    svg.innerHTML = `
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                    `;
+                } else {
+                    // Show eye icon
+                    svg.innerHTML = `
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    `;
+                }
+            });
+        }
+
+        // Save token
+        if (saveTokenBtn) {
+            saveTokenBtn.addEventListener('click', async () => {
+                await this.saveGitHubToken();
+            });
+        }
+
+        // Test token
+        if (testTokenBtn) {
+            testTokenBtn.addEventListener('click', async () => {
+                await this.testGitHubToken();
+            });
+        }
+
+        // Clear token
+        if (clearTokenBtn) {
+            clearTokenBtn.addEventListener('click', () => {
+                this.clearGitHubToken();
+            });
+        }
+
+        // Auto-validate on input
+        if (tokenInput) {
+            let validateTimeout;
+            tokenInput.addEventListener('input', () => {
+                clearTimeout(validateTimeout);
+                validateTimeout = setTimeout(() => {
+                    const token = tokenInput.value.trim();
+                    if (token.length > 10) { // Basic length check
+                        this.showValidationState('loading', 'Validating token...', '');
+                    } else {
+                        this.hideValidation();
+                    }
+                }, 500);
+            });
+        }
+    }
+
+    async saveGitHubToken() {
+        const tokenInput = document.getElementById('githubToken');
+        const saveBtn = document.getElementById('saveToken');
+        
+        if (!tokenInput || !saveBtn) return;
+        
+        const token = tokenInput.value.trim();
+        
+        if (!token) {
+            this.showValidationState('error', 'Please enter a token', '');
+            return;
+        }
+
+        // Disable button and show loading
+        saveBtn.disabled = true;
+        this.showValidationState('loading', 'Validating and saving token...', '');
+
+        try {
+            // Validate token first
+            const isValid = await this.validateToken(token);
+            
+            if (isValid) {
+                // Save to session storage
+                const success = this.config.setSessionToken(token);
+                
+                if (success) {
+                    this.isAuthenticated = true;
+                    this.showValidationState('success', 'Token saved successfully!', 'You can now use the enhanced API rate limits.');
+                    this.showToast('success', 'Token Saved', 'GitHub token saved and validated successfully.');
+                    this.updateSettingsDisplay();
+                    
+                    // Clear the input for security
+                    tokenInput.value = '';
+                    
+                    // Refresh current data
+                    this.refreshData();
+                } else {
+                    this.showValidationState('error', 'Failed to save token', 'Unable to save token to session storage.');
+                }
+            }
+        } catch (error) {
+            console.error('Error saving token:', error);
+            this.showValidationState('error', 'Token validation failed', error.message);
+        } finally {
+            saveBtn.disabled = false;
+        }
+    }
+
+    async testGitHubToken() {
+        const tokenInput = document.getElementById('githubToken');
+        const testBtn = document.getElementById('testToken');
+        
+        if (!tokenInput || !testBtn) return;
+        
+        const token = tokenInput.value.trim();
+        
+        if (!token) {
+            this.showValidationState('error', 'Please enter a token to test', '');
+            return;
+        }
+
+        testBtn.disabled = true;
+        this.showValidationState('loading', 'Testing token...', '');
+
+        try {
+            const isValid = await this.validateToken(token);
+            
+            if (isValid) {
+                this.showValidationState('success', 'Token is valid!', 'This token can be used with the GitHub API.');
+            }
+        } catch (error) {
+            console.error('Error testing token:', error);
+            this.showValidationState('error', 'Token test failed', error.message);
+        } finally {
+            testBtn.disabled = false;
+        }
+    }
+
+    clearGitHubToken() {
+        const success = this.config.clearSessionToken();
+        
+        if (success) {
+            this.isAuthenticated = false;
+            this.rateLimitInfo = null;
+            this.showToast('info', 'Token Cleared', 'GitHub token removed. Using public API.');
+            this.updateSettingsDisplay();
+            this.hideValidation();
+            
+            // Clear the input
+            const tokenInput = document.getElementById('githubToken');
+            if (tokenInput) tokenInput.value = '';
+            
+            // Refresh current data
+            this.refreshData();
+        } else {
+            this.showToast('error', 'Error', 'Failed to clear token from session storage.');
+        }
+    }
+
+    async validateToken(token) {
+        try {
+            const response = await fetch('https://api.github.com/user', {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'User-Agent': 'GitHub-Dashboard'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
+                const rateLimitLimit = response.headers.get('X-RateLimit-Limit');
+                
+                this.rateLimitInfo = {
+                    limit: parseInt(rateLimitLimit) || 0,
+                    remaining: parseInt(rateLimitRemaining) || 0,
+                    reset: parseInt(response.headers.get('X-RateLimit-Reset')) || 0,
+                    used: parseInt(response.headers.get('X-RateLimit-Used')) || 0
+                };
+                
+                return true;
+            } else if (response.status === 401) {
+                throw new Error('Invalid token. Please check your GitHub personal access token.');
+            } else if (response.status === 403) {
+                throw new Error('Token access denied. Please check token permissions.');
+            } else {
+                throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+            }
+        } catch (error) {
+            if (error.message.includes('Failed to fetch')) {
+                throw new Error('Network error. Please check your internet connection.');
+            }
+            throw error;
+        }
+    }
+
+    showValidationState(type, message, details) {
+        const validation = document.getElementById('tokenValidation');
+        const validationMessage = document.getElementById('validationMessage');
+        const validationDetails = document.getElementById('validationDetails');
+        
+        if (!validation || !validationMessage || !validationDetails) return;
+        
+        validation.className = `token-validation ${type}`;
+        validation.style.display = 'block';
+        validationMessage.textContent = message;
+        validationDetails.textContent = details;
+    }
+
+    hideValidation() {
+        const validation = document.getElementById('tokenValidation');
+        if (validation) {
+            validation.style.display = 'none';
+        }
+    }
+
+    showToast(type, title, message) {
+        // Remove any existing toasts
+        const existingToast = document.querySelector('.toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const iconSvg = {
+            success: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/>',
+            error: '<circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/>',
+            info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'
+        };
+        
+        toast.innerHTML = `
+            <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                ${iconSvg[type] || iconSvg.info}
+            </svg>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Add close functionality
+        const closeBtn = toast.querySelector('.toast-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            });
+        }
+        
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (toast.classList.contains('show')) {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }
+        }, 5000);
+    }
+
+    // Enhanced fetchFromGitHubRaw with automatic fallback
+    async fetchFromGitHubRaw(url) {
+        // Build headers conditionally based on token availability
+        const headers = {
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'GitHub-Dashboard'
+        };
+
+        // Add authorization header only if token is available
+        if (this.config && this.config.token) {
+            headers['Authorization'] = `token ${this.config.token}`;
+            this.isAuthenticated = true;
+        } else {
+            this.isAuthenticated = false;
+        }
+
+        try {
+            const response = await fetch(url, { headers });
+
+            // Parse rate limit information from response headers
+            this.rateLimitInfo = {
+                limit: parseInt(response.headers.get('X-RateLimit-Limit')) || 0,
+                remaining: parseInt(response.headers.get('X-RateLimit-Remaining')) || 0,
+                reset: parseInt(response.headers.get('X-RateLimit-Reset')) || 0,
+                used: parseInt(response.headers.get('X-RateLimit-Used')) || 0
+            };
+
+            this.updateRateLimitDisplay();
+            this.updateRateLimitSettings();
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    // Invalid token - clear it and fall back to public API
+                    console.warn('Invalid GitHub token detected, clearing and falling back to public API');
+                    this.config.clearSessionToken();
+                    this.isAuthenticated = false;
+                    this.showToast('error', 'Invalid Token', 'GitHub token was invalid and has been cleared. Using public API.');
+                    this.updateSettingsDisplay();
+                    
+                    // Retry with public API
+                    return this.fetchFromGitHubRaw(url);
+                } else if (response.status === 403) {
+                    const resetTime = new Date(this.rateLimitInfo.reset * 1000);
+                    const message = this.isAuthenticated 
+                        ? `API rate limit exceeded. Resets at ${resetTime.toLocaleTimeString()}.`
+                        : `Rate limit exceeded (60 requests/hour for unauthenticated requests). Resets at ${resetTime.toLocaleTimeString()}. Consider adding a GitHub token for 5000 requests/hour.`;
+                    throw new Error(message);
+                } else {
+                    throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+                }
+            }
+
+            const data = await response.json();
+            const linkHeader = response.headers.get('Link');
+
+            return {
+                data,
+                linkHeader
+            };
+        } catch (error) {
+            // If there's a token error and we haven't already fallen back, try without token
+            if (this.config.token && (error.message.includes('401') || error.message.includes('Invalid token'))) {
+                console.warn('Token error detected, falling back to public API');
+                this.config.clearSessionToken();
+                this.isAuthenticated = false;
+                this.updateSettingsDisplay();
+                
+                // Retry without token
+                return this.fetchFromGitHubRaw(url);
+            }
+            
+            throw error;
+        }
+    }
+}
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -1807,28 +2236,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('loadingSpinner').style.display = 'flex';
         document.getElementById('errorMessage').style.display = 'none';
         
-        // Try to load GitHub token from AWS Secrets Manager (optional)
-        if (window.GitHubConfig && window.GitHubConfig.loadToken) {
-            // once we figure out how to hook up api gateway to github pages uncomment
-            // the lines below.
-            window.GitHubConfig.token = null;
-            // try {
-            //     console.log('Attempting to load GitHub token from AWS Secrets Manager...');
-            //     await window.GitHubConfig.loadToken();
-            //     console.log('GitHub token loaded successfully');
-            // } catch (tokenError) {
-            //     console.warn('Could not load GitHub token, continuing with public API:', tokenError.message);
-            //     // Clear any existing token to ensure we use public API
-            //     if (window.GitHubConfig) {
-            //         window.GitHubConfig.token = null;
-            //     }
-            // }
-        } else {
-            console.log('No token loading configured, using public GitHub API');
-        }
+        // Initialize dashboard with session token support
+        const dashboard = new GitHubDashboard();
         
-        // Initialize dashboard (works with or without token)
-        new GitHubDashboard();
+        // Setup settings page event listeners
+        dashboard.setupSettingsEventListeners();
         
     } catch (error) {
         console.error('Failed to initialize dashboard:', error);
@@ -1838,21 +2250,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (errorElement) {
             errorElement.style.display = 'flex';
             document.getElementById('errorText').textContent = 
-                `Initialization warning: ${error.message}. Dashboard will use public GitHub API with rate limits.`;
+                `Initialization error: ${error.message}`;
             
-            // Auto-hide error after 5 seconds since dashboard still works
+            // Auto-hide error after 5 seconds
             setTimeout(() => {
                 errorElement.style.display = 'none';
             }, 5000);
         }
         
         document.getElementById('loadingSpinner').style.display = 'none';
-        
-        // Initialize dashboard anyway - it should work with public API
-        try {
-            new GitHubDashboard();
-        } catch (dashboardError) {
-            console.error('Dashboard initialization failed:', dashboardError);
-        }
     }
 });
