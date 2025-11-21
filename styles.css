@@ -1089,6 +1089,36 @@ body {
     opacity: 1;
 }
 
+/* Badge link styling */
+.badge-table .badge-cell a {
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    outline-offset: 2px;
+}
+
+.badge-table .badge-cell a:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.badge-table .badge-cell a:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+.badge-table .badge-cell a:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure images maintain their sizing within links */
+.badge-table .badge-cell a img {
+    display: block;
+    margin: 0 auto;
+}
+
 /* Dynamic column width support */
 .badge-table {
     --repo-column-width: auto;

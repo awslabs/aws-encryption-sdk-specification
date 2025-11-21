@@ -295,19 +295,29 @@ class GitHubDashboard {
                                 console.log(repo.name + " " + workflowFile);
                                 
                                 dailyCIBadge = `
-                                    <img src="https://img.shields.io/github/actions/workflow/status/${repo.owner}/${repo.name}/${workflowFile}?style=flat&label=CI" 
-                                         alt="Daily CI Status for ${repo.displayName}" 
-                                         loading="lazy"
-                                         onload="this.classList.add('loaded')"
-                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjOTk5Ii8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPk4vQTwvdGV4dD4KPHN2Zz4K'" />
+                                    <a href="https://github.com/${repo.owner}/${repo.name}/actions" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       title="View GitHub Actions for ${repo.displayName}">
+                                        <img src="https://img.shields.io/github/actions/workflow/status/${repo.owner}/${repo.name}/${workflowFile}?style=flat&label=CI" 
+                                             alt="Daily CI Status for ${repo.displayName}" 
+                                             loading="lazy"
+                                             onload="this.classList.add('loaded')"
+                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjOTk5Ii8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPk4vQTwvdGV4dD4KPHN2Zz4K'" />
+                                    </a>
                                 `;
                             } else {
-                                // No workflows configured - show N/A badge
+                                // No workflows configured - show N/A badge (still link to actions page)
                                 dailyCIBadge = `
-                                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjOTk5Ii8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPk4vQTwvdGV4dD4KPHN2Zz4K" 
-                                         alt="NA" 
-                                         loading="lazy"
-                                         onload="this.classList.add('loaded')" />
+                                    <a href="https://github.com/${repo.owner}/${repo.name}/actions" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       title="View GitHub Actions for ${repo.displayName}">
+                                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjOTk5Ii8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPk4vQTwvdGV4dD4KPHN2Zz4K" 
+                                             alt="NA" 
+                                             loading="lazy"
+                                             onload="this.classList.add('loaded')" />
+                                    </a>
                                 `;
                             }
                             
@@ -315,18 +325,28 @@ class GitHubDashboard {
                                 <tr>
                                     <td class="repo-name">${repo.displayName}</td>
                                     <td class="badge-cell">
-                                        <img src="https://img.shields.io/github/issues/${repo.owner}/${repo.name}?style=flat" 
-                                             alt="Open Issues for ${repo.displayName}" 
-                                             loading="lazy"
-                                             onload="this.classList.add('loaded')"
-                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
+                                        <a href="https://github.com/${repo.owner}/${repo.name}/issues" 
+                                           target="_blank" 
+                                           rel="noopener noreferrer"
+                                           title="View open issues for ${repo.displayName} on GitHub">
+                                            <img src="https://img.shields.io/github/issues/${repo.owner}/${repo.name}?style=flat" 
+                                                 alt="Open Issues for ${repo.displayName}" 
+                                                 loading="lazy"
+                                                 onload="this.classList.add('loaded')"
+                                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
+                                        </a>
                                     </td>
                                     <td class="badge-cell">
-                                        <img src="https://img.shields.io/github/issues-pr/${repo.owner}/${repo.name}?style=flat&label=PRs" 
-                                             alt="Open Pull Requests for ${repo.displayName}" 
-                                             loading="lazy"
-                                             onload="this.classList.add('loaded')"
-                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
+                                        <a href="https://github.com/${repo.owner}/${repo.name}/pulls" 
+                                           target="_blank" 
+                                           rel="noopener noreferrer"
+                                           title="View open pull requests for ${repo.displayName} on GitHub">
+                                            <img src="https://img.shields.io/github/issues-pr/${repo.owner}/${repo.name}?style=flat&label=PRs" 
+                                                 alt="Open Pull Requests for ${repo.displayName}" 
+                                                 loading="lazy"
+                                                 onload="this.classList.add('loaded')"
+                                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA4MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2NjIi8+Cjx0ZXh0IHg9IjQwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNmZmYiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K'" />
+                                        </a>
                                     </td>
                                     <td class="badge-cell">
                                         ${dailyCIBadge}
