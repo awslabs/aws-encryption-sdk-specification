@@ -74,6 +74,21 @@ class GitHubDashboard {
                     this.clearAllIssueFilters();
                     this.clearAllPullRequestFilters();
                     
+                    // Show/hide filters based on section and repository selection
+                    if (this.currentSection === 'issues') {
+                        if (this.currentRepository) {
+                            this.showIssueFilters();
+                        } else {
+                            this.hideIssueFilters();
+                        }
+                    } else if (this.currentSection === 'pull-requests') {
+                        if (this.currentRepository) {
+                            this.showPullRequestFilters();
+                        } else {
+                            this.hidePullRequestFilters();
+                        }
+                    }
+                    
                     this.loadSection(this.currentSection);
                 });
             }
@@ -137,6 +152,10 @@ class GitHubDashboard {
         // Update URL hash
         window.location.hash = section;
 
+        // Hide all filter panels first when switching sections
+        this.hideIssueFilters();
+        this.hidePullRequestFilters();
+
         // Update section
         this.currentSection = section;
         
@@ -175,7 +194,22 @@ class GitHubDashboard {
         // For detailed views, check if repository is selected
         if (!this.currentRepository) {
             this.showRepositorySelectionState(section);
+            // Hide filters when no repository is selected
+            if (section === 'issues') {
+                this.hideIssueFilters();
+            } else if (section === 'pull-requests') {
+                this.hidePullRequestFilters();
+            }
             return;
+        }
+
+        // Show filters when repository is selected
+        if (section === 'issues') {
+            this.showIssueFilters();
+            this.showIssuesOverviewSection();
+        } else if (section === 'pull-requests') {
+            this.showPullRequestFilters();
+            this.showPROverviewSection();
         }
         
         this.showLoading();
@@ -194,6 +228,10 @@ class GitHubDashboard {
                 // Extract users for suggestions
                 this.extractUsersFromIssues(data);
                 
+                // Categorize and render overview before applying filters
+                const categorizedData = this.categorizeIssues(data);
+                this.renderIssueOverview(categorizedData);
+                
                 // Apply filters and custom sorting
                 data = this.filterAndSortIssues(data);
                 
@@ -202,6 +240,10 @@ class GitHubDashboard {
             } else if (section === 'pull-requests') {
                 // Extract users for suggestions
                 this.extractUsersFromPullRequests(data);
+                
+                // Categorize and render overview before applying filters
+                const categorizedData = this.categorizePullRequests(data);
+                this.renderPROverview(categorizedData);
                 
                 // Apply filters and custom sorting
                 data = this.filterAndSortPullRequests(data);
@@ -1407,6 +1449,21 @@ class GitHubDashboard {
         this.hideUserSuggestions();
     }
 
+    showPullRequestFilters() {
+        const filtersPanel = document.getElementById('pullRequestFilters');
+        if (filtersPanel) {
+            filtersPanel.style.display = 'flex';
+        }
+    }
+
+    hidePullRequestFilters() {
+        const filtersPanel = document.getElementById('pullRequestFilters');
+        if (filtersPanel) {
+            filtersPanel.style.display = 'none';
+        }
+        this.hidePRUserSuggestions();
+    }
+
     applyIssueFilters() {
         // Get current issue data from cache or re-render
         this.loadSection('issues');
@@ -1833,6 +1890,118 @@ class GitHubDashboard {
 
         this.hidePRUserSuggestions();
         this.updatePRFilterActiveState();
+    }
+
+    // Pull request categorization and overview methods
+    categorizePullRequests(prs) {
+        const dependabotPRs = prs.filter(pr => 
+            pr.user && pr.user.login === 'dependabot[bot]'
+        );
+
+        // Get CRYPTO_TOOLS_USERNAMES from global scope
+        const cryptoToolsUsernames = typeof CRYPTO_TOOLS_USERNAMES !== 'undefined' ? CRYPTO_TOOLS_USERNAMES : [];
+
+        const teamMemberPRs = prs.filter(pr => 
+            pr.user && 
+            pr.user.login !== 'dependabot[bot]' && 
+            cryptoToolsUsernames.includes(pr.user.login)
+        );
+
+        const externalPRs = prs.filter(pr => 
+            pr.user && 
+            pr.user.login !== 'dependabot[bot]' && 
+            !cryptoToolsUsernames.includes(pr.user.login)
+        );
+
+        return {
+            dependabot: dependabotPRs,
+            teamMembers: teamMemberPRs,
+            external: externalPRs,
+            total: prs.length
+        };
+    }
+
+    // Issues categorization and overview methods
+    categorizeIssues(issues) {
+        // Get CRYPTO_TOOLS_USERNAMES from global scope
+        const cryptoToolsUsernames = typeof CRYPTO_TOOLS_USERNAMES !== 'undefined' ? CRYPTO_TOOLS_USERNAMES : [];
+
+        const teamMemberIssues = issues.filter(issue => 
+            issue.user && 
+            cryptoToolsUsernames.includes(issue.user.login)
+        );
+
+        const externalIssues = issues.filter(issue => 
+            issue.user && 
+            !cryptoToolsUsernames.includes(issue.user.login)
+        );
+
+        return {
+            teamMembers: teamMemberIssues,
+            external: externalIssues,
+            total: issues.length
+        };
+    }
+
+    renderPROverview(categorizedData) {
+        // Update the count displays
+        const dependabotCount = document.getElementById('dependabotCount');
+        const teamMembersCount = document.getElementById('teamMembersCount');
+        const externalCount = document.getElementById('externalCount');
+
+        if (dependabotCount) {
+            dependabotCount.textContent = categorizedData.dependabot.length;
+        }
+
+        if (teamMembersCount) {
+            teamMembersCount.textContent = categorizedData.teamMembers.length;
+        }
+
+        if (externalCount) {
+            externalCount.textContent = categorizedData.external.length;
+        }
+    }
+
+    renderIssueOverview(categorizedData) {
+        // Update the count displays for issues
+        const issuesTeamMembersCount = document.getElementById('issuesTeamMembersCount');
+        const issuesExternalCount = document.getElementById('issuesExternalCount');
+
+        if (issuesTeamMembersCount) {
+            issuesTeamMembersCount.textContent = categorizedData.teamMembers.length;
+        }
+
+        if (issuesExternalCount) {
+            issuesExternalCount.textContent = categorizedData.external.length;
+        }
+    }
+
+    showPROverviewSection() {
+        const overviewSection = document.getElementById('prOverviewSection');
+        if (overviewSection) {
+            overviewSection.style.display = 'block';
+        }
+    }
+
+    hidePROverviewSection() {
+        const overviewSection = document.getElementById('prOverviewSection');
+        if (overviewSection) {
+            overviewSection.style.display = 'none';
+        }
+    }
+
+    showIssuesOverviewSection() {
+        const overviewSection = document.getElementById('issuesOverviewSection');
+        if (overviewSection) {
+            overviewSection.style.display = 'block';
+        }
+    }
+
+    hideIssuesOverviewSection() {
+        const overviewSection = document.getElementById('issuesOverviewSection');
+        if (overviewSection) {
+            overviewSection.style.display = 'none';
+        }
     }
     // Settings page functionality
     updateSettingsDisplay() {

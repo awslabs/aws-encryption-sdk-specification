@@ -1575,6 +1575,211 @@ body {
     color: #6b7280;
 }
 
+/* Pull Request Overview Styling */
+.pr-overview-section {
+    margin-bottom: 24px;
+}
+
+.pr-overview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 16px;
+}
+
+.pr-category-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.pr-category-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.pr-category-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--category-color), transparent);
+}
+
+/* Category-specific colors */
+.pr-category-card.dependabot {
+    --category-color: #f59e0b;
+}
+
+.pr-category-card.dependabot .category-icon {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.pr-category-card.team-members {
+    --category-color: #3b82f6;
+}
+
+.pr-category-card.team-members .category-icon {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.pr-category-card.external {
+    --category-color: #10b981;
+}
+
+.pr-category-card.external .category-icon {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.category-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.pr-category-card:hover .category-icon {
+    transform: scale(1.05);
+}
+
+.category-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.category-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.category-count {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--category-color);
+    line-height: 1;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+}
+
+.category-description {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Responsive design for PR overview */
+@media (max-width: 1024px) {
+    .pr-overview {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+    
+    .pr-category-card {
+        padding: 16px;
+        gap: 12px;
+    }
+    
+    .category-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .category-count {
+        font-size: 28px;
+    }
+    
+    .category-title {
+        font-size: 13px;
+    }
+    
+    .category-description {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pr-overview {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .pr-category-card {
+        padding: 16px;
+        gap: 14px;
+    }
+    
+    .category-icon {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .category-count {
+        font-size: 30px;
+    }
+    
+    .category-title {
+        font-size: 14px;
+    }
+    
+    .category-description {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pr-overview {
+        gap: 10px;
+    }
+    
+    .pr-category-card {
+        padding: 14px;
+        gap: 12px;
+    }
+    
+    .category-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .category-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .category-count {
+        font-size: 24px;
+    }
+    
+    .category-title {
+        font-size: 13px;
+    }
+    
+    .category-description {
+        font-size: 11px;
+    }
+}
+
 /* Mobile responsive design */
 @media (max-width: 1024px) {
     .app-container {

@@ -164,6 +164,60 @@
                         </div>
                     </div>
 
+                    <!-- PR Overview Section -->
+                    <div class="pr-overview-section" id="prOverviewSection" style="display: none;">
+                        <div class="pr-overview">
+                            <div class="pr-category-card dependabot">
+                                <div class="category-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 1.16-.21 2.31-.48 3.38-.84"/>
+                                        <path d="M22 12c0 1.25-.23 2.45-.64 3.56"/>
+                                        <path d="M18.58 15.58L21 18l-2.42 2.42"/>
+                                        <path d="M12 8v8"/>
+                                        <path d="M8 12l8 0"/>
+                                    </svg>
+                                </div>
+                                <div class="category-content">
+                                    <h3 class="category-title">Dependabot</h3>
+                                    <div class="category-count" id="dependabotCount">0</div>
+                                    <p class="category-description">Automated dependency updates</p>
+                                </div>
+                            </div>
+
+                            <div class="pr-category-card team-members">
+                                <div class="category-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="8.5" cy="7" r="4"/>
+                                        <path d="M20 8v6"/>
+                                        <path d="M23 11h-6"/>
+                                    </svg>
+                                </div>
+                                <div class="category-content">
+                                    <h3 class="category-title">Team Members</h3>
+                                    <div class="category-count" id="teamMembersCount">0</div>
+                                    <p class="category-description">AWS Crypto Tools team</p>
+                                </div>
+                            </div>
+
+                            <div class="pr-category-card external">
+                                <div class="category-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="8.5" cy="7" r="4"/>
+                                        <line x1="18" y1="8" x2="23" y2="3"/>
+                                        <line x1="21" y1="6" x2="21" y2="6"/>
+                                    </svg>
+                                </div>
+                                <div class="category-content">
+                                    <h3 class="category-title">External Contributors</h3>
+                                    <div class="category-count" id="externalCount">0</div>
+                                    <p class="category-description">Community contributions</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="filters" id="pullRequestFilters" style="display: none;">
                         <div class="filter-group">
                             <label for="prSortSelect">Sort by:</label>
@@ -203,6 +257,43 @@
                         <div class="data-info">
                             <span id="issuesDataCount">-</span>
                             <span class="last-updated">Last updated: <span id="issuesLastUpdated">Never</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Issues Overview Section -->
+                    <div class="pr-overview-section" id="issuesOverviewSection" style="display: none;">
+                        <div class="pr-overview">
+                            <div class="pr-category-card team-members">
+                                <div class="category-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="8.5" cy="7" r="4"/>
+                                        <path d="M20 8v6"/>
+                                        <path d="M23 11h-6"/>
+                                    </svg>
+                                </div>
+                                <div class="category-content">
+                                    <h3 class="category-title">Team Members</h3>
+                                    <div class="category-count" id="issuesTeamMembersCount">0</div>
+                                    <p class="category-description">AWS Crypto Tools team</p>
+                                </div>
+                            </div>
+
+                            <div class="pr-category-card external">
+                                <div class="category-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="8.5" cy="7" r="4"/>
+                                        <line x1="18" y1="8" x2="23" y2="3"/>
+                                        <line x1="21" y1="6" x2="21" y2="6"/>
+                                    </svg>
+                                </div>
+                                <div class="category-content">
+                                    <h3 class="category-title">External Contributors</h3>
+                                    <div class="category-count" id="issuesExternalCount">0</div>
+                                    <p class="category-description">Community contributions</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

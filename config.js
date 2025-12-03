@@ -158,6 +158,21 @@ const REPOSITORIES = [
     }
 ];
 
+const CRYPTO_TOOLS_USERNAMES = [
+    "seebees",
+    "texastony", 
+    "ShubhamChaturvedi7",
+    "mahnushm",
+    "lucasmcdonald3",
+    "robin-aws",
+    "josecorella",
+    "imabhichow",
+    "rishav-karanjit",
+    "antonf-amzn",
+    "kessplas",
+    "ajewellamz"
+];
+
 // Your GitHub username
 const GITHUB_USERNAME = 'aws-crypto-tools-ci-bot';
 
