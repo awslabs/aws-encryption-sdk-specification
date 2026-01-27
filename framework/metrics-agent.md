@@ -39,7 +39,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 ### label
 
 A label is a string that is used
-as a an attribute name to aggregate
+as an attribute name to aggregate
 measurements. A label can be used to
 add a dimension to the Metrics Agent
 
@@ -156,7 +156,7 @@ Used to aggregate a sum from multiple count values with the same metric name.
 
 #### AddProperty
 
-Used to add context/metadata in the form of a key-value pair related to a Metrics reference. 
+Used to add context/metadata in the form of a key-value pair related to a Metrics reference.
 
 ## Proposed Smithy Model
 
@@ -173,29 +173,32 @@ resource MetricsAgent {
   ]
 }
 
+union Duration {
+    seconds: PositiveLong
+    minutes: PositiveLong
+    milliseconds: PositiveLong
+    hours: PositiveLong
+}
+
 // Operations for different metric types
 operation AddDate {
   input: AddDateInput,
   output: AddOutput,
-  errors: [MetricsPutError]
 }
 
 operation AddTime {
   input: AddTimeInput,
   output: AddOutput,
-  errors: [MetricsPutError]
 }
 
 operation AddCount {
   input: AddCountInput,
   output: AddOutput,
-  errors: [MetricsPutError]
 }
 
 operation AddProperty {
   input: AddPropertyInput,
   output: AddOutput,
-  errors: [MetricsPutError]
 }
 
 // Input structures for each operation with flattened values
@@ -211,7 +214,7 @@ structure AddTimeInput {
   @required
   label: String,
   @required
-  duration: Long,  // Duration in milliseconds
+  duration: Duration
   transactionId: String
 }
 
@@ -233,13 +236,6 @@ structure AddPropertyInput {
 
 // Common output structure
 structure AddOutput {}
-
-// Error structure
-@error("client")
-structure MetricsPutError {
-  @required
-  message: String
-}
 
 @aws.polymorph#reference(resource: MetricsAgent)
 structure MetricsAgentReference {}

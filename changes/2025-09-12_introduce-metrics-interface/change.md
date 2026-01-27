@@ -46,7 +46,7 @@ in this document are to be interpreted as described in
 ## Summary
 
 Existing users of Crypto Tools (CT) libraries do no have any insights as to
-how the librar(y/ies) behave(s) in their application.
+how the libraries behaves in their application.
 This can lead to frustrating debugging sessions where users
 are required to have explicit tests to assert they are using a particular feature
 correctly, or if customers are using any of the KMS keyrings users have to have
@@ -105,6 +105,13 @@ level Metrics Agent; this agent will get plumbed throughout CT's stack.
 
 For example, in the ESDK for Java this would look like:
 
+**This example uses a simple metrics agent that the mpl provides to customers**
+
+**This simple interface is simply a wrapper around a battle tested logging framework.**
+
+_Note: The following code snippets show changes to the ESDK.
+Please see the [Appendix](#appendix) for proposed changes to other libraries._
+
 ```java
 final AwsCrypto crypto = AwsCrypto.builder().build();
 // Create a Keyring
@@ -147,7 +154,7 @@ structure EncryptInput {
 
   frameLength: FrameLength,
 
-+  metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
++ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
 }
 ...
 structure DecryptInput {
@@ -164,6 +171,296 @@ structure DecryptInput {
   //# - [Encryption Context](#encryption-context)
   encryptionContext: aws.cryptography.materialProviders#EncryptionContext,
 
-+  metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
++ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
+}
+```
+
+## Issues and Alternatives
+
+### Issue 0: Should Metric Agents be supported on client construction?
+
+#### Yes
+
+#### No
+
+## Appendix
+
+The following API changes are not complete. These changes assume that the new optional parameter is supplied to any additional downstream consumer that may or may not be listed here.
+
+### MPL
+
+#### CMM Operations
+
+```diff
+namespace aws.cryptography.materialProviders
+
+use aws.polymorph#reference
+use aws.polymorph#positional
+use aws.polymorph#extendable
+use aws.polymorph#javadoc
+...
+structure GetEncryptionMaterialsInput {
+  //= aws-encryption-sdk-specification/framework/cmm-interface.md#encryption-materials-request
+  //= type=implication
+  //# The encryption materials request MUST include the following:
+  //#
+  //# - [Encryption Context](structures.md#encryption-context)
+  //#   - The encryption context provided MAY be empty.
+  //# - [Commitment Policy](./commitment-policy.md#supported-commitment-policy-enum)
+
+  @required
+  encryptionContext: EncryptionContext,
+
+  @required
+  commitmentPolicy: CommitmentPolicy,
+
+  //= aws-encryption-sdk-specification/framework/cmm-interface.md#encryption-materials-request
+  //= type=implication
+  //# The encryption request MAY include the following:
+  //#
+  //# - [Algorithm Suite Id](algorithm-suites.md#algorithm-suite-id)
+  //# - Required Encryption Context Keys - a set of strings.
+  //# - Max Plaintext Length
+  //#   - This value represents the maximum length of the plaintext to be encrypted
+  //#     using the returned materials.
+  //#     The length of the plaintext to be encrypted MUST not be larger than this value.
+
+  algorithmSuiteId: AlgorithmSuiteId,
+
+  maxPlaintextLength: Long,
+
+  requiredEncryptionContextKeys: EncryptionContextKeys,
+
++ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
+}
+...
+structure DecryptMaterialsInput {
+//= aws-encryption-sdk-specification/framework/cmm-interface.md#decrypt-materials-request
+//= type=implication
+//# The decrypt materials request MUST include the following:
+//#
+//# - [Algorithm Suite Id](algorithm-suites.md#algorithm-suite-id)
+//# - [Commitment Policy](./commitment-policy.md#supported-commitment-policy-enum)
+//# - [Encrypted Data Keys](structures.md#encrypted-data-keys)
+//# - [Encryption Context](structures.md#encryption-context)
+//#   - The encryption context provided MAY be empty.
+
+  @required
+  algorithmSuiteId: AlgorithmSuiteId,
+
+  @required
+  commitmentPolicy: CommitmentPolicy,
+
+  @required
+  encryptedDataKeys: EncryptedDataKeyList,
+
+  @required
+  encryptionContext: EncryptionContext,
+
+  //= aws-encryption-sdk-specification/framework/cmm-interface.md#decrypt-materials-request
+  //= type=implication
+  //# The decrypt materials request MAY include the following:
+  //#
+  //# - [Reproduced Encryption Context](structures.md#encryption-context)
+
+  reproducedEncryptionContext: EncryptionContext,
+
++ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
+}
+```
+
+#### Keyring Operations
+
+```diff
+namespace aws.cryptography.materialProviders
+
+use aws.polymorph#reference
+use aws.polymorph#positional
+use aws.polymorph#extendable
+use aws.polymorph#javadoc
+
+use com.amazonaws.kms#EncryptionAlgorithmSpec
+use aws.cryptography.materialProviders#CacheType
+
+@extendable
+resource Keyring {
+  operations: [OnEncrypt, OnDecrypt]
+}
+
+// Keyring Structures
+
+@reference(resource: Keyring)
+structure KeyringReference {}
+...
+// Keyring Operations
+
+//= aws-encryption-sdk-specification/framework/keyring-interface.md#onencrypt
+//= type=implication
+//# This interface MUST take [encryption materials](structures.md#encryption-materials) as input.
+operation OnEncrypt {
+  input: OnEncryptInput,
+  output: OnEncryptOutput,
+}
+
+structure OnEncryptInput {
+  @required
+  materials: EncryptionMaterials,
+
++ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
+}
+
+structure OnEncryptOutput {
+  @required
+  materials: EncryptionMaterials
+}
+
+//= aws-encryption-sdk-specification/framework/keyring-interface.md#ondecrypt
+//= type=implication
+//# This interface MUST take [decryption materials](structures.md#decryption-materials) and
+//# a list of [encrypted data keys](structures.md#encrypted-data-key) as input.
+operation OnDecrypt {
+  input: OnDecryptInput,
+  output: OnDecryptOutput,
+}
+
+structure OnDecryptInput {
+  @required
+  materials: DecryptionMaterials,
+
+  @required
+  encryptedDataKeys: EncryptedDataKeyList,
+
++ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
+}
+
+structure OnDecryptOutput {
+  @required
+  materials: DecryptionMaterials
+}
+...
+```
+
+### S3EC
+
+The S3EC does not have a smithy model, but its Java implementation
+is the canonical implementation that the other language implementations
+should base their implementations off of.
+
+#### S3EncryptionClient
+
+```diff
+@Override
+public PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody)
+        throws AwsServiceException, SdkClientException {
+          ...
+}
+
++ public PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody, IMetricsAgent metricsAgent)
++        throws AwsServiceException, SdkClientException {
++          ...
++          ## Pass the IMetricsAgent reference to the appropriate downstream consumers
++}
+...
+
+@Override
+public <T> T getObject(GetObjectRequest getObjectRequest,
+                        ResponseTransformer<GetObjectResponse, T> responseTransformer)
+        throws AwsServiceException, SdkClientException {
+          ...
+}
+
++public <T> T getObject(GetObjectRequest getObjectRequest,
++                        ResponseTransformer<GetObjectResponse, T> responseTransformer,
++                        IMetricsAgent metricsAgent)
++        throws AwsServiceException, SdkClientException {
++          ...
++          ## Pass the IMetricsAgent reference to the appropriate downstream consumers
++}
+```
+
+#### GetEncryptedObjectPipeline
+
+```diff
+...
+public class GetEncryptedObjectPipeline {
+    private final S3AsyncClient _s3AsyncClient;
+    private final CryptographicMaterialsManager _cryptoMaterialsManager;
+    private final boolean _enableLegacyUnauthenticatedModes;
+    private final boolean _enableDelayedAuthentication;
+    private final long _bufferSize;
+    private final InstructionFileConfig _instructionFileConfig;
+    private final CommitmentPolicy _commitmentPolicy;
++   private final IMetricsAgent _metricsAgent;
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private GetEncryptedObjectPipeline(Builder builder) {
+        this._s3AsyncClient = builder._s3AsyncClient;
+        this._cryptoMaterialsManager = builder._cryptoMaterialsManager;
+        this._enableLegacyUnauthenticatedModes = builder._enableLegacyUnauthenticatedModes;
+        this._enableDelayedAuthentication = builder._enableDelayedAuthentication;
+        this._bufferSize = builder._bufferSize;
+        this._instructionFileConfig = builder._instructionFileConfig;
+        this._commitmentPolicy = builder._commitmentPolicy;
++       this._metricsAgent = builder._metricsAgentl
+    }
+    ...
+}
+```
+
+#### PutEncryptedObjectPipeline
+
+```diff
+...
+public class PutEncryptedObjectPipeline {
+  final private S3AsyncClient _s3AsyncClient;
+  final private CryptographicMaterialsManager _cryptoMaterialsManager;
+  final private AsyncContentEncryptionStrategy _asyncContentEncryptionStrategy;
+  final private ContentMetadataEncodingStrategy _contentMetadataEncodingStrategy;
+  final private AlgorithmSuite _encryptionAlgorithm;
++  final private IMetricsAgent _metricsAgent;
+
+  public static Builder builder() {
+      return new Builder();
+  }
+
+  private PutEncryptedObjectPipeline(Builder builder) {
+      this._s3AsyncClient = builder._s3AsyncClient;
+      this._cryptoMaterialsManager = builder._cryptoMaterialsManager;
+      this._asyncContentEncryptionStrategy = builder._asyncContentEncryptionStrategy;
+      this._contentMetadataEncodingStrategy = builder._contentMetadataEncodingStrategy;
+      this._encryptionAlgorithm = builder._encryptionAlgorithm;
++     this._metricsAgent = builder._metricsAgent;
+  }
+...
+}
+```
+
+#### Keyring
+
+```diff
+package software.amazon.encryption.s3.materials;
+
+import java.util.List;
+public interface Keyring {
+    EncryptionMaterials onEncrypt(final EncryptionMaterials materials);
++   EncryptionMaterials onEncrypt(final EncryptionMaterials materials, final IMetricsAgent metricsAgent);
+    DecryptionMaterials onDecrypt(final DecryptionMaterials materials, final List<EncryptedDataKey> encryptedDataKeys);
++   DecryptionMaterials onDecrypt(final DecryptionMaterials materials, final List<EncryptedDataKey> encryptedDataKeys, final IMetricsAgent metricsAgent);
+}
+```
+
+#### CryptographicMaterialsManager
+
+```diff
+package software.amazon.encryption.s3.materials;
+
+public interface CryptographicMaterialsManager {
+    EncryptionMaterials getEncryptionMaterials(EncryptionMaterialsRequest request);
++   EncryptionMaterials getEncryptionMaterials(EncryptionMaterialsRequest request, IMetricsAgent metricsAgent);
+    DecryptionMaterials decryptMaterials(DecryptMaterialsRequest request);
++   DecryptionMaterials decryptMaterials(DecryptMaterialsRequest request, IMetricsAgent metricsAgent);
 }
 ```

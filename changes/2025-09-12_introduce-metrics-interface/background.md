@@ -5,6 +5,14 @@
 
 ## Definitions
 
+- Metrics: Throughout this document and other related documents the word, "metrics" is used extensively.
+  For Crypto Tools' libraries metrics means two things.
+
+      1. Measuring application performance, (e.g. api requests, cache performance, latency).
+      1. Collecting application information, (e.g. algorithm suite choice, cmm configuration, keyring configuration),
+      and either transmitting that information to a specific user defined location or transmitting this
+      information with Crypto Tools.
+
 ### Conventions used in this document
 
 The key words
@@ -20,7 +28,7 @@ versions of these libraries have no logging or metrics publishing
 to either a local application or to an observability service like AWS CloudWatch.
 
 As client side encryption libraries emitting metrics must be done carefully as
-to avoid accidentally [leaking](https://github.com/aws/aws-encryption-sdk-python/pull/105/files) any information related to the plaintext that could lead to a
+to avoid accidentally leaking any information related to the plaintext that could lead to a
 loss of customer trust.
 
 A popular feature request has been for in depth insights into CT libraries. Many customers
@@ -38,7 +46,7 @@ a better customer experience.
 ### Issue 1: What will be the default behavior?
 
 As a client-side encryption library CT should be as cautious as possible.
-Customers of CT libraries should be on the driver seat and determine for
+Customers of CT libraries should be in the driver's seat and determine for
 themselves if their application could benefit from emitting metrics.
 Making that decision for customers can erode customer trust.
 
@@ -61,7 +69,7 @@ will not change. Perhaps a bold implication this is ultimately what the customer
 will feel like; getting no choice on the matter and opting to not upgrade.
 Going from never emitting metrics to always emitting them says to customers
 that their application no matter its use case will always benefit from metrics.
-Without letting customers make that choice, CT looses hard earned customer trust.
+Without letting customers make that choice, CT loses hard earned customer trust.
 
 This also forces customers to make a choice, start collecting metrics and pick up
 additional updates CT provides or get stuck in a version of the library that will
@@ -100,6 +108,19 @@ Keeping in line with the rest of CT features, a well defined interface with out
 of the box implementations should satisfy the feature request.
 
 Out of the box implementations should cover publishing metrics to an
-existing observability service like AWS CloudWatch and to the local file system.
+existing observability service like AWS CloudWatch and to the local file system using
+a hardened framework for that particular language implementation.
 These implementations should offer customers a guide into implementing their own
 if they wish to do so.
+
+### Issue 4: Should out of the box solutions be custom implementations
+
+#### No (recommended)
+
+There is no need to reinvent the wheel. Other metric frameworks have solved many
+of the issues that are described above, (e.g. handling failing requests, perform
+blocking requests to CT libraries, use a separate thread/thread pool that handles
+these request). By just providing a wrapper, customers can use the framework they
+are most comfortable with.
+
+#### Yes
