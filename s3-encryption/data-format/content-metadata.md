@@ -48,7 +48,7 @@ Metadata containing "x-amz-c" is considered to use the V3 format.
 
 ### Content Metadata MapKeys
 
-Metadata is stored as a string -> string map (see TODO for further specification of "string").
+Metadata is stored as an US-ASCII preferred string -> an US-ASCII preferred only string map (see [US-ASCII preferred String](#us-ascii-preferred-string) for details).
 Metadata is responsible for storing data which is critical for decryption of the object.
 The mapkeys contained in the metadata depends on the format version used.
 The "x-amz-meta-" prefix is automatically added by the S3 server and MUST NOT be included in implementation code.
@@ -253,3 +253,25 @@ The mapping of Algorithm Suite to Message Format Versions follows:
 Objects encrypted with ALG_AES_256_CBC_IV16_NO_KDF MAY use either the V1 or V2 message format version.
 Objects encrypted with ALG_AES_256_GCM_IV12_TAG16_NO_KDF MUST use the V2 message format version only.
 Objects encrypted with ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY MUST use the V3 message format version only.
+
+### US-ASCII Preferred String
+
+Amazon S3 defines the character space for String values in object metadata:
+
+> Amazon S3 allows arbitrary Unicode characters in your metadata values.
+> To avoid issues related to the presentation of these metadata values, you should conform to using US-ASCII characters when using REST and UTF-8 when using SOAP or browser-based uploads through POST. When using non-US-ASCII characters in your metadata values, the provided Unicode string is examined for non-US-ASCII characters. Values of such headers are character decoded as per RFC 2047 before storing and encoded as per RFC 2047 to make them mail-safe before returning.
+
+-- Source: [Amazon S3 User Guide on Using Metadata -- Quoted on 2026/01/26](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html#UserMetadata "Amazon S3 User Guide on Using Metadata -- Quoted on 2026/01/26")
+
+As US-ASCII is common to both SOAP and REST,
+and the S3 Encryption Client is agnostic on how metadata is viewed,
+the S3 Encryption Client is preferential with respect to stings in the metadata.
+Thus,
+Content Metadata MapKeys SHOULD be restricted to US-ASCII.
+
+An implementation MAY support UTF-8.
+If an implementation does NOT support UTF-8,
+then the implementation SHOULD throw an error if non-US-ASCII characters are encountered;
+the error SHOULD detail that the implementation does not support non-US-ASCII characters but encountered non-US-ASCII characters.
+
+[//]: # "See https://taskei.amazon.dev/tasks/P330807252 for details on UTF-8."
