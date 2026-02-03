@@ -54,13 +54,6 @@ Decryption MUST fail.
 The error SHOULD detail why the cipher could not be initialized
 (such as CBC or PKCS5Padding is not supported by the underlying crypto provider).
 
-Otherwise:
-
-- the S3EC MUST Decrypt the ciphertext using the initialized cipher.
-- the S3EC MUST Return the plaintext to the caller.
-
-The S3EC MUST NOT provide authentication for CBC-encrypted content, as CBC mode does not provide authenticated encryption.
-
 ### Key Commitment
 
 The S3EC supports algorithm suite(s) which provide [key commitment](./key-commitment.md).
