@@ -47,11 +47,7 @@ If an object is encrypted with ALG_AES_256_CBC_IV16_NO_KDF and [legacy unauthent
 the S3EC MUST throw an error which details that client was not configured to decrypt objects with ALG_AES_256_CBC_IV16_NO_KDF.
 
 If an object is encrypted with ALG_AES_256_CBC_IV16_NO_KDF and [legacy unauthenticated algorithm suites](#legacy-decryption) is enabled,
-then the S3EC MUST create a cipher object:
-
-- with cipher mode DECRYPT_MODE; encryption with CBC MUST NOT be supported.
-- initialize the cipher with the plaintext data key and the IV retrieved from the content metadata.
-- use the cipher transformation "AES/CBC/PKCS5Padding".
+then the S3EC MUST create a cipher object using the cipher transformation "AES/CBC/PKCS5Padding".
 
 If the cipher object cannot be created as described above,
 Decryption MUST fail;
