@@ -50,9 +50,9 @@ If an object is encrypted with ALG_AES_256_CBC_IV16_NO_KDF and [legacy unauthent
 then the S3EC MUST create a cipher object using the cipher transformation "AES/CBC/PKCS5Padding".
 
 If the cipher object cannot be created as described above,
-Decryption MUST fail;
-the error SHOULD detail why the cipher could not be initilized
-(such as CBC or PKCS5Padding is not supported by the underlying crypto provdier).
+Decryption MUST fail;  
+the error SHOULD detail why the cipher could not be initialized
+(such as CBC or PKCS5Padding is not supported by the underlying crypto provider).
 
 Otherwise:
 
