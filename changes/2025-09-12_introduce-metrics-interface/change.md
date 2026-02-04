@@ -59,7 +59,7 @@ integration with CT's libraries would be welcomed by users and will deliver on t
 "easy to use and hard to misuse" tenet.
 
 Introducing a new interface that defines the operations that must be
-implemented in order to build a specification compliant MetricsAgent.
+implemented in order to build a specification compliant MetricsWorker.
 
 ## Requirements
 
@@ -77,8 +77,8 @@ ensure the following.
 
 ## Points of Integration
 
-To collect metrics across CT's library stack multiple points of integration
-are needed in order to collect metrics across CT's libraries.
+To collect metrics across CT's library stack, multiple points of integration
+are needed in order to collect metrics.
 Generally, CT's libraries work as follows:
 
 _Note: Not every Client supports the Material Provider Library.
@@ -100,12 +100,12 @@ sequenceDiagram
 
 To optionally emit metrics from a top level client,
 all customer facing APIs MUST be changed to optionally accept
-a Metrics Agent. This will allow customers to define and supply one top
-level Metrics Agent; this agent will get plumbed throughout CT's stack.
+a Metrics Worker. This will allow customers to define and supply one top
+level Metrics Worker; this agent will get plumbed throughout CT's stack.
 
 For example, in the ESDK for Java this would look like:
 
-**This example uses a simple metrics agent that the mpl provides to customers**
+**This example uses a simple Metrics Worker that the mpl provides to customers**
 
 **This simple interface is simply a wrapper around a battle tested logging framework.**
 
@@ -124,16 +124,16 @@ final IKeyring rawAesKeyring = matProv.CreateRawAesKeyring(keyringInput);
 final Map<String, String> encryptionContext =
     Collections.singletonMap("ExampleContextKey", "ExampleContextValue");
 
-// Create a Metrics Agent
-final IMetricsAgent metrics = matProv.CreateSimpleMetricsAgent(metricsAgentInput);
+// Create a Metrics Worker
+final IMetricsWorker metricWorker = matProv.CreateSimpleMetricsWorker(metricsWorkerInput);
 // 4. Encrypt the data
 final CryptoResult<byte[], ?> encryptResult =
-    crypto.encryptData(rawAesKeyring, metrics, EXAMPLE_DATA, encryptionContext);
+    crypto.encryptData(rawAesKeyring, metricWorker, EXAMPLE_DATA, encryptionContext);
 final byte[] ciphertext = encryptResult.getResult();
 ```
 
-This change will allow Crypto Tools to introduce a Metrics Agent in a
-non-breaking way as the Metrics Agent will be an optional parameter
+This change will allow Crypto Tools to introduce a Metrics Worker in a
+non-breaking way as the Metrics Worker will be an optional parameter
 at customer facing API call sites.
 
 Currently, the ESDK client APIs models are defined [here](https://github.com/aws/aws-encryption-sdk/blob/mainline/AwsEncryptionSDK/dafny/AwsEncryptionSdk/Model/esdk.smithy#L60-L126).
@@ -154,7 +154,7 @@ structure EncryptInput {
 
   frameLength: FrameLength,
 
-+ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
++ metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
 }
 ...
 structure DecryptInput {
@@ -171,21 +171,50 @@ structure DecryptInput {
   //# - [Encryption Context](#encryption-context)
   encryptionContext: aws.cryptography.materialProviders#EncryptionContext,
 
-+ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
++ metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
 }
 ```
 
 ## Issues and Alternatives
 
-### Issue 0: Should Metric Agents be supported on client construction?
+### Issue 0: Should Metrics Workers be supported on client construction?
+
+This options assumes that a Metrics Worker on client instantiation
+is optional. Making the Metrics Worker required would face pushback
+and overall losses customer trust.
 
 #### Yes
 
-#### No
+Set it and forget it. This would make it easy for our customers to only have
+to supply their metrics workers in one place rather than to reason about which
+operations should get metrics. Additionally, this option would be a blanket
+over the entire CT stack and output all metrics the library tracks.
+
+This option also gives customers a very nice integration point of always capture
+metrics to this one worker and to only sometimes capture metrics to this
+other worker.
+
+#### No (recommended)
+
+Since this would be an optional argument to the client, adding the option
+in a separate minor release is a two-way door. Even if at launch CT decides
+to add the optional argument later on to remove the option would be a one-way
+door since customers who use the optional feature would get build errors.
+
+As CT learns from its customers, more and more
+of them seems to prefer or rather are forced to do request overrides for
+specific requests.
+
+Additionally, there is nuanced behavior that CT would need to decide to determine
+the appropriate behavior when a client is configured with a metrics worker and
+supplied with a metrics worker at the API call site.
+CT would need to settle on this behavior regardless of making it optional, but it
+allows CT to get metrics into the hands of customers much faster.
 
 ## Appendix
 
-The following API changes are not complete. These changes assume that the new optional parameter is supplied to any additional downstream consumer that may or may not be listed here.
+The following API changes are not complete. These changes assume that the new optional parameter
+is supplied to any additional downstream consumer that may or may not be listed here.
 
 ### MPL
 
@@ -231,7 +260,7 @@ structure GetEncryptionMaterialsInput {
 
   requiredEncryptionContextKeys: EncryptionContextKeys,
 
-+ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
++ metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
 }
 ...
 structure DecryptMaterialsInput {
@@ -265,7 +294,7 @@ structure DecryptMaterialsInput {
 
   reproducedEncryptionContext: EncryptionContext,
 
-+ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
++ metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
 }
 ```
 
@@ -306,7 +335,7 @@ structure OnEncryptInput {
   @required
   materials: EncryptionMaterials,
 
-+ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
++ metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
 }
 
 structure OnEncryptOutput {
@@ -330,7 +359,7 @@ structure OnDecryptInput {
   @required
   encryptedDataKeys: EncryptedDataKeyList,
 
-+ metricsAgent: aws.cryptography.materialProviders#MetricsAgentReference
++ metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
 }
 
 structure OnDecryptOutput {
@@ -355,10 +384,10 @@ public PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBod
           ...
 }
 
-+ public PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody, IMetricsAgent metricsAgent)
++ public PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody, IMetricsWorker metricsWorker)
 +        throws AwsServiceException, SdkClientException {
 +          ...
-+          ## Pass the IMetricsAgent reference to the appropriate downstream consumers
++          ## Pass the IMetricsWorker reference to the appropriate downstream consumers
 +}
 ...
 
@@ -371,10 +400,10 @@ public <T> T getObject(GetObjectRequest getObjectRequest,
 
 +public <T> T getObject(GetObjectRequest getObjectRequest,
 +                        ResponseTransformer<GetObjectResponse, T> responseTransformer,
-+                        IMetricsAgent metricsAgent)
++                        IMetricsWorker metricsWorker)
 +        throws AwsServiceException, SdkClientException {
 +          ...
-+          ## Pass the IMetricsAgent reference to the appropriate downstream consumers
++          ## Pass the IMetricsWorker reference to the appropriate downstream consumers
 +}
 ```
 
@@ -390,7 +419,7 @@ public class GetEncryptedObjectPipeline {
     private final long _bufferSize;
     private final InstructionFileConfig _instructionFileConfig;
     private final CommitmentPolicy _commitmentPolicy;
-+   private final IMetricsAgent _metricsAgent;
++   private final IMetricsWorker _metricsWorker;
 
     public static Builder builder() {
         return new Builder();
@@ -404,7 +433,7 @@ public class GetEncryptedObjectPipeline {
         this._bufferSize = builder._bufferSize;
         this._instructionFileConfig = builder._instructionFileConfig;
         this._commitmentPolicy = builder._commitmentPolicy;
-+       this._metricsAgent = builder._metricsAgentl
++       this._metricsWorker = builder._metricsWorkerl
     }
     ...
 }
@@ -420,7 +449,7 @@ public class PutEncryptedObjectPipeline {
   final private AsyncContentEncryptionStrategy _asyncContentEncryptionStrategy;
   final private ContentMetadataEncodingStrategy _contentMetadataEncodingStrategy;
   final private AlgorithmSuite _encryptionAlgorithm;
-+  final private IMetricsAgent _metricsAgent;
++  final private IMetricsWorker _metricsWorker;
 
   public static Builder builder() {
       return new Builder();
@@ -432,7 +461,7 @@ public class PutEncryptedObjectPipeline {
       this._asyncContentEncryptionStrategy = builder._asyncContentEncryptionStrategy;
       this._contentMetadataEncodingStrategy = builder._contentMetadataEncodingStrategy;
       this._encryptionAlgorithm = builder._encryptionAlgorithm;
-+     this._metricsAgent = builder._metricsAgent;
++     this._metricsWorker = builder._metricsWorker;
   }
 ...
 }
@@ -446,9 +475,9 @@ package software.amazon.encryption.s3.materials;
 import java.util.List;
 public interface Keyring {
     EncryptionMaterials onEncrypt(final EncryptionMaterials materials);
-+   EncryptionMaterials onEncrypt(final EncryptionMaterials materials, final IMetricsAgent metricsAgent);
++   EncryptionMaterials onEncrypt(final EncryptionMaterials materials, final IMetricsWorker metricsWorker);
     DecryptionMaterials onDecrypt(final DecryptionMaterials materials, final List<EncryptedDataKey> encryptedDataKeys);
-+   DecryptionMaterials onDecrypt(final DecryptionMaterials materials, final List<EncryptedDataKey> encryptedDataKeys, final IMetricsAgent metricsAgent);
++   DecryptionMaterials onDecrypt(final DecryptionMaterials materials, final List<EncryptedDataKey> encryptedDataKeys, final IMetricsWorker metricsWorker);
 }
 ```
 
@@ -459,8 +488,8 @@ package software.amazon.encryption.s3.materials;
 
 public interface CryptographicMaterialsManager {
     EncryptionMaterials getEncryptionMaterials(EncryptionMaterialsRequest request);
-+   EncryptionMaterials getEncryptionMaterials(EncryptionMaterialsRequest request, IMetricsAgent metricsAgent);
++   EncryptionMaterials getEncryptionMaterials(EncryptionMaterialsRequest request, IMetricsWorker metricsWorker);
     DecryptionMaterials decryptMaterials(DecryptMaterialsRequest request);
-+   DecryptionMaterials decryptMaterials(DecryptMaterialsRequest request, IMetricsAgent metricsAgent);
++   DecryptionMaterials decryptMaterials(DecryptMaterialsRequest request, IMetricsWorker metricsWorker);
 }
 ```

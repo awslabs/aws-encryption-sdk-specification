@@ -1,7 +1,7 @@
 [//]: # "Copyright Amazon.com Inc. or its affiliates. All Rights Reserved."
 [//]: # "SPDX-License-Identifier: CC-BY-SA-4.0"
 
-# Metrics Agent Interface
+# Metrics Worker Interface
 
 _NOTE: Still in draft but in a state to receive feedback on 9-15-2025_
 
@@ -24,10 +24,10 @@ _NOTE: Still in draft but in a state to receive feedback on 9-15-2025_
 
 ## Overview
 
-The Metrics Agent defines defines operations that allow messages
+The Metrics Worker defines defines operations that allow messages
 to be published to a destination.
-The Metrics Agent interface describes the interface that all
-Metrics Agents MUST implement.
+The Metrics Worker interface describes the interface that all
+Metrics Workers MUST implement.
 
 ## Definitions
 
@@ -41,7 +41,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 A label is a string that is used
 as an attribute name to aggregate
 measurements. A label can be used to
-add a dimension to the Metrics Agent
+add a dimension to the Metrics Worker
 
 ### date
 
@@ -49,11 +49,13 @@ A date is a value in milliseconds since epoch.
 
 ### duration
 
-A duration is a value in milliseconds
+A duration is an enum value union with valid
+options being seconds, minutes, milliseconds,
+or hours.
 
 ### count
 
-A count is an Long value
+A count is a long value
 
 ### value
 
@@ -66,15 +68,15 @@ A transactionId is a string that
 is used to coalasce multiple metric requests
 for a given client request.
 
-## Supported Metrics Agents
+## Supported Metrics Workers
 
-Note: A user MAY create their own custom Metrics Agent.
+Note: A user MAY create their own custom Metrics Worker.
 
 ## Interface
 
 ### Inputs
 
-The inputs to the MetricsAgent are groups of related fields, referred to as:
+The inputs to the MetricsWorker are groups of related fields, referred to as:
 
 - [AddDate Input](#adddate-input)
 - [AddTime Input](#addtime-input)
@@ -135,7 +137,7 @@ The add property input MAY include the following:
 
 ### Behaviors
 
-The MetricsAgent Interface MUST support the following behaviors:
+The MetricsWorker Interface MUST support the following behaviors:
 
 - [AddDate](#adddate)
 - [AddTime](#addtime)
@@ -164,7 +166,7 @@ Used to add context/metadata in the form of a key-value pair related to a Metric
 use aws.polymorph#extendable
 
 @extendable
-resource MetricsAgent {
+resource MetricsWorker {
   operations: [
     AddDate,
     AddTime,
@@ -237,7 +239,6 @@ structure AddPropertyInput {
 // Common output structure
 structure AddOutput {}
 
-@aws.polymorph#reference(resource: MetricsAgent)
-structure MetricsAgentReference {}
-
+@aws.polymorph#reference(resource: MetricsWorker)
+structure MetricsWorkerReference {}
 ```

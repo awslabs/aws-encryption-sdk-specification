@@ -120,7 +120,21 @@ if they wish to do so.
 There is no need to reinvent the wheel. Other metric frameworks have solved many
 of the issues that are described above, (e.g. handling failing requests, perform
 blocking requests to CT libraries, use a separate thread/thread pool that handles
-these request). By just providing a wrapper, customers can use the framework they
-are most comfortable with.
+these request). By providing a wrapper around a language's most popular logging
+framework, customer's can configure their metrics provider of their liking and
+it would just work with CT libraries.
 
 #### Yes
+
+CT has always shipped custom implementations of interfaces it provides customers.
+One could argue that any of the KMS keyrings is simply a wrapper around KMS.
+While true, these keyring implementations do more than just call KMS.
+The metrics worker that CT provides customers would just delegate all operations
+to the underlying client. If anything, CT _may_ implement an operation to flush
+any metrics the wrappers have collected.
+
+## Success Criteria
+
+To consider this feature a success, customers should be able to wrap their
+telemetry provider of choice with the proposed interface and experience
+negligible application latency.
