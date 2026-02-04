@@ -48,7 +48,7 @@ Metadata containing "x-amz-c" is considered to use the V3 format.
 
 ### Content Metadata MapKeys
 
-Metadata is stored as an US-ASCII preferred string -> an US-ASCII preferred only string map (see [US-ASCII preferred String](#us-ascii-preferred-string) for details).
+Metadata is stored as a US-ASCII preferred string -> a US-ASCII preferred only string map (see [US-ASCII preferred String](#us-ascii-preferred-string) for details).
 Metadata is responsible for storing data which is critical for decryption of the object.
 The mapkeys contained in the metadata depends on the format version used.
 The "x-amz-meta-" prefix is automatically added by the S3 server and MUST NOT be included in implementation code.
@@ -60,7 +60,7 @@ When the object is encrypted using the V1 format:
 - The mapkey "x-amz-key" MUST be present for V1 format objects.
 - The mapkey "x-amz-matdesc" MUST be present for V1 format objects.
 - The mapkey "x-amz-iv" MUST be present for V1 format objects.
-- Mapkeys exclusive to other format versions MUST NOT be present.
+- If mapkeys exclusive to other (non-V1) format versions is present,the S3EC SHOULD throw an exception.
 
 When the object is encrypted using the V2 format:
 
@@ -72,9 +72,8 @@ When the object is encrypted using the V2 format:
 - The mapkey "x-amz-tag-len" MAY be present for V2 format objects.
   - If the object is encrypted using AES-GCM for content encryption, then the the mapkey "x-amz-tag-len" MUST be present.
   - If the object is encrypted using AES-CBC for content encryption, then the the mapkey "x-amz-tag-len" MUST NOT be present.
-- The mapkey "x-amz-unencrypted-content-length" MAY be present for V2 format objects.
-- Mapkeys exclusive to other format versions MUST NOT be present.
-- If a mapkey exclusive to one or more other format versions is present, the S3EC SHOULD throw an exception.
+- The mapkey "x-amz-unencrypted-content-length" SHOULD be present for V2 format objects.
+- If a mapkey exclusive to other (non-V2) format versions is present, the S3EC SHOULD throw an exception.
 
 The V3 format introduces the use of compression to reduce the size of S3EC-specific metadata.
 The V3 format uses the following mapkeys:
@@ -101,8 +100,7 @@ The V3 format uses the following mapkeys:
 - The mapkey "x-amz-i" MUST be present for V3 format objects.
   - This mapkey ("x-amz-i") SHOULD be represented by a constant named "MESSAGE_ID_V3" or similar in the implementation code.
   - This mapkey is new for V3 and refers to the Message ID value used by committing algorithm suites.
-- Mapkeys exclusive to other format versions MUST NOT be present.
-- If a mapkey exclusive to one or more other format versions is present, the S3EC SHOULD throw an exception.
+- If a mapkey exclusive to other (non-V3) format versions is present, the S3EC SHOULD throw an exception.
 
 In general, the storage medium is independent from the format, with the exception of the V3 format.
 In the V3 format, the mapkeys "x-amz-c", "x-amz-d", and "x-amz-i" MUST be stored exclusively in the Object Metadata.
@@ -275,3 +273,4 @@ then the implementation SHOULD throw an error if non-US-ASCII characters are enc
 the error SHOULD detail that the implementation does not support non-US-ASCII characters but encountered non-US-ASCII characters.
 
 [//]: # "See https://taskei.amazon.dev/tasks/P330807252 for details on UTF-8."
+[//]: # " LocalWords:  mapkeys "

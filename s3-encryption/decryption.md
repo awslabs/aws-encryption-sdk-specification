@@ -47,7 +47,7 @@ If an object is encrypted with ALG_AES_256_CBC_IV16_NO_KDF and [legacy unauthent
 the S3EC MUST throw an error which details that client was not configured to decrypt objects with ALG_AES_256_CBC_IV16_NO_KDF.
 
 If an object is encrypted with ALG_AES_256_CBC_IV16_NO_KDF and [legacy unauthenticated algorithm suites](#legacy-decryption) is enabled,
-then the S3EC MUST create a cipher object using the cipher transformation "AES/CBC/PKCS5Padding".
+then the S3EC MUST create a cipher with AES in CBC Mode with PKCS5Padding or PKCS7Padding compatible padding for a 16-byte block cipher (example: for the Java JCE, this is "AES/CBC/PKCS5Padding").
 
 If the cipher object cannot be created as described above,
 Decryption MUST fail.
