@@ -140,6 +140,7 @@ a set of algorithm suite ENUM for each [supported format](#supported-format).
 | ALG_AES_256_CTR_IV16_TAG16_NO_KDF      |
 | ALG_AES_256_GCM_IV12_TAG16_NO_KDF      |
 | ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY |
+| ALG_AES_256_CTR_HKDF_SHA512_COMMIT_KEY |
 
 | DBE Algorithm Suite ENUM                                             |
 | -------------------------------------------------------------------- |

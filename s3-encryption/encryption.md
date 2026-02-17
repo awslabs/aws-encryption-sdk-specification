@@ -58,9 +58,9 @@ Attempts to encrypt using key committing AES-CTR MUST fail.
 
 #### ALG_AES_256_CBC_IV16_NO_KDF
 
-TODO: Spec CBC encryption.
 CBC encryption is no longer supported.
 Decryption of ciphertexts encrypted using CBC is supported as an optional legacy behavior.
+See [CBC Decryption](decryption.md#cbc-decryption).
 
 #### ALG_AES_256_GCM_IV12_TAG16_NO_KDF
 

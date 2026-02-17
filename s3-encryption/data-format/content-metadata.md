@@ -48,7 +48,7 @@ Metadata containing "x-amz-c" is considered to use the V3 format.
 
 ### Content Metadata MapKeys
 
-Metadata is stored as a string -> string map (see TODO for further specification of "string").
+Metadata is stored as a US-ASCII preferred string -> a US-ASCII preferred only string map (see [US-ASCII preferred String](#us-ascii-preferred-string) for details).
 Metadata is responsible for storing data which is critical for decryption of the object.
 The mapkeys contained in the metadata depends on the format version used.
 The "x-amz-meta-" prefix is automatically added by the S3 server and MUST NOT be included in implementation code.
@@ -60,6 +60,7 @@ When the object is encrypted using the V1 format:
 - The mapkey "x-amz-key" MUST be present for V1 format objects.
 - The mapkey "x-amz-matdesc" MUST be present for V1 format objects.
 - The mapkey "x-amz-iv" MUST be present for V1 format objects.
+- If mapkeys exclusive to other (non-V1) format versions is present,the S3EC SHOULD throw an exception.
 
 When the object is encrypted using the V2 format:
 
@@ -68,7 +69,11 @@ When the object is encrypted using the V2 format:
 - The mapkey "x-amz-iv" MUST be present for V2 format objects.
 - The mapkey "x-amz-wrap-alg" MUST be present for V2 format objects.
 - The mapkey "x-amz-cek-alg" MUST be present for V2 format objects.
-- The mapkey "x-amz-tag-len" MUST be present for V2 format objects.
+- The mapkey "x-amz-tag-len" MAY be present for V2 format objects.
+  - If the object is encrypted using AES-GCM for content encryption, then the the mapkey "x-amz-tag-len" MUST be present.
+  - If the object is encrypted using AES-CBC for content encryption, then the the mapkey "x-amz-tag-len" MUST NOT be present.
+- The mapkey "x-amz-unencrypted-content-length" SHOULD be present for V2 format objects.
+- If a mapkey exclusive to other (non-V2) format versions is present, the S3EC SHOULD throw an exception.
 
 The V3 format introduces the use of compression to reduce the size of S3EC-specific metadata.
 The V3 format uses the following mapkeys:
@@ -83,6 +88,7 @@ The V3 format uses the following mapkeys:
   - This mapkey ("x-amz-m") SHOULD be represented by a constant named "MAT_DESC_V3" or similar in the implementation code.
   - This mapkey is the V3 version of the "x-amz-matdesc" mapkey.
 - The mapkey "x-amz-t" SHOULD be present for V3 format objects that use KMS Encryption Context.
+  - In practice, this mapkey will always be present due to the default KMS Encryption Context used in kms+context mode.
   - This mapkey ("x-amz-t") SHOULD be represented by a constant named "ENCRYPTION_CONTEXT_V3" or similar in the implementation code.
   - This mapkey is new for V3 and serves to distinguish KMS Encryption Context from Raw Keyring Material Description.
 - The mapkey "x-amz-w" MUST be present for V3 format objects.
@@ -94,6 +100,7 @@ The V3 format uses the following mapkeys:
 - The mapkey "x-amz-i" MUST be present for V3 format objects.
   - This mapkey ("x-amz-i") SHOULD be represented by a constant named "MESSAGE_ID_V3" or similar in the implementation code.
   - This mapkey is new for V3 and refers to the Message ID value used by committing algorithm suites.
+- If a mapkey exclusive to other (non-V3) format versions is present, the S3EC SHOULD throw an exception.
 
 In general, the storage medium is independent from the format, with the exception of the V3 format.
 In the V3 format, the mapkeys "x-amz-c", "x-amz-d", and "x-amz-i" MUST be stored exclusively in the Object Metadata.
@@ -105,20 +112,20 @@ Whether or not an object is determined to be a valid object encrypted by S3EC is
 
 V1:
 
-- If the metadata contains "x-amz-iv" and "x-amz-key" then the object MUST be considered as an S3EC-encrypted object using the V1 format.
+- If the metadata contains "x-amz-iv" and "x-amz-key" but no other version exclusive keys then the object MUST be considered as an S3EC-encrypted object using the V1 format.
 
 V2:
 
-- If the metadata contains "x-amz-iv" and "x-amz-metadata-x-amz-key-v2" then the object MUST be considered as an S3EC-encrypted object using the V2 format.
+- If the metadata contains "x-amz-iv" and "x-amz-key-v2" but no other version exclusive keys then the object MUST be considered as an S3EC-encrypted object using the V2 format.
 
 V3:
 
-- If the metadata contains "x-amz-3" and "x-amz-d" and "x-amz-i" then the object MUST be considered an S3EC-encrypted object using the V3 format.
+- If the metadata contains "x-amz-3" and "x-amz-d" and "x-amz-i" but no other version exclusive keys then the object MUST be considered an S3EC-encrypted object using the V3 format.
 
 This logic applies only to objects using ObjectMetadata to store cryptographic metadata.
 If the object matches none of the V1/V2/V3 formats, the S3EC MUST attempt to get the instruction file.
 
-If there are multiple mapkeys which are meant to be exclusive, such as "x-amz-key", "x-amz-key-v2", and "x-amz-3" then the S3EC SHOULD throw an exception.
+If there are multiple mapkeys which are meant to be exclusive to different versions, such as "x-amz-key", "x-amz-key-v2", and "x-amz-3" then the S3EC SHOULD throw an exception.
 In general, if there is any deviation from the above format, with the exception of additional unrelated mapkeys, then the S3EC SHOULD throw an exception.
 
 ### Content Metadata Values
@@ -196,7 +203,7 @@ _x-amz-m_
 A JSON string representing the Material Description of the key material used to encrypt the data key.
 This material description string MAY be encoded by the esoteric double-encoding scheme used by the S3 web server.
 The Material Description MUST be used for wrapping algorithms `AES/GCM` (`02`) and `RSA-OAEP-SHA1` (`22`).
-If the mapkey is not present, the default Material Description value MUST be set to an empty map (`{}`).
+If the mapkey x-amz-m is not present, the default Material Description value MUST be set to an empty map (`{}`).
 See TODO-link for more details on the S3 double-encoding scheme.
 
 _x-amz-t_
@@ -204,6 +211,7 @@ _x-amz-t_
 A JSON string representing the AWS KMS Encryption Context associated with the encrypted object.
 This encryption context string MAY be encoded by the esoteric double-encoding scheme used by the S3 web server.
 The Encryption Context value MUST be used for wrapping algorithm `kms+context` or `12`.
+If the mapkey x-amz-t is not present, the default Material Description value MUST be set to an empty map (`{}`).
 See TODO-link for more details on the S3 double-encoding scheme.
 
 _x-amz-w_
@@ -243,3 +251,26 @@ The mapping of Algorithm Suite to Message Format Versions follows:
 Objects encrypted with ALG_AES_256_CBC_IV16_NO_KDF MAY use either the V1 or V2 message format version.
 Objects encrypted with ALG_AES_256_GCM_IV12_TAG16_NO_KDF MUST use the V2 message format version only.
 Objects encrypted with ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY MUST use the V3 message format version only.
+
+### US-ASCII Preferred String
+
+Amazon S3 defines the character space for String values in object metadata:
+
+> Amazon S3 allows arbitrary Unicode characters in your metadata values.
+> To avoid issues related to the presentation of these metadata values, you should conform to using US-ASCII characters when using REST and UTF-8 when using SOAP or browser-based uploads through POST. When using non-US-ASCII characters in your metadata values, the provided Unicode string is examined for non-US-ASCII characters. Values of such headers are character decoded as per RFC 2047 before storing and encoded as per RFC 2047 to make them mail-safe before returning.
+
+-- Source: [Amazon S3 User Guide on Using Metadata -- Quoted on 2026/01/26](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html#UserMetadata "Amazon S3 User Guide on Using Metadata -- Quoted on 2026/01/26")
+
+As US-ASCII is common to both SOAP and REST,
+and the S3 Encryption Client is agnostic on how metadata is viewed,
+the S3 Encryption Client is preferential with respect to stings in the metadata.
+Thus,
+Content Metadata MapKeys SHOULD be restricted to US-ASCII.
+
+An implementation MAY support UTF-8.
+If an implementation does NOT support UTF-8,
+then the implementation SHOULD throw an error if non-US-ASCII characters are encountered;
+the error SHOULD detail that the implementation does not support non-US-ASCII characters but encountered non-US-ASCII characters.
+
+[//]: # "See https://taskei.amazon.dev/tasks/P330807252 for details on UTF-8."
+[//]: # " LocalWords:  mapkeys "

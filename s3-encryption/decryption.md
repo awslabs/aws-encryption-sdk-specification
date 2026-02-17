@@ -41,6 +41,19 @@ This behavior indicates that this is a "multipart download" which is currently n
 The S3EC MUST NOT decrypt objects encrypted using legacy unauthenticated algorithm suites unless specifically configured to do so.
 If the S3EC is not configured to enable legacy unauthenticated content decryption, the client MUST throw an exception when attempting to decrypt an object encrypted with a legacy unauthenticated algorithm suite.
 
+#### CBC Decryption
+
+If an object is encrypted with ALG_AES_256_CBC_IV16_NO_KDF and [legacy unauthenticated algorithm suites](#legacy-decryption) is NOT enabled,
+the S3EC MUST throw an error which details that client was not configured to decrypt objects with ALG_AES_256_CBC_IV16_NO_KDF.
+
+If an object is encrypted with ALG_AES_256_CBC_IV16_NO_KDF and [legacy unauthenticated algorithm suites](#legacy-decryption) is enabled,
+then the S3EC MUST create a cipher with AES in CBC Mode with PKCS5Padding or PKCS7Padding compatible padding for a 16-byte block cipher (example: for the Java JCE, this is "AES/CBC/PKCS5Padding").
+
+If the cipher object cannot be created as described above,
+Decryption MUST fail.
+The error SHOULD detail why the cipher could not be initialized
+(such as CBC or PKCS5Padding is not supported by the underlying crypto provider).
+
 ### Key Commitment
 
 The S3EC supports algorithm suite(s) which provide [key commitment](./key-commitment.md).
