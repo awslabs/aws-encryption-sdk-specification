@@ -3,13 +3,17 @@ name: static analysis
 
 on: ["pull_request", "push"]
 
+permissions:
+  contents: read
+
 jobs:
-  not-grep:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: not-grep
-        uses: mattsb42-meta/not-grep@1.0.0
+  # Once https://github.com/mattsb42-meta/not-grep/pull/48 lands, restore
+  # not-grep:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: not-grep
+  #       uses: mattsb42-meta/not-grep@1.0.0
   prettier:
     runs-on: ubuntu-latest
     steps:
