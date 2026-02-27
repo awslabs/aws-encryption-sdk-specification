@@ -44,7 +44,7 @@ Once a [commitment policy](#commitment-policy) has been set it SHOULD be immutab
 
 ### Commitment Policy
 
-The AWS Encryption SDK MUST use commitment policies defined in the Material Providers Library.
+The AWS Encryption SDK MUST use the ESDK [commitment policies](../framework/commitment-policy.md) defined in the Material Providers Library.
 
 ### Maximum Number Of Encrypted Data Keys
 
