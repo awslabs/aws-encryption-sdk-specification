@@ -44,48 +44,13 @@ Once a [commitment policy](#commitment-policy) has been set it SHOULD be immutab
 
 ### Commitment Policy
 
-Some algorithm suites provide a commitment
-that one and only one data key
-can be used to decrypt the plaintext.
-Commitment policies control which algorithm suites are enabled
-for [encrypt](encrypt.md) and [decrypt](decrypt.md).
-As well as which algorithm suite is the default.
-
-The AWS Encryption SDK MUST provide the following commitment policies:
-
-- FORBID_ENCRYPT_ALLOW_DECRYPT
-- REQUIRE_ENCRYPT_ALLOW_DECRYPT
-- REQUIRE_ENCRYPT_REQUIRE_DECRYPT
+The AWS Encryption SDK MUST use the ESDK [commitment policies](../framework/commitment-policy.md) defined in the Material Providers Library.
 
 ### Maximum Number Of Encrypted Data Keys
 
 A AWS Encryption SDK message can contain multiple encrypted data keys.
 This is the maximum number of encrypted data keys that the client will attempt to unwrap.
 Callers MUST have a way to disable this limit.
-
-#### FORBID_ENCRYPT_ALLOW_DECRYPT
-
-When the commitment policy `FORBID_ENCRYPT_ALLOW_DECRYPT` is configured:
-
-- `03 78` MUST be the default algorithm suite
-- [encrypt](encrypt.md) MUST only support algorithm suites that have a [Key Commitment](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of False
-- [decrypt](decrypt.md) MUST support all algorithm suites
-
-#### REQUIRE_ENCRYPT_ALLOW_DECRYPT
-
-When the commitment policy `REQUIRE_ENCRYPT_ALLOW_DECRYPT` is configured:
-
-- `05 78` MUST be the default algorithm suite
-- [encrypt](encrypt.md) MUST only support algorithm suites that have a [Key Commitment](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
-- [decrypt](decrypt.md) MUST support all algorithm suites
-
-#### REQUIRE_ENCRYPT_REQUIRE_DECRYPT
-
-When the commitment policy `REQUIRE_ENCRYPT_REQUIRE_DECRYPT` is configured:
-
-- `05 78` MUST be the default algorithm suite
-- [encrypt](encrypt.md) MUST only support algorithm suites that have a [Key Commitment](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
-- [decrypt](decrypt.md) MUST only support algorithm suites that have a [Key Commitment](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) value of True
 
 ## Operation
 
