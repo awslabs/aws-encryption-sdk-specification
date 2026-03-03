@@ -10,13 +10,16 @@
 ### Changelog
 
 - 0.5.0
+
   - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
   - Add requirements to specify that Algorithm Suite be ESDK supported
 
 - 0.3.0
+
   - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
 
 - 0.2.0
+
   - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
 
 - 0.1.0-preview
