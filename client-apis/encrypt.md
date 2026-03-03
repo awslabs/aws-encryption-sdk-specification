@@ -10,20 +10,16 @@
 ### Changelog
 
 - 0.5.0
-
   - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
   - Add requirements to specify that Algorithm Suite be ESDK supported
 
 - 0.3.0
-
   - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
 
 - 0.2.0
-
   - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
 
 - 0.1.0-preview
-
   - Initial record
 
 ## Implementations
@@ -44,14 +40,14 @@ This document describes the behavior by which a plaintext is encrypted and seria
 
 Required arguments:
 
-* The input to the encrypt operation MUST accept a [plaintext](#plaintext) argument.
-* The input to the encrypt operation MUST accept either a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [keyring](../framework/keyring-interface.md) argument.
+- The input to the encrypt operation MUST accept a [plaintext](#plaintext) argument.
+- The input to the encrypt operation MUST accept either a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [keyring](../framework/keyring-interface.md) argument.
 
 Optional arguments:
 
-* The input to the encrypt operation MUST accept an optional [Algorithm Suite](#algorithm-suite) argument.
-* The input to the encrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
-* The input to the encrypt operation MUST accept an optional [Frame Length](#frame-length) argument.
+- The input to the encrypt operation MUST accept an optional [Algorithm Suite](#algorithm-suite) argument.
+- The input to the encrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
+- The input to the encrypt operation MUST accept an optional [Frame Length](#frame-length) argument.
 
 If the [plaintext](#plaintext) is of unknown length, the caller MAY also input a
 [Plaintext Length Bound](#plaintext-length-bound).
@@ -110,10 +106,10 @@ greater than this value.
 
 ## Output
 
-* The output of the encrypt operation MUST include an [encrypted message](#encrypted-message) value.
-* The output of the encrypt operation MUST include an [encryption context](#encryption-context) value.
-* The output of the encrypt operation MUST include an [algorithm suite](#algorithm-suite) value.
-* The output of the encrypt operation SHOULD include a [Parsed Header](#parsed-header) value.
+- The output of the encrypt operation MUST include an [encrypted message](#encrypted-message) value.
+- The output of the encrypt operation MUST include an [encryption context](#encryption-context) value.
+- The output of the encrypt operation MUST include an [algorithm suite](#algorithm-suite) value.
+- The output of the encrypt operation SHOULD include a [Parsed Header](#parsed-header) value.
 
 ### Encrypted Message
 
@@ -213,7 +209,7 @@ the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-a
 This document refers to the output of the key derivation algorithm as the derived data key.
 Note:
 
-- If the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
+- If the key derivation algorithm MUST be the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
   then the derived data key MUST be the same as the plaintext data key.
 - If the key derivation algorithm is [HKDF](../framework/algorithm-suites.md#hkdf),
   the derivation process used MUST be the process described in [HKDF Encryption Key](../transitive-requirements.md#hkdf-encryption-key).
@@ -369,7 +365,7 @@ with the following inputs:
   constructed as follows:
   - The [message ID](../data-format/message-body-aad.md#message-id) MUST be the same as the
     [message ID](../data-frame/message-header.md#message-id) serialized in the header of this message.
-  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST be the structure defined in 
+  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST be the structure defined in
     [Message Body AAD](../data-format/message-body-aad.md).
   - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be the sequence
     number of the frame being encrypted.
