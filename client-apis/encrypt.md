@@ -43,14 +43,14 @@ This document describes the behavior by which a plaintext is encrypted and seria
 
 Required arguments:
 
-- The input to the encrypt operation MUST accept a [plaintext](#plaintext) argument.
-- The input to the encrypt operation MUST accept either a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [keyring](../framework/keyring-interface.md) argument.
+- The input to the Encrypt operation MUST accept a required [plaintext](#plaintext) argument.
+- The input to the Encrypt operation MUST accept a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) and a [keyring](../framework/keyring-interface.md) argument. The keyring and CMM inputs SHOULD be optional. The Encrypt operation MUST validate that exactly one keyring or CMM was provided by the caller.
 
 Optional arguments:
 
-- The input to the encrypt operation MUST accept an optional [Algorithm Suite](#algorithm-suite) argument.
-- The input to the encrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
-- The input to the encrypt operation MUST accept an optional [Frame Length](#frame-length) argument.
+- The input to the Encrypt operation MUST accept an optional [Algorithm Suite](#algorithm-suite) argument.
+- The input to the Encrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
+- The input to the Encrypt operation MUST accept an optional [Frame Length](#frame-length) argument.
 
 If the [plaintext](#plaintext) is of unknown length, the caller MAY also input a
 [Plaintext Length Bound](#plaintext-length-bound).
