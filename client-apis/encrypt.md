@@ -3,38 +3,6 @@
 
 # Encrypt
 
-## Version
-
-0.5.0
-
-### Changelog
-
-- 0.5.0
-
-  - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
-  - Add requirements to specify that Algorithm Suite be ESDK supported
-
-- 0.3.0
-
-  - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
-
-- 0.2.0
-
-  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
-
-- 0.1.0-preview
-  - Initial record
-
-## Implementations
-
-| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                 |
-| ---------- | -------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C          | 0.1.0-preview                          | 0.1.0                     | [session_encrypt.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_encrypt.c)                                                          |
-| NodeJS     | 0.1.0-preview                          | 0.1.0                     | [encrypt.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-node/src/encrypt.ts)                                         |
-| Browser JS | 0.1.0-preview                          | 0.1.0                     | [encrypt.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-browser/src/encrypt.ts)                                      |
-| Python     | 0.1.0-preview                          | 1.2.0                     | [streaming_client.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py)                                 |
-| Java       | 0.1.0-preview                          | 0.0.1                     | [EncryptionHandler.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/EncryptionHandler.java) |
-
 ## Overview
 
 This document describes the behavior by which a plaintext is encrypted and serialized into a [message](../data-format/message.md).
@@ -109,10 +77,10 @@ greater than this value.
 
 ## Output
 
-- The output of the encrypt operation MUST include an [encrypted message](#encrypted-message) value.
-- The output of the encrypt operation MUST include an [encryption context](#encryption-context) value.
-- The output of the encrypt operation MUST include an [algorithm suite](#algorithm-suite) value.
-- The output of the encrypt operation SHOULD include a [Parsed Header](#parsed-header) value.
+- The output of the Encrypt operation MUST include an [encrypted message](#encrypted-message) value.
+- The output of the Encrypt operation MUST include an [encryption context](#encryption-context) value.
+- The output of the Encrypt operation MUST include an [algorithm suite](#algorithm-suite) value.
+- The output of the Encrypt operation SHOULD include a [Parsed Header](#parsed-header) value.
 
 ### Encrypted Message
 
@@ -154,8 +122,8 @@ The Encrypt operation MUST perform all of its steps in the specified order.
 - [Construct the signature](#construct-the-signature)
   - If the [encryption materials gathered](#get-the-encryption-materials) has a algorithm suite
     including a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
-    the encrypt operation MUST perform this step.
-    Otherwise the encrypt operation MUST NOT perform this step.
+    the Encrypt operation MUST perform this step.
+    Otherwise the Encrypt operation MUST NOT perform this step.
 
 These steps calculate and serialize the components of the output [encrypted message](#encrypted-message).
 Any data that is not specified within the [message format](../data-format/message.md)
