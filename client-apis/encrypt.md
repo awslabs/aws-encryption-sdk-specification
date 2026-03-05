@@ -12,7 +12,10 @@ This document describes the behavior by which a plaintext is encrypted and seria
 Required arguments:
 
 - The input to the Encrypt operation MUST accept a required [plaintext](#plaintext) argument.
-- The input to the Encrypt operation MUST accept a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) and a [keyring](../framework/keyring-interface.md) argument. The keyring and CMM inputs SHOULD be optional. The Encrypt operation MUST validate that exactly one keyring or CMM was provided by the caller.
+- The input to the Encrypt operation MUST accept a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) and a [keyring](../framework/keyring-interface.md) argument.
+  The keyring and CMM inputs SHOULD be optional.
+  The Encrypt operation MUST validate that exactly one keyring or CMM was provided by the caller.
+  If the caller does not provide exactly one of a keyring or CMM, the Encrypt operation MUST fail.
 
 Optional arguments:
 
@@ -116,14 +119,15 @@ A collection of deserialized fields of the [encrypted message's](#encrypted-mess
 The Encrypt operation is divided into several distinct steps.
 The Encrypt operation MUST perform all of its steps in the specified order.
 
-- [Get the encryption materials](#get-the-encryption-materials)
-- [Construct the header](#construct-the-header)
-- [Construct the body](#construct-the-body)
-- [Construct the signature](#construct-the-signature)
+- Encrypt operation step 1: [Get the encryption materials](#get-the-encryption-materials)
+- Encrypt operation step 2: [Construct the header](#construct-the-header)
+- Encrypt operation step 3: [Construct the body](#construct-the-body)
+- Encrypt operation step 4: [Construct the signature](#construct-the-signature)
   - If the [encryption materials gathered](#get-the-encryption-materials) has a algorithm suite
     including a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
     the Encrypt operation MUST perform this step.
-    Otherwise the Encrypt operation MUST NOT perform this step.
+  - If the materials do not have an algorithm suite including a signature algorithm,
+    the Encrypt operation MUST NOT construct a signature.
 
 These steps calculate and serialize the components of the output [encrypted message](#encrypted-message).
 Any data that is not specified within the [message format](../data-format/message.md)
@@ -153,12 +157,12 @@ on that CMM MUST be constructed as follows:
   Otherwise, this MUST be an empty encryption context.
 - Commitment Policy: This MUST be the [commitment policy](client.md#commitment-policy) configured in the [client](client.md) exposing this encrypt function.
 - Algorithm Suite: If provided, this MUST be the [input algorithm suite](#algorithm-suite).
-  Otherwise, this field MUST NOT be included.
+  If no Algorithm Suite is provided, this field MUST NOT be included.
 - Max Plaintext Length: If the [input plaintext](#plaintext) has known length,
   this length MUST be used.
   If the input [plaintext](#plaintext) has unknown length and a [Plaintext Length Bound](#plaintext-length-bound)
   was provided, this MUST be the [Plaintext Length Bound](#plaintext-length-bound).
-  Otherwise, this field MUST NOT be included.
+  If no Plaintext Length Bound is provided, this field MUST NOT be included.
 
 The [algorithm suite](../framework/algorithm-suites.md) used in all aspects of this operation
 MUST be the algorithm suite in the [encryption materials](../framework/structures.md#encryption-materials)
@@ -180,7 +184,7 @@ the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-a
 This document refers to the output of the key derivation algorithm as the derived data key.
 Note:
 
-- If the key derivation algorithm MUST be the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
+- If the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
   then the derived data key MUST be the same as the plaintext data key.
 - If the key derivation algorithm is [HKDF](../framework/algorithm-suites.md#hkdf),
   the derivation process used MUST be the process described in [HKDF Encryption Key](../transitive-requirements.md#hkdf-encryption-key).
@@ -286,6 +290,7 @@ the serialized message header MUST be released.
 
 The encrypted message output by the Encrypt operation MUST have a message header equal
 to the message header calculated in this step.
+If the messager headers are not equal, the Encrypt operation MUST fail.
 
 If the algorithm suite contains a signature algorithm and
 this operation is [streaming](streaming.md) the encrypted message output to the caller,
@@ -296,6 +301,7 @@ such that the serialized header isn't required to remain in memory to [construct
 
 The encrypted message output by the Encrypt operation MUST have a message body equal
 to the message body calculated in this step.
+If the messager bodies are not equal, the Encrypt operation MUST fail.
 
 If [Plaintext Length Bound](#plaintext-length-bound) was specified on input
 and this operation determines at any time that the plaintext being encrypted
