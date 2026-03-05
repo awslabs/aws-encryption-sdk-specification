@@ -116,13 +116,12 @@ A collection of deserialized fields of the [encrypted message's](#encrypted-mess
 
 ## Behavior
 
-The Encrypt operation is divided into several distinct steps.
-The Encrypt operation MUST perform all of its steps in the specified order.
+The Encrypt operation is divided into several distinct steps:
 
-- Encrypt operation step 1: [Get the encryption materials](#get-the-encryption-materials)
-- Encrypt operation step 2: [Construct the header](#construct-the-header)
-- Encrypt operation step 3: [Construct the body](#construct-the-body)
-- Encrypt operation step 4: [Construct the signature](#construct-the-signature)
+- Encrypt operation Step 1 MUST be [Get the encryption materials](#get-the-encryption-materials)
+- Encrypt operation step 2 MUST be [Construct the header](#construct-the-header)
+- Encrypt operation step 3 MUST be [Construct the body](#construct-the-body)
+- Encrypt operation step 4 MUST be [Construct the signature](#construct-the-signature)
   - If the [encryption materials gathered](#get-the-encryption-materials) has a algorithm suite
     including a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
     the Encrypt operation MUST perform this step.
