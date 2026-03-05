@@ -289,7 +289,7 @@ the serialized message header MUST be released.
 
 The encrypted message output by the Encrypt operation MUST have a message header equal
 to the message header calculated in this step.
-If the messager headers are not equal, the Encrypt operation MUST fail.
+If the message headers are not equal, the Encrypt operation MUST fail.
 
 If the algorithm suite contains a signature algorithm and
 this operation is [streaming](streaming.md) the encrypted message output to the caller,
@@ -300,7 +300,7 @@ such that the serialized header isn't required to remain in memory to [construct
 
 The encrypted message output by the Encrypt operation MUST have a message body equal
 to the message body calculated in this step.
-If the messager bodies are not equal, the Encrypt operation MUST fail.
+If the message bodies are not equal, the Encrypt operation MUST fail.
 
 If [Plaintext Length Bound](#plaintext-length-bound) was specified on input
 and this operation determines at any time that the plaintext being encrypted
