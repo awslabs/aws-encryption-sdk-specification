@@ -3,65 +3,32 @@
 
 # Encrypt
 
-## Version
-
-0.5.0
-
-### Changelog
-
-- 0.5.0
-
-  - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
-  - Add requirements to specify that Algorithm Suite be ESDK supported
-
-- 0.3.0
-
-  - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
-
-- 0.2.0
-
-  - [Remove Keyring Trace](../changes/2020-05-13_remove-keyring-trace/change.md)
-
-- 0.1.0-preview
-
-  - Initial record
-
-## Implementations
-
-| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                 |
-| ---------- | -------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C          | 0.1.0-preview                          | 0.1.0                     | [session_encrypt.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_encrypt.c)                                                          |
-| NodeJS     | 0.1.0-preview                          | 0.1.0                     | [encrypt.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-node/src/encrypt.ts)                                         |
-| Browser JS | 0.1.0-preview                          | 0.1.0                     | [encrypt.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-browser/src/encrypt.ts)                                      |
-| Python     | 0.1.0-preview                          | 1.2.0                     | [streaming_client.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py)                                 |
-| Java       | 0.1.0-preview                          | 0.0.1                     | [EncryptionHandler.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/EncryptionHandler.java) |
-
 ## Overview
 
 This document describes the behavior by which a plaintext is encrypted and serialized into a [message](../data-format/message.md).
 
-Any client provided by the AWS Encryption SDK that performs encryption of caller plaintext MUST follow
-this specification for encryption.
-
 ## Input
 
-The following inputs to this behavior are REQUIRED:
+Required arguments:
 
-- [Plaintext ](#plaintext)
-- Either a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) or a [Keyring](../framework/keyring-interface.md)
+- The input to the Encrypt operation MUST accept a required [plaintext](#plaintext) argument.
+- The input to the Encrypt operation MUST accept a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) and a [keyring](../framework/keyring-interface.md) argument.
+  The keyring and CMM inputs SHOULD be optional.
+  The Encrypt operation MUST validate that exactly one keyring or CMM was provided by the caller.
+  If the caller does not provide exactly one of a keyring or CMM, the Encrypt operation MUST fail.
 
-The following inputs to this behavior MUST be OPTIONAL:
+Optional arguments:
 
-- [Algorithm Suite](#algorithm-suite)
-- [Encryption Context](#encryption-context)
-- [Frame Length](#frame-length)
+- The input to the Encrypt operation MUST accept an optional [Algorithm Suite](#algorithm-suite) argument.
+- The input to the Encrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
+- The input to the Encrypt operation MUST accept an optional [Frame Length](#frame-length) argument.
 
-If the [plaintext ](#plaintext) is of unknown length, the caller MAY also input a
+If the [plaintext](#plaintext) is of unknown length, the caller MAY also input a
 [Plaintext Length Bound](#plaintext-length-bound).
 
-Implementations SHOULD ensure that a caller is not able to specify both a [plaintext ](#plaintext)
+Implementations SHOULD ensure that a caller is not able to specify both a [plaintext](#plaintext)
 with known length and a [Plaintext Length Bound](#plaintext-length-bound) by construction.
-If a caller is able to specify both an input [plaintext ](#plaintext) with known length and
+If a caller is able to specify both an input [plaintext](#plaintext) with known length and
 a [Plaintext Length Bound](#plaintext-length-bound),
 the [Plaintext Length Bound](#plaintext-length-bound) MUST NOT be used during the Encrypt operation
 and MUST be ignored.
@@ -82,7 +49,7 @@ See [encryption context](../framework/structures.md#encryption-context).
 
 The prefix `aws-crypto-` is reserved for internal use by the AWS Encryption SDK;
 see the [the Default CMM spec](default-cmm.md) for one such use.
-If the input encryption context contains any entries with a key beginning with this prefix,
+If the input encryption context contains any entries with a key beginning with `aws-crypto-`,
 the encryption operation MUST fail.
 
 ### CMM
@@ -95,7 +62,7 @@ A Keyring that implements the [keyring interface](../framework/keyring-interface
 
 ### Algorithm Suite
 
-The [algorithm suite](../framework/algorithm-suites.md) that SHOULD be used for encryption.
+The [algorithm suite](../framework/algorithm-suites.md) that MUST be used for encryption.
 This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 ### Frame Length
@@ -106,46 +73,38 @@ This value MUST default to 4096 bytes.
 
 ### Plaintext Length Bound
 
-A bound on the length of [plaintext ](#plaintext) with an unknown length to encrypt.
+A bound on the length of [plaintext](#plaintext) with an unknown length to encrypt.
 
 If this input is provided, this operation MUST NOT encrypt a plaintext with length
 greater than this value.
 
 ## Output
 
-This behavior MUST output the following if the behavior is successful:
-
-- [Encrypted Message](#encrypted-message)
-- [Encryption Context](#encryption-context)
-- [Algorithm Suite](#algorithm-suite)
-
-The client SHOULD return as an output:
-
-- [Parsed Header](#parsed-header)
+- The output of the Encrypt operation MUST include an [encrypted message](#encrypted-message) value.
+- The output of the Encrypt operation MUST include an [encryption context](#encryption-context) value.
+- The output of the Encrypt operation MUST include an [algorithm suite](#algorithm-suite) value.
+- The output of the Encrypt operation SHOULD include a [Parsed Header](#parsed-header) value.
 
 ### Encrypted Message
 
-An encrypted form of the input [plaintext ](#plaintext),
+An encrypted form of the input [plaintext](#plaintext),
 encrypted according to the [behavior specified below](#behavior).
 This MUST be a sequence of bytes
 and conform to the [message format specification](../data-format/message.md).
 
 This operation MAY [stream](streaming.md) the encrypted message.
 
-If an implementation requires holding the entire input plaintext in memory in order to perform this operation,
-that implementation SHOULD NOT provide an API that allows this output to be streamed.
-
 ### Encryption Context
 
 The [encryption context](../framework/structures.md#encryption-context) that is used as
-additional authenticated data during the encryption of the input [plaintext ](#plaintext).
+additional authenticated data during the encryption of the input [plaintext](#plaintext).
 
 This output MAY be satisfied by outputting a [parsed header](#parsed-header) containing this value.
 
 ### Algorithm Suite
 
 The [algorithm suite](../framework/algorithm-suites.md) that is used to encrypt
-the input [plaintext ](#plaintext).
+the input [plaintext](#plaintext).
 
 This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
@@ -159,17 +118,15 @@ A collection of deserialized fields of the [encrypted message's](#encrypted-mess
 
 The Encrypt operation is divided into several distinct steps:
 
-- [Get the encryption materials](#get-the-encryption-materials)
-- [Construct the header](#construct-the-header)
-- [Construct the body](#construct-the-body)
-- [Construct the signature](#construct-the-signature)
+- Encrypt operation Step 1 MUST be [Get the encryption materials](#get-the-encryption-materials)
+- Encrypt operation step 2 MUST be [Construct the header](#construct-the-header)
+- Encrypt operation step 3 MUST be [Construct the body](#construct-the-body)
+- Encrypt operation step 4 MUST be [Construct the signature](#construct-the-signature)
   - If the [encryption materials gathered](#get-the-encryption-materials) has a algorithm suite
     including a [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
-    the encrypt operation MUST perform this step.
-    Otherwise the encrypt operation MUST NOT perform this step.
-
-This operation MUST perform all the above steps unless otherwise specified,
-and it MUST perform them in the above order.
+    the Encrypt operation MUST perform this step.
+  - If the materials do not have an algorithm suite including a signature algorithm,
+    the Encrypt operation MUST NOT construct a signature.
 
 These steps calculate and serialize the components of the output [encrypted message](#encrypted-message).
 Any data that is not specified within the [message format](../data-format/message.md)
@@ -195,16 +152,16 @@ constructed using the caller-supplied keyring as input.
 The call to [Get Encryption Materials](../framework/cmm-interface.md#get-encryption-materials)
 on that CMM MUST be constructed as follows:
 
-- Encryption Context: If provided, this is the [input encryption context](#encryption-context).
-  Otherwise, this is an empty encryption context.
-- Commitment Policy: The [commitment policy](client.md#commitment-policy) configured in the [client](client.md) exposing this encrypt function.
-- Algorithm Suite: If provided, this is the [input algorithm suite](#algorithm-suite).
-  Otherwise, this field is not included.
+- Encryption Context: If provided, this MUST be the [input encryption context](#encryption-context).
+  Otherwise, this MUST be an empty encryption context.
+- Commitment Policy: This MUST be the [commitment policy](client.md#commitment-policy) configured in the [client](client.md) exposing this encrypt function.
+- Algorithm Suite: If provided, this MUST be the [input algorithm suite](#algorithm-suite).
+  If no Algorithm Suite is provided, this field MUST NOT be included.
 - Max Plaintext Length: If the [input plaintext](#plaintext) has known length,
   this length MUST be used.
-  If the input [plaintext ](#plaintext) has unknown length and a [Plaintext Length Bound](#plaintext-length-bound)
-  was provided, this is the [Plaintext Length Bound](#plaintext-length-bound).
-  Otherwise, this field is not included.
+  If the input [plaintext](#plaintext) has unknown length and a [Plaintext Length Bound](#plaintext-length-bound)
+  was provided, this MUST be the [Plaintext Length Bound](#plaintext-length-bound).
+  If no Plaintext Length Bound is provided, this field MUST NOT be included.
 
 The [algorithm suite](../framework/algorithm-suites.md) used in all aspects of this operation
 MUST be the algorithm suite in the [encryption materials](../framework/structures.md#encryption-materials)
@@ -218,7 +175,7 @@ configured in the [client](client.md) encrypt MUST yield an error.
 If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys) on the [encryption materials](../framework/structures.md#encryption-materials)
 is greater than the [maximum number of encrypted data keys](client.md#maximum-number-of-encrypted-data-keys) configured in the [client](client.md) encrypt MUST yield an error.
 
-The data key used as input for all encryption described below is a data key derived from the plaintext data key
+The data key used as input for all encryption described below MUST be a data key derived from the plaintext data key
 included in the [encryption materials](../framework/structures.md#encryption-materials).
 The algorithm used to derive a data key from the plaintext data key MUST be
 the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-algorithm) included in the
@@ -227,18 +184,21 @@ This document refers to the output of the key derivation algorithm as the derive
 Note:
 
 - If the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
-  then the derived data key is the same as the plaintext data key.
+  then the derived data key MUST be the same as the plaintext data key.
 - If the key derivation algorithm is [HKDF](../framework/algorithm-suites.md#hkdf),
-  the derivation process is described in [HKDF Encryption Key](../transitive-requirements.md#hkdf-encryption-key).
+  the derivation process used MUST be the process described in [HKDF Encryption Key](../transitive-requirements.md#hkdf-encryption-key).
 
-The frame length used in the procedures described below is the input [frame length](#frame-length),
-if supplied, or the default if not.
+The frame length used in the procedures described below MUST be the input [frame length](#frame-length),
+if supplied.
+If no input frame length is supplied, the default frame length MUST be used.
 
 ### Construct the header
 
 Before encrypting input plaintext,
 this operation MUST serialize the [message header body](../data-format/message-header.md).
-The [message format version](../data-format/message-header.md#supported-versions) MUST be associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites).
+The [message format version](../data-format/message-header.md#supported-versions) MUST be the value associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites).
+
+#### V2 Header
 
 If the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 2.0
 then the [message header body](../data-format/message-header.md#header-body-version-1-0) MUST be serialized with the following specifics:
@@ -260,6 +220,8 @@ then the [message header body](../data-format/message-header.md#header-body-vers
 - [Frame Length](../data-format/message-header.md#frame-length): MUST be the value of the frame size determined above.
 - [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data): MUST be the value of the [commit key](../framework/algorithm-suites.md#commit-key)
   derived according to the [algorithm suites commit key derivation settings](../framework/algorithm-suites.md#algorithm-suites-commit-key-derivation-settings).
+
+#### V1 Header
 
 If the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 1.0
 then the [message header body](../data-format/message-header.md#header-body-version-1-0) MUST be serialized with the following specifics:
@@ -284,6 +246,8 @@ then the [message header body](../data-format/message-header.md#header-body-vers
   specified by the [algorithm suite](../framework/algorithm-suites.md)
 - [Frame Length](../data-format/message-header.md#frame-length): MUST be the value of the frame size determined above.
 
+#### Authentication Tag
+
 After serializing the message header body,
 this operation MUST calculate an [authentication tag](../data-format/message-header.md#authentication-tag)
 over the message header body.
@@ -298,9 +262,9 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
   the [encryption material's](../framework/structures.md#encryption-materials)
   [required encryption context keys](../framework/structures.md#required-encryption-context-keys)
   serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
-- The IV has a value of 0.
-- The cipherkey is the derived data key
-- The plaintext is an empty byte array
+- The IV MUST have a value of 0.
+- The cipherkey MUST be the derived data key
+- The plaintext MUST be an empty byte array
 
 With the authentication tag calculated,
 if the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 2.0,
@@ -309,7 +273,8 @@ this operation MUST serialize the [message header authentication](../data-format
 - [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
   of the authentication tag calculated above.
 
-If the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 1.0
+With the authentication tag calculated,
+if the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 1.0
 this operation MUST serialize the [message header authentication](../data-format/message-header.md#header-authentication-version-1-0) with the following specifics:
 
 - [IV](../data-format/message-header.md#iv): MUST have the value of the IV used in the calculation above,
@@ -317,13 +282,14 @@ this operation MUST serialize the [message header authentication](../data-format
 - [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
   of the authentication tag calculated above.
 
-The serialized bytes MUST NOT be released until the entire message header has been serialized
+The serialized bytes MUST NOT be released until the entire message header has been serialized.
 If this operation is streaming the encrypted message and
 the entire message header has been serialized,
-the serialized message header SHOULD be released.
+the serialized message header MUST be released.
 
-The encrypted message output by this operation MUST have a message header equal
+The encrypted message output by the Encrypt operation MUST have a message header equal
 to the message header calculated in this step.
+If the message headers are not equal, the Encrypt operation MUST fail.
 
 If the algorithm suite contains a signature algorithm and
 this operation is [streaming](streaming.md) the encrypted message output to the caller,
@@ -332,8 +298,9 @@ such that the serialized header isn't required to remain in memory to [construct
 
 ## Construct the body
 
-The encrypted message output by this operation MUST have a message body equal
+The encrypted message output by the Encrypt operation MUST have a message body equal
 to the message body calculated in this step.
+If the message bodies are not equal, the Encrypt operation MUST fail.
 
 If [Plaintext Length Bound](#plaintext-length-bound) was specified on input
 and this operation determines at any time that the plaintext being encrypted
@@ -370,14 +337,13 @@ this operation MUST calculate the encrypted content and an authentication tag us
 specified by the [algorithm suite](../framework/algorithm-suites.md),
 with the following inputs:
 
-- The AAD is the serialized [message body AAD](../data-format/message-body-aad.md),
+- The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
   constructed as follows:
-  - The [message ID](../data-format/message-body-aad.md#message-id) is the same as the
+  - The [message ID](../data-format/message-body-aad.md#message-id) MUST be the same as the
     [message ID](../data-frame/message-header.md#message-id) serialized in the header of this message.
-  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) depends on
-    whether the thing being encrypted is a regular frame or final frame.
-    Refer to [Message Body AAD](../data-format/message-body-aad.md) specification for more information.
-  - The [sequence number](../data-format/message-body-aad.md#sequence-number) is the sequence
+  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST be the structure defined in
+    [Message Body AAD](../data-format/message-body-aad.md).
+  - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be the sequence
     number of the frame being encrypted.
     If this is the first frame sequentially, this value MUST be 1.
     Otherwise, this value MUST be 1 greater than the value of the sequence number
@@ -388,11 +354,11 @@ with the following inputs:
     - For a final frame this MUST be the length of the remaining plaintext bytes
       which have not yet been encrypted,
       whose length MUST be equal to or less than the frame length.
-- The IV is the [sequence number](../data-format/message-body-aad.md#sequence-number)
+- The IV MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length).
-- The cipherkey is the derived data key
-- The plaintext is the next subsequence of consumable plaintext bytes that have not yet been encrypted.
+- The cipherkey MUST be the derived data key
+- The plaintext MUST be the next subsequence of consumable plaintext bytes that have not yet been encrypted.
   - For a regular frame the length of this plaintext subsequence MUST equal the frame length.
   - For a final frame this MUST be the remaining plaintext bytes which have not yet been encrypted,
     whose length MUST be equal to or less than the frame length.
@@ -409,7 +375,7 @@ This operation MUST serialize a regular frame or final frame with the following 
 The above serialized bytes MUST NOT be released until the entire frame has been serialized.
 If this operation is streaming the encrypted message and
 the entire frame has been serialized,
-the serialized frame SHOULD be released.
+the serialized frame MUST be released.
 
 If the algorithm suite contains a signature algorithm and
 this operation is [streaming](streaming.md) the encrypted message output to the caller,
@@ -425,8 +391,8 @@ and the output [encrypted message](#encrypted-message) MUST contain a [message f
 To calculate a signature, this operation MUST use the [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
 specified by the [algorithm suite](../framework/algorithm-suites.md), with the following input:
 
-- the signature key is the [signing key](../framework/structures.md#signing-key) in the [encryption materials](../framework/structures.md#encryption-materials)
-- the input to sign is the concatenation of the serialization of the [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md)
+- the signature key MUST be the [signing key](../framework/structures.md#signing-key) in the [encryption materials](../framework/structures.md#encryption-materials)
+- the input to sign MUST be the concatenation of the serialization of the [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md)
 
 Note that the message header and message body MAY have already been input during previous steps.
 
@@ -461,7 +427,7 @@ the [message body](../data-format/message-body.md) was serialized with the follo
   - The AAD is the serialized [message body AAD](../data-format/message-body-aad.md)
   - The IV is the [IV](../data-format/message-body.md#iv) specified above.
   - The cipherkey is the derived data key
-  - The plaintext is the input [plaintext ](#plaintext)
+  - The plaintext is the input [plaintext](#plaintext)
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag returned by the above encryption.
 
 ### Encryption Context not stored in the message
