@@ -42,6 +42,11 @@ run `./ci/prettify.sh write`.
 If you want to check them without writing,
 run `./ci/prettify.sh check`.
 
+## Conventions used in these specifications
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+in these specifications are to be interpreted as described in [RFC2119](https://tools.ietf.org/html/rfc2119) unless otherwise noted in a particular specification.
+
 ## Generate Duvet Reports
 
 [Duvet](https://github.com/awslabs/aws-encryption-sdk-specification/issues/240) is a tool that can be used to ensure specification is documented alongside code.
