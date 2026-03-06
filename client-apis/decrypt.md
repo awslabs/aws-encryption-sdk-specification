@@ -286,7 +286,7 @@ message header to determine whether the operation will deserialize the message b
 [un-framed data](../data-format/message-body.md#un-framed-data).
 
 If deserializing [framed data](../data-format/message-body.md#framed-data),
-the Decrypt operation operation MUST use the first 4 bytes of a frame to determine
+the Decrypt operation MUST use the first 4 bytes of a frame to determine
 whether the operation will deserialize the frame as a [final frame](../data-format/message-body.md#final-frame)
 or [regular frame](../fata-format/message-body/md#regular-frame).
 If the first 4 bytes have a value of 0xFFFF,
