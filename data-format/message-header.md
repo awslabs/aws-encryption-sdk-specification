@@ -3,31 +3,6 @@
 
 # Message Header
 
-## Version
-
-0.1.1
-
-### Changelog
-
-- 0.1.2
-
-  - Add requirements to specify that Algorithm Suite be ESDK supported
-
-- 0.1.1
-
-  - Include `aws-crypto-public-key` encryption context key.
-
-- 0.1.0-preview
-
-  - Initial record
-
-## Implementations
-
-- [C](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/header.c)
-- [JavaScript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/types.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/structures.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextHeaders.java)
-
 ## Overview
 
 The message header is a component of the [message](message.md).
@@ -39,11 +14,6 @@ The purpose of the message header is to define the authenticated metadata requir
 - The [encryption context](../framework/structures.md#encryption-context)
 
 ## Definitions
-
-### Conventions used in this document
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
-in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
 ## Structure
 
