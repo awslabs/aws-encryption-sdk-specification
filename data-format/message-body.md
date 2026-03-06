@@ -25,7 +25,7 @@ The following sections describe the format of the message body for each content 
 Non-framed data is a sequence of encrypted bytes along with the [initialization vector (IV)](#iv)
 and body [authentication tag](#authentication-tag).
 
-The following table is a non-normative representation of the normative requirements in this secion.
+The following table is a non-normative representation of the normative requirements in this section.
 The bytes are appended in the order shown.
 
 | Field                                                 | Length (bytes)                           | Interpreted as |
