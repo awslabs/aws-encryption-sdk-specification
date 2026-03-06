@@ -32,7 +32,7 @@ of the algorithm suite indicated in the message header.
 Required arguments:
 
 - The input to the Decrypt operation MUST accept a required [Encrypted Message](#encrypted-message) argument.
-- The input to the Decrypt operation MUST accept a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) and a [keyring](../framework/keyring-interface.md) argument.
+- The input to the Decrypt operation MUST accept a [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) and a [keyring](../framework/keyring-interface.md) argument.
   The keyring and CMM inputs SHOULD be optional.
   The Decrypt operation MUST validate that exactly one keyring or CMM was provided by the caller.
   If the caller does not provide exactly one of a keyring or CMM, the Decrypt operation MUST fail.
@@ -288,7 +288,7 @@ message header to determine whether the operation will deserialize the message b
 If deserializing [framed data](../data-format/message-body.md#framed-data),
 the Decrypt operation MUST use the first 4 bytes of a frame to determine
 whether the operation will deserialize the frame as a [final frame](../data-format/message-body.md#final-frame)
-or [regular frame](../fata-format/message-body/md#regular-frame).
+or [regular frame](../data-format/message-body.md#regular-frame).
 If the first 4 bytes have a value of 0xFFFF,
 then the Decrypt operation MUST deserialize this as the [sequence number end](../data-format/message-header.md#sequence-number-end)
 and the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
@@ -321,7 +321,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
     equal to the length of the plaintext that was encrypted.
     If this is a regular frame, this SHOULD be determined by using the [frame length](../data-format/message-header.md#frame-length)
     deserialized from the message header.
-    If this is not a regular frame, this SHOULD be determined by using the the [encrypted content length](../data-format/message-body.md#encrypted-content-length).
+    If this is not a regular frame, this SHOULD be determined by using the [encrypted content length](../data-format/message-body.md#encrypted-content-length).
 - The IV MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
