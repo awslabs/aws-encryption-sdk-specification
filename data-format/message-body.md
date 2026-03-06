@@ -54,7 +54,7 @@ The length of the encrypted content.
 The length MUST NOT be greater than `2^36 - 32`, or 64 gibibytes (64 GiB),
 due to restrictions imposed by the [implemented algorithms](../framework/algorithm-suites.md).
 The length of the serialized encrypted content length MUST be 8 bytes.
-The encrypted content length MUST be interpreted as a Uint64.
+The encrypted content length MUST be interpreted as a UInt64.
 
 #### Encrypted Content
 
