@@ -3,20 +3,6 @@
 
 # Client
 
-## Version
-
-0.1.0
-
-## Implementations
-
-| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                        |
-| ---------- | -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| C          | 0.1.0                                  | 0.1.0                     | [session.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session.c)                                                 |
-| NodeJS     | 0.1.0                                  | 0.1.0                     | [index.ts](https://github.com/aws/aws-encryption-sdk-javascript/blob/master/modules/client-node/src/index.ts)                         |
-| Browser JS | 0.1.0                                  | 0.1.0                     | [index.ts](https://github.com/aws/aws-encryption-sdk-javascript/blob/master/modules/client-browser/src/index.ts)                      |
-| Python     | 0.1.0                                  | 0.1.0                     | [\_\_init\_\_.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/__init__.py)                    |
-| Java       | 0.1.0                                  | 0.1.0                     | [AwsCrypto.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/AwsCrypto.java) |
-
 ## Overview
 
 This document describes the client experience for the AWS Encryption SDK.
@@ -30,11 +16,10 @@ because anything a client encrypts can be decrypted by the same client.
 
 ## Initialization
 
-On client initialization,
-the caller MUST have the option to provide a:
-
-- [commitment policy](#commitment-policy)
-- [maximum number of encrypted data keys](#maximum-number-of-encrypted-data-keys)
+- On client initialization,
+  the caller MUST have the option to provide a [commitment policy](#commitment-policy).
+- On client initialization,
+  the caller MUST have the option to provide a [maximum number of encrypted data keys](#maximum-number-of-encrypted-data-keys).
 
 If no [commitment policy](#commitment-policy) is provided the default MUST be [REQUIRE_ENCRYPT_REQUIRE_DECRYPT](../framework/algorithm-suites.md#require_encrypt_require_decrypt).
 If no [maximum number of encrypted data keys](#maximum-number-of-encrypted-data-keys) is provided
@@ -50,7 +35,6 @@ The AWS Encryption SDK MUST use the ESDK [commitment policies](../framework/comm
 
 A AWS Encryption SDK message can contain multiple encrypted data keys.
 This is the maximum number of encrypted data keys that the client will attempt to unwrap.
-Callers MUST have a way to disable this limit.
 
 ## Operation
 
