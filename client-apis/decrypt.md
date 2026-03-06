@@ -39,7 +39,7 @@ Required arguments:
 
 Optional arguments:
 
-- The input to the Encrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
+- The input to the Decrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
 
 ### Encrypted Message
 
