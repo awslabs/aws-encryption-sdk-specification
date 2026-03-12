@@ -18,4 +18,5 @@ If the [message header](message-header.md) contains an [algorithm suite](../fram
 [algorithm suite ID](message-header.md#algorithm-suite-id) field that contains a
 [signature algorithm](../framework/algorithm-suites.md#signature-algorithm), the message MUST also contain a
 [message footer](message-footer.md) serialized after the [message body](message-body.md).
-If the algorithm suite does not contain a signature algorithm, the message MUST NOT  contain a message footer.
+If the algorithm suite does not contain a signature algorithm, the message MUST NOT contain a message footer.
+If the algorithm suite contain an unrecognized signature algorithm, the operation MUST raise an error.

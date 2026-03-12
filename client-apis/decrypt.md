@@ -8,9 +8,6 @@
 This document describes the AWS Encryption SDK's (ESDK's) decrypt operation,
 used for decrypting a message that was previously encrypted by the ESDK.
 
-Any client provided by the AWS Encryption SDK that performs decryption of encrypted messages MUST follow
-this specification for decryption.
-
 ## Definitions
 
 ### Authenticated Data
@@ -39,7 +36,7 @@ Required arguments:
 
 Optional arguments:
 
-- The input to the Encrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
+- The input to the Decrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
 
 ### Encrypted Message
 
@@ -210,6 +207,7 @@ MUST be constructed as follows:
 - Encrypted Data Keys: This MUST be the parsed [encrypted data keys](../data-format/message-header#encrypted-data-keys)
   from the message header.
 - Reproduced Encryption Context: This MUST be the [input](#input) encryption context.
+- Commitment Policy: This MUST be the commitment policy configured on the client.
 
 The data key used as input for all decryption described below MUST be a data key derived from the plaintext data key
 included in the [decryption materials](../framework/structures.md#decryption-materials).

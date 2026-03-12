@@ -40,6 +40,8 @@ The bytes are appended in the order shown.
 ### Signature Length
 
 The length of the signature.
+This length of the signature length field MUST be 2 bytes.
+The signature length field MUST be interpreted as a UInt16.
 
 ### Signature
 

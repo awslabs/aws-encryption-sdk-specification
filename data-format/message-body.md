@@ -41,14 +41,14 @@ Encrypted Content Length,
 Encrypted Content,
 and Authentication Tag.
 
-#### IV
+#### Non-Framed Data IV
 
 The initialization vector to use with the encryption algorithm.
 The IV MUST be a unique IV within the message.
 The length of the serialized IV MUST be [IV Length](message-header.md#iv-length) bytes.
 The IV MUST be interpreted as bytes.
 
-#### Encrypted Content Length
+#### Non-Framed Data Encrypted Content Length
 
 The length of the encrypted content.  
 The length MUST NOT be greater than `2^36 - 32`, or 64 gibibytes (64 GiB),
@@ -56,13 +56,13 @@ due to restrictions imposed by the [implemented algorithms](../framework/algorit
 The length of the serialized encrypted content length MUST be 8 bytes.
 The encrypted content length MUST be interpreted as a Uint64.
 
-#### Encrypted Content
+#### Non-Framed Data Encrypted Content
 
 The encrypted data as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
 The length of the serialized encrypted content MUST be equal to the value of the [Encrypted Content Length](#encrypted-content-length) field.
 The encrypted content MUST be interpreted as bytes.
 
-#### Authentication Tag
+#### Non-Framed Data Authentication Tag
 
 The authentication value for the body.
 It is used to authenticate the message body.
@@ -102,16 +102,17 @@ IV,
 Encrypted Content,
 and Authentication Tag.
 
-##### Sequence Number
+##### Regular Frame Sequence Number
 
 The Frame sequence number.  
 It is an incremental counter number for the frames.  
 Framed Data MUST start at Sequence Number 1.  
 Subsequent frames MUST be in order and MUST contain an increment of 1 from the previous frame.
-The length of the serialized sequence number MUST be 4 bytes.
-The sequence number MUST be interpreted as a UInt32.
+When serializing the sequence number to a message, the length of the serialized sequence number MUST be 4 bytes.
+The sequence number MUST be serialized as a UInt32.
+When reading the sequence number from a message, the sequence number MUST be interpreted as a UInt32.
 
-##### IV
+##### Regular Frame IV
 
 The initialization vector (IV) for the frame.  
 Each frame in the [Framed Data](#framed-data) MUST include an IV that is unique within the message.
@@ -119,13 +120,13 @@ The IV length MUST be equal to the IV length of the algorithm suite specified by
 The IV MUST be interpreted as bytes.
 Note: This IV is different from the [Header IV](message-header.md#iv).
 
-##### Encrypted Content
+##### Regular Frame Encrypted Content
 
 The encrypted data for each frame, as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).  
 The length of the encrypted content of a Regular Frame MUST be equal to the Frame Length.
 The encrypted content MUST be interpreted as bytes.
 
-##### Authentication Tag
+##### Regular Frame Authentication Tag
 
 The authentication value for the frame.  
 The authentication tag length MUST be equal to the authentication tag length of the algorithm suite
@@ -175,6 +176,10 @@ Encrypted Content Length,
 Encrypted Content,
 and Authentication Tag.
 
+This means a final frame MUST be a regular frame with the addition of the serialized
+Sequence Number End
+and Encrypted Content Length.
+
 ##### Sequence Number End
 
 An indicator for the Final Frame.  
@@ -182,15 +187,16 @@ The value MUST be encoded as the 4 bytes `FF FF FF FF` in hexadecimal notation.
 The length of the serialized sequence number end MUST be 4 bytes.
 The sequence number end MUST be interpreted as bytes.
 
-##### Sequence Number
+##### Final Frame Sequence Number
 
-The Frame Sequence Number.  
-It is an incremental counter number for the frames.
+The Frame sequence number for the final frame.
 The Final Frame Sequence number MUST be equal to the total number of frames in the Framed Data.
-The length of the serialized sequence number MUST be 4 bytes.
-The sequence number MUST be interpreted as a UInt32.
+The Final Frame Sequence Number MUST be serialized to a message the same way as the
+[Regular Frame Sequence Number](#regular-frame-sequence-number).
+The Final Frame Sequence Number MUST be interpreted from a message the same way as the
+[Regular Frame Sequence Number](#regular-frame-sequence-number).
 
-##### IV
+##### Final Frame IV
 
 The initialization vector for the final frame.  
 The IV MUST be a unique IV within the message.  
@@ -198,19 +204,19 @@ The IV length MUST be equal to the IV length of the [algorithm suite](../framewo
 The IV MUST be interpreted as bytes.
 Note: This IV is different from the [Header IV](message-header.md#iv).
 
-##### Encrypted Content Length
+##### Final Frame Encrypted Content Length
 
 The length of the encrypted content.
 The length of the serialized encrypted content length field MUST be 4 bytes.
 The encrypted content length MUST be interpreted as a UInt32.
 
-##### Encrypted Content
+##### Final Frame Encrypted Content
 
 The encrypted data for the final frame, as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
 The length of the serialized encrypted content MUST be equal to the value of the [Encrypted Content Length](#encrypted-content-length-1) field.
 The encrypted content MUST be interpreted as bytes.
 
-##### Authentication Tag
+##### Final Frame Authentication Tag
 
 The authentication value for the final frame.  
 It is used to authenticate the final frame.  

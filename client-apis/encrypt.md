@@ -266,22 +266,6 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
 - The cipherkey MUST be the derived data key
 - The plaintext MUST be an empty byte array
 
-With the authentication tag calculated,
-if the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 2.0,
-this operation MUST serialize the [message header authentication](../data-format/message-header.md#header-authentication-version-2-0) with the following specifics:
-
-- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
-  of the authentication tag calculated above.
-
-With the authentication tag calculated,
-if the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 1.0
-this operation MUST serialize the [message header authentication](../data-format/message-header.md#header-authentication-version-1-0) with the following specifics:
-
-- [IV](../data-format/message-header.md#iv): MUST have the value of the IV used in the calculation above,
-  padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
-- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
-  of the authentication tag calculated above.
-
 The serialized bytes MUST NOT be released until the entire message header has been serialized.
 If this operation is streaming the encrypted message and
 the entire message header has been serialized,
@@ -295,6 +279,26 @@ If the algorithm suite contains a signature algorithm and
 this operation is [streaming](streaming.md) the encrypted message output to the caller,
 this operation MUST input the serialized header to the signature algorithm as soon as it is serialized,
 such that the serialized header isn't required to remain in memory to [construct the signature](#construct-the-signature).
+
+#### V2 Authentication Tag
+
+With the authentication tag calculated,
+if the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 2.0,
+this operation MUST serialize the [message header authentication](../data-format/message-header.md#header-authentication-version-2-0) with the following specifics:
+
+- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
+  of the authentication tag calculated above.
+
+#### V1 Authentication Tag
+
+With the authentication tag calculated,
+if the message format version associated with the [algorithm suite](../framework/algorithm-suites.md#supported-algorithm-suites) is 1.0
+this operation MUST serialize the [message header authentication](../data-format/message-header.md#header-authentication-version-1-0) with the following specifics:
+
+- [IV](../data-format/message-header.md#iv): MUST have the value of the IV used in the calculation above,
+  padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
+- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST have the value
+  of the authentication tag calculated above.
 
 ## Construct the body
 
@@ -345,8 +349,8 @@ with the following inputs:
     [Message Body AAD](../data-format/message-body-aad.md).
   - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be the sequence
     number of the frame being encrypted.
-    If this is the first frame sequentially, this value MUST be 1.
-    Otherwise, this value MUST be 1 greater than the value of the sequence number
+    If this is the first frame sequentially, the sequence number value MUST be 1.
+    Otherwise, the sequence number value MUST be 1 greater than the value of the sequence number
     of the previous frame.
   - The [content length](../data-format/message-body-aad.md#content-length) MUST have a value
     equal to the length of the plaintext being encrypted.
@@ -365,9 +369,15 @@ with the following inputs:
 
 This operation MUST serialize a regular frame or final frame with the following specifics:
 
+- Final frame only: [Sequence Number End](../data-format/message-body.md#sequence-number-end) field: This MUST
+  be the sequence number end value.
+  The Sequence Number End MUST only be serialized for the final frame.
 - [Sequence Number](../data-format/message-body.md#sequence-number): MUST be the sequence number of this frame,
   as determined above.
 - [IV](../data-format/message-body.md#iv): MUST be the IV used when calculating the encrypted content above
+- Final frame only: [Encrypted Content Length](../data-format/message-body.md#encrypted-content-length) field: This MUST
+  be the encrypted content length value
+  The Encrypted Content Length MUST only be serialized for the final frame.
 - [Encrypted Content](../data-format/message-body.md#encrypted-content): MUST be the encrypted content calculated above.
 - [Authentication Tag](../data-format/message-body.md#authentication-tag): MUST be the authentication tag
   output when calculating the encrypted content above.
