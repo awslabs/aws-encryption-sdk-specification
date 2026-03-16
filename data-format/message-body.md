@@ -35,7 +35,13 @@ The bytes are appended in the order shown.
 | [Encrypted Content](#encrypted-content)               | Variable                                 | Bytes          |
 | [Authentication Tag](#authentication-tag)             | Variable                                 | Bytes          |
 
-Non-framed data MUST be serialized as, in order,
+Non-framed data MUST be serialized (written) as, in order,
+IV,
+Encrypted Content Length,
+Encrypted Content,
+and Authentication Tag.
+
+Non-framed data MUST be deserialized (read) as, in order,
 IV,
 Encrypted Content Length,
 Encrypted Content,
@@ -44,17 +50,21 @@ and Authentication Tag.
 #### Non-Framed Data IV
 
 The initialization vector to use with the encryption algorithm.
-The IV MUST be a unique IV within the message.
-The length of the serialized IV MUST be [IV Length](message-header.md#iv-length) bytes.
-The IV MUST be interpreted as bytes.
+
+When writing a message, the IV MUST be a unique IV within the message.
+When writing a message, the operation MUST serialize the IV to be [IV Length](message-header.md#iv-length) bytes.
+
+When reading a message, the operation MUST deserialize [IV Length](message-header.md#iv-length) bytes and interpret it as the IV.
+When reading a message, the deserialized IV MUST be interpreted as bytes.
 
 #### Non-Framed Data Encrypted Content Length
 
 The length of the encrypted content.  
 The length MUST NOT be greater than `2^36 - 32`, or 64 gibibytes (64 GiB),
 due to restrictions imposed by the [implemented algorithms](../framework/algorithm-suites.md).
-The length of the serialized encrypted content length MUST be 8 bytes.
-The encrypted content length MUST be interpreted as a Uint64.
+When serializing the encrypted content length to a message, the length of the serialized encrypted content length MUST be 8 bytes.
+The encrypted content length MUST be serialized as a Uint64.
+When reading the encrypted content length from a message, the encrypted content length MUST be interpreted as a Uint64.
 
 #### Non-Framed Data Encrypted Content
 
@@ -207,8 +217,9 @@ Note: This IV is different from the [Header IV](message-header.md#iv).
 ##### Final Frame Encrypted Content Length
 
 The length of the encrypted content.
-The length of the serialized encrypted content length field MUST be 4 bytes.
-The encrypted content length MUST be interpreted as a UInt32.
+When serializing the encrypted content length to a message, the length of the serialized encrypted content length field MUST be 4 bytes.
+The encrypted content length MUST be serialized as a UInt32.
+When reading the encrypted content length from a message, the encrypted content length MUST be interpreted as a UInt32.
 
 ##### Final Frame Encrypted Content
 

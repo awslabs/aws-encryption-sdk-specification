@@ -18,21 +18,26 @@ The purpose of the message header is to define the authenticated metadata requir
 ## Structure
 
 The message header is a sequence of bytes that MUST be in big-endian format.
-The following table describes the fields that form the header.
-The bytes are appended in the order shown.
+
+The following table is a non-normative representation of the normative requirements in this section.
+
 
 | Field                                           | Length (bytes) | Interpreted as                                  |
 | ----------------------------------------------- | -------------- | ----------------------------------------------- |
 | [Header Body](#header-body)                     | Variable       | [Header Body](#header-body)                     |
 | [Header Authentication](#header-authentication) | Variable       | [Header Authentication](#header-authentication) |
 
+The header MUST be serialized as, in order,
+Header Body,
+and Header Authentication.
+
 ### Header Body
 
 #### Header Body Version 1.0
 
-The following table describes the fields that form the Version 1.0 header body.
 The value of the `Version` field MUST be `01` in the Version 1.0 header body.
-The bytes are appended in the order shown.
+
+The following table is a non-normative representation of the normative requirements for a Version 1.0 header.
 
 | Field                                       | Length (bytes)                                                                    | Interpreted as                                                                                |
 | ------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
@@ -47,11 +52,23 @@ The bytes are appended in the order shown.
 | [IV Length](#iv-length)                     | 1                                                                                 | UInt8                                                                                         |
 | [Frame Length](#frame-length)               | 4                                                                                 | UInt32                                                                                        |
 
+The V1 Header Body MUST be serialized as, in order,
+Version,
+Type,
+Algorithm Suite ID,
+Message ID,
+AAD,
+Encrypted Data Keys,
+Content Type,
+Reserved,
+IV Length,
+and Frame Length.
+
 #### Header Body Version 2.0
 
-The following table describes the fields that form the Version 2.0 header body.
 The value of the `Version` field MUST be `02` in the Version 2.0 header body.
-The bytes are appended in the order shown.
+
+The following table is a non-normative representation of the normative requirements for a Version 2.0 header.
 
 | Field                                         | Length (bytes)                                                                    | Interpreted as                                                                                |
 | --------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
@@ -64,12 +81,29 @@ The bytes are appended in the order shown.
 | [Frame Length](#frame-length)                 | 4                                                                                 | UInt32                                                                                        |
 | [Algorithm Suite Data](#algorithm-suite-data) | Variable. Determined by the Algorithm Suite ID                                    | See [Algorithm Suite Data](../framework/algorithm-suites.md#algorithm-suite-data)             |
 
+The V2 Header Body MUST be serialized as, in order,
+Version,
+Algorithm Suite ID,
+Message ID,
+AAD,
+Encrypted Data Keys,
+Content Type,
+Frame Length,
+and Algorithm Suite Data.
+
 #### Version
 
 The version of the message format.
-The version (hex) of this field MUST be a value that exists in the following table:
+The length of the serialized version field MUST be 1 byte.
 
 ##### Supported Versions
+
+The supported versions MUST be:
+
+- `01` MUST be version 1.0
+- `02` MUST be version 2.0
+
+The following table is a non-normative representation of the supported versions.
 
 | Value (hex) | Version |
 | ----------- | ------- |
@@ -79,9 +113,16 @@ The version (hex) of this field MUST be a value that exists in the following tab
 #### Type
 
 The type of the message format.
+The length of the serialized type field MUST be 1 byte.
 The type (hex) of this field MUST be a value that exists in the following table:
 
 ##### Supported Types
+
+The supported types MUST be:
+
+- `80` MUST be Customer Authenticated Encrypted Data
+
+The following table is a non-normative representation of the supported types.
 
 | Value (hex) | Type                                  |
 | ----------- | ------------------------------------- |
@@ -90,16 +131,20 @@ The type (hex) of this field MUST be a value that exists in the following table:
 #### Algorithm Suite ID
 
 The identifier for the algorithm suite used when generating the message.
+The length of the serialized algorithm suite ID field MUST be 2 bytes.
 The value (hex) of this field MUST be a value that exists in the
 [Supported Algorithm Suites](../framework/algorithm-suites.md#supported-algorithm-suites) table.
 This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum).
 
 #### Message ID
 
-A Message ID MUST uniquely identify the [message](message.md).
+A Message ID uniquely identifies the [message](message.md).
 While implementations cannot guarantee complete uniqueness,
 implementations MUST use a good source of randomness when generating messages IDs in order to make
 the chance of duplicate IDs negligible.
+The length of the serialized message ID MUST be 16 bytes for [version 1.0](#header-body-version-10) headers.
+The length of the serialized message ID MUST be 32 bytes for [version 2.0](#header-body-version-20) headers.
+The message ID MUST be interpreted as bytes.
 
 The purpose of the message ID is to:
 
@@ -114,23 +159,30 @@ The purpose of the message ID is to:
 The Additional Authenticated Data (AAD) for the header.
 
 This AAD is an encoding of the [encryption context](../framework/structures.md#encryption-context).
-The bytes are appended in the order shown:
+
+The following table is a non-normative representation of the normative requirements in this section.
 
 | Field                                             | Length (bytes)                                                                          | Interpreted as                      |
 | ------------------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------- |
 | [Key Value Pairs Length](#key-value-pairs-length) | 2                                                                                       | UInt16                              |
 | [Key Value Pairs](#key-value-pairs)               | Variable. Determined by the value of [Key Value Pairs Length](#key-value-pairs-length). | [Key Value Pairs](#key-value-pairs) |
 
+The AAD MUST be serialized as, in order,
+Key Value Pairs Length,
+and Key Value Pairs.
+
 ##### Key Value Pairs Length
 
 The length of the [Key Value Pairs](#key-value-pairs) field in bytes.
+The length of the serialized key value pairs length field MUST be 2 bytes.
+The key value pairs length MUST be serialized as a UInt16.
 
 When the [encryption context](../framework/structures.md#encryption-context) is empty, the value of this field MUST be 0.
 
 ##### Key Value Pairs
 
-The encoding of the key-value pairs of the [encryption context](../framework/structures.md#encryption-context),
-serialized according to it's [specification for serialization](../framework/structures.md#serialization).
+The encoding of the key-value pairs of the [encryption context](../framework/structures.md#encryption-context).
+The encryption context key-value pairs MUST be serialized according to its [specification for serialization](../framework/structures.md#serialization).
 
 When the [encryption context](../framework/structures.md#encryption-context) is empty,
 this field MUST NOT be included in the [AAD](#aad).
@@ -139,25 +191,29 @@ this field MUST NOT be included in the [AAD](#aad).
 
 The encoding of the [encrypted data keys](../framework/structures.md#encrypted-data-key).
 
-The following table describes the fields that form the encrypted data keys.
-The bytes are appended in the order shown.
+The following table is a non-normative representation of the normative requirements in this section.
 
 | Field                                                     | Length, in bytes                                                     | Interpreted as                                            |
 | --------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------- |
 | [Encrypted Data Key Count](#encrypted-data-key-count)     | 2                                                                    | UInt16                                                    |
 | [Encrypted Data Key Entries](#encrypted-data-key-entries) | Variable. Determined by the count and length of each key-value pair. | [Encrypted Data Key Entries](#encrypted-data-key-entries) |
 
+The Encrypted Data Keys MUST be serialized as, in order,
+Encrypted Data Key Count,
+and Encrypted Data Key Entries.
+
 #### Encrypted Data Key Count
 
 The number of encrypted data keys.
+The length of the serialized encrypted data key count MUST be 2 bytes.
+The encrypted data key count MUST be serialized as a UInt16.
 This value MUST be greater than 0.
 
 #### Encrypted Data Key Entries
 
 A sequence of one or more encrypted data key entries.
 
-The following table describes the fields that form each encrypted data key entry.
-The bytes are appended in the order shown.
+The following table is a non-normative representation of the normative requirements in this section.
 
 | Field                                                               | Length, in bytes                                                                                  | Interpreted as      |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------- |
@@ -168,39 +224,67 @@ The bytes are appended in the order shown.
 | [Encrypted Data Key Length](#encrypted-data-key-length)             | 2                                                                                                 | UInt16              |
 | [Encrypted Data Key](#encrypted-data-key)                           | Variable. Equal to the value specified in the previous 2 bytes (Encrypted Data Key Length).       | Bytes               |
 
+Each Encrypted Data Key Entry MUST be serialized as, in order,
+Key Provider ID Length,
+Key Provider ID,
+Key Provider Information Length,
+Key Provider Information,
+Encrypted Data Key Length,
+and Encrypted Data Key.
+
 ##### Key Provider ID Length
 
 The length of the key provider ID.
+The length of the serialized key provider ID length field MUST be 2 bytes.
+The key provider ID length MUST be serialized as a UInt16.
 
 ##### Key Provider ID
 
 The key provider ID.
+The length of the serialized key provider ID MUST be equal to the value of the [Key Provider ID Length](#key-provider-id-length) field.
+The key provider ID MUST be interpreted as UTF-8 encoded bytes.
 See [the specification for encrypted data keys](../framework/structures.md#encrypted-data-key).
 
 ##### Key Provider Information Length
 
 The length of the key provider information.
+The length of the serialized key provider information length field MUST be 2 bytes.
+The key provider information length MUST be serialized as a UInt16.
 
 ##### Key Provider Information
 
 The key provider information.
+The length of the serialized key provider information MUST be equal to the value of the [Key Provider Information Length](#key-provider-information-length) field.
+The key provider information MUST be interpreted as bytes.
 See [the specification for encrypted data keys](../framework/structures.md#encrypted-data-key).
 
 ##### Encrypted Data Key Length
 
 The length of the encrypted data key.
+The length of the serialized encrypted data key length field MUST be 2 bytes.
+The encrypted data key length MUST be serialized as a UInt16.
 
 ##### Encrypted Data Key
 
 The encrypted data key.
 It is the data key encrypted by the key provider.
+The length of the serialized encrypted data key MUST be equal to the value of the [Encrypted Data Key Length](#encrypted-data-key-length) field.
+The encrypted data key MUST be interpreted as bytes.
 
 #### Content Type
 
 The content type of the [message body](message-body.md).
+The length of the serialized content type field MUST be 1 byte.
 The value (hex) of this field MUST be a value that exists in the following table:
 
 ##### Supported Content Types
+
+The supported content types MUST be:
+
+- `01` for [Non-Framed](message-body.md#non-framed-data)
+- `02` for [Framed](message-body.md#framed-data)
+
+The following table is a non-normative representation of the supported content types.
 
 | Value (hex) | Content Type                                  |
 | ----------- | --------------------------------------------- |
@@ -212,21 +296,27 @@ The value (hex) of this field MUST be a value that exists in the following table
 A variable length byte sequence interpreted according to the algorithm suite.
 The length of the suite data field MUST be equal to the [Algorithm Suite Data Length](../framework/algorithm-suites.md#algorithm-suite-data-length) value
 of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.
+The algorithm suite data MUST be interpreted as bytes.
 
 #### Reserved
 
 A reserved sequence of 4 bytes
 that MUST have the value (hex) of `00 00 00 00`.
+The length of the serialized reserved field MUST be 4 bytes.
 
 #### IV Length
 
 The length of the initialization vector (IV).
+The length of the serialized IV length field MUST be 1 byte.
+The IV length MUST be serialized as a UInt8.
 This value MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-length) value of the
 [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.
 
 #### Frame Length
 
 The length of the [encrypted content](message-body.md#encrypted-content) within each [regular frame](message-body.md#regular-frame) of framed content.
+The length of the serialized frame length field MUST be 4 bytes.
+The frame length MUST be serialized as a UInt32.
 When the [content type](#content-type) is non-framed, the value of this field MUST be 0.
 
 ### Header Authentication
@@ -235,30 +325,38 @@ The header authentication contains fields used for authentication of the [header
 
 #### Header Authentication Version 1.0
 
-The following table describes the fields that form the header authentication.
-The bytes are appended in the order shown.
+The following table is a non-normative representation of the normative requirements in this section.
 
 | Field                                     | Length, in bytes                                                                                                                                                                              | Interpreted as |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | [IV](#iv)                                 | Variable. Determined by the IV length value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.                      | Bytes          |
 | [Authentication Tag](#authentication-tag) | Variable. Determined by the byte value of the authentication tag of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
 
+The V1 Header Authentication MUST be serialized as, in order,
+IV,
+and Authentication Tag.
+
 #### Header Authentication Version 2.0
 
-The following table describes the fields that form the header authentication.
-The bytes are appended in the order shown.
+The following table is a non-normative representation of the normative requirements in this section.
 
 | Field                                     | Length, in bytes                                                                                                                                                                              | Interpreted as |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | [Authentication Tag](#authentication-tag) | Variable. Determined by the byte value of the authentication tag of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
 
+The V2 Header Authentication MUST be serialized as the Authentication Tag only.
+
 #### IV
 
 The initialization vector (IV) used as input to calculate the [authentication tag](#authentication-tag).
+The length of the serialized IV MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-length) value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.
+The IV MUST be interpreted as bytes.
 
 #### Authentication Tag
 
 The authentication value for the header.
+The length of the serialized authentication tag MUST be equal to the [authentication tag length](../framework/algorithm-suites.md#authentication-tag-length) of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.
+The authentication tag MUST be interpreted as bytes.
 The [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field
 [determines how the value of this field is calculated](../client-apis/encrypt.md),
 and uses this value to [authenticate the contents of the header during decryption](../client-apis/decrypt.md).
