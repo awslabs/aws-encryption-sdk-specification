@@ -159,18 +159,15 @@ const REPOSITORIES = [
 ];
 
 const CRYPTO_TOOLS_USERNAMES = [
-    "seebees",
     "texastony", 
     "ShubhamChaturvedi7",
     "mahnushm",
     "lucasmcdonald3",
-    "robin-aws",
     "josecorella",
-    "imabhichow",
     "rishav-karanjit",
     "antonf-amzn",
     "kessplas",
-    "ajewellamz"
+    "sharmabikram"
 ];
 
 // Former team members who should still be considered as team for filtering
@@ -188,7 +185,11 @@ const FORMER_CRYPTO_TOOLS_MEMBERS = [
     "acioc",
     "tegansb",
     "adpaco-aws",
-    "alex-chew"
+    "alex-chew",
+    "ajewellamz",
+    "imabhichow",
+    "seebees",
+    "robin-aws",
 ];
 
 // Combined list for filtering
