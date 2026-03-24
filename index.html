@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AWS Crypto Tools GitHub Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        // Apply saved theme immediately to prevent flash
+        (function() {
+            var theme = localStorage.getItem('dashboard-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
 <body>
     <div class="app-container">
@@ -70,7 +78,7 @@
                                     <path d="M4.22 19.78l4.24-4.24"/>
                                     <path d="M15.54 8.46l4.24-4.24"/>
                                 </svg>
-                                GitHub Actions
+                                Daily CI
                             </button>
                         </li>
                     </ul>
@@ -134,16 +142,54 @@
                 <!-- Dashboard Section -->
                 <div class="section" id="dashboardSection">
                     <div class="section-header">
-                        <h2>At a Glance</h2>
+                        <h2>What's New</h2>
+                        <div class="header-controls">
+                            <label style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+                                Last
+                                <select id="dashboardTimeRange" class="gh-toolbar-btn" style="border:1px solid var(--border-color);border-radius:6px;padding:4px 8px;background:var(--input-bg);color:var(--text-primary);font-size:13px;">
+                                    <option value="7" selected>7 days</option>
+                                    <option value="14">14 days</option>
+                                    <option value="30">30 days</option>
+                                    <option value="90">90 days</option>
+                                </select>
+                            </label>
+                        </div>
                         <div class="data-info">
                             <span class="last-updated">Last updated: <span id="dashboardLastUpdated">Never</span></span>
                         </div>
                     </div>
                     
                 <div class="dashboard-content">
-                    <div id="badgeTableContainer">
-                        <!-- Badge table will be inserted here -->
+                    <div class="dashboard-stats" id="dashboardStats">
+                        <div class="dash-stat">
+                            <span class="dash-stat-value" id="statExternalIssues">-</span>
+                            <span class="dash-stat-label">Active external issues</span>
+                        </div>
+                        <div class="dash-stat">
+                            <span class="dash-stat-value" id="statExternalPRs">-</span>
+                            <span class="dash-stat-label">Active external PRs</span>
+                        </div>
+                        <div class="dash-stat">
+                            <span class="dash-stat-value" id="statFailedCI">-</span>
+                            <span class="dash-stat-label">Repos with failing CI</span>
+                        </div>
                     </div>
+
+                    <div class="dash-section" id="dashNewIssues">
+                        <h3 class="dash-section-title">📋 Active external issues</h3>
+                        <div class="dash-section-content" id="dashNewIssuesList"></div>
+                    </div>
+
+                    <div class="dash-section" id="dashNewPRs">
+                        <h3 class="dash-section-title">🔀 Active external PRs</h3>
+                        <div class="dash-section-content" id="dashNewPRsList"></div>
+                    </div>
+
+                    <div class="dash-section" id="dashFailedCI">
+                        <h3 class="dash-section-title">🔴 CI failures <span id="dashCIRangeLabel">this week</span></h3>
+                        <div class="dash-section-content" id="dashFailedCIList"></div>
+                    </div>
+
                 </div>
                 </div>
 
@@ -152,6 +198,14 @@
                     <div class="section-header">
                         <h2>Pull Requests</h2>
                         <div class="header-controls">
+                            <div class="view-toggle">
+                                <button class="view-toggle-btn" data-view="card" data-section="pull-requests" title="Card view">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                                </button>
+                                <button class="view-toggle-btn active" data-view="list" data-section="pull-requests" title="List view">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                </button>
+                            </div>
                             <div class="repository-filter">
                                 <select id="repositorySelect" class="repo-select">
                                     <option value="" disabled selected>Select a repository...</option>
@@ -218,27 +272,40 @@
                         </div>
                     </div>
 
-                    <div class="filters" id="pullRequestFilters" style="display: none;">
-                        <div class="filter-group">
-                            <label for="prSortSelect">Sort by:</label>
-                            <select id="prSortSelect" class="filter-select">
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="prUserFilter">Created by:</label>
-                            <div class="user-filter-container">
-                                <input type="text" id="prUserFilter" class="filter-input" placeholder="Filter by user...">
-                                <button id="prClearUserFilter" class="clear-filter-btn" title="Clear user filter">×</button>
+                    <div class="gh-toolbar" id="pullRequestFilters" style="display: none;">
+                        <div class="gh-toolbar-bar">
+                            <div class="gh-toolbar-left">
+                                <div class="gh-dropdown-wrapper">
+                                    <button class="gh-toolbar-btn" id="prAuthorBtn">Author ▾</button>
+                                    <div class="gh-dropdown" id="prAuthorDropdown">
+                                        <div class="gh-dropdown-header">Filter by author</div>
+                                        <input type="text" class="gh-dropdown-search" id="prAuthorSearch" placeholder="Filter users">
+                                        <div class="gh-dropdown-items" id="prAuthorItems"></div>
+                                    </div>
+                                </div>
+                                <div class="gh-dropdown-wrapper">
+                                    <button class="gh-toolbar-btn" id="prSortBtn">Sort ▾</button>
+                                    <div class="gh-dropdown" id="prSortDropdown">
+                                        <div class="gh-dropdown-header">Sort by</div>
+                                        <div class="gh-dropdown-items">
+                                            <button class="gh-dropdown-item active" data-sort="updated-desc">Newest updated</button>
+                                            <button class="gh-dropdown-item" data-sort="updated-asc">Oldest updated</button>
+                                            <button class="gh-dropdown-item" data-sort="created-desc">Newest created</button>
+                                            <button class="gh-dropdown-item" data-sort="created-asc">Oldest created</button>
+                                            <button class="gh-dropdown-item" data-sort="comments-desc">Most commented</button>
+                                            <button class="gh-dropdown-item" data-sort="comments-asc">Least commented</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="prUserSuggestions" class="user-suggestions"></div>
+                            <div class="gh-toolbar-right">
+                                <input type="text" class="gh-search-input" id="prKeywordSearch" placeholder="Search pull requests...">
+                            </div>
                         </div>
-                        <div class="filter-group">
-                            <button id="prClearAllFilters" class="clear-all-btn">Clear All Filters</button>
-                        </div>
+                        <div class="gh-active-filters" id="prActiveFilters"></div>
                     </div>
 
+                    <div class="expanded-card-container" id="pullRequestsExpanded"></div>
                     <div class="content-grid" id="pullRequestsGrid">
                         <!-- Pull requests content will be inserted here -->
                     </div>
@@ -248,6 +315,14 @@
                     <div class="section-header">
                         <h2>Issues</h2>
                         <div class="header-controls">
+                            <div class="view-toggle">
+                                <button class="view-toggle-btn" data-view="card" data-section="issues" title="Card view">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                                </button>
+                                <button class="view-toggle-btn active" data-view="list" data-section="issues" title="List view">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                </button>
+                            </div>
                             <div class="repository-filter">
                                 <select id="issuesRepositorySelect" class="repo-select">
                                     <option value="" disabled selected>Select a repository...</option>
@@ -297,27 +372,40 @@
                         </div>
                     </div>
 
-                    <div class="filters" id="issueFilters" style="display: none;">
-                        <div class="filter-group">
-                            <label for="sortSelect">Sort by:</label>
-                            <select id="sortSelect" class="filter-select">
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="userFilter">Created by:</label>
-                            <div class="user-filter-container">
-                                <input type="text" id="userFilter" class="filter-input" placeholder="Filter by user...">
-                                <button id="clearUserFilter" class="clear-filter-btn" title="Clear user filter">×</button>
+                    <div class="gh-toolbar" id="issueFilters" style="display: none;">
+                        <div class="gh-toolbar-bar">
+                            <div class="gh-toolbar-left">
+                                <div class="gh-dropdown-wrapper">
+                                    <button class="gh-toolbar-btn" id="issueAuthorBtn">Author ▾</button>
+                                    <div class="gh-dropdown" id="issueAuthorDropdown">
+                                        <div class="gh-dropdown-header">Filter by author</div>
+                                        <input type="text" class="gh-dropdown-search" id="issueAuthorSearch" placeholder="Filter users">
+                                        <div class="gh-dropdown-items" id="issueAuthorItems"></div>
+                                    </div>
+                                </div>
+                                <div class="gh-dropdown-wrapper">
+                                    <button class="gh-toolbar-btn" id="issueSortBtn">Sort ▾</button>
+                                    <div class="gh-dropdown" id="issueSortDropdown">
+                                        <div class="gh-dropdown-header">Sort by</div>
+                                        <div class="gh-dropdown-items">
+                                            <button class="gh-dropdown-item active" data-sort="updated-desc">Newest updated</button>
+                                            <button class="gh-dropdown-item" data-sort="updated-asc">Oldest updated</button>
+                                            <button class="gh-dropdown-item" data-sort="created-desc">Newest created</button>
+                                            <button class="gh-dropdown-item" data-sort="created-asc">Oldest created</button>
+                                            <button class="gh-dropdown-item" data-sort="comments-desc">Most commented</button>
+                                            <button class="gh-dropdown-item" data-sort="comments-asc">Least commented</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="userSuggestions" class="user-suggestions"></div>
+                            <div class="gh-toolbar-right">
+                                <input type="text" class="gh-search-input" id="issueKeywordSearch" placeholder="Search issues...">
+                            </div>
                         </div>
-                        <div class="filter-group">
-                            <button id="clearAllFilters" class="clear-all-btn">Clear All Filters</button>
-                        </div>
+                        <div class="gh-active-filters" id="issueActiveFilters"></div>
                     </div>
 
+                    <div class="expanded-card-container" id="issuesExpanded"></div>
                     <div class="content-grid" id="issuesGrid">
                         <!-- Issues content will be inserted here -->
                     </div>
@@ -325,13 +413,16 @@
 
                 <div class="section" id="actionsSection" style="display: none;">
                     <div class="section-header">
-                        <h2>GitHub Actions</h2>
+                        <h2>Daily CI</h2>
                         <div class="header-controls">
-                            <div class="repository-filter">
-                                <select id="actionsRepositorySelect" class="repo-select">
-                                    <option value="" disabled selected>Select a repository...</option>
+                            <label style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+                                Last
+                                <select id="ciDateRange" style="border:1px solid var(--border-color);border-radius:6px;padding:4px 8px;background:var(--input-bg);color:var(--text-primary);font-size:13px;">
+                                    <option value="30">30 days</option>
+                                    <option value="60" selected>60 days</option>
+                                    <option value="90">90 days</option>
                                 </select>
-                            </div>
+                            </label>
                         </div>
                         <div class="data-info">
                             <span id="actionsDataCount">-</span>
@@ -339,9 +430,7 @@
                         </div>
                     </div>
 
-                    <div class="content-grid actions-layout" id="actionsGrid">
-                        <!-- Actions content will be inserted here -->
-                    </div>
+                    <div id="ciRepoResults"></div>
                 </div>
 
                 <div class="section" id="duvetSection" style="display: none;">
@@ -464,6 +553,25 @@
                                     <div class="security-note">
                                         <strong>Security Note:</strong> The token is stored only in your browser's session and will be cleared when you close this tab. It is never sent to any server except GitHub's API.
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appearance Settings Card -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3>Appearance</h3>
+                            </div>
+                            <div class="settings-card-content">
+                                <div class="theme-setting">
+                                    <div class="theme-setting-label">
+                                        <span>Dark Mode</span>
+                                        <span>Use a dark color scheme for the dashboard</span>
+                                    </div>
+                                    <label class="theme-toggle" for="themeToggle">
+                                        <input type="checkbox" id="themeToggle" aria-label="Toggle dark mode">
+                                        <span class="theme-toggle-slider"></span>
+                                    </label>
                                 </div>
                             </div>
                         </div>

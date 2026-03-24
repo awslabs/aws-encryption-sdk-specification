@@ -159,19 +159,41 @@ const REPOSITORIES = [
 ];
 
 const CRYPTO_TOOLS_USERNAMES = [
-    "seebees",
     "texastony", 
     "ShubhamChaturvedi7",
     "mahnushm",
     "lucasmcdonald3",
-    "robin-aws",
     "josecorella",
-    "imabhichow",
     "rishav-karanjit",
     "antonf-amzn",
     "kessplas",
-    "ajewellamz"
+    "sharmabikram"
 ];
+
+// Former team members who should still be considered as team for filtering
+const FORMER_CRYPTO_TOOLS_MEMBERS = [
+    "mattsb42-aws",
+    "lavaleri",
+    "juneb",
+    "david-koenig",
+    "SalusaSecondus",
+    "danielsn",
+    "WesleyRosenblum",
+    "feliperodri",
+    "ttjsu-aws",
+    "dougch",
+    "acioc",
+    "tegansb",
+    "adpaco-aws",
+    "alex-chew",
+    "ajewellamz",
+    "imabhichow",
+    "seebees",
+    "robin-aws",
+];
+
+// Combined list for filtering
+const ALL_CRYPTO_TOOLS_USERNAMES = [...CRYPTO_TOOLS_USERNAMES, ...FORMER_CRYPTO_TOOLS_MEMBERS];
 
 // Your GitHub username
 const GITHUB_USERNAME = 'aws-crypto-tools-ci-bot';

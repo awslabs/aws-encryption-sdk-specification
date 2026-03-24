@@ -7,6 +7,7 @@ class GitHubDashboard {
         this.cache = new Map();
         this.isAuthenticated = false;
         this.rateLimitInfo = null;
+        this.viewMode = { 'issues': 'list', 'pull-requests': 'list' };
         
         // Dashboard data cache
         this.dashboardCache = {
@@ -16,16 +17,19 @@ class GitHubDashboard {
         
         // Issue filtering properties
         this.issueFilters = {
-            sortBy: 'newest', // 'newest' or 'oldest'
-            userFilter: '', // username filter
-            availableUsers: new Set() // unique users from current data
+            keyword: '',
+            author: '@last-reply-external',
+            lastReplyTeam: null,
+            sort: 'updated-desc',
+            availableUsers: new Set()
         };
         
         // Pull request filtering properties
         this.pullRequestFilters = {
-            sortBy: 'newest', // 'newest' or 'oldest'
-            userFilter: '', // username filter
-            availableUsers: new Set() // unique users from current data
+            keyword: '',
+            author: '@external',
+            sort: 'updated-desc',
+            availableUsers: new Set()
         };
         
         this.init();
@@ -36,7 +40,18 @@ class GitHubDashboard {
         this.loadSessionToken();
         this.setupEventListeners();
         this.populateRepositorySelect();
-        this.loadSection(this.currentSection);
+        
+        // If URL has a hash, switch to that section; otherwise load dashboard
+        if (window.location.hash) {
+            const section = window.location.hash.slice(1);
+            if (['dashboard', 'pull-requests', 'issues', 'actions', 'duvet', 'settings'].includes(section)) {
+                this.switchSection(section);
+            } else {
+                this.switchSection('dashboard');
+            }
+        } else {
+            this.switchSection(this.currentSection);
+        }
         
         // Update settings page with current token status
         this.updateSettingsDisplay();
@@ -74,22 +89,18 @@ class GitHubDashboard {
                     this.clearAllIssueFilters();
                     this.clearAllPullRequestFilters();
                     
-                    // Show/hide filters based on section and repository selection
-                    if (this.currentSection === 'issues') {
-                        if (this.currentRepository) {
-                            this.showIssueFilters();
+                    // For issues and PRs, filter cached aggregate client-side
+                    if (this.currentSection === 'issues' || this.currentSection === 'pull-requests') {
+                        const cacheKey = `aggregate-${this.currentSection}`;
+                        if (this.cache.has(cacheKey)) {
+                            this.filterAggregateByRepo(this.currentSection);
                         } else {
-                            this.hideIssueFilters();
+                            this.loadSection(this.currentSection);
                         }
-                    } else if (this.currentSection === 'pull-requests') {
-                        if (this.currentRepository) {
-                            this.showPullRequestFilters();
-                        } else {
-                            this.hidePullRequestFilters();
-                        }
+                    } else {
+                        // Actions still requires full reload per repo
+                        this.loadSection(this.currentSection);
                     }
-                    
-                    this.loadSection(this.currentSection);
                 });
             }
         });
@@ -99,6 +110,22 @@ class GitHubDashboard {
             this.refreshData();
         });
 
+        // Dashboard time range
+        const timeRange = document.getElementById('dashboardTimeRange');
+        if (timeRange) {
+            timeRange.addEventListener('change', () => {
+                if (this.currentSection === 'dashboard') this.loadDashboard();
+            });
+        }
+
+        // CI date range
+        const ciRange = document.getElementById('ciDateRange');
+        if (ciRange) {
+            ciRange.addEventListener('change', () => {
+                if (this.currentSection === 'actions') this.loadDailyCI();
+            });
+        }
+
         // Handle browser back/forward
         window.addEventListener('hashchange', () => {
             const section = window.location.hash.slice(1) || 'dashboard';
@@ -107,17 +134,23 @@ class GitHubDashboard {
             }
         });
 
-        // Load initial hash
-        if (window.location.hash) {
-            const section = window.location.hash.slice(1);
-            if (['dashboard', 'pull-requests', 'issues', 'actions', 'duvet'].includes(section)) {
-                this.currentSection = section;
-            }
-        }
-
         // Filter event listeners
         this.setupIssueFilterListeners();
         this.setupPullRequestFilterListeners();
+
+        // View toggle buttons
+        document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const view = e.currentTarget.dataset.view;
+                const section = e.currentTarget.dataset.section;
+                this.viewMode[section] = view;
+                // Update active state
+                e.currentTarget.closest('.view-toggle').querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                // Re-render with cached data
+                this.filterAggregateByRepo(section);
+            });
+        });
     }
 
     populateRepositorySelect() {
@@ -130,6 +163,19 @@ class GitHubDashboard {
             // Clear existing options except the first one (placeholder)
             while (select.children.length > 1) {
                 select.removeChild(select.lastChild);
+            }
+
+            // For issues and PRs, add "All Repositories" as default selected option
+            if (selectId === 'issuesRepositorySelect' || selectId === 'repositorySelect') {
+                const allOption = document.createElement('option');
+                allOption.value = 'all';
+                allOption.textContent = 'All Repositories';
+                select.appendChild(allOption);
+                // Remove the disabled placeholder and select "All"
+                if (select.children[0] && select.children[0].disabled) {
+                    select.removeChild(select.children[0]);
+                }
+                allOption.selected = true;
             }
 
             // Add repository options
@@ -191,67 +237,37 @@ class GitHubDashboard {
             return;
         }
 
-        // For detailed views, check if repository is selected
-        if (!this.currentRepository) {
-            this.showRepositorySelectionState(section);
-            // Hide filters when no repository is selected
-            if (section === 'issues') {
-                this.hideIssueFilters();
-            } else if (section === 'pull-requests') {
-                this.hidePullRequestFilters();
-            }
+        if (section === 'settings') {
             return;
         }
 
-        // Show filters when repository is selected
-        if (section === 'issues') {
-            this.showIssueFilters();
-            this.showIssuesOverviewSection();
-        } else if (section === 'pull-requests') {
-            this.showPullRequestFilters();
-            this.showPROverviewSection();
+        // Issues and PRs aggregate across all repos by default
+        if (section === 'issues' || section === 'pull-requests') {
+            await this.loadAggregatedSection(section);
+            return;
         }
-        
+
+        // Actions still requires specific loading
+        if (section === 'actions') {
+            await this.loadDailyCI();
+            return;
+        }
+
+        if (!this.currentRepository) {
+            this.showRepositorySelectionState(section);
+            return;
+        }
+
         this.showLoading();
         
         try {
             let data = [];
-            
-            // Load data for specific repository
             const repo = this.config.repositories.find(r => r.id === this.currentRepository);
             if (repo) {
                 data = await this.fetchDataForRepository(section, repo);
             }
 
-            // Apply section-specific filtering and sorting
-            if (section === 'issues') {
-                // Extract users for suggestions
-                this.extractUsersFromIssues(data);
-                
-                // Categorize and render overview before applying filters
-                const categorizedData = this.categorizeIssues(data);
-                this.renderIssueOverview(categorizedData);
-                
-                // Apply filters and custom sorting
-                data = this.filterAndSortIssues(data);
-                
-                // Update filter active state
-                this.updateFilterActiveState();
-            } else if (section === 'pull-requests') {
-                // Extract users for suggestions
-                this.extractUsersFromPullRequests(data);
-                
-                // Categorize and render overview before applying filters
-                const categorizedData = this.categorizePullRequests(data);
-                this.renderPROverview(categorizedData);
-                
-                // Apply filters and custom sorting
-                data = this.filterAndSortPullRequests(data);
-                
-                // Update filter active state
-                this.updatePRFilterActiveState();
-            } else if (section !== 'actions') {
-                // Default sorting for other sections (newest first) - skip actions as it has custom sorting
+            if (section !== 'actions') {
                 data.sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
             }
 
@@ -264,18 +280,411 @@ class GitHubDashboard {
         }
     }
 
-    async loadDashboard() {
+    async loadAggregatedSection(section) {
+        // Show filters and overview sections immediately
+        if (section === 'issues') {
+            this.showIssueFilters();
+        } else if (section === 'pull-requests') {
+            this.showPullRequestFilters();
+        }
+
         this.showLoading();
-        
+
         try {
-            // For shields.io badges, we don't need to fetch data - badges are live
-            this.renderDashboard();
-            
+            // Fetch all repos in parallel, using per-repo cache
+            const allData = await this.fetchAllReposForSection(section);
+
+            // Store the aggregate for client-side filtering
+            const cacheKey = `aggregate-${section}`;
+
+            // Enrich issues with comment data for "last reply from team" filter
+            if (section === 'issues') {
+                const enriched = await this.enrichIssuesWithComments(allData);
+                this.cache.set(cacheKey, { data: enriched, timestamp: Date.now() });
+            } else {
+                this.cache.set(cacheKey, { data: allData, timestamp: Date.now() });
+            }
+
+            // Filter by selected repo if one is chosen
+            let data = this.cache.get(cacheKey).data;
+            if (this.currentRepository && this.currentRepository !== 'all') {
+                data = allData.filter(item => item.repository && item.repository.id === this.currentRepository);
+            }
+
+            // Apply section-specific filtering and sorting
+            if (section === 'issues') {
+                this.extractUsersFromIssues(data);
+                data = this.filterAndSortIssues(data);
+            } else if (section === 'pull-requests') {
+                this.extractUsersFromPullRequests(data);
+                data = this.filterAndSortPullRequests(data);
+            }
+
+            this.renderSectionData(section, data);
+            this.updateSectionDataInfo(section, data.length);
+
         } catch (error) {
-            console.error('Error loading dashboard:', error);
-            this.showError('Failed to load dashboard');
+            console.error('Error loading section:', error);
+            this.showError(`Failed to load ${section.replace('-', ' ')}`);
         }
     }
+
+    async fetchAllReposForSection(section) {
+        const cacheDuration = this.getCacheDuration();
+        const cacheKey = `aggregate-${section}`;
+
+        // Check aggregate cache first
+        if (this.cache.has(cacheKey)) {
+            const cached = this.cache.get(cacheKey);
+            if (Date.now() - cached.timestamp < cacheDuration) {
+                return cached.data;
+            }
+        }
+
+        // Fetch all repos in parallel
+        const promises = this.config.repositories.map(repo =>
+            this.fetchDataForRepository(section, repo).catch(err => {
+                console.error(`Error fetching ${section} for ${repo.name}:`, err);
+                return [];
+            })
+        );
+
+        const results = await Promise.all(promises);
+        return results.flat();
+    }
+
+    async enrichIssuesWithComments(issues) {
+        const teamUsernames = ALL_CRYPTO_TOOLS_USERNAMES.map(u => u.toLowerCase());
+        const enriched = await Promise.all(issues.map(async (issue) => {
+            if (issue.comments === 0) {
+                return { ...issue, lastReplyIsFromTeam: false };
+            }
+            // Check cache first
+            const cacheKey = `comments-${issue.repository?.owner}/${issue.repository?.name}#${issue.number}`;
+            if (this.cache.has(cacheKey)) {
+                return { ...issue, ...this.cache.get(cacheKey).data };
+            }
+            try {
+                const url = `${this.config.apiBase}/repos/${issue.repository.owner}/${issue.repository.name}/issues/${issue.number}/comments?per_page=100`;
+                const response = await this.fetchFromGitHubRaw(url);
+                const comments = response.data || [];
+                let lastReplyIsFromTeam = false;
+                for (let i = comments.length - 1; i >= 0; i--) {
+                    if (comments[i].user) {
+                        lastReplyIsFromTeam = teamUsernames.includes(comments[i].user.login.toLowerCase());
+                        break;
+                    }
+                }
+                this.cache.set(cacheKey, { data: { lastReplyIsFromTeam }, timestamp: Date.now() });
+                return { ...issue, lastReplyIsFromTeam };
+            } catch (err) {
+                console.error(`Error fetching comments for ${issue.number}:`, err);
+                return { ...issue, lastReplyIsFromTeam: false };
+            }
+        }));
+        return enriched;
+    }
+
+    filterAggregateByRepo(section) {
+        // Use cached aggregate data and filter client-side — no new API calls
+        const cacheKey = `aggregate-${section}`;
+        if (!this.cache.has(cacheKey)) return;
+
+        const allData = this.cache.get(cacheKey).data;
+
+        let data = allData;
+        if (this.currentRepository && this.currentRepository !== 'all') {
+            data = allData.filter(item => item.repository && item.repository.id === this.currentRepository);
+        }
+
+        if (section === 'issues') {
+            this.showIssueFilters();
+            this.extractUsersFromIssues(data);
+            data = this.filterAndSortIssues(data);
+        } else if (section === 'pull-requests') {
+            this.showPullRequestFilters();
+            this.extractUsersFromPullRequests(data);
+            data = this.filterAndSortPullRequests(data);
+        }
+
+        this.renderSectionData(section, data);
+        this.updateSectionDataInfo(section, data.length);
+    }
+
+    async loadDashboard() {
+            this.showLoading();
+
+            try {
+                const teamUsernames = ALL_CRYPTO_TOOLS_USERNAMES.map(u => u.toLowerCase());
+                const days = parseInt(document.getElementById('dashboardTimeRange')?.value || '7');
+                const cutoff = new Date(Date.now() - days * 86400000);
+
+                // Fetch issues and PRs for all repos in parallel
+                const [allIssues, allPRs] = await Promise.all([
+                    this.fetchAllReposForSection('issues'),
+                    this.fetchAllReposForSection('pull-requests')
+                ]);
+
+                // Enrich issues with comment data
+                const enrichedIssues = await this.enrichIssuesWithComments(allIssues);
+
+                // Cache aggregates for other pages
+                this.cache.set('aggregate-issues', { data: enrichedIssues, timestamp: Date.now() });
+                this.cache.set('aggregate-pull-requests', { data: allPRs, timestamp: Date.now() });
+
+                // External issues updated in time range
+                const newExternalIssues = enrichedIssues.filter(i => {
+                    const isTeam = teamUsernames.includes(i.user.login.toLowerCase());
+                    return !isTeam && new Date(i.updated_at) >= cutoff;
+                }).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+                // External PRs updated in time range (not dependabot, not team, not draft)
+                const newExternalPRs = allPRs.filter(pr => {
+                    const login = pr.user.login.toLowerCase();
+                    const isDep = login === 'dependabot[bot]' || login === 'dependabot';
+                    const isTeam = teamUsernames.includes(login);
+                    return !isDep && !isTeam && !pr.draft && new Date(pr.updated_at) >= cutoff;
+                }).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+                // Pre-fetch CI runs (caches for Daily CI page) and get failures
+                await this.fetchAllCIRuns(90);
+                const ciFailures = await this.fetchWeeklyCIFailures(days);
+
+                // Update stats
+                document.getElementById('statExternalIssues').textContent = newExternalIssues.length;
+                document.getElementById('statExternalPRs').textContent = newExternalPRs.length;
+                document.getElementById('statFailedCI').textContent = ciFailures.length;
+
+                // Render new external issues
+                const issuesList = document.getElementById('dashNewIssuesList');
+                issuesList.innerHTML = newExternalIssues.map(i => `
+                    <div class="dash-item">
+                        <div class="dash-item-title">
+                            <a href="${i.html_url}" target="_blank">${this.escapeHtml(i.title)}</a>
+                            <div class="dash-item-meta">#${i.number} · ${i.user.login} · updated ${this.formatDate(i.updated_at)} · ${i.comments || 0} comments</div>
+                        </div>
+                        <div class="dash-item-repo">${i.repository?.displayName || ''}</div>
+                    </div>
+                `).join('');
+
+                // Render new external PRs
+                const prsList = document.getElementById('dashNewPRsList');
+                prsList.innerHTML = newExternalPRs.map(pr => `
+                    <div class="dash-item">
+                        <div class="dash-item-title">
+                            <a href="${pr.html_url}" target="_blank">${this.escapeHtml(pr.title)}</a>
+                            <div class="dash-item-meta">#${pr.number} · ${pr.user.login} · updated ${this.formatDate(pr.updated_at)}</div>
+                        </div>
+                        <div class="dash-item-repo">${pr.repository?.displayName || ''}</div>
+                    </div>
+                `).join('');
+
+                // Update CI range label
+                const ciRangeLabel = document.getElementById('dashCIRangeLabel');
+                if (ciRangeLabel) ciRangeLabel.textContent = `last ${days} days`;
+
+                // Render CI failures summary
+                const ciList = document.getElementById('dashFailedCIList');
+                ciList.innerHTML = ciFailures.map(r => `
+                    <div class="dash-item">
+                        <div class="dash-item-title">
+                            <a href="https://github.com/${r.owner}/${r.name}/actions" target="_blank">${r.owner}/${r.name}</a>
+                            <div class="dash-item-meta">${r.failureCount} failure${r.failureCount > 1 ? 's' : ''} / ${r.totalCount} runs this week · last failure ${this.formatDate(r.lastFailureDate)}</div>
+                        </div>
+                        <div class="dash-item-status failure">${r.failureRate}% failing</div>
+                    </div>
+                `).join('');
+
+                document.getElementById('dashboardLastUpdated').textContent = new Date().toLocaleTimeString();
+                this.hideLoading();
+                this.hideError();
+                this.hideEmptyState();
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                this.showError('Failed to load dashboard');
+            }
+        }
+
+        async fetchCIStatus() {
+                const results = [];
+                const promises = this.config.repositories.filter(r => r.badgeWorkflows && r.badgeWorkflows.length > 0).map(async repo => {
+                    try {
+                        const url = `${this.config.apiBase}/repos/${repo.owner}/${repo.name}/actions/runs?per_page=5&status=completed`;
+                        const response = await this.fetchFromGitHubRaw(url);
+                        const runs = response.data?.workflow_runs || [];
+                        const seen = new Set();
+                        for (const run of runs) {
+                            if (!seen.has(run.name)) {
+                                seen.add(run.name);
+                                results.push({
+                                    repoName: repo.displayName,
+                                    workflowName: run.name,
+                                    failed: run.conclusion === 'failure',
+                                    url: run.html_url,
+                                    updatedAt: run.updated_at
+                                });
+                            }
+                        }
+                    } catch (err) {
+                        console.error(`Error fetching CI for ${repo.name}:`, err);
+                    }
+                });
+                await Promise.all(promises);
+                return results;
+            }
+        async fetchAllCIRuns(days = 90) {
+            const cacheKey = `ci-runs-${days}`;
+            const cacheDuration = this.getCacheDuration();
+            if (this.cache.has(cacheKey)) {
+                const cached = this.cache.get(cacheKey);
+                if (Date.now() - cached.timestamp < cacheDuration) return cached.data;
+            }
+
+            const startDate = new Date(Date.now() - days * 86400000);
+            const endDate = new Date();
+            endDate.setUTCDate(endDate.getUTCDate() + 1);
+            const repos = this.config.repositories.filter(r => r.badgeWorkflows && r.badgeWorkflows.length > 0);
+
+            const results = await Promise.all(repos.map(async repo => {
+                const workflowFile = repo.badgeWorkflows[0] + '.yml';
+                try {
+                    let runs = [];
+                    let page = 1;
+                    while (page <= 10) {
+                        const url = `${this.config.apiBase}/repos/${repo.owner}/${repo.name}/actions/workflows/${workflowFile}/runs?per_page=100&page=${page}&event=schedule`;
+                        const response = await this.fetchFromGitHubRaw(url);
+                        const wfRuns = response.data?.workflow_runs || [];
+                        if (!wfRuns.length) break;
+                        const filtered = wfRuns.filter(r => new Date(r.created_at) >= startDate && new Date(r.created_at) < endDate);
+                        runs.push(...filtered);
+                        if (filtered.length < wfRuns.length) break;
+                        page++;
+                    }
+                    return { repo, runs };
+                } catch (err) {
+                    console.error(`Error fetching CI for ${repo.name}:`, err);
+                    return { repo, runs: [] };
+                }
+            }));
+
+            this.cache.set(cacheKey, { data: results, timestamp: Date.now() });
+            return results;
+        }
+        async fetchWeeklyCIFailures(days = 7) {
+                const cutoff = new Date(Date.now() - days * 86400000);
+                // Reuse the shared CI cache — fetch at least as many days as needed
+                const allResults = await this.fetchAllCIRuns(Math.max(days, 60));
+                const results = [];
+
+                for (const { repo, runs } of allResults) {
+                    const weekRuns = runs.filter(r => new Date(r.created_at) >= cutoff);
+                    const failures = weekRuns.filter(r => r.conclusion === 'failure');
+                    if (failures.length > 0) {
+                        const failureRate = ((failures.length / weekRuns.length) * 100).toFixed(0);
+                        results.push({
+                            owner: repo.owner,
+                            name: repo.name,
+                            displayName: repo.displayName,
+                            totalCount: weekRuns.length,
+                            failureCount: failures.length,
+                            failureRate,
+                            lastFailureDate: failures[0].created_at
+                        });
+                    }
+                }
+
+                results.sort((a, b) => b.failureRate - a.failureRate);
+                return results;
+            }
+
+            async loadDailyCI() {
+                    this.showLoading();
+                    const days = parseInt(document.getElementById('ciDateRange')?.value || '60');
+                    const startDate = new Date(Date.now() - days * 86400000);
+                    const endDate = new Date();
+                    endDate.setUTCDate(endDate.getUTCDate() + 1);
+
+                    // Use shared CI run cache
+                    const results = await this.fetchAllCIRuns(days);
+
+                    const repoResults = results.map(({ repo, runs }) => {
+                        // Filter to the requested date range (cache may have wider range)
+                        const filtered = runs.filter(r => new Date(r.created_at) >= startDate && new Date(r.created_at) < endDate);
+                        const success = filtered.filter(r => r.conclusion === 'success').length;
+                        const failure = filtered.filter(r => r.conclusion === 'failure').length;
+                        const completed = filtered.filter(r => r.status !== 'in_progress' && r.status !== 'queued').length;
+                        const total = filtered.length;
+                        const rate = completed ? ((success / completed) * 100).toFixed(1) : 0;
+                        return { repo, runs: filtered, success, failure, total, rate: parseFloat(rate) };
+                    }).sort((a, b) => a.rate - b.rate);
+
+                    const container = document.getElementById('ciRepoResults');
+                    container.innerHTML = repoResults.map(({ repo, runs, success, failure, total, rate }) => {
+                        const dayMap = {};
+                        runs.forEach(run => {
+                            const dateStr = new Date(run.created_at).toISOString().split('T')[0];
+                            if (!dayMap[dateStr]) dayMap[dateStr] = [];
+                            dayMap[dateStr].push(run);
+                        });
+
+                        let timeline = '';
+                        const cur = new Date(startDate);
+                        while (cur < endDate) {
+                            const dateStr = cur.toISOString().split('T')[0];
+                            const dayRuns = dayMap[dateStr] || [];
+                            let cls = 'none', onclick = '', title = `${cur.toLocaleDateString()}: no runs`;
+                            if (dayRuns.length > 0) {
+                                const hasSuccess = dayRuns.some(r => r.conclusion === 'success');
+                                const hasFailure = dayRuns.some(r => r.conclusion && r.conclusion !== 'success');
+                                const allInProgress = dayRuns.every(r => r.status === 'in_progress' || r.status === 'queued');
+                                if (allInProgress) cls = 'in-progress';
+                                else if (hasSuccess && !hasFailure) cls = 'success';
+                                else if (hasFailure) cls = 'failure';
+                                else cls = 'in-progress';
+                                onclick = `onclick="window.open('${dayRuns[0].html_url}','_blank')"`;
+                                title = `${cur.toLocaleDateString()}: ${dayRuns.length} run(s) - ${cls}`;
+                            }
+                            timeline += `<div class="ci-day ${cls}" title="${title}" ${onclick}></div>`;
+                            cur.setUTCDate(cur.getUTCDate() + 1);
+                        }
+
+                        const repoId = `${repo.owner}-${repo.name}`.replace(/[^a-zA-Z0-9-]/g, '');
+                        const rateClass = rate >= 90 ? 'good' : 'bad';
+                        const runsTable = runs.slice(0, 30).map(run => {
+                            const isRunning = run.status === 'in_progress' || run.status === 'queued';
+                            const conclusion = isRunning ? 'in progress' : (run.conclusion || 'failed');
+                            const cls = run.conclusion === 'success' ? 'ci-run-success' : isRunning ? 'ci-run-in-progress' : 'ci-run-failure';
+                            return `<tr><td>${new Date(run.created_at).toLocaleString()}</td><td class="${cls}">${conclusion}</td><td><a href="${run.html_url}" target="_blank">View</a></td></tr>`;
+                        }).join('');
+
+                        return `<div class="ci-repo-section" id="ci-${repoId}">
+                            <div class="ci-repo-header" onclick="document.getElementById('ci-${repoId}').classList.toggle('expanded')">
+                                <div class="ci-repo-info">
+                                    <span class="ci-repo-name">${repo.owner}/${repo.name}</span>
+                                    <span class="ci-repo-rate ${rateClass}">(${rate}%)</span>
+                                </div>
+                                <div class="ci-timeline">${timeline}</div>
+                                <span class="ci-repo-toggle">▼</span>
+                            </div>
+                            <div class="ci-repo-details">
+                                <div class="ci-metrics-row">
+                                    <div class="ci-metric-card"><div class="ci-metric-card-label">Total Runs</div><div class="ci-metric-card-value">${total}</div></div>
+                                    <div class="ci-metric-card"><div class="ci-metric-card-label">Success Rate</div><div class="ci-metric-card-value ${rateClass === 'good' ? 'ci-success' : 'ci-failure'}">${rate}%</div></div>
+                                    <div class="ci-metric-card"><div class="ci-metric-card-label">Successes</div><div class="ci-metric-card-value ci-success">${success}</div></div>
+                                    <div class="ci-metric-card"><div class="ci-metric-card-label">Failures</div><div class="ci-metric-card-value ci-failure">${failure}</div></div>
+                                </div>
+                                <table class="ci-runs-table"><thead><tr><th>Date</th><th>Conclusion</th><th>Link</th></tr></thead><tbody>${runsTable}</tbody></table>
+                            </div>
+                        </div>`;
+                    }).join('');
+
+                    document.getElementById('actionsDataCount').textContent = `${results.length} repos`;
+                    document.getElementById('actionsLastUpdated').textContent = new Date().toLocaleTimeString();
+                    this.hideLoading();
+                    this.hideError();
+                    this.hideEmptyState();
+                }
 
     async fetchMergedPRsLastWeek(repository) {
         // Calculate date for one week ago
@@ -833,12 +1242,58 @@ class GitHubDashboard {
         return card;
     }
 
+    createListItem(section, item) {
+        const el = document.createElement('div');
+        el.className = 'card';
+
+        const labels = (item.labels || []).map(label =>
+            `<span class="gh-label" style="background-color: #${label.color}30; color: #${label.color}; border: 1px solid #${label.color}50;">${label.name}</span>`
+        ).join('');
+
+        const repoName = item.repository?.displayName || '';
+        const body = item.body ? (typeof marked !== 'undefined' ? marked.parse(item.body) : this.escapeHtml(item.body)) : '<em>No description</em>';
+        const commentCount = item.comments || 0;
+        const isDraft = section === 'pull-requests' && item.draft;
+
+        let line2 = '';
+        if (section === 'pull-requests') {
+            const suffix = isDraft ? ' · Draft' : ' · Review required';
+            line2 = `#${item.number} opened ${this.formatDate(item.created_at)} by ${item.user.login}${suffix}`;
+        } else {
+            line2 = `#${item.number} · ${item.user.login} opened on ${this.formatDateFull(item.created_at)} · Updated on ${this.formatDateFull(item.updated_at)}`;
+        }
+
+        el.innerHTML = `
+            <div class="list-item-toggle">
+                <div class="gh-list-line1">
+                    <div class="gh-list-title-area">
+                        <a href="${item.html_url}" target="_blank" onclick="event.stopPropagation()" class="gh-list-title">${this.escapeHtml(item.title)}</a>
+                        ${labels}
+                    </div>
+                    ${commentCount > 0 ? `<span class="gh-list-comments">💬 ${commentCount}</span>` : ''}
+                    <span class="card-expand-icon">▶</span>
+                </div>
+                <div class="gh-list-line2">
+                    ${line2}
+                    <span class="gh-list-repo">${this.escapeHtml(repoName)}</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="card-body-content markdown-body">${body}</div>
+                <a href="${item.html_url}" target="_blank" class="card-body-link">View on GitHub →</a>
+            </div>
+        `;
+
+        return el;
+    }
+
     createPullRequestCard(pr) {
         const statusClass = pr.draft ? 'status-draft' : 'status-open';
         const statusText = pr.draft ? 'Draft' : 'Open';
+        const body = pr.body ? (typeof marked !== 'undefined' ? marked.parse(pr.body) : this.escapeHtml(pr.body)) : '<em>No description</em>';
         
         return `
-            <div class="card-header">
+            <div class="card-header card-toggle">
                 <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="18" cy="18" r="3"/>
                     <circle cx="6" cy="6" r="3"/>
@@ -848,31 +1303,34 @@ class GitHubDashboard {
                 </svg>
                 <div class="card-content">
                     <h3 class="card-title">
-                        <a href="${pr.html_url}" target="_blank">${this.escapeHtml(pr.title)}</a>
+                        <a href="${pr.html_url}" target="_blank" onclick="event.stopPropagation()">${this.escapeHtml(pr.title)}</a>
                     </h3>
                     <div class="card-meta">
                         #${pr.number} by ${pr.user.login} • ${this.formatDate(pr.created_at)} • ${pr.repository.displayName}
                     </div>
                 </div>
+                <span class="card-expand-icon">▶</span>
             </div>
-            ${pr.body ? `<div class="card-description">${this.escapeHtml(pr.body)}</div>` : ''}
+            <div class="card-body">
+                <div class="card-body-content markdown-body">${body}</div>
+                <a href="${pr.html_url}" target="_blank" class="card-body-link">View on GitHub →</a>
+            </div>
             <div class="card-footer">
                 <div class="card-labels">
                     <span class="label ${statusClass}">${statusText}</span>
-                    ${pr.mergeable_state ? `<span class="label">Mergeable: ${pr.mergeable_state}</span>` : ''}
-                </div>
-                <div>
-                    <span style="font-size: 12px; color: #64748b;">
-                        +${pr.additions || 0} -${pr.deletions || 0}
-                    </span>
+                    ${pr.labels ? pr.labels.map(label => 
+                        `<span class="label" style="background-color: #${label.color}20; color: #${label.color};">${label.name}</span>`
+                    ).join('') : ''}
                 </div>
             </div>
         `;
     }
 
     createIssueCard(issue) {
+        const body = issue.body ? (typeof marked !== 'undefined' ? marked.parse(issue.body) : this.escapeHtml(issue.body)) : '<em>No description</em>';
+        
         return `
-            <div class="card-header">
+            <div class="card-header card-toggle">
                 <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M12 6v6"/>
@@ -880,14 +1338,18 @@ class GitHubDashboard {
                 </svg>
                 <div class="card-content">
                     <h3 class="card-title">
-                        <a href="${issue.html_url}" target="_blank">${this.escapeHtml(issue.title)}</a>
+                        <a href="${issue.html_url}" target="_blank" onclick="event.stopPropagation()">${this.escapeHtml(issue.title)}</a>
                     </h3>
                     <div class="card-meta">
                         #${issue.number} by ${issue.user.login} • ${this.formatDate(issue.created_at)} • ${issue.repository.displayName}
                     </div>
                 </div>
+                <span class="card-expand-icon">▶</span>
             </div>
-            ${issue.body ? `<div class="card-description">${this.escapeHtml(issue.body)}</div>` : ''}
+            <div class="card-body">
+                <div class="card-body-content markdown-body">${body}</div>
+                <a href="${issue.html_url}" target="_blank" class="card-body-link">View on GitHub →</a>
+            </div>
             <div class="card-footer">
                 <div class="card-labels">
                     <span class="label status-open">Open</span>
@@ -895,7 +1357,7 @@ class GitHubDashboard {
                         `<span class="label" style="background-color: #${label.color}20; color: #${label.color};">${label.name}</span>`
                     ).join('')}
                 </div>
-                ${issue.assignee ? `<div style="font-size: 12px; color: #64748b;">Assigned to ${issue.assignee.login}</div>` : ''}
+                ${issue.assignee ? `<div style="font-size: 12px; color: var(--text-muted);">Assigned to ${issue.assignee.login}</div>` : ''}
             </div>
         `;
     }
@@ -1267,20 +1729,36 @@ class GitHubDashboard {
         const container = document.getElementById(gridId);
         
         if (!container) return;
+
+        // Always clear the grid and expanded container first
+        container.innerHTML = '';
+        const expandIds = { 'pullRequestsGrid': 'pullRequestsExpanded', 'issuesGrid': 'issuesExpanded' };
+        const expandContainer = document.getElementById(expandIds[gridId]);
+        if (expandContainer) {
+            expandContainer.innerHTML = '';
+            expandContainer.classList.remove('active');
+        }
         
         if (data.length === 0) {
             this.showEmptyState(section);
             return;
         }
-
-        container.innerHTML = '';
         
-        // Apply actions-layout class for GitHub Actions to use row-based layout
+        const viewMode = this.viewMode[section] || 'card';
+        
         if (section === 'actions') {
             container.classList.add('actions-layout');
+            container.classList.remove('list-view');
             this.renderActionsWithSections(container, data);
-        } else {
+        } else if (viewMode === 'list') {
             container.classList.remove('actions-layout');
+            container.classList.add('list-view');
+            data.forEach(item => {
+                const row = this.createListItem(section, item);
+                container.appendChild(row);
+            });
+        } else {
+            container.classList.remove('actions-layout', 'list-view');
             data.forEach(item => {
                 const card = this.createCard(section, item);
                 container.appendChild(card);
@@ -1290,6 +1768,90 @@ class GitHubDashboard {
         this.hideLoading();
         this.hideError();
         this.hideEmptyState();
+        
+        // Add click-to-expand handlers — whole card is clickable
+        container.querySelectorAll('.card').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a') || e.target.closest('.card-body')) return;
+                const icon = card.querySelector('.card-expand-icon');
+                const wasOpen = card.classList.contains('expanded');
+
+                if (container.classList.contains('list-view')) {
+                    if (icon) icon.textContent = wasOpen ? '▶' : '▼';
+                    card.classList.toggle('expanded', !wasOpen);
+                } else {
+                    // Card view: pull card out into expanded container above grid
+                    const expandedContainers = { 'pullRequestsGrid': 'pullRequestsExpanded', 'issuesGrid': 'issuesExpanded' };
+                    const expandContainer = document.getElementById(expandedContainers[container.id]);
+                    
+                    if (wasOpen) {
+                        // Collapse: move card back into grid at its original position
+                        card.classList.remove('expanded', 'expanding');
+                        card.style.width = '';
+                        card.style.marginLeft = '';
+                        if (icon) icon.textContent = '▶';
+                        const placeholder = container.querySelector(`[data-placeholder="${card.dataset.expandId}"]`);
+                        if (placeholder) {
+                            container.insertBefore(card, placeholder);
+                            placeholder.remove();
+                        } else {
+                            container.appendChild(card);
+                        }
+                        if (expandContainer) expandContainer.classList.remove('active');
+                    } else {
+                        // Collapse any previously expanded
+                        if (expandContainer && expandContainer.classList.contains('active')) {
+                            const prev = expandContainer.querySelector('.card');
+                            if (prev) {
+                                prev.classList.remove('expanded', 'expanding');
+                                prev.style.width = '';
+                                prev.style.marginLeft = '';
+                                const pi = prev.querySelector('.card-expand-icon');
+                                if (pi) pi.textContent = '▶';
+                                const ph = container.querySelector(`[data-placeholder="${prev.dataset.expandId}"]`);
+                                if (ph) {
+                                    container.insertBefore(prev, ph);
+                                    ph.remove();
+                                } else {
+                                    container.appendChild(prev);
+                                }
+                            }
+                            expandContainer.classList.remove('active');
+                        }
+                        
+                        // Mark position with placeholder, move card to expand container
+                        const id = 'exp-' + Date.now();
+                        card.dataset.expandId = id;
+                        const placeholder = document.createElement('div');
+                        placeholder.dataset.placeholder = id;
+                        placeholder.style.display = 'none';
+                        container.insertBefore(placeholder, card);
+                        
+                        // Capture original width and position before moving
+                        const originalWidth = card.offsetWidth + 'px';
+                        const cardRect = card.getBoundingClientRect();
+                        const containerRect = container.getBoundingClientRect();
+                        const originalLeft = (cardRect.left - containerRect.left) + 'px';
+                        
+                        if (expandContainer) {
+                            expandContainer.innerHTML = '';
+                            expandContainer.appendChild(card);
+                            // Set starting width and position to match grid card
+                            card.style.width = originalWidth;
+                            card.style.marginLeft = originalLeft;
+                            // Force reflow then animate to full width from left edge
+                            expandContainer.offsetHeight;
+                            expandContainer.classList.add('active');
+                            card.classList.add('expanded');
+                            card.style.width = '100%';
+                            card.style.marginLeft = '0px';
+                        }
+                        if (icon) icon.textContent = '▼';
+                    }
+                }
+            });
+        });
     }
 
     updateSectionDataInfo(section, count) {
@@ -1342,6 +1904,12 @@ class GitHubDashboard {
         return date.toLocaleDateString();
     }
 
+    formatDateFull(dateString) {
+        const date = new Date(dateString);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    }
+
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
@@ -1354,90 +1922,13 @@ class GitHubDashboard {
 
     // Issue filtering methods
     setupIssueFilterListeners() {
-        const sortSelect = document.getElementById('sortSelect');
-        const userFilter = document.getElementById('userFilter');
-        const clearUserFilter = document.getElementById('clearUserFilter');
-        const clearAllFilters = document.getElementById('clearAllFilters');
-        const userSuggestions = document.getElementById('userSuggestions');
-
-        // Sort dropdown
-        if (sortSelect) {
-            sortSelect.addEventListener('change', (e) => {
-                this.issueFilters.sortBy = e.target.value;
-                if (this.currentSection === 'issues') {
-                    this.applyIssueFilters();
-                }
-                this.updateFilterActiveState();
-            });
+            this.setupGhToolbar('issue', this.issueFilters, () => this.applyIssueFilters());
         }
-
-        // User filter input
-        if (userFilter) {
-            let debounceTimeout;
-            
-            userFilter.addEventListener('input', (e) => {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(() => {
-                    this.issueFilters.userFilter = e.target.value.trim();
-                    if (this.currentSection === 'issues') {
-                        this.applyIssueFilters();
-                        this.showUserSuggestions(e.target.value.trim());
-                    }
-                    this.updateFilterActiveState();
-                }, 300);
-            });
-
-            userFilter.addEventListener('focus', () => {
-                if (this.currentSection === 'issues') {
-                    this.showUserSuggestions(userFilter.value.trim());
-                }
-            });
-
-            userFilter.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    this.hideUserSuggestions();
-                } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    this.navigateUserSuggestions(e.key === 'ArrowDown' ? 1 : -1);
-                } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.selectHighlightedSuggestion();
-                }
-            });
-        }
-
-        // Clear user filter button
-        if (clearUserFilter) {
-            clearUserFilter.addEventListener('click', () => {
-                userFilter.value = '';
-                this.issueFilters.userFilter = '';
-                if (this.currentSection === 'issues') {
-                    this.applyIssueFilters();
-                }
-                this.hideUserSuggestions();
-                this.updateFilterActiveState();
-            });
-        }
-
-        // Clear all filters button
-        if (clearAllFilters) {
-            clearAllFilters.addEventListener('click', () => {
-                this.clearAllIssueFilters();
-            });
-        }
-
-        // Click outside to hide suggestions
-        document.addEventListener('click', (e) => {
-            if (!userFilter?.contains(e.target) && !userSuggestions?.contains(e.target)) {
-                this.hideUserSuggestions();
-            }
-        });
-    }
 
     showIssueFilters() {
         const filtersPanel = document.getElementById('issueFilters');
         if (filtersPanel) {
-            filtersPanel.style.display = 'flex';
+            filtersPanel.style.display = 'block';
         }
     }
 
@@ -1446,13 +1937,15 @@ class GitHubDashboard {
         if (filtersPanel) {
             filtersPanel.style.display = 'none';
         }
-        this.hideUserSuggestions();
     }
+
+
+
 
     showPullRequestFilters() {
         const filtersPanel = document.getElementById('pullRequestFilters');
         if (filtersPanel) {
-            filtersPanel.style.display = 'flex';
+            filtersPanel.style.display = 'block';
         }
     }
 
@@ -1461,34 +1954,42 @@ class GitHubDashboard {
         if (filtersPanel) {
             filtersPanel.style.display = 'none';
         }
-        this.hidePRUserSuggestions();
     }
 
     applyIssueFilters() {
-        // Get current issue data from cache or re-render
-        this.loadSection('issues');
+        this.filterAggregateByRepo('issues');
     }
 
     filterAndSortIssues(issues) {
-        let filteredIssues = [...issues];
+            let filtered = [...issues];
+            const f = this.issueFilters;
+            const teamUsernames = ALL_CRYPTO_TOOLS_USERNAMES.map(u => u.toLowerCase());
 
-        // Apply user filter
-        if (this.issueFilters.userFilter) {
-            const userQuery = this.issueFilters.userFilter.toLowerCase();
-            filteredIssues = filteredIssues.filter(issue => 
-                issue.user.login.toLowerCase().includes(userQuery)
-            );
+            if (f.keyword) {
+                const keywords = f.keyword.split(',').map(k => k.trim().toLowerCase()).filter(Boolean);
+                filtered = filtered.filter(issue => {
+                    const text = `${issue.title || ''} ${issue.body || ''}`.toLowerCase();
+                    return keywords.every(kw => text.includes(kw));
+                });
+            }
+
+            if (f.author) {
+                if (f.author === '@team') {
+                    filtered = filtered.filter(i => teamUsernames.includes(i.user.login.toLowerCase()));
+                } else if (f.author === '@external') {
+                    filtered = filtered.filter(i => !teamUsernames.includes(i.user.login.toLowerCase()));
+                } else if (f.author === '@last-reply-team') {
+                    filtered = filtered.filter(i => !!i.lastReplyIsFromTeam);
+                } else if (f.author === '@last-reply-external') {
+                    filtered = filtered.filter(i => !i.lastReplyIsFromTeam);
+                } else {
+                    filtered = filtered.filter(i => i.user.login.toLowerCase() === f.author.toLowerCase());
+                }
+            }
+
+            filtered = this.applySorting(filtered, f.sort);
+            return filtered;
         }
-
-        // Apply sorting
-        if (this.issueFilters.sortBy === 'newest') {
-            filteredIssues.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        } else if (this.issueFilters.sortBy === 'oldest') {
-            filteredIssues.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        }
-
-        return filteredIssues;
-    }
 
     extractUsersFromIssues(issues) {
         const users = new Set();
@@ -1500,156 +2001,69 @@ class GitHubDashboard {
         this.issueFilters.availableUsers = users;
     }
 
-    showUserSuggestions(query) {
-        const userSuggestions = document.getElementById('userSuggestions');
-        if (!userSuggestions || !this.issueFilters.availableUsers.size) return;
-
-        const matchingUsers = Array.from(this.issueFilters.availableUsers)
-            .filter(user => !query || user.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 8); // Limit to 8 suggestions
-
-        if (matchingUsers.length === 0 || (query && matchingUsers.length === 1 && matchingUsers[0].toLowerCase() === query.toLowerCase())) {
-            this.hideUserSuggestions();
-            return;
-        }
-
-        userSuggestions.innerHTML = matchingUsers.map((user, index) => `
-            <div class="user-suggestion" data-user="${this.escapeHtml(user)}" data-index="${index}">
-                <div class="user-avatar" style="background-image: url('https://github.com/${user}.png?size=40')"></div>
-                <span>${this.escapeHtml(user)}</span>
-            </div>
-        `).join('');
-
-        // Add click handlers
-        userSuggestions.querySelectorAll('.user-suggestion').forEach(suggestion => {
-            suggestion.addEventListener('click', () => {
-                this.selectUserSuggestion(suggestion.dataset.user);
-            });
-        });
-
-        userSuggestions.classList.add('show');
-    }
-
-    hideUserSuggestions() {
-        const userSuggestions = document.getElementById('userSuggestions');
-        if (userSuggestions) {
-            userSuggestions.classList.remove('show');
+    applySorting(items, sort) {
+        switch (sort) {
+            case 'updated-desc': return items.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+            case 'updated-asc': return items.sort((a, b) => new Date(a.updated_at) - new Date(b.updated_at));
+            case 'created-desc': return items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            case 'created-asc': return items.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            case 'comments-desc': return items.sort((a, b) => (b.comments || 0) - (a.comments || 0));
+            case 'comments-asc': return items.sort((a, b) => (a.comments || 0) - (b.comments || 0));
+            default: return items.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
         }
     }
 
-    navigateUserSuggestions(direction) {
-        const userSuggestions = document.getElementById('userSuggestions');
-        if (!userSuggestions || !userSuggestions.classList.contains('show')) return;
 
-        const suggestions = userSuggestions.querySelectorAll('.user-suggestion');
-        const currentHighlighted = userSuggestions.querySelector('.highlighted');
-        let newIndex = 0;
 
-        if (currentHighlighted) {
-            const currentIndex = parseInt(currentHighlighted.dataset.index);
-            newIndex = currentIndex + direction;
-        } else {
-            newIndex = direction > 0 ? 0 : suggestions.length - 1;
-        }
 
-        // Wrap around
-        if (newIndex < 0) newIndex = suggestions.length - 1;
-        if (newIndex >= suggestions.length) newIndex = 0;
 
-        // Update highlighting
-        suggestions.forEach(s => s.classList.remove('highlighted'));
-        if (suggestions[newIndex]) {
-            suggestions[newIndex].classList.add('highlighted');
-        }
-    }
-
-    selectHighlightedSuggestion() {
-        const highlighted = document.querySelector('.user-suggestion.highlighted');
-        if (highlighted) {
-            this.selectUserSuggestion(highlighted.dataset.user);
-        }
-    }
-
-    selectUserSuggestion(username) {
-        const userFilter = document.getElementById('userFilter');
-        if (userFilter) {
-            userFilter.value = username;
-            this.issueFilters.userFilter = username;
-            if (this.currentSection === 'issues') {
-                this.applyIssueFilters();
-            }
-            this.hideUserSuggestions();
-            this.updateFilterActiveState();
-        }
-    }
 
     clearAllIssueFilters() {
-        const sortSelect = document.getElementById('sortSelect');
-        const userFilter = document.getElementById('userFilter');
-
-        // Reset to defaults
-        this.issueFilters.sortBy = 'newest';
-        this.issueFilters.userFilter = '';
-
-        // Update UI
-        if (sortSelect) sortSelect.value = 'newest';
-        if (userFilter) userFilter.value = '';
-
-        // Apply filters
-        if (this.currentSection === 'issues') {
+            this.issueFilters.keyword = '';
+            this.issueFilters.author = '@last-reply-external';
+            this.issueFilters.sort = 'updated-desc';
+            const input = document.getElementById('issueKeywordSearch');
+            if (input) input.value = '';
+            this.renderActiveFilters('issue', this.issueFilters, () => this.applyIssueFilters());
             this.applyIssueFilters();
         }
 
-        this.hideUserSuggestions();
-        this.updateFilterActiveState();
-    }
-
-    updateFilterActiveState() {
-        const sortSelect = document.getElementById('sortSelect');
-        const userFilter = document.getElementById('userFilter');
-        const sortGroup = sortSelect?.closest('.filter-group');
-        const userGroup = userFilter?.closest('.filter-group');
-
-        // Update sort filter active state
-        if (sortGroup) {
-            if (this.issueFilters.sortBy !== 'newest') {
-                sortGroup.classList.add('filter-active');
-            } else {
-                sortGroup.classList.remove('filter-active');
-            }
-        }
-
-        // Update user filter active state
-        if (userGroup) {
-            if (this.issueFilters.userFilter) {
-                userGroup.classList.add('filter-active');
-            } else {
-                userGroup.classList.remove('filter-active');
-            }
-        }
-    }
 
     // Pull request filtering methods
     filterAndSortPullRequests(prs) {
-        let filteredPRs = [...prs];
+            let filtered = [...prs];
+            const f = this.pullRequestFilters;
+            const teamUsernames = ALL_CRYPTO_TOOLS_USERNAMES.map(u => u.toLowerCase());
 
-        // Apply user filter
-        if (this.pullRequestFilters.userFilter) {
-            const userQuery = this.pullRequestFilters.userFilter.toLowerCase();
-            filteredPRs = filteredPRs.filter(pr => 
-                pr.user.login.toLowerCase().includes(userQuery)
-            );
+            if (f.keyword) {
+                const keywords = f.keyword.split(',').map(k => k.trim().toLowerCase()).filter(Boolean);
+                filtered = filtered.filter(pr => {
+                    const text = `${pr.title || ''} ${pr.body || ''}`.toLowerCase();
+                    return keywords.every(kw => text.includes(kw));
+                });
+            }
+
+            if (f.author) {
+                if (f.author === '@team') {
+                    filtered = filtered.filter(pr => teamUsernames.includes(pr.user.login.toLowerCase()));
+                } else if (f.author === '@external') {
+                    filtered = filtered.filter(pr => {
+                        const login = pr.user.login.toLowerCase();
+                        return !teamUsernames.includes(login) && login !== 'dependabot[bot]' && login !== 'dependabot';
+                    });
+                } else if (f.author === '@dependabot') {
+                    filtered = filtered.filter(pr => {
+                        const login = pr.user.login.toLowerCase();
+                        return login === 'dependabot[bot]' || login === 'dependabot';
+                    });
+                } else {
+                    filtered = filtered.filter(pr => pr.user.login.toLowerCase() === f.author.toLowerCase());
+                }
+            }
+
+            filtered = this.applySorting(filtered, f.sort);
+            return filtered;
         }
-
-        // Apply sorting
-        if (this.pullRequestFilters.sortBy === 'newest') {
-            filteredPRs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        } else if (this.pullRequestFilters.sortBy === 'oldest') {
-            filteredPRs.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        }
-
-        return filteredPRs;
-    }
 
     extractUsersFromPullRequests(prs) {
         const users = new Set();
@@ -1661,236 +2075,200 @@ class GitHubDashboard {
         this.pullRequestFilters.availableUsers = users;
     }
 
-    updatePRFilterActiveState() {
-        const prSortSelect = document.getElementById('prSortSelect');
-        const prUserFilter = document.getElementById('prUserFilter');
-        const prSortGroup = prSortSelect?.closest('.filter-group');
-        const prUserGroup = prUserFilter?.closest('.filter-group');
-
-        // Update sort filter active state
-        if (prSortGroup) {
-            if (this.pullRequestFilters.sortBy !== 'newest') {
-                prSortGroup.classList.add('filter-active');
-            } else {
-                prSortGroup.classList.remove('filter-active');
-            }
-        }
-
-        // Update user filter active state
-        if (prUserGroup) {
-            if (this.pullRequestFilters.userFilter) {
-                prUserGroup.classList.add('filter-active');
-            } else {
-                prUserGroup.classList.remove('filter-active');
-            }
-        }
-    }
 
     // Pull request filtering methods
     setupPullRequestFilterListeners() {
-        const prSortSelect = document.getElementById('prSortSelect');
-        const prUserFilter = document.getElementById('prUserFilter');
-        const prClearUserFilter = document.getElementById('prClearUserFilter');
-        const prClearAllFilters = document.getElementById('prClearAllFilters');
-        const prUserSuggestions = document.getElementById('prUserSuggestions');
+        this.setupGhToolbar('pr', this.pullRequestFilters, () => this.applyPullRequestFilters());
+    }
 
-        // Sort dropdown
-        if (prSortSelect) {
-            prSortSelect.addEventListener('change', (e) => {
-                this.pullRequestFilters.sortBy = e.target.value;
-                if (this.currentSection === 'pull-requests') {
-                    this.applyPullRequestFilters();
+    setupGhToolbar(prefix, filters, apply) {
+        const authorBtn = document.getElementById(`${prefix}AuthorBtn`);
+        const authorDropdown = document.getElementById(`${prefix}AuthorDropdown`);
+        const authorSearch = document.getElementById(`${prefix}AuthorSearch`);
+        const sortBtn = document.getElementById(`${prefix}SortBtn`);
+        const sortDropdown = document.getElementById(`${prefix}SortDropdown`);
+        const keywordInput = document.getElementById(prefix === 'issue' ? 'issueKeywordSearch' : 'prKeywordSearch');
+
+        if (authorBtn) {
+            authorBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sortDropdown?.classList.remove('open');
+                authorDropdown.classList.toggle('open');
+                if (authorDropdown.classList.contains('open')) {
+                    this.populateAuthorDropdown(prefix, filters);
+                    authorSearch?.focus();
                 }
-                this.updatePRFilterActiveState();
+            });
+        }
+        if (sortBtn) {
+            sortBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                authorDropdown?.classList.remove('open');
+                sortDropdown.classList.toggle('open');
             });
         }
 
-        // User filter input
-        if (prUserFilter) {
-            let debounceTimeout;
-            
-            prUserFilter.addEventListener('input', (e) => {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(() => {
-                    this.pullRequestFilters.userFilter = e.target.value.trim();
-                    if (this.currentSection === 'pull-requests') {
-                        this.applyPullRequestFilters();
-                        this.showPRUserSuggestions(e.target.value.trim());
-                    }
-                    this.updatePRFilterActiveState();
+        document.addEventListener('click', (e) => {
+            if (!authorDropdown?.contains(e.target) && e.target !== authorBtn) authorDropdown?.classList.remove('open');
+            if (!sortDropdown?.contains(e.target) && e.target !== sortBtn) sortDropdown?.classList.remove('open');
+        });
+
+        sortDropdown?.querySelectorAll('.gh-dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                sortDropdown.querySelectorAll('.gh-dropdown-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                filters.sort = item.dataset.sort;
+                sortDropdown.classList.remove('open');
+                apply();
+            });
+        });
+
+        if (authorSearch) {
+            authorSearch.addEventListener('input', () => {
+                this.populateAuthorDropdown(prefix, filters, authorSearch.value);
+            });
+        }
+
+        if (keywordInput) {
+            let t;
+            keywordInput.addEventListener('input', (e) => {
+                clearTimeout(t);
+                t = setTimeout(() => {
+                    filters.keyword = e.target.value.trim();
+                    this.renderActiveFilters(prefix, filters, apply);
+                    apply();
                 }, 300);
             });
-
-            prUserFilter.addEventListener('focus', () => {
-                if (this.currentSection === 'pull-requests') {
-                    this.showPRUserSuggestions(prUserFilter.value.trim());
-                }
-            });
-
-            prUserFilter.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    this.hidePRUserSuggestions();
-                } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    this.navigatePRUserSuggestions(e.key === 'ArrowDown' ? 1 : -1);
-                } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.selectHighlightedPRSuggestion();
-                }
-            });
         }
 
-        // Clear user filter button
-        if (prClearUserFilter) {
-            prClearUserFilter.addEventListener('click', () => {
-                prUserFilter.value = '';
-                this.pullRequestFilters.userFilter = '';
-                if (this.currentSection === 'pull-requests') {
-                    this.applyPullRequestFilters();
-                }
-                this.hidePRUserSuggestions();
-                this.updatePRFilterActiveState();
-            });
+        // Render initial active filter tags
+        this.renderActiveFilters(prefix, filters, apply);
+    }
+
+    populateAuthorDropdown(prefix, filters, searchQuery) {
+        const container = document.getElementById(`${prefix}AuthorItems`);
+        if (!container) return;
+        const q = (searchQuery || '').toLowerCase();
+        const apply = prefix === 'issue' ? () => this.applyIssueFilters() : () => this.applyPullRequestFilters();
+
+        const shorthands = [
+            { value: '@team', label: 'Crypto Tools team', badge: 'team' },
+            { value: '@external', label: 'External contributors', badge: 'external' },
+        ];
+        if (prefix === 'pr') {
+            shorthands.push({ value: '@dependabot', label: 'Dependabot', badge: 'bot' });
+        }
+        if (prefix === 'issue') {
+            shorthands.push({ value: '@last-reply-team', label: 'Last reply from team', badge: 'filter' });
+            shorthands.push({ value: '@last-reply-external', label: 'Last reply not from team', badge: 'filter' });
         }
 
-        // Clear all filters button
-        if (prClearAllFilters) {
-            prClearAllFilters.addEventListener('click', () => {
-                this.clearAllPullRequestFilters();
-            });
-        }
+        const filteredShorthands = shorthands.filter(s => !q || s.label.toLowerCase().includes(q) || s.value.includes(q));
 
-        // Click outside to hide suggestions
-        document.addEventListener('click', (e) => {
-            if (!prUserFilter?.contains(e.target) && !prUserSuggestions?.contains(e.target)) {
-                this.hidePRUserSuggestions();
-            }
+        container.innerHTML = '';
+
+        filteredShorthands.forEach(s => {
+            const btn = document.createElement('button');
+            btn.className = 'gh-dropdown-item' + (filters.author === s.value ? ' active' : '');
+            btn.innerHTML = `${s.label} <span class="gh-author-badge">${s.badge}</span>`;
+            btn.addEventListener('click', () => {
+                filters.author = filters.author === s.value ? null : s.value;
+                document.getElementById(`${prefix}AuthorDropdown`)?.classList.remove('open');
+                this.renderActiveFilters(prefix, filters, apply);
+                apply();
+            });
+            container.appendChild(btn);
         });
-    }
 
-    showPullRequestFilters() {
-        const filtersPanel = document.getElementById('pullRequestFilters');
-        if (filtersPanel) {
-            filtersPanel.style.display = 'flex';
+        // Only show individual users when there's a search query
+        if (q) {
+            const users = Array.from(filters.availableUsers)
+                .filter(u => u.toLowerCase().includes(q))
+                .sort()
+                .slice(0, 10);
+            const teamUsernames = ALL_CRYPTO_TOOLS_USERNAMES.map(u => u.toLowerCase());
+
+            users.forEach(user => {
+                const isTeam = teamUsernames.includes(user.toLowerCase());
+                const btn = document.createElement('button');
+                btn.className = 'gh-dropdown-item' + (filters.author === user ? ' active' : '');
+                btn.textContent = user;
+                if (isTeam) btn.innerHTML += ' <span class="gh-author-badge">team</span>';
+                btn.addEventListener('click', () => {
+                    filters.author = filters.author === user ? null : user;
+                    document.getElementById(`${prefix}AuthorDropdown`)?.classList.remove('open');
+                    this.renderActiveFilters(prefix, filters, apply);
+                    apply();
+                });
+                container.appendChild(btn);
+            });
         }
     }
 
-    hidePullRequestFilters() {
-        const filtersPanel = document.getElementById('pullRequestFilters');
-        if (filtersPanel) {
-            filtersPanel.style.display = 'none';
+    renderActiveFilters(prefix, filters, apply) {
+        const container = document.getElementById(`${prefix}ActiveFilters`);
+        if (!container) return;
+        container.innerHTML = '';
+
+        const addTag = (label, onRemove) => {
+            const tag = document.createElement('span');
+            tag.className = 'gh-filter-tag';
+            tag.innerHTML = `${this.escapeHtml(label)} <button class="gh-filter-tag-remove">×</button>`;
+            tag.querySelector('button').addEventListener('click', onRemove);
+            container.appendChild(tag);
+        };
+
+        if (filters.author) {
+            const label = filters.author.startsWith('@') ? filters.author.slice(1).replace(/-/g, ' ') : `author: ${filters.author}`;
+            addTag(label, () => { filters.author = null; this.renderActiveFilters(prefix, filters, apply); apply(); });
         }
-        this.hidePRUserSuggestions();
+
+        if (filters.keyword) {
+            addTag(`"${filters.keyword}"`, () => {
+                filters.keyword = '';
+                const input = document.getElementById(prefix === 'issue' ? 'issueKeywordSearch' : 'prKeywordSearch');
+                if (input) input.value = '';
+                this.renderActiveFilters(prefix, filters, apply);
+                apply();
+            });
+        }
+
+        if (container.children.length > 0) {
+            const clear = document.createElement('button');
+            clear.className = 'gh-clear-filters';
+            clear.textContent = 'Clear filters';
+            clear.addEventListener('click', () => {
+                filters.author = null;
+                filters.keyword = '';
+                const input = document.getElementById(prefix === 'issue' ? 'issueKeywordSearch' : 'prKeywordSearch');
+                if (input) input.value = '';
+                this.renderActiveFilters(prefix, filters, apply);
+                apply();
+            });
+            container.appendChild(clear);
+        }
     }
+
+
 
     applyPullRequestFilters() {
-        // Get current PR data from cache or re-render
-        this.loadSection('pull-requests');
+        this.filterAggregateByRepo('pull-requests');
     }
 
-    showPRUserSuggestions(query) {
-        const prUserSuggestions = document.getElementById('prUserSuggestions');
-        if (!prUserSuggestions || !this.pullRequestFilters.availableUsers.size) return;
 
-        const matchingUsers = Array.from(this.pullRequestFilters.availableUsers)
-            .filter(user => !query || user.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 8); // Limit to 8 suggestions
 
-        if (matchingUsers.length === 0 || (query && matchingUsers.length === 1 && matchingUsers[0].toLowerCase() === query.toLowerCase())) {
-            this.hidePRUserSuggestions();
-            return;
-        }
 
-        prUserSuggestions.innerHTML = matchingUsers.map((user, index) => `
-            <div class="user-suggestion" data-user="${this.escapeHtml(user)}" data-index="${index}">
-                <div class="user-avatar" style="background-image: url('https://github.com/${user}.png?size=40')"></div>
-                <span>${this.escapeHtml(user)}</span>
-            </div>
-        `).join('');
 
-        // Add click handlers
-        prUserSuggestions.querySelectorAll('.user-suggestion').forEach(suggestion => {
-            suggestion.addEventListener('click', () => {
-                this.selectPRUserSuggestion(suggestion.dataset.user);
-            });
-        });
-
-        prUserSuggestions.classList.add('show');
-    }
-
-    hidePRUserSuggestions() {
-        const prUserSuggestions = document.getElementById('prUserSuggestions');
-        if (prUserSuggestions) {
-            prUserSuggestions.classList.remove('show');
-        }
-    }
-
-    navigatePRUserSuggestions(direction) {
-        const prUserSuggestions = document.getElementById('prUserSuggestions');
-        if (!prUserSuggestions || !prUserSuggestions.classList.contains('show')) return;
-
-        const suggestions = prUserSuggestions.querySelectorAll('.user-suggestion');
-        const currentHighlighted = prUserSuggestions.querySelector('.highlighted');
-        let newIndex = 0;
-
-        if (currentHighlighted) {
-            const currentIndex = parseInt(currentHighlighted.dataset.index);
-            newIndex = currentIndex + direction;
-        } else {
-            newIndex = direction > 0 ? 0 : suggestions.length - 1;
-        }
-
-        // Wrap around
-        if (newIndex < 0) newIndex = suggestions.length - 1;
-        if (newIndex >= suggestions.length) newIndex = 0;
-
-        // Update highlighting
-        suggestions.forEach(s => s.classList.remove('highlighted'));
-        if (suggestions[newIndex]) {
-            suggestions[newIndex].classList.add('highlighted');
-        }
-    }
-
-    selectHighlightedPRSuggestion() {
-        const highlighted = document.querySelector('#prUserSuggestions .user-suggestion.highlighted');
-        if (highlighted) {
-            this.selectPRUserSuggestion(highlighted.dataset.user);
-        }
-    }
-
-    selectPRUserSuggestion(username) {
-        const prUserFilter = document.getElementById('prUserFilter');
-        if (prUserFilter) {
-            prUserFilter.value = username;
-            this.pullRequestFilters.userFilter = username;
-            if (this.currentSection === 'pull-requests') {
-                this.applyPullRequestFilters();
-            }
-            this.hidePRUserSuggestions();
-            this.updatePRFilterActiveState();
-        }
-    }
 
     clearAllPullRequestFilters() {
-        const prSortSelect = document.getElementById('prSortSelect');
-        const prUserFilter = document.getElementById('prUserFilter');
-
-        // Reset to defaults
-        this.pullRequestFilters.sortBy = 'newest';
-        this.pullRequestFilters.userFilter = '';
-
-        // Update UI
-        if (prSortSelect) prSortSelect.value = 'newest';
-        if (prUserFilter) prUserFilter.value = '';
-
-        // Apply filters
-        if (this.currentSection === 'pull-requests') {
+            this.pullRequestFilters.keyword = '';
+            this.pullRequestFilters.author = '@external';
+            this.pullRequestFilters.sort = 'updated-desc';
+            const input = document.getElementById('prKeywordSearch');
+            if (input) input.value = '';
+            this.renderActiveFilters('pr', this.pullRequestFilters, () => this.applyPullRequestFilters());
             this.applyPullRequestFilters();
         }
-
-        this.hidePRUserSuggestions();
-        this.updatePRFilterActiveState();
-    }
 
     // Pull request categorization and overview methods
     categorizePullRequests(prs) {
@@ -1898,8 +2276,8 @@ class GitHubDashboard {
             pr.user && pr.user.login === 'dependabot[bot]'
         );
 
-        // Get CRYPTO_TOOLS_USERNAMES from global scope
-        const cryptoToolsUsernames = typeof CRYPTO_TOOLS_USERNAMES !== 'undefined' ? CRYPTO_TOOLS_USERNAMES : [];
+        // Get ALL_CRYPTO_TOOLS_USERNAMES from global scope
+        const cryptoToolsUsernames = typeof ALL_CRYPTO_TOOLS_USERNAMES !== 'undefined' ? ALL_CRYPTO_TOOLS_USERNAMES : [];
 
         const teamMemberPRs = prs.filter(pr => 
             pr.user && 
@@ -1923,8 +2301,8 @@ class GitHubDashboard {
 
     // Issues categorization and overview methods
     categorizeIssues(issues) {
-        // Get CRYPTO_TOOLS_USERNAMES from global scope
-        const cryptoToolsUsernames = typeof CRYPTO_TOOLS_USERNAMES !== 'undefined' ? CRYPTO_TOOLS_USERNAMES : [];
+        // Get ALL_CRYPTO_TOOLS_USERNAMES from global scope
+        const cryptoToolsUsernames = typeof ALL_CRYPTO_TOOLS_USERNAMES !== 'undefined' ? ALL_CRYPTO_TOOLS_USERNAMES : [];
 
         const teamMemberIssues = issues.filter(issue => 
             issue.user && 
@@ -2064,6 +2442,19 @@ class GitHubDashboard {
     }
 
     setupSettingsEventListeners() {
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            const currentTheme = localStorage.getItem('dashboard-theme') || 'dark';
+            themeToggle.checked = currentTheme === 'dark';
+
+            themeToggle.addEventListener('change', () => {
+                const theme = themeToggle.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('dashboard-theme', theme);
+            });
+        }
+
         const tokenInput = document.getElementById('githubToken');
         const toggleVisibilityBtn = document.getElementById('toggleTokenVisibility');
         const saveTokenBtn = document.getElementById('saveToken');
