@@ -173,6 +173,27 @@ const CRYPTO_TOOLS_USERNAMES = [
     "ajewellamz"
 ];
 
+// Former team members who should still be considered as team for filtering
+const FORMER_CRYPTO_TOOLS_MEMBERS = [
+    "mattsb42-aws",
+    "lavaleri",
+    "juneb",
+    "david-koenig",
+    "SalusaSecondus",
+    "danielsn",
+    "WesleyRosenblum",
+    "feliperodri",
+    "ttjsu-aws",
+    "dougch",
+    "acioc",
+    "tegansb",
+    "adpaco-aws",
+    "alex-chew"
+];
+
+// Combined list for filtering
+const ALL_CRYPTO_TOOLS_USERNAMES = [...CRYPTO_TOOLS_USERNAMES, ...FORMER_CRYPTO_TOOLS_MEMBERS];
+
 // Your GitHub username
 const GITHUB_USERNAME = 'aws-crypto-tools-ci-bot';
 
