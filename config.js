@@ -205,14 +205,14 @@ const GITHUB_API_BASE = 'https://api.github.com';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // Session storage key for GitHub token
-const SESSION_TOKEN_KEY = 'github-dashboard-session-token';
+const SESSION_TOKEN_KEY = 'github-dashboard-token';
 
 // Session storage helper functions
 function getSessionToken() {
     try {
-        return sessionStorage.getItem(SESSION_TOKEN_KEY);
+        return localStorage.getItem(SESSION_TOKEN_KEY);
     } catch (error) {
-        console.warn('Error accessing session storage:', error);
+        console.warn('Error accessing localStorage:', error);
         return null;
     }
 }
@@ -220,37 +220,37 @@ function getSessionToken() {
 function setSessionToken(token) {
     try {
         if (token && token.trim()) {
-            sessionStorage.setItem(SESSION_TOKEN_KEY, token.trim());
+            localStorage.setItem(SESSION_TOKEN_KEY, token.trim());
             GITHUB_TOKEN = token.trim();
             window.GitHubConfig.token = GITHUB_TOKEN;
             return true;
         }
         return false;
     } catch (error) {
-        console.warn('Error setting session storage:', error);
+        console.warn('Error setting localStorage:', error);
         return false;
     }
 }
 
 function clearSessionToken() {
     try {
-        sessionStorage.removeItem(SESSION_TOKEN_KEY);
+        localStorage.removeItem(SESSION_TOKEN_KEY);
         GITHUB_TOKEN = null;
         window.GitHubConfig.token = null;
         return true;
     } catch (error) {
-        console.warn('Error clearing session storage:', error);
+        console.warn('Error clearing localStorage:', error);
         return false;
     }
 }
 
-// Load token from session storage on page load
+// Load token from localStorage on page load
 function loadSessionToken() {
-    const token = getSessionToken();
+    const token = localStorage.getItem(SESSION_TOKEN_KEY);
     if (token) {
         GITHUB_TOKEN = token;
         window.GitHubConfig.token = token;
-        console.log('GitHub token loaded from session storage');
+        console.log('GitHub token loaded from localStorage');
         return token;
     }
     return null;

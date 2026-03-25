@@ -7,7 +7,7 @@ class GitHubDashboard {
         this.cache = new Map();
         this.isAuthenticated = false;
         this.rateLimitInfo = null;
-        this.viewMode = { 'issues': 'list', 'pull-requests': 'list' };
+        this.viewMode = JSON.parse(localStorage.getItem('dashboard-view-mode') || '{"issues":"list","pull-requests":"list"}');
         
         // Dashboard data cache
         this.dashboardCache = {
@@ -140,10 +140,19 @@ class GitHubDashboard {
 
         // View toggle buttons
         document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+            // Sync active state from persisted viewMode
+            const section = btn.dataset.section;
+            const view = btn.dataset.view;
+            if (this.viewMode[section] === view) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
             btn.addEventListener('click', (e) => {
                 const view = e.currentTarget.dataset.view;
                 const section = e.currentTarget.dataset.section;
                 this.viewMode[section] = view;
+                localStorage.setItem('dashboard-view-mode', JSON.stringify(this.viewMode));
                 // Update active state
                 e.currentTarget.closest('.view-toggle').querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
                 e.currentTarget.classList.add('active');
