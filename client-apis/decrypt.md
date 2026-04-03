@@ -88,8 +88,7 @@ A Keyring that implements the [keyring interface](../framework/keyring-interface
 
 If the Keyring is provided as the input, the client MUST construct a [default CMM](../framework/default-cmm.md) that uses this keyring,
 to obtain the [decryption materials](../framework/structures.md#decryption-materials) that is required for decryption.
-
-This default CMM MUST obtain the decryption materials required for decryption.
+This default CMM constructed from the keyring MUST obtain the decryption materials required for decryption.
 
 ## Output
 
@@ -101,6 +100,7 @@ This default CMM MUST obtain the decryption materials required for decryption.
 ### Plaintext
 
 The decrypted data.
+This MUST be a sequence of bytes.
 
 This operation MAY [stream](streaming.md) the plaintext as output.
 
@@ -166,6 +166,38 @@ deserializing those bytes according to the [message format](../data-format/messa
 
 This operation MUST attempt to deserialize all consumable encrypted message bytes until it has
 successfully deserialized a valid [message header](../data-format/message-header.md).
+
+The header deserialization order MUST follow the [Header Body Version 1.0](../data-format/message-header.md#header-body-version-10)
+or [Header Body Version 2.0](../data-format/message-header.md#header-body-version-20) specification,
+depending on the [Version](../data-format/message-header.md#version) field.
+
+Each header field MUST be deserialized according to its specification in the [message header](../data-format/message-header.md):
+
+- [Version](../data-format/message-header.md#version): MUST be deserialized according to the
+  [Version](../data-format/message-header.md#version) specification.
+  The value MUST be a [supported version](../data-format/message-header.md#supported-versions).
+- [Type](../data-format/message-header.md#type) (V1 only): MUST be deserialized according to the
+  [Type](../data-format/message-header.md#type) specification.
+  The value MUST be a [supported type](../data-format/message-header.md#supported-types).
+- [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST be deserialized according to the
+  [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id) specification.
+- [Message ID](../data-format/message-header.md#message-id): MUST be deserialized according to the
+  [Message ID](../data-format/message-header.md#message-id) specification.
+- [AAD](../data-format/message-header.md#aad): MUST be deserialized according to the
+  [AAD](../data-format/message-header.md#aad) specification.
+- [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys): MUST be deserialized according to the
+  [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys) specification.
+- [Content Type](../data-format/message-header.md#content-type): MUST be deserialized according to the
+  [Content Type](../data-format/message-header.md#content-type) specification.
+  The value MUST be a [supported content type](../data-format/message-header.md#supported-content-types).
+- [Reserved](../data-format/message-header.md#reserved) (V1 only): MUST be deserialized according to the
+  [Reserved](../data-format/message-header.md#reserved) specification.
+- [IV Length](../data-format/message-header.md#iv-length) (V1 only): MUST be deserialized according to the
+  [IV Length](../data-format/message-header.md#iv-length) specification.
+- [Frame Length](../data-format/message-header.md#frame-length): MUST be deserialized according to the
+  [Frame Length](../data-format/message-header.md#frame-length) specification.
+- [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data) (V2 only): MUST be deserialized according to the
+  [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data) specification.
 
 If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys)
 deserialized from the [message header](../data-format/message-header.md)
@@ -266,9 +298,12 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
 - The streamed Decrypt operation SHOULD input the serialized header to the signature algorithm as soon as it is deserialized,
-  such that the serialized frame isn't required to remain in memory to [verify the signature](#verify-the-signature).
+  such that the serialized header isn't required to remain in memory to [verify the signature](#verify-the-signature).
 
 ### Decrypt the message body
+
+Regular frame deserialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
+Final frame deserialization MUST conform to the [Final Frame](../data-format/message-body.md#final-frame) specification.
 
 Once the message header is successfully parsed, the next sequential bytes
 MUST be deserialized according to the [message body spec](../data-format/message-body.md).
@@ -281,21 +316,31 @@ or deserialize and/or decrypt the consumable bytes.
 The Decrypt operation MUST use the [content type](../data-format/message-header.md#content-type) field parsed from the
 message header to determine whether the operation will deserialize the message bytes as
 [framed data](../data-format/message-body.md#framed-data) or
-[un-framed data](../data-format/message-body.md#un-framed-data).
+[un-framed data](../data-format/message-body.md#non-framed-data).
 
 If deserializing [framed data](../data-format/message-body.md#framed-data),
-the Decrypt operation operation MUST use the first 4 bytes of a frame to determine
+the Decrypt operation MUST use the first 4 bytes of a frame to determine
 whether the operation will deserialize the frame as a [final frame](../data-format/message-body.md#final-frame)
-or [regular frame](../fata-format/message-body/md#regular-frame).
-If the first 4 bytes have a value of 0xFFFF,
-then the Decrypt operation MUST deserialize this as the [sequence number end](../data-format/message-header.md#sequence-number-end)
-and the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
-Otherwise, the Decrypt operation MUST deserialize this as the [sequence number](../data-format/message-header.md#sequence-number)
-and the following bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
+or [regular frame](../data-format/message-body.md#regular-frame).
 
-If deserializing a [final frame](../data-format/message-body.md#final-frame),
-the Decrypt operation MUST ensure that the length of the encrypted content field is
-less than or equal to the frame length deserialized in the message header.
+- The [Sequence Number End](../data-format/message-body.md#sequence-number-end): MUST be deserialized according to the
+  [Sequence Number End](../data-format/message-body.md#sequence-number-end) specification.
+  If the first 4 bytes have a value of 0xFFFF,
+  then the Decrypt operation MUST deserialize the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
+  Otherwise, the Decrypt operation MUST deserialize the bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
+- [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number): MUST be deserialized according to the
+  [Regular Frame Sequence Number](../data-format/message-body.md#regular-frame-sequence-number) specification.
+- [IV](../data-format/message-body.md#regular-frame-iv): MUST be deserialized according to the
+  [Regular Frame IV](../data-format/message-body.md#regular-frame-iv) specification.
+- [Encrypted Content Length](../data-format/message-body.md#final-frame-encrypted-content-length): MUST be deserialized according to the
+  [Final Frame Encrypted Content Length](../data-format/message-body.md#final-frame-encrypted-content-length) specification.
+  If deserializing a [final frame](../data-format/message-body.md#final-frame),
+  the Decrypt operation MUST ensure that the length of the encrypted content field is
+  less than or equal to the frame length deserialized in the message header.
+- [Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content): MUST be deserialized according to the
+  [Regular Frame Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content) specification.
+- [Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag): MUST be deserialized according to the
+  [Regular Frame Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag) specification.
 
 Once at least a single frame is deserialized (or the entire body in the un-framed case),
 the Decrypt operation MUST decrypt and authenticate the frame (or body) using the
@@ -385,3 +430,29 @@ This means that callers that process such released plaintext MUST NOT consider a
 until this operation completes successfully.
 Additionally, if this operation fails, callers MUST discard the released plaintext and encryption context
 and MUST rollback any processing done due to the released plaintext or encryption context.
+
+## Appendix
+
+### Un-Framed Message Body Decryption
+
+Implementations of the AWS Encryption SDK MUST NOT encrypt using the Non-Framed content type.
+However, older messages may use this content type, and decryption MUST support them.
+
+If a message has the [non-framed](../data-format/message-body.md#non-framed-data) content type,
+the Decrypt operation MUST deserialize the message body according to the
+[non-framed data specification](../data-format/message-body.md#non-framed-data)
+and decrypt it using the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
+specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
+
+- The IV MUST be the [IV](../data-format/message-body.md#iv) deserialized from the message body.
+- The ciphertext MUST be the [Encrypted Content](../data-format/message-body.md#encrypted-content) deserialized from the message body.
+- The cipherkey MUST be the derived data key.
+- The tag MUST be the [Authentication Tag](../data-format/message-body.md#authentication-tag) deserialized from the message body.
+- The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
+  constructed with:
+  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST use the value for
+    [non-framed data](../data-format/message-body-aad.md#body-aad-content).
+  - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be `1`.
+  - The [content length](../data-format/message-body-aad.md#content-length) MUST equal the length of the encrypted content.
+
+If this decryption fails, this operation MUST immediately halt and fail.

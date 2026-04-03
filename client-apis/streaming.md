@@ -74,8 +74,7 @@ bytes are considered released once those bytes are available to be read by the c
 
 If bytes are processed by an operation, that does not imply that the operation is allowed to
 release any result of that processing.
-The decrypt and encrypt operations specify when output bytes MUST NOT be released
-and when they SHOULD be released.
+The decrypt and encrypt operations specify when to release output bytes and when not to release output bytes.
 
 ## Inputs
 
