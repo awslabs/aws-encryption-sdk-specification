@@ -21,7 +21,6 @@ The message header is a sequence of bytes that MUST be in big-endian format.
 
 The following table is a non-normative representation of the normative requirements in this section.
 
-
 | Field                                           | Length (bytes) | Interpreted as                                  |
 | ----------------------------------------------- | -------------- | ----------------------------------------------- |
 | [Header Body](#header-body)                     | Variable       | [Header Body](#header-body)                     |

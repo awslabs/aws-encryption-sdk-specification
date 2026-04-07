@@ -193,9 +193,9 @@ The sequence number end MUST be interpreted as bytes.
 
 The Frame sequence number for the final frame.
 The Final Frame Sequence number MUST be equal to the total number of frames in the Framed Data.
-The length of the Final Frame Sequence number field  MUST be the same as the
+The length of the Final Frame Sequence number field MUST be the same as the
 [Regular Frame Sequence Number](#regular-frame-sequence-number).
-The Final Frame Sequence Number MUST be interpreted as the same type as the 
+The Final Frame Sequence Number MUST be interpreted as the same type as the
 [Regular Frame Sequence Number](#regular-frame-sequence-number).
 
 ##### Final Frame IV
