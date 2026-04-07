@@ -380,7 +380,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md),
 with the following inputs:
 
 - The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
-  constructed as follows:
+  constructed according to the [Message Body AAD](../data-format/message-body-aad.md) specification, as follows:
   - The [message ID](../data-format/message-body-aad.md#message-id) MUST be the same as the
     [message ID](../data-frame/message-header.md#message-id) serialized in the header of this message.
   - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST be the structure defined in
@@ -458,6 +458,8 @@ This operation MUST then serialize a message footer with the following specifics
 - [Signature Length](../data-format/message-footer.md#signature-length): MUST be the length of the
   output of the calculation above.
 - [Signature](../data-format/message-footer.md#signature): MUST be the output of the calculation above.
+
+The order for message footer serialization MUST conform to the [Message Footer](../data-format/message-footer.md) specification.
 
 The above serialized bytes MUST NOT be released until the entire message footer has been serialized.
 Once the entire message footer has been serialized,

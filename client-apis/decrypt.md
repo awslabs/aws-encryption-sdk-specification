@@ -198,6 +198,8 @@ Each header field MUST be deserialized according to its specification in the [me
   [Frame Length](../data-format/message-header.md#frame-length) specification.
 - [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data) (V2 only): MUST be deserialized according to the
   [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data) specification.
+- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST be deserialized according to the
+  [Authentication Tag](../data-format/message-header.md#authentication-tag) specification.
 
 If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys)
 deserialized from the [message header](../data-format/message-header.md)
@@ -304,6 +306,7 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 
 Regular frame deserialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
 Final frame deserialization MUST conform to the [Final Frame](../data-format/message-body.md#final-frame) specification.
+Non-framed data deserialization MUST conform to the [Non-Framed Data](../data-format/message-body.md#non-framed-data) specification.
 
 Once the message header is successfully parsed, the next sequential bytes
 MUST be deserialized according to the [message body spec](../data-format/message-body.md).
@@ -348,7 +351,7 @@ the Decrypt operation MUST decrypt and authenticate the frame (or body) using th
 specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
 
 - The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
-  constructed as follows:
+  constructed according to the [Message Body AAD](../data-format/message-body-aad.md) specification, as follows:
   - The [message ID](../data-format/message-body-aad.md#message-id) MUST be the same as the
     [message ID](../data-frame/message-header.md#message-id) deserialized from the header of this message.
   - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST be constructed
@@ -400,6 +403,8 @@ the Decrypt operation MUST verify the message footer using the specified signatu
 After deserializing the body, the Decrypt operation MUST deserialize the next encrypted message bytes
 as the [message footer](../data-format/message-footer.md).
 
+The order for message footer deserialization MUST conform to the [Message Footer](../data-format/message-footer.md) specification.
+
 If there are not enough consumable bytes to deserialize the message footer and
 the caller has not yet indicated an end to the encrypted message,
 the Decrypt operation MUST wait for enough bytes to become consumable or for the caller
@@ -434,9 +439,6 @@ and MUST rollback any processing done due to the released plaintext or encryptio
 ## Appendix
 
 ### Un-Framed Message Body Decryption
-
-Implementations of the AWS Encryption SDK MUST NOT encrypt using the Non-Framed content type.
-However, older messages may use this content type, and decryption MUST support them.
 
 If a message has the [non-framed](../data-format/message-body.md#non-framed-data) content type,
 the Decrypt operation MUST deserialize the message body according to the

@@ -29,13 +29,17 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Structure
 
-The following describes the fields that form the footer.  
+The following table is a non-normative representation of the normative requirements in this secion.
 The bytes are appended in the order shown.
 
 | Field            | Length (bytes) | Interpreted as |
 | ---------------- | -------------- | -------------- |
 | Signature Length | 2              | Uint16         |
 | Signature        | Variable.      | Bytes          |
+
+The message footer MUST consist of, in order,
+Signature Length,
+and Signature.
 
 ### Signature Length
 
@@ -51,6 +55,7 @@ in the order of serialization.
 The [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](../framework/algorithm-suites.md#algorithm-suite-id) field
 [determines how the value of this field is calculated](../client-apis/encrypt.md),
 and uses this value to [authenticate the contents of the header and body during decryption](../client-apis/decrypt.md).
+The signature MUST be interpreted as bytes.
 
 ## Example Usage
 

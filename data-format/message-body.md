@@ -35,13 +35,7 @@ The bytes are appended in the order shown.
 | [Encrypted Content](#encrypted-content)               | Variable                                 | Bytes          |
 | [Authentication Tag](#authentication-tag)             | Variable                                 | Bytes          |
 
-Non-framed data MUST be serialized (written) as, in order,
-IV,
-Encrypted Content Length,
-Encrypted Content,
-and Authentication Tag.
-
-Non-framed data MUST be deserialized (read) as, in order,
+Non-framed data MUST consist of, in order,
 IV,
 Encrypted Content Length,
 Encrypted Content,
@@ -51,38 +45,37 @@ and Authentication Tag.
 
 The initialization vector to use with the encryption algorithm.
 
-When writing a message, the IV MUST be a unique IV within the message.
-When writing a message, the operation MUST serialize the IV to be [IV Length](message-header.md#iv-length) bytes.
+A generated IV MUST be a unique IV within the message.
 
-When reading a message, the operation MUST deserialize [IV Length](message-header.md#iv-length) bytes and interpret it as the IV.
-When reading a message, the deserialized IV MUST be interpreted as bytes.
+The length of the IV field MUST be [IV Length](message-header.md#iv-length) bytes.
+The IV MUST be interpreted as bytes.
 
 #### Non-Framed Data Encrypted Content Length
 
-The length of the encrypted content.  
-The length MUST NOT be greater than `2^36 - 32`, or 64 gibibytes (64 GiB),
+The length of the encrypted content.
+The encrypted content length MUST be interpreted as a UInt64.
+The value of this field MUST NOT be greater than `2^36 - 32`, or 64 gibibytes (64 GiB),
 due to restrictions imposed by the [implemented algorithms](../framework/algorithm-suites.md).
-When serializing the encrypted content length to a message, the length of the serialized encrypted content length MUST be 8 bytes.
-The encrypted content length MUST be serialized as a Uint64.
-When reading the encrypted content length from a message, the encrypted content length MUST be interpreted as a Uint64.
+The length of the encrypted content field MUST be 8 bytes.
 
 #### Non-Framed Data Encrypted Content
 
 The encrypted data as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
-The length of the serialized encrypted content MUST be equal to the value of the [Encrypted Content Length](#encrypted-content-length) field.
-The encrypted content MUST be interpreted as bytes.
+
+The length of the serialized encrypted content field MUST be equal to the value of the [Encrypted Content Length](#encrypted-content-length) field.
+The encrypted content value MUST be interpreted as bytes.
 
 #### Non-Framed Data Authentication Tag
 
 The authentication value for the body.
 It is used to authenticate the message body.
-The length of the serialized authentication tag MUST be equal to the [authentication tag length](../framework/algorithm-suites.md#authentication-tag-length) of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](message-header.md#algorithm-suite-id) field.
-The authentication tag MUST be interpreted as bytes.
+The length of the serialized authentication tag field MUST be equal to the [authentication tag length](../framework/algorithm-suites.md#authentication-tag-length) of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](message-header.md#algorithm-suite-id) field.
+The authentication tag value MUST be interpreted as bytes.
 
 ### Framed Data
 
 Framed data is a sequence of bytes divided into equal-length parts called frames.  
-Each frame is encrypted separately with a unique [IV](#iv) and body [authentication tag](#authentication-tag).  
+Each frame is encrypted separately with a unique [IV](#iv) and body [authentication tag](#authentication-tag).
 There are two kinds of frames:
 
 - [Regular Frame](#regular-frame)
@@ -106,7 +99,7 @@ The following table is a non-normative representation of the normative requireme
 | [Encrypted Content](#encrypted-content)   | Variable                                                                                                     | Bytes          |
 | [Authentication Tag](#authentication-tag) | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
 
-A regular frame MUST be serialized as, in order,
+A regular frame MUST consist of, in order,
 Sequence Number,
 IV,
 Encrypted Content,
@@ -118,9 +111,8 @@ The Frame sequence number.
 It is an incremental counter number for the frames.  
 Framed Data MUST start at Sequence Number 1.  
 Subsequent frames MUST be in order and MUST contain an increment of 1 from the previous frame.
-When serializing the sequence number to a message, the length of the serialized sequence number MUST be 4 bytes.
-The sequence number MUST be serialized as a UInt32.
-When reading the sequence number from a message, the sequence number MUST be interpreted as a UInt32.
+The length of the serialized sequence number field MUST be 4 bytes.
+The sequence number MUST be interpreted as a UInt32.
 
 ##### Regular Frame IV
 
@@ -178,7 +170,7 @@ The following table is a non-normative representation of the normative requireme
 | [Encrypted Content](#encrypted-content)                 | Variable                                                                                                     | Bytes          |
 | [Authentication Tag](#authentication-tag)               | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
 
-A final frame MUST be serialized as, in order,
+A final frame MUST consist of, in order,
 Sequence Number End,
 Sequence Number,
 IV,
@@ -186,7 +178,7 @@ Encrypted Content Length,
 Encrypted Content,
 and Authentication Tag.
 
-This means a final frame MUST be a regular frame with the addition of the serialized
+A final frame MUST only differ from a regular frame by the addition of the
 Sequence Number End
 and Encrypted Content Length.
 
@@ -194,43 +186,42 @@ and Encrypted Content Length.
 
 An indicator for the Final Frame.  
 The value MUST be encoded as the 4 bytes `FF FF FF FF` in hexadecimal notation.
-The length of the serialized sequence number end MUST be 4 bytes.
+The length of the sequence number end field MUST be 4 bytes.
 The sequence number end MUST be interpreted as bytes.
 
 ##### Final Frame Sequence Number
 
 The Frame sequence number for the final frame.
 The Final Frame Sequence number MUST be equal to the total number of frames in the Framed Data.
-The Final Frame Sequence Number MUST be serialized to a message the same way as the
+The length of the Final Frame Sequence number field  MUST be the same as the
 [Regular Frame Sequence Number](#regular-frame-sequence-number).
-The Final Frame Sequence Number MUST be interpreted from a message the same way as the
+The Final Frame Sequence Number MUST be interpreted as the same type as the 
 [Regular Frame Sequence Number](#regular-frame-sequence-number).
 
 ##### Final Frame IV
 
 The initialization vector for the final frame.  
-The IV MUST be a unique IV within the message.  
-The IV length MUST be equal to the IV length of the [algorithm suite](../framework/algorithm-suites.md) that generated the message.
+A generated IV MUST be a unique IV within the message.
+The length of the IV field MUST be equal to the IV length of the [algorithm suite](../framework/algorithm-suites.md) that generated the message.
 The IV MUST be interpreted as bytes.
 Note: This IV is different from the [Header IV](message-header.md#iv).
 
 ##### Final Frame Encrypted Content Length
 
 The length of the encrypted content.
-When serializing the encrypted content length to a message, the length of the serialized encrypted content length field MUST be 4 bytes.
-The encrypted content length MUST be serialized as a UInt32.
-When reading the encrypted content length from a message, the encrypted content length MUST be interpreted as a UInt32.
+The length of the serialized encrypted content length field MUST be 4 bytes.
+The encrypted content length MUST be a UInt32.
 
 ##### Final Frame Encrypted Content
 
 The encrypted data for the final frame, as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
-The length of the serialized encrypted content MUST be equal to the value of the [Encrypted Content Length](#encrypted-content-length-1) field.
+The length of the serialized encrypted content field MUST be equal to the value of the [Encrypted Content Length](#encrypted-content-length-1) field.
 The encrypted content MUST be interpreted as bytes.
 
 ##### Final Frame Authentication Tag
 
 The authentication value for the final frame.  
-It is used to authenticate the final frame.  
+It MUST be used to authenticate the final frame.
 The authentication tag length MUST be equal to the authentication tag length of the algorithm suite
 specified by the [Algorithm Suite ID](message-header.md#algorithm-suite-id) field.
 The authentication tag MUST be interpreted as bytes.

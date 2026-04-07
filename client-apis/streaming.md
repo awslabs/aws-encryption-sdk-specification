@@ -114,4 +114,4 @@ for bytes to be made consumable to the operation
 and for bytes to be released by the operation.
 
 The behavior of the operation specifies how the operation processes consumable bytes,
-and specifies when processed bytes MUST NOT and SHOULD be released.
+and specifies when processed bytes are to be released.
