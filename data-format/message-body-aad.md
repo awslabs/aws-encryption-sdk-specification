@@ -20,7 +20,7 @@ The message body AAD is the serialization of the AAD to be used as input to encr
 
 ## Structure
 
-The following table is a non-normative representation of the normative requirements in this secion.
+The following table is a non-normative representation of the normative requirements in this section.
 The bytes are appended in the order shown.
 
 | Field            | Length (bytes) | Interpreted as |
@@ -57,7 +57,7 @@ The body AAD content value MUST be encoded as UTF-8 bytes.
 ### Sequence Number
 
 The sequence number of the data this message body AAD belongs to.
-For [framed data](message-body.md#framed-data), the value of this field MUST be the [frame sequence number](message-body.md#sequence-number).
+For [framed data](message-body.md#framed-data), the value of this field MUST be the [frame sequence number](message-body.md#regular-frame-sequence-number).
 For [non-framed data](message-body.md#non-framed-data), the value of this field MUST be `1`.
 The length of the sequence number field MUST be 4 bytes.
 The sequence number field MUST be interpreted as a UInt32.

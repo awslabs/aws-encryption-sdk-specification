@@ -29,7 +29,7 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ## Structure
 
-The following table is a non-normative representation of the normative requirements in this secion.
+The following table is a non-normative representation of the normative requirements in this section.
 The bytes are appended in the order shown.
 
 | Field            | Length (bytes) | Interpreted as |
@@ -44,8 +44,8 @@ and Signature.
 ### Signature Length
 
 The length of the signature.
-This length of the signature length field MUST be 2 bytes.
-The signature length field MUST be interpreted as a UInt16.
+The length of the signature length field MUST be 2 bytes.
+The signature length value MUST be a UInt16.
 
 ### Signature
 

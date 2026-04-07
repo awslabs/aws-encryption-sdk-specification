@@ -13,7 +13,7 @@ used for decrypting a message that was previously encrypted by the ESDK.
 ### Authenticated Data
 
 Plaintext or associated data is considered authenticated if the associated
-[authentication tag](../data-format/message-body.md#authentication-tag) is successfully checked
+[authentication tag](../data-format/message-body.md#regular-frame-authentication-tag) is successfully checked
 as defined by the algorithm suite indicated in the message header.
 
 This operation MUST NOT release any unauthenticated plaintext or unauthenticated associated data.
@@ -45,7 +45,7 @@ The input encrypted message MUST be a sequence of bytes in the
 [message format](../data-format/message.md) specified by the AWS Encryption SDK.
 The encrypted message contains the list of [encrypted data keys](../data-format/message-header.md#encrypted-data-keys),
 [encryption context](../data-format/message-header.md#aad), if provided during encryption,
-[encrypted content](../data-format/message-body.md#encrypted-content) and
+[encrypted content](../data-format/message-body.md#regular-frame-encrypted-content) and
 [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id) among other metadata.
 Each key in the encrypted data key list is an encrypted version of the single plaintext data key that was used to encrypt the plaintext.
 The encryption context is the additional authenticated data that was used during encryption.
@@ -238,7 +238,7 @@ MUST be constructed as follows:
 - Algorithm Suite ID: This MUST be the parsed
   [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id)
   from the message header.
-- Encrypted Data Keys: This MUST be the parsed [encrypted data keys](../data-format/message-header#encrypted-data-keys)
+- Encrypted Data Keys: This MUST be the parsed [encrypted data keys](../data-format/message-header.md#encrypted-data-keys)
   from the message header.
 - Reproduced Encryption Context: This MUST be the [input](#input) encryption context.
 - Commitment Policy: This MUST be the commitment policy configured on the client.
@@ -279,7 +279,7 @@ to decrypt with the following inputs:
   [required encryption context keys](../framework/structures.md#required-encryption-context-keys-1)
   serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
 - For message format version [1.0](../data-format/message-header.md#supported-versions)
-  the IV MUST be the value serialized in the message header's [IV field](../data-format/message-header#iv).
+  the IV MUST be the value serialized in the message header's [IV field](../data-format/message-header.md#iv).
   For message format version [2.0](../data-format/message-header.md#supported-versions)
   the IV MUST be 0.
 - the cipherkey MUST be the derived data key
@@ -328,7 +328,7 @@ or [regular frame](../data-format/message-body.md#regular-frame).
 
 - The [Sequence Number End](../data-format/message-body.md#sequence-number-end): MUST be deserialized according to the
   [Sequence Number End](../data-format/message-body.md#sequence-number-end) specification.
-  If the first 4 bytes have a value of 0xFFFF,
+  If the first 4 bytes have a value of 0xFFFFFFFF,
   then the Decrypt operation MUST deserialize the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
   Otherwise, the Decrypt operation MUST deserialize the bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
 - [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number): MUST be deserialized according to the
@@ -353,7 +353,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
 - The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
   constructed according to the [Message Body AAD](../data-format/message-body-aad.md) specification, as follows:
   - The [message ID](../data-format/message-body-aad.md#message-id) MUST be the same as the
-    [message ID](../data-frame/message-header.md#message-id) deserialized from the header of this message.
+    [message ID](../data-format/message-header.md#message-id) deserialized from the header of this message.
   - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST be constructed
     according to [Message Body AAD](../data-format/message-body-aad.md) depending on
     whether the bytes being decrypted are a regular frame, final frame, or un-framed data.
@@ -367,14 +367,14 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
     equal to the length of the plaintext that was encrypted.
     If this is a regular frame, this SHOULD be determined by using the [frame length](../data-format/message-header.md#frame-length)
     deserialized from the message header.
-    If this is not a regular frame, this SHOULD be determined by using the the [encrypted content length](../data-format/message-body.md#encrypted-content-length).
+    If this is not a regular frame, this SHOULD be determined by using the the [encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
 - The IV MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
 - The cipherkey MUST be the derived data key
-- The ciphertext MUST be the [encrypted content](../data-format/message-body.md#encrypted-content).
+- The ciphertext MUST be the [encrypted content](../data-format/message-body.md#regular-frame-encrypted-content).
 - The tag MUST be the value serialized in the
-  [authentication tag field](../data-format/message-body.md#authentication-tag)
+  [authentication tag field](../data-format/message-body.md#regular-frame-authentication-tag)
   in the message body or frame.
 
 If this decryption fails, this operation MUST immediately halt and fail.
@@ -446,10 +446,10 @@ the Decrypt operation MUST deserialize the message body according to the
 and decrypt it using the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
 specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
 
-- The IV MUST be the [IV](../data-format/message-body.md#iv) deserialized from the message body.
-- The ciphertext MUST be the [Encrypted Content](../data-format/message-body.md#encrypted-content) deserialized from the message body.
+- The IV MUST be the [IV](../data-format/message-body.md#non-framed-data-iv) deserialized from the message body.
+- The ciphertext MUST be the [Encrypted Content](../data-format/message-body.md#non-framed-data-encrypted-content) deserialized from the message body.
 - The cipherkey MUST be the derived data key.
-- The tag MUST be the [Authentication Tag](../data-format/message-body.md#authentication-tag) deserialized from the message body.
+- The tag MUST be the [Authentication Tag](../data-format/message-body.md#non-framed-data-authentication-tag) deserialized from the message body.
 - The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
   constructed with:
   - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST use the value for

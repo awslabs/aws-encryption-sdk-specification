@@ -313,7 +313,7 @@ This value MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-
 
 #### Frame Length
 
-The length of the [encrypted content](message-body.md#encrypted-content) within each [regular frame](message-body.md#regular-frame) of framed content.
+The length of the [encrypted content](message-body.md#regular-frame-encrypted-content) within each [regular frame](message-body.md#regular-frame) of framed content.
 The length of the serialized frame length field MUST be 4 bytes.
 The frame length MUST be serialized as a UInt32.
 When the [content type](#content-type) is non-framed, the value of this field MUST be 0.

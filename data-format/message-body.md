@@ -6,8 +6,8 @@
 ## Overview
 
 The message body is a component of the [message](message.md).  
-The message body contains the encrypted data, called the [encrypted content](#encrypted-content).  
-The purpose of the message body is to define the structure containing the [encrypted content](#encrypted-content).
+The message body contains the encrypted data, called the [encrypted content](#regular-frame-encrypted-content).  
+The purpose of the message body is to define the structure containing the [encrypted content](#regular-frame-encrypted-content).
 
 The structure of the body depends on the content type:
 
@@ -22,18 +22,18 @@ The following sections describe the format of the message body for each content 
 
 ### Non-Framed Data
 
-Non-framed data is a sequence of encrypted bytes along with the [initialization vector (IV)](#iv)
-and body [authentication tag](#authentication-tag).
+Non-framed data is a sequence of encrypted bytes along with the [initialization vector (IV)](#non-framed-data-iv)
+and body [authentication tag](#non-framed-data-authentication-tag).
 
-The following table is a non-normative representation of the normative requirements in this secion.
+The following table is a non-normative representation of the normative requirements in this section.
 The bytes are appended in the order shown.
 
 | Field                                                 | Length (bytes)                           | Interpreted as |
 | ----------------------------------------------------- | ---------------------------------------- | -------------- |
-| [IV](#iv)                                             | [IV Length](message-header.md#iv-length) | Bytes          |
-| [Encrypted Content Length](#encrypted-content-length) | 8                                        | Uint64         |
-| [Encrypted Content](#encrypted-content)               | Variable                                 | Bytes          |
-| [Authentication Tag](#authentication-tag)             | Variable                                 | Bytes          |
+| [IV](#non-framed-data-iv)                                             | [IV Length](message-header.md#iv-length) | Bytes          |
+| [Encrypted Content Length](#non-framed-data-encrypted-content-length) | 8                                        | Uint64         |
+| [Encrypted Content](#non-framed-data-encrypted-content)               | Variable                                 | Bytes          |
+| [Authentication Tag](#non-framed-data-authentication-tag)             | Variable                                 | Bytes          |
 
 Non-framed data MUST consist of, in order,
 IV,
@@ -62,7 +62,7 @@ The length of the encrypted content field MUST be 8 bytes.
 
 The encrypted data as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
 
-The length of the serialized encrypted content field MUST be equal to the value of the [Encrypted Content Length](#encrypted-content-length) field.
+The length of the serialized encrypted content field MUST be equal to the value of the [Encrypted Content Length](#non-framed-data-encrypted-content-length) field.
 The encrypted content value MUST be interpreted as bytes.
 
 #### Non-Framed Data Authentication Tag
@@ -75,7 +75,7 @@ The authentication tag value MUST be interpreted as bytes.
 ### Framed Data
 
 Framed data is a sequence of bytes divided into equal-length parts called frames.  
-Each frame is encrypted separately with a unique [IV](#iv) and body [authentication tag](#authentication-tag).
+Each frame is encrypted separately with a unique [IV](#regular-frame-iv) and body [authentication tag](#regular-frame-authentication-tag).
 There are two kinds of frames:
 
 - [Regular Frame](#regular-frame)
@@ -94,10 +94,10 @@ The following table is a non-normative representation of the normative requireme
 
 | Field                                     | Length (bytes)                                                                                               | Interpreted as |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
-| [Sequence Number](#sequence-number)       | 4                                                                                                            | UInt32         |
-| [IV](#iv)                                 | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
-| [Encrypted Content](#encrypted-content)   | Variable                                                                                                     | Bytes          |
-| [Authentication Tag](#authentication-tag) | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
+| [Sequence Number](#regular-frame-sequence-number)       | 4                                                                                                            | UInt32         |
+| [IV](#regular-frame-iv)                                 | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
+| [Encrypted Content](#regular-frame-encrypted-content)   | Variable                                                                                                     | Bytes          |
+| [Authentication Tag](#regular-frame-authentication-tag) | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
 
 A regular frame MUST consist of, in order,
 Sequence Number,
@@ -164,11 +164,11 @@ The following table is a non-normative representation of the normative requireme
 | Field                                                   | Length (bytes)                                                                                               | Interpreted as |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
 | [Sequence Number End](#sequence-number-end)             | 4                                                                                                            | Bytes          |
-| [Sequence Number](#sequence-number)                     | 4                                                                                                            | UInt32         |
-| [IV](#iv)                                               | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
+| [Sequence Number](#final-frame-sequence-number)                     | 4                                                                                                            | UInt32         |
+| [IV](#final-frame-iv)                                               | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
 | [Encrypted Content Length](#encrypted-content-length-1) | 4                                                                                                            | UInt32         |
-| [Encrypted Content](#encrypted-content)                 | Variable                                                                                                     | Bytes          |
-| [Authentication Tag](#authentication-tag)               | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
+| [Encrypted Content](#final-frame-encrypted-content)                 | Variable                                                                                                     | Bytes          |
+| [Authentication Tag](#final-frame-authentication-tag)               | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
 
 A final frame MUST consist of, in order,
 Sequence Number End,
