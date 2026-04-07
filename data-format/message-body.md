@@ -28,8 +28,8 @@ and body [authentication tag](#non-framed-data-authentication-tag).
 The following table is a non-normative representation of the normative requirements in this section.
 The bytes are appended in the order shown.
 
-| Field                                                 | Length (bytes)                           | Interpreted as |
-| ----------------------------------------------------- | ---------------------------------------- | -------------- |
+| Field                                                                 | Length (bytes)                           | Interpreted as |
+| --------------------------------------------------------------------- | ---------------------------------------- | -------------- |
 | [IV](#non-framed-data-iv)                                             | [IV Length](message-header.md#iv-length) | Bytes          |
 | [Encrypted Content Length](#non-framed-data-encrypted-content-length) | 8                                        | Uint64         |
 | [Encrypted Content](#non-framed-data-encrypted-content)               | Variable                                 | Bytes          |
@@ -92,8 +92,8 @@ All frames except the [Final Frame](#final-frame) are "Regular Frames".
 
 The following table is a non-normative representation of the normative requirements in this section.
 
-| Field                                     | Length (bytes)                                                                                               | Interpreted as |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
+| Field                                                   | Length (bytes)                                                                                               | Interpreted as |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
 | [Sequence Number](#regular-frame-sequence-number)       | 4                                                                                                            | UInt32         |
 | [IV](#regular-frame-iv)                                 | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
 | [Encrypted Content](#regular-frame-encrypted-content)   | Variable                                                                                                     | Bytes          |
@@ -164,11 +164,11 @@ The following table is a non-normative representation of the normative requireme
 | Field                                                   | Length (bytes)                                                                                               | Interpreted as |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
 | [Sequence Number End](#sequence-number-end)             | 4                                                                                                            | Bytes          |
-| [Sequence Number](#final-frame-sequence-number)                     | 4                                                                                                            | UInt32         |
-| [IV](#final-frame-iv)                                               | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
+| [Sequence Number](#final-frame-sequence-number)         | 4                                                                                                            | UInt32         |
+| [IV](#final-frame-iv)                                   | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
 | [Encrypted Content Length](#encrypted-content-length-1) | 4                                                                                                            | UInt32         |
-| [Encrypted Content](#final-frame-encrypted-content)                 | Variable                                                                                                     | Bytes          |
-| [Authentication Tag](#final-frame-authentication-tag)               | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
+| [Encrypted Content](#final-frame-encrypted-content)     | Variable                                                                                                     | Bytes          |
+| [Authentication Tag](#final-frame-authentication-tag)   | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
 
 A final frame MUST consist of, in order,
 Sequence Number End,
