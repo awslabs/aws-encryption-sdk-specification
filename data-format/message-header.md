@@ -26,7 +26,7 @@ The following table is a non-normative representation of the normative requireme
 | [Header Body](#header-body)                     | Variable       | [Header Body](#header-body)                     |
 | [Header Authentication](#header-authentication) | Variable       | [Header Authentication](#header-authentication) |
 
-The header MUST be serialized as, in order,
+The header MUST consist of, in order,
 Header Body,
 and Header Authentication.
 
@@ -51,7 +51,7 @@ The following table is a non-normative representation of the normative requireme
 | [IV Length](#iv-length)                     | 1                                                                                 | UInt8                                                                                         |
 | [Frame Length](#frame-length)               | 4                                                                                 | UInt32                                                                                        |
 
-The V1 Header Body MUST be serialized as, in order,
+The V1 Header Body MUST consist of, in order,
 Version,
 Type,
 Algorithm Suite ID,
@@ -80,7 +80,7 @@ The following table is a non-normative representation of the normative requireme
 | [Frame Length](#frame-length)                 | 4                                                                                 | UInt32                                                                                        |
 | [Algorithm Suite Data](#algorithm-suite-data) | Variable. Determined by the Algorithm Suite ID                                    | See [Algorithm Suite Data](../framework/algorithm-suites.md#algorithm-suite-data)             |
 
-The V2 Header Body MUST be serialized as, in order,
+The V2 Header Body MUST consist of, in order,
 Version,
 Algorithm Suite ID,
 Message ID,
@@ -99,8 +99,8 @@ The length of the serialized version field MUST be 1 byte.
 
 The supported versions MUST be:
 
-- `01` MUST be version 1.0
-- `02` MUST be version 2.0
+- Hex value `01` MUST be version 1.0
+- Hex value `02` MUST be version 2.0
 
 The following table is a non-normative representation of the supported versions.
 
@@ -166,7 +166,7 @@ The following table is a non-normative representation of the normative requireme
 | [Key Value Pairs Length](#key-value-pairs-length) | 2                                                                                       | UInt16                              |
 | [Key Value Pairs](#key-value-pairs)               | Variable. Determined by the value of [Key Value Pairs Length](#key-value-pairs-length). | [Key Value Pairs](#key-value-pairs) |
 
-The AAD MUST be serialized as, in order,
+The AAD MUST consist of, in order,
 Key Value Pairs Length,
 and Key Value Pairs.
 
@@ -174,7 +174,7 @@ and Key Value Pairs.
 
 The length of the [Key Value Pairs](#key-value-pairs) field in bytes.
 The length of the serialized key value pairs length field MUST be 2 bytes.
-The key value pairs length MUST be serialized as a UInt16.
+The key value pairs length MUST be interpreted as a UInt16.
 
 When the [encryption context](../framework/structures.md#encryption-context) is empty, the value of this field MUST be 0.
 
@@ -197,7 +197,7 @@ The following table is a non-normative representation of the normative requireme
 | [Encrypted Data Key Count](#encrypted-data-key-count)     | 2                                                                    | UInt16                                                    |
 | [Encrypted Data Key Entries](#encrypted-data-key-entries) | Variable. Determined by the count and length of each key-value pair. | [Encrypted Data Key Entries](#encrypted-data-key-entries) |
 
-The Encrypted Data Keys MUST be serialized as, in order,
+The Encrypted Data Keys MUST consist of, in order,
 Encrypted Data Key Count,
 and Encrypted Data Key Entries.
 
@@ -205,8 +205,9 @@ and Encrypted Data Key Entries.
 
 The number of encrypted data keys.
 The length of the serialized encrypted data key count MUST be 2 bytes.
-The encrypted data key count MUST be serialized as a UInt16.
+The encrypted data key count MUST be interpreted as a UInt16.
 This value MUST be greater than 0.
+This value MUST be less than or equal to the [maximum number of encrypted data keys](../client-apis/client.md#maximum-number-of-encrypted-data-keys) if the maximum number is configured.
 
 #### Encrypted Data Key Entries
 
@@ -223,7 +224,7 @@ The following table is a non-normative representation of the normative requireme
 | [Encrypted Data Key Length](#encrypted-data-key-length)             | 2                                                                                                 | UInt16              |
 | [Encrypted Data Key](#encrypted-data-key)                           | Variable. Equal to the value specified in the previous 2 bytes (Encrypted Data Key Length).       | Bytes               |
 
-Each Encrypted Data Key Entry MUST be serialized as, in order,
+Each Encrypted Data Key Entry MUST consist of, in order,
 Key Provider ID Length,
 Key Provider ID,
 Key Provider Information Length,
@@ -235,7 +236,7 @@ and Encrypted Data Key.
 
 The length of the key provider ID.
 The length of the serialized key provider ID length field MUST be 2 bytes.
-The key provider ID length MUST be serialized as a UInt16.
+The key provider ID length MUST be interpreted as a UInt16.
 
 ##### Key Provider ID
 
@@ -248,7 +249,7 @@ See [the specification for encrypted data keys](../framework/structures.md#encry
 
 The length of the key provider information.
 The length of the serialized key provider information length field MUST be 2 bytes.
-The key provider information length MUST be serialized as a UInt16.
+The key provider information length MUST be interpreted as a UInt16.
 
 ##### Key Provider Information
 
@@ -261,7 +262,7 @@ See [the specification for encrypted data keys](../framework/structures.md#encry
 
 The length of the encrypted data key.
 The length of the serialized encrypted data key length field MUST be 2 bytes.
-The encrypted data key length MUST be serialized as a UInt16.
+The encrypted data key length MUST be interpreted as a UInt16.
 
 ##### Encrypted Data Key
 
@@ -274,7 +275,6 @@ The encrypted data key MUST be interpreted as bytes.
 
 The content type of the [message body](message-body.md).
 The length of the serialized content type field MUST be 1 byte.
-The value (hex) of this field MUST be a value that exists in the following table:
 
 ##### Supported Content Types
 
@@ -307,7 +307,7 @@ The length of the serialized reserved field MUST be 4 bytes.
 
 The length of the initialization vector (IV).
 The length of the serialized IV length field MUST be 1 byte.
-The IV length MUST be serialized as a UInt8.
+The IV length MUST be interpreted as a UInt8.
 This value MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-length) value of the
 [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.
 
@@ -315,7 +315,7 @@ This value MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-
 
 The length of the [encrypted content](message-body.md#regular-frame-encrypted-content) within each [regular frame](message-body.md#regular-frame) of framed content.
 The length of the serialized frame length field MUST be 4 bytes.
-The frame length MUST be serialized as a UInt32.
+The frame length MUST be interpreted as a UInt32.
 When the [content type](#content-type) is non-framed, the value of this field MUST be 0.
 
 ### Header Authentication
@@ -331,7 +331,7 @@ The following table is a non-normative representation of the normative requireme
 | [IV](#iv)                                 | Variable. Determined by the IV length value of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field.                      | Bytes          |
 | [Authentication Tag](#authentication-tag) | Variable. Determined by the byte value of the authentication tag of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
 
-The V1 Header Authentication MUST be serialized as, in order,
+The V1 Header Authentication MUST consist of, in order,
 IV,
 and Authentication Tag.
 
@@ -343,7 +343,7 @@ The following table is a non-normative representation of the normative requireme
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | [Authentication Tag](#authentication-tag) | Variable. Determined by the byte value of the authentication tag of the [algorithm suite](../framework/algorithm-suites.md) specified by the [Algorithm Suite ID](#algorithm-suite-id) field. | Bytes          |
 
-The V2 Header Authentication MUST be serialized as the Authentication Tag only.
+The V2 Header Authentication MUST consist of the Authentication Tag only.
 
 #### IV
 
