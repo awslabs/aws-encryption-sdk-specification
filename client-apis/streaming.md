@@ -3,15 +3,6 @@
 
 # Streaming
 
-## Version
-
-0.1.0
-
-### Changelog
-
-- 0.1.0
-  - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
-
 ## Overview
 
 The AWS Encryption SDK MAY provide APIs that enable streamed [encryption](encrypt.md)

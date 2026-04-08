@@ -7,13 +7,6 @@
 
 See [Message Version](message.md#version).
 
-## Implementations
-
-- [C](https://github.com/awslabs/aws-encryption-sdk-c/blob/master/source/session_encrypt.c)
-- [JavaScript](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/serialize/src/signature_info.ts)
-- [Python](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/internal/structures.py)
-- [Java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/model/CiphertextFooters.java)
-
 ## Overview
 
 The footer is a component of the [message](message.md).  
