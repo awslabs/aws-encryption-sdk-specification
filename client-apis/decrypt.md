@@ -411,7 +411,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
     equal to the length of the plaintext that was encrypted.
     If this is a regular frame, this SHOULD be determined by using the [frame length](../data-format/message-header.md#frame-length)
     deserialized from the message header.
-    If this is not a regular frame, this SHOULD be determined by using the the [encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
+    If this is not a regular frame, this SHOULD be determined by using the [encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
 - The IV MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
@@ -432,7 +432,7 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 - If the streamed Decrypt operation is using an algorithm suite with a signature algorithm,
   all plaintext decrypted from regular frames SHOULD be released as soon as the above calculation,
   including tag verification, succeeds.
-  Any plaintext decrypted from [unframed data](../data-format/message-body.md#un-framed-data) or
+  Any plaintext decrypted from [unframed data](../data-format/message-body.md#non-framed-data) or
   a final frame in a streamed Decrypt operation MUST NOT be released until [signature verification](#verify-the-signature)
   successfully completes.
 - The streamed Decrypt operation SHOULD input the serialized frame to the signature algorithm as soon as it is deserialized,

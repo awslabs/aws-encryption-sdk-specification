@@ -27,7 +27,7 @@ The bytes are appended in the order shown.
 
 | Field            | Length (bytes) | Interpreted as |
 | ---------------- | -------------- | -------------- |
-| Signature Length | 2              | Uint16         |
+| Signature Length | 2              | UInt16         |
 | Signature        | Variable.      | Bytes          |
 
 The message footer MUST consist of, in order,

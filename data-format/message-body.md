@@ -6,8 +6,8 @@
 ## Overview
 
 The message body is a component of the [message](message.md).  
-The message body contains the encrypted data, called the [encrypted content](#regular-frame-encrypted-content).  
-The purpose of the message body is to define the structure containing the [encrypted content](#regular-frame-encrypted-content).
+The message body contains the encrypted data, called the encrypted content; for non-framed messages, see [Non-Framed Data Encrypted Content](#non-framed-data-encrypted-content), and for framed messages, see [Regular Frame Encrypted Content](#regular-frame-encrypted-content).  
+The purpose of the message body is to define the structure containing the encrypted content for both [non-framed data](#non-framed-data-encrypted-content) and [framed data](#regular-frame-encrypted-content).
 
 The structure of the body depends on the content type:
 
@@ -56,7 +56,7 @@ The length of the encrypted content.
 The encrypted content length MUST be interpreted as a UInt64.
 The value of this field MUST NOT be greater than `2^36 - 32`, or 64 gibibytes (64 GiB),
 due to restrictions imposed by the [implemented algorithms](../framework/algorithm-suites.md).
-The length of the encrypted content field MUST be 8 bytes.
+The length of the Encrypted Content Length field MUST be 8 bytes.
 
 #### Non-Framed Data Encrypted Content
 
