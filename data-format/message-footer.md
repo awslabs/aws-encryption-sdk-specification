@@ -3,10 +3,6 @@
 
 # Footer Structure
 
-## Version
-
-See [Message Version](message.md#version).
-
 ## Overview
 
 The footer is a component of the [message](message.md).  

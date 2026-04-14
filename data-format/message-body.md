@@ -6,8 +6,10 @@
 ## Overview
 
 The message body is a component of the [message](message.md).  
-The message body contains the encrypted data, called the encrypted content; for non-framed messages, see [Non-Framed Data Encrypted Content](#non-framed-data-encrypted-content), and for framed messages, see [Regular Frame Encrypted Content](#regular-frame-encrypted-content).  
-The purpose of the message body is to define the structure containing the encrypted content for both [non-framed data](#non-framed-data-encrypted-content) and [framed data](#regular-frame-encrypted-content).
+The message body contains the encrypted data, called the encrypted content.
+For non-framed messages, see [Non-Framed Data Encrypted Content](#non-framed-data-encrypted-content).
+For framed messages, see [Regular Frame Encrypted Content](#regular-frame-encrypted-content).  
+The purpose of the message body is to define the structure containing the encrypted content.
 
 The structure of the body depends on the content type:
 
@@ -31,7 +33,7 @@ The bytes are appended in the order shown.
 | Field                                                                 | Length (bytes)                           | Interpreted as |
 | --------------------------------------------------------------------- | ---------------------------------------- | -------------- |
 | [IV](#non-framed-data-iv)                                             | [IV Length](message-header.md#iv-length) | Bytes          |
-| [Encrypted Content Length](#non-framed-data-encrypted-content-length) | 8                                        | Uint64         |
+| [Encrypted Content Length](#non-framed-data-encrypted-content-length) | 8                                        | UInt64         |
 | [Encrypted Content](#non-framed-data-encrypted-content)               | Variable                                 | Bytes          |
 | [Authentication Tag](#non-framed-data-authentication-tag)             | Variable                                 | Bytes          |
 
@@ -166,7 +168,7 @@ The following table is a non-normative representation of the normative requireme
 | [Sequence Number End](#sequence-number-end)             | 4                                                                                                            | Bytes          |
 | [Sequence Number](#final-frame-sequence-number)         | 4                                                                                                            | UInt32         |
 | [IV](#final-frame-iv)                                   | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
-| [Encrypted Content Length](#encrypted-content-length-1) | 4                                                                                                            | UInt32         |
+| [Encrypted Content Length](#final-frame-encrypted-content-length) | 4                                                                                                            | UInt32         |
 | [Encrypted Content](#final-frame-encrypted-content)     | Variable                                                                                                     | Bytes          |
 | [Authentication Tag](#final-frame-authentication-tag)   | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
 
@@ -215,7 +217,7 @@ The encrypted content length MUST be a UInt32.
 ##### Final Frame Encrypted Content
 
 The encrypted data for the final frame, as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
-The length of the serialized encrypted content field MUST be equal to the value of the [Encrypted Content Length](#encrypted-content-length-1) field.
+The length of the serialized encrypted content field MUST be equal to the value of the [Encrypted Content Length](#final-frame-encrypted-content-length) field.
 The encrypted content MUST be interpreted as bytes.
 
 ##### Final Frame Authentication Tag

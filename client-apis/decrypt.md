@@ -279,7 +279,7 @@ included in the [decryption materials](../framework/structures.md#decryption-mat
 The algorithm suite used as input for all decryption described below MUST be the algorithm suite
 included in the [decryption materials](../framework/structures.md#decryption-materials).
 If this algorithm suite is not [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum)
-encrypt MUST yield an error.
+decrypt MUST yield an error.
 If the algorithm suite is not supported by the [commitment policy](client.md#commitment-policy)
 configured in the [client](client.md) decrypt MUST yield an error.
 If the [algorithm suite](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) supports [key commitment](../framework/algorithm-suites.md#key-commitment)

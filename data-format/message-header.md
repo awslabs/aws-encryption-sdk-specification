@@ -7,10 +7,10 @@
 
 The message header is a component of the [message](message.md).
 
-The purpose of the message header is to define the authenticated metadata required for decryption of the [message body](message-body.md#encrypted-content), including:
+The purpose of the message header is to define the authenticated metadata required for decryption of the [message body](message-body.md), including:
 
 - The format of the [message](message.md) and [message body](message-body.md)
-- The encrypted data keys needed for decryption of the [message body encrypted content](message-body.md#encrypted-content)
+- The encrypted data keys needed for decryption of the [message body encrypted content](message-body.md)
 - The [encryption context](../framework/structures.md#encryption-context)
 
 ## Definitions
@@ -139,7 +139,7 @@ This algorithm suite MUST be [supported for the ESDK](../framework/algorithm-sui
 
 A Message ID uniquely identifies the [message](message.md).
 While implementations cannot guarantee complete uniqueness,
-implementations MUST use a good source of randomness when generating messages IDs in order to make
+implementations MUST use a good source of randomness when generating message IDs in order to make
 the chance of duplicate IDs negligible.
 The length of the serialized message ID MUST be 16 bytes for [version 1.0](#header-body-version-10) headers.
 The length of the serialized message ID MUST be 32 bytes for [version 2.0](#header-body-version-20) headers.

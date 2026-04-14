@@ -3,10 +3,6 @@
 
 # Message Body AAD
 
-## Version
-
-See [Message Version](message.md#version).
-
 ## Overview
 
 The message body AAD is the serialization of the AAD to be used as input to encryption of the message body.
@@ -18,10 +14,10 @@ The bytes are appended in the order shown.
 
 | Field            | Length (bytes) | Interpreted as |
 | ---------------- | -------------- | -------------- |
-| Message ID       | 16             | Bytes          |
+| Message ID       | Variable.      | Bytes          |
 | Body AAD Content | Variable.      | UTF-8 Bytes    |
-| Sequence Number  | 4              | Uint32         |
-| Content Length   | 8              | Uint64         |
+| Sequence Number  | 4              | UInt32         |
+| Content Length   | 8              | UInt64         |
 
 The message body AAD MUST consist of, in order,
 Message ID,
@@ -32,8 +28,8 @@ and Content Length.
 ### Message ID
 
 An identifier for the [message](message.md) this message body AAD is associated with.
-The length of the message ID field MUST be 16 bytes.
-The message ID MUST be interpreted as bytes.
+This MUST be the [message ID](message-header.md#message-id) stored in the header of the message.
+The length of the Message ID field MUST be equal to the length of the [Message ID](message-header.md#message-id) defined by the message header version.
 
 ### Body AAD Content
 
