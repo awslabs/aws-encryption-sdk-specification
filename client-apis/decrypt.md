@@ -48,7 +48,7 @@ The input encrypted message MUST be a sequence of bytes in the
 [message format](../data-format/message.md) specified by the AWS Encryption SDK.
 The encrypted message contains the list of [encrypted data keys](../data-format/message-header.md#encrypted-data-keys),
 [encryption context](../data-format/message-header.md#aad), if provided during encryption,
-[encrypted content](../data-format/message-body.md#regular-frame-encrypted-content) and
+[encrypted content](../data-format/message-body.md) and
 [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id) among other metadata.
 Each key in the encrypted data key list is an encrypted version of the single plaintext data key that was used to encrypt the plaintext.
 The encryption context is the additional authenticated data that was used during encryption.
