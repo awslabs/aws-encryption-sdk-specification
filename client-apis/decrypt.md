@@ -196,6 +196,11 @@ the remaining header fields MUST be deserialized according to the
 - The Decrypt operation MUST deserialize the [Reserved](../data-format/message-header.md#reserved).
 - The Decrypt operation MUST deserialize the [IV Length](../data-format/message-header.md#iv-length).
 - The Decrypt operation MUST deserialize the [Frame Length](../data-format/message-header.md#frame-length).
+
+The Decrypt operation MUST then deserialize the
+[Header Authentication Version 1.0](../data-format/message-header.md#header-authentication-version-10):
+
+- The Decrypt operation MUST deserialize the [IV](../data-format/message-header.md#iv).
 - The Decrypt operation MUST deserialize the [Authentication Tag](../data-format/message-header.md#authentication-tag).
 
 #### V2 Header Deserialization
@@ -212,6 +217,10 @@ the remaining header fields MUST be deserialized according to the
   The value MUST be a [supported content type](../data-format/message-header.md#supported-content-types).
 - The Decrypt operation MUST deserialize the [Frame Length](../data-format/message-header.md#frame-length).
 - The Decrypt operation MUST deserialize the [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data).
+
+The Decrypt operation MUST then deserialize the
+[Header Authentication Version 2.0](../data-format/message-header.md#header-authentication-version-20):
+
 - The Decrypt operation MUST deserialize the [Authentication Tag](../data-format/message-header.md#authentication-tag).
 
 If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys)
@@ -355,6 +364,8 @@ For a regular frame, each field MUST be deserialized according to its specificat
 
 For a final frame, each field MUST be deserialized according to its specification:
 
+- The Decrypt operation MUST deserialize the [Sequence Number End](../data-format/message-body.md#sequence-number-end).
+  The value MUST be `0xFFFFFFFF`.
 - The Decrypt operation MUST deserialize the [Sequence Number](../data-format/message-body.md#final-frame-sequence-number).
 - The Decrypt operation MUST deserialize the [IV](../data-format/message-body.md#final-frame-iv).
 - The Decrypt operation MUST deserialize the [Encrypted Content Length](../data-format/message-body.md#final-frame-encrypted-content-length).
