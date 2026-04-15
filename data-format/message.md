@@ -19,4 +19,7 @@ If the [message header](message-header.md) contains an [algorithm suite](../fram
 [signature algorithm](../framework/algorithm-suites.md#signature-algorithm), the message MUST also contain a
 [message footer](message-footer.md) serialized after the [message body](message-body.md).
 If the algorithm suite does not contain a signature algorithm, the message MUST NOT contain a message footer.
-If the algorithm suite contains an unrecognized signature algorithm, the operation MUST raise an error.
+If the [algorithm suite ID](message-header.md#algorithm-suite-id) is unrecognized or unsupported, or its
+[algorithm suite](../framework/algorithm-suites.md) definition cannot be used to determine whether a
+[signature algorithm](../framework/algorithm-suites.md#signature-algorithm) is required, the operation MUST raise
+an error and MUST NOT treat any trailing bytes as a valid [message footer](message-footer.md).
