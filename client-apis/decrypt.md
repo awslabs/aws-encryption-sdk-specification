@@ -32,9 +32,9 @@ of the algorithm suite indicated in the message header.
 Required arguments:
 
 - The input to the Decrypt operation MUST accept a required [Encrypted Message](#encrypted-message) argument.
-- The input to the Decrypt operation MUST accept a [cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) and a [keyring](../framework/keyring-interface.md) argument.
-  The keyring and CMM inputs SHOULD be optional.
-  The Decrypt operation MUST validate that exactly one keyring or CMM was provided by the caller.
+- The input to the Decrypt operation MUST accept an optional [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) argument.
+- The input to the Decrypt operation MUST accept an optional [Keyring](../framework/keyring-interface.md) argument.
+  The Decrypt operation MUST validate that exactly one of a keyring or CMM was provided by the caller.
   If the caller does not provide exactly one of a keyring or CMM, the Decrypt operation MUST fail.
 
 Optional arguments:
@@ -66,7 +66,7 @@ Because the first two bytes of the message format have a very limited set of pos
 (currently they are in fact fixed),
 the first two bytes of the Base64 encoding of a valid message are also simple to recognize.
 
-To make diagnosing this mistake easier, implementations SHOULD detect the first two bytes of the Base64 encoding of any supported message [versions](../data-format/message-header.md#version-1)
+To make diagnosing this mistake easier, implementations SHOULD detect the first two bytes of the Base64 encoding of any supported message [versions](../data-format/message-header.md#version)
 and [types](../data-format/message-header.md#type)
 and fail with a more specific error message.
 In particular, the hex values to detect for the current set of versions and types are:
@@ -339,10 +339,12 @@ the Decrypt operation MUST use the first 4 bytes of a frame to determine
 whether the operation will deserialize the frame as a [final frame](../data-format/message-body.md#final-frame)
 or [regular frame](../data-format/message-body.md#regular-frame).
 
-- The Decrypt operation MUST deserialize the [Sequence Number End](../data-format/message-body.md#sequence-number-end).
+The Decrypt operation MUST inspect the first 4 bytes of each frame.
   If the first 4 bytes have a value of 0xFFFFFFFF,
-  then the Decrypt operation MUST deserialize the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
-  Otherwise, the Decrypt operation MUST deserialize the bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
+  the Decrypt operation MUST treat them as the [Sequence Number End](../data-format/message-body.md#sequence-number-end)
+  and deserialize the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
+  Otherwise, the Decrypt operation MUST treat them as the [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number)
+  and deserialize the following bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
 
 For a regular frame, each field MUST be deserialized according to its specification:
 
@@ -383,15 +385,20 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
     equal to the length of the plaintext that was encrypted.
     If this is a regular frame, this SHOULD be determined by using the [frame length](../data-format/message-header.md#frame-length)
     deserialized from the message header.
-    If this is not a regular frame, this SHOULD be determined by using the [encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
+    If this is a final frame, this SHOULD be determined by using the [final frame encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
+    If this is non-framed data, this SHOULD be determined by using the [non-framed data encrypted content length](../data-format/message-body.md#non-framed-data-encrypted-content-length).
 - The IV MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
 - The cipherkey MUST be the derived data key
-- The ciphertext MUST be the [encrypted content](../data-format/message-body.md#regular-frame-encrypted-content).
-- The tag MUST be the value serialized in the
-  [authentication tag field](../data-format/message-body.md#regular-frame-authentication-tag)
-  in the message body or frame.
+- The ciphertext MUST be the encrypted content deserialized from the frame or body.
+  For a regular frame this is the [Regular Frame Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content).
+  For a final frame this is the [Final Frame Encrypted Content](../data-format/message-body.md#final-frame-encrypted-content).
+  For non-framed data this is the [Non-Framed Data Encrypted Content](../data-format/message-body.md#non-framed-data-encrypted-content).
+- The tag MUST be the authentication tag deserialized from the frame or body.
+  For a regular frame this is the [Regular Frame Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag).
+  For a final frame this is the [Final Frame Authentication Tag](../data-format/message-body.md#final-frame-authentication-tag).
+  For non-framed data this is the [Non-Framed Data Authentication Tag](../data-format/message-body.md#non-framed-data-authentication-tag).
 
 If this decryption fails, this operation MUST immediately halt and fail.
 This operation MUST NOT release any unauthenticated plaintext.
