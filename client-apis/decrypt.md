@@ -185,28 +185,18 @@ If the version is [1.0](../data-format/message-header.md#supported-versions),
 the remaining header fields MUST be deserialized according to the
 [Header Body Version 1.0](../data-format/message-header.md#header-body-version-10) specification:
 
-- [Type](../data-format/message-header.md#type): MUST be deserialized according to the
-  [Type](../data-format/message-header.md#type) specification.
+- The Decrypt operation MUST deserialize the [Type](../data-format/message-header.md#type).
   The value MUST be a [supported type](../data-format/message-header.md#supported-types).
-- [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST be deserialized according to the
-  [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id) specification.
-- [Message ID](../data-format/message-header.md#message-id): MUST be deserialized according to the
-  [Message ID](../data-format/message-header.md#message-id) specification.
-- [AAD](../data-format/message-header.md#aad): MUST be deserialized according to the
-  [AAD](../data-format/message-header.md#aad) specification.
-- [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys): MUST be deserialized according to the
-  [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys) specification.
-- [Content Type](../data-format/message-header.md#content-type): MUST be deserialized according to the
-  [Content Type](../data-format/message-header.md#content-type) specification.
+- The Decrypt operation MUST deserialize the [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id).
+- The Decrypt operation MUST deserialize the [Message ID](../data-format/message-header.md#message-id).
+- The Decrypt operation MUST deserialize the [AAD](../data-format/message-header.md#aad).
+- The Decrypt operation MUST deserialize the [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys).
+- The Decrypt operation MUST deserialize the [Content Type](../data-format/message-header.md#content-type).
   The value MUST be a [supported content type](../data-format/message-header.md#supported-content-types).
-- [Reserved](../data-format/message-header.md#reserved): MUST be deserialized according to the
-  [Reserved](../data-format/message-header.md#reserved) specification.
-- [IV Length](../data-format/message-header.md#iv-length): MUST be deserialized according to the
-  [IV Length](../data-format/message-header.md#iv-length) specification.
-- [Frame Length](../data-format/message-header.md#frame-length): MUST be deserialized according to the
-  [Frame Length](../data-format/message-header.md#frame-length) specification.
-- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST be deserialized according to the
-  [Authentication Tag](../data-format/message-header.md#authentication-tag) specification.
+- The Decrypt operation MUST deserialize the [Reserved](../data-format/message-header.md#reserved).
+- The Decrypt operation MUST deserialize the [IV Length](../data-format/message-header.md#iv-length).
+- The Decrypt operation MUST deserialize the [Frame Length](../data-format/message-header.md#frame-length).
+- The Decrypt operation MUST deserialize the [Authentication Tag](../data-format/message-header.md#authentication-tag).
 
 #### V2 Header Deserialization
 
@@ -214,23 +204,15 @@ If the version is [2.0](../data-format/message-header.md#supported-versions),
 the remaining header fields MUST be deserialized according to the
 [Header Body Version 2.0](../data-format/message-header.md#header-body-version-20) specification:
 
-- [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id): MUST be deserialized according to the
-  [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id) specification.
-- [Message ID](../data-format/message-header.md#message-id): MUST be deserialized according to the
-  [Message ID](../data-format/message-header.md#message-id) specification.
-- [AAD](../data-format/message-header.md#aad): MUST be deserialized according to the
-  [AAD](../data-format/message-header.md#aad) specification.
-- [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys): MUST be deserialized according to the
-  [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys) specification.
-- [Content Type](../data-format/message-header.md#content-type): MUST be deserialized according to the
-  [Content Type](../data-format/message-header.md#content-type) specification.
+- The Decrypt operation MUST deserialize the [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id).
+- The Decrypt operation MUST deserialize the [Message ID](../data-format/message-header.md#message-id).
+- The Decrypt operation MUST deserialize the [AAD](../data-format/message-header.md#aad).
+- The Decrypt operation MUST deserialize the [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys).
+- The Decrypt operation MUST deserialize the [Content Type](../data-format/message-header.md#content-type).
   The value MUST be a [supported content type](../data-format/message-header.md#supported-content-types).
-- [Frame Length](../data-format/message-header.md#frame-length): MUST be deserialized according to the
-  [Frame Length](../data-format/message-header.md#frame-length) specification.
-- [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data): MUST be deserialized according to the
-  [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data) specification.
-- [Authentication Tag](../data-format/message-header.md#authentication-tag): MUST be deserialized according to the
-  [Authentication Tag](../data-format/message-header.md#authentication-tag) specification.
+- The Decrypt operation MUST deserialize the [Frame Length](../data-format/message-header.md#frame-length).
+- The Decrypt operation MUST deserialize the [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data).
+- The Decrypt operation MUST deserialize the [Authentication Tag](../data-format/message-header.md#authentication-tag).
 
 If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys)
 deserialized from the [message header](../data-format/message-header.md)
@@ -357,37 +339,27 @@ the Decrypt operation MUST use the first 4 bytes of a frame to determine
 whether the operation will deserialize the frame as a [final frame](../data-format/message-body.md#final-frame)
 or [regular frame](../data-format/message-body.md#regular-frame).
 
-- The [Sequence Number End](../data-format/message-body.md#sequence-number-end): MUST be deserialized according to the
-  [Sequence Number End](../data-format/message-body.md#sequence-number-end) specification.
+- The Decrypt operation MUST deserialize the [Sequence Number End](../data-format/message-body.md#sequence-number-end).
   If the first 4 bytes have a value of 0xFFFFFFFF,
   then the Decrypt operation MUST deserialize the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
   Otherwise, the Decrypt operation MUST deserialize the bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
 
 For a regular frame, each field MUST be deserialized according to its specification:
 
-- [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number): MUST be deserialized according to the
-  [Regular Frame Sequence Number](../data-format/message-body.md#regular-frame-sequence-number) specification.
-- [IV](../data-format/message-body.md#regular-frame-iv): MUST be deserialized according to the
-  [Regular Frame IV](../data-format/message-body.md#regular-frame-iv) specification.
-- [Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content): MUST be deserialized according to the
-  [Regular Frame Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content) specification.
-- [Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag): MUST be deserialized according to the
-  [Regular Frame Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag) specification.
+- The Decrypt operation MUST deserialize the [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number).
+- The Decrypt operation MUST deserialize the [IV](../data-format/message-body.md#regular-frame-iv).
+- The Decrypt operation MUST deserialize the [Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content).
+- The Decrypt operation MUST deserialize the [Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag).
 
 For a final frame, each field MUST be deserialized according to its specification:
 
-- [Sequence Number](../data-format/message-body.md#final-frame-sequence-number): MUST be deserialized according to the
-  [Final Frame Sequence Number](../data-format/message-body.md#final-frame-sequence-number) specification.
-- [IV](../data-format/message-body.md#final-frame-iv): MUST be deserialized according to the
-  [Final Frame IV](../data-format/message-body.md#final-frame-iv) specification.
-- [Encrypted Content Length](../data-format/message-body.md#final-frame-encrypted-content-length): MUST be deserialized according to the
-  [Final Frame Encrypted Content Length](../data-format/message-body.md#final-frame-encrypted-content-length) specification.
+- The Decrypt operation MUST deserialize the [Sequence Number](../data-format/message-body.md#final-frame-sequence-number).
+- The Decrypt operation MUST deserialize the [IV](../data-format/message-body.md#final-frame-iv).
+- The Decrypt operation MUST deserialize the [Encrypted Content Length](../data-format/message-body.md#final-frame-encrypted-content-length).
   The Decrypt operation MUST ensure that the length of the encrypted content field is
   less than or equal to the frame length deserialized in the message header.
-- [Encrypted Content](../data-format/message-body.md#final-frame-encrypted-content): MUST be deserialized according to the
-  [Final Frame Encrypted Content](../data-format/message-body.md#final-frame-encrypted-content) specification.
-- [Authentication Tag](../data-format/message-body.md#final-frame-authentication-tag): MUST be deserialized according to the
-  [Final Frame Authentication Tag](../data-format/message-body.md#final-frame-authentication-tag) specification.
+- The Decrypt operation MUST deserialize the [Encrypted Content](../data-format/message-body.md#final-frame-encrypted-content).
+- The Decrypt operation MUST deserialize the [Authentication Tag](../data-format/message-body.md#final-frame-authentication-tag).
 
 Once at least a single frame is deserialized (or the entire body in the un-framed case),
 the Decrypt operation MUST decrypt and authenticate the frame (or body) using the
