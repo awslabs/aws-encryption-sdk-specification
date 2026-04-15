@@ -341,7 +341,7 @@ or deserialize and/or decrypt the consumable bytes.
 The Decrypt operation MUST use the [content type](../data-format/message-header.md#content-type) field parsed from the
 message header to determine whether the operation will deserialize the message bytes as
 [framed data](../data-format/message-body.md#framed-data) or
-[un-framed data](../data-format/message-body.md#non-framed-data).
+[non-framed data](../data-format/message-body.md#non-framed-data).
 
 If deserializing [framed data](../data-format/message-body.md#framed-data),
 the Decrypt operation MUST use the first 4 bytes of a frame to determine
