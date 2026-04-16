@@ -78,7 +78,7 @@ implementations SHOULD detect this and provide a more specific error message on 
 
 ## Reference-level Explanation
 
-Implementations SHOULD detect the first two bytes of the Base64 encoding of any supported message [versions](../data-format/message-header.md#version)
+Implementations SHOULD detect the first two bytes of the Base64 encoding of any supported message [versions](../data-format/message-header.md#version-1)
 and [types](../data-format/message-header.md#type)
 and fail with a more specific error message.
 In particular, the hex values to detect for the current set of versions and types are:
