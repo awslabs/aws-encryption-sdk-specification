@@ -472,7 +472,7 @@ and MUST rollback any processing done due to the released plaintext or encryptio
 
 ## Appendix
 
-### nonframed Message Body Decryption
+### Nonframed Message Body Decryption
 
 If a message has the [nonframed](../data-format/message-body.md#nonframed-data) content type,
 the Decrypt operation MUST deserialize the message body according to the
@@ -489,6 +489,6 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
   - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST use the value for
     [nonframed data](../data-format/message-body-aad.md#body-aad-content).
   - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be `1`.
-  - The [content length](../data-format/message-body-aad.md#content-length) MUST equal the length of the encrypted content.
+  - The [content length](../data-format/message-body-aad.md#content-length) MUST equal the length of the plaintext.
 
 If this decryption fails, this operation MUST immediately halt and fail.
