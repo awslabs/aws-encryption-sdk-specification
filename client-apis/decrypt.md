@@ -39,7 +39,7 @@ Required arguments:
 
 Optional arguments:
 
-- The input to the Decrypt operation MUST accept an optional [Encryption Context](#encryption-context) argument.
+- Decrypt operation input MUST accept an optional [Encryption Context](#encryption-context) argument.
 
 ### Encrypted Message
 
@@ -326,10 +326,6 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 
 ### Decrypt the message body
 
-Regular frame deserialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
-Final frame deserialization MUST conform to the [Final Frame](../data-format/message-body.md#final-frame) specification.
-Nonframed data deserialization MUST conform to the [Nonframed Data](../data-format/message-body.md#nonframed-data) specification.
-
 Once the message header is successfully parsed, the next sequential bytes
 MUST be deserialized according to the [message body spec](../data-format/message-body.md).
 
@@ -355,6 +351,7 @@ The Decrypt operation MUST inspect the first 4 bytes of each frame.
   Otherwise, the Decrypt operation MUST treat them as the [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number)
   and deserialize the following bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
 
+Regular frame deserialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
 For a regular frame, each field MUST be deserialized according to its specification:
 
 - MUST deserialize the [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number).
@@ -362,6 +359,7 @@ For a regular frame, each field MUST be deserialized according to its specificat
 - MUST deserialize the [Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content).
 - MUST deserialize the [Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag).
 
+Final frame deserialization MUST conform to the [Final Frame](../data-format/message-body.md#final-frame) specification.
 For a final frame, each field MUST be deserialized according to its specification:
 
 - MUST deserialize the [Sequence Number End](../data-format/message-body.md#sequence-number-end).
@@ -394,10 +392,10 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
     of the previous frame.
   - The [content length](../data-format/message-body-aad.md#content-length) MUST have a value
     equal to the length of the plaintext that was encrypted.
-    If this is a regular frame, this SHOULD be determined by using the [frame length](../data-format/message-header.md#frame-length)
+    If this is a regular frame, this MUST be determined by using the [frame length](../data-format/message-header.md#frame-length)
     deserialized from the message header.
-    If this is a final frame, this SHOULD be determined by using the [final frame encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
-    If this is nonframed data, this SHOULD be determined by using the [nonframed data encrypted content length](../data-format/message-body.md#nonframed-data-encrypted-content-length).
+    If this is a final frame, this MUST be determined by using the [final frame encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
+    If this is nonframed data, this MUST be determined by using the [nonframed data encrypted content length](../data-format/message-body.md#nonframed-data-encrypted-content-length).
 - The IV MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
@@ -473,6 +471,8 @@ and MUST rollback any processing done due to the released plaintext or encryptio
 ## Appendix
 
 ### Nonframed Message Body Decryption
+
+Nonframed data deserialization MUST conform to the [Nonframed Data](../data-format/message-body.md#nonframed-data) specification.
 
 If a message has the [nonframed](../data-format/message-body.md#nonframed-data) content type,
 the Decrypt operation MUST deserialize the message body according to the

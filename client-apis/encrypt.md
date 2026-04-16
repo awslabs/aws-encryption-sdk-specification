@@ -322,9 +322,6 @@ this operation MUST serialize the [message header authentication](../data-format
 
 ## Construct the body
 
-Regular frame serialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
-Final frame serialization MUST conform to the [Final Frame](../data-format/message-body.md#final-frame) specification.
-
 The encrypted message output by the Encrypt operation MUST have a message body equal
 to the message body calculated in this step.
 If the message bodies are not equal, the Encrypt operation MUST fail.
@@ -392,8 +389,7 @@ with the following inputs:
 
 The Encrypt operation MUST serialize a regular frame or final frame with the following specifics:
 
-For a regular frame, the serialization MUST follow the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
-For a final frame, the serialization MUST follow the [Final Frame](../data-format/message-body.md#final-frame) specification.
+Regular frame serialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
 
 For a regular frame, each field MUST be serialized according to its specification:
 
@@ -405,6 +401,8 @@ For a regular frame, each field MUST be serialized according to its specificatio
   The value MUST be the encrypted content calculated for this frame.
 - MUST serialize the [Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag).
   The value MUST be the authentication tag output when calculating the encrypted content for this frame.
+
+Final frame serialization MUST conform to the [Final Frame](../data-format/message-body.md#final-frame) specification.
 
 For a final frame, each field MUST be serialized according to its specification:
 
@@ -443,7 +441,6 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
 
 Note that the message header and message body MAY have already been input during previous steps.
 
-This operation MUST then serialize a message footer.
 The order for message footer serialization MUST conform to the [Message Footer](../data-format/message-footer.md) specification.
 
 - MUST serialize the [Signature Length](../data-format/message-footer.md#signature-length).
