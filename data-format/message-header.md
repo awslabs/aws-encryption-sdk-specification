@@ -280,14 +280,14 @@ The length of the serialized content type field MUST be 1 byte.
 
 The supported content types MUST be:
 
-- `01` for [nonframed](message-body.md#nonframed-data)
+- `01` for [Nonframed](message-body.md#nonframed-data)
 - `02` for [Framed](message-body.md#framed-data)
 
 The following table is a non-normative representation of the supported content types.
 
 | Value (hex) | Content Type                                  |
 | ----------- | --------------------------------------------- |
-| 01          | [nonframed](message-body.md#nonframed-data) |
+| 01          | [Nonframed](message-body.md#nonframed-data) |
 | 02          | [Framed](message-body.md#framed-data)         |
 
 ### Algorithm Suite Data

@@ -7,13 +7,13 @@
 
 The message body is a component of the [message](message.md).  
 The message body contains the encrypted data, called the encrypted content.
-For nonframed messages, see [nonframed Data Encrypted Content](#nonframed-data-encrypted-content).
+For nonframed messages, see [Nonframed Data Encrypted Content](#nonframed-data-encrypted-content).
 For framed messages, see [Regular Frame Encrypted Content](#regular-frame-encrypted-content).  
 The purpose of the message body is to define the structure containing the encrypted content.
 
 The structure of the body depends on the content type:
 
-- [nonframed Data](#nonframed-data)
+- [Nonframed Data](#nonframed-data)
 - [Framed Data](#framed-data)
 
 ## Definitions
@@ -22,9 +22,9 @@ The structure of the body depends on the content type:
 
 The following sections describe the format of the message body for each content type.
 
-### nonframed Data
+### Nonframed Data
 
-nonframed data is a sequence of encrypted bytes along with the [initialization vector (IV)](#nonframed-data-iv)
+Nonframed data is a sequence of encrypted bytes along with the [initialization vector (IV)](#nonframed-data-iv)
 and body [authentication tag](#nonframed-data-authentication-tag).
 
 The following table is a non-normative representation of the normative requirements in this section.
@@ -37,13 +37,13 @@ The bytes are appended in the order shown.
 | [Encrypted Content](#nonframed-data-encrypted-content)               | Variable                                 | Bytes          |
 | [Authentication Tag](#nonframed-data-authentication-tag)             | Variable                                 | Bytes          |
 
-nonframed data MUST consist of, in order,
+Nonframed data MUST consist of, in order,
 IV,
 Encrypted Content Length,
 Encrypted Content,
 and Authentication Tag.
 
-#### nonframed Data IV
+#### Nonframed Data IV
 
 The initialization vector to use with the encryption algorithm.
 
@@ -52,7 +52,7 @@ A generated IV MUST be a unique IV within the message.
 The length of the IV field MUST be [IV Length](message-header.md#iv-length) bytes.
 The IV MUST be interpreted as bytes.
 
-#### nonframed Data Encrypted Content Length
+#### Nonframed Data Encrypted Content Length
 
 The length of the encrypted content.
 The encrypted content length MUST be interpreted as a UInt64.
@@ -60,14 +60,14 @@ The value of this field MUST NOT be greater than `2^36 - 32`, or 64 gibibytes (6
 due to restrictions imposed by the [implemented algorithms](../framework/algorithm-suites.md).
 The length of the Encrypted Content Length field MUST be 8 bytes.
 
-#### nonframed Data Encrypted Content
+#### Nonframed Data Encrypted Content
 
 The encrypted data as returned by the [encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm).
 
 The length of the serialized encrypted content field MUST be equal to the value of the [Encrypted Content Length](#nonframed-data-encrypted-content-length) field.
 The encrypted content value MUST be interpreted as bytes.
 
-#### nonframed Data Authentication Tag
+#### Nonframed Data Authentication Tag
 
 The authentication value for the body.
 It is used to authenticate the message body.
@@ -230,11 +230,11 @@ The authentication tag MUST be interpreted as bytes.
 
 ## Example Usage
 
-The following section contains examples of the message body for [nonframed Data](#nonframed-data) and [Framed Data](#framed-data).
+The following section contains examples of the message body for [Nonframed Data](#nonframed-data) and [Framed Data](#framed-data).
 
-### nonframed Data
+### Nonframed Data
 
-The following example shows the message body format for [nonframed Data](#nonframed-data).
+The following example shows the message body format for [Nonframed Data](#nonframed-data).
 
 #### Example Pseudo-ASN.1 Structure
 

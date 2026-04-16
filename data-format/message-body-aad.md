@@ -37,7 +37,7 @@ An identifier for the content type of the data this message body AAD is associat
 
 This value depends on the [content type](message-header.md#content-type) of the [message](message.md):
 
-- [Non-framed data](message-body.md#non-framed-data) MUST use the value `AWSKMSEncryptionClient Single Block`.
+- [nonframed data](message-body.md#nonframed-data) MUST use the value `AWSKMSEncryptionClient Single Block`.
 - The [regular frames](message-body.md#regular-frame) in [framed data](message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Frame`.
 - The [final frame](message-body.md#final-frame) in [framed data](message-body.md#framed-data) MUST use the value `AWSKMSEncryptionClient Final Frame`.
 
@@ -49,7 +49,7 @@ The sequence number of the data this message body AAD belongs to.
 For [framed data](message-body.md#framed-data), the value of this field MUST be the [frame sequence number](message-body.md#regular-frame-sequence-number).
 For a regular frame this is the [Regular Frame Sequence Number](message-body.md#regular-frame-sequence-number).
 For a final frame this is the [Final Frame Sequence Number](message-body.md#final-frame-sequence-number).
-For [non-framed data](message-body.md#non-framed-data), the value of this field MUST be `1`.
+For [nonframed data](message-body.md#nonframed-data), the value of this field MUST be `1`.
 The length of the sequence number field MUST be 4 bytes.
 The sequence number field MUST be interpreted as a UInt32.
 
@@ -62,7 +62,7 @@ The content length field MUST be interpreted as a UInt64.
 
 More specifically, depending on the [content type](message-header.md#content-type) of the [message](message.md):
 
-- For [non-framed data](message-body.md#non-framed-data), this value MUST equal the length, in bytes,
+- For [nonframed data](message-body.md#nonframed-data), this value MUST equal the length, in bytes,
   of the plaintext data provided to the algorithm for encryption.
 - For [framed data](message-body.md#framed-data), this value MUST equal the length, in bytes,
   of the plaintext being encrypted in this frame.
