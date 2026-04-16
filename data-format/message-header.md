@@ -280,14 +280,14 @@ The length of the serialized content type field MUST be 1 byte.
 
 The supported content types MUST be:
 
-- `01` for [Non-Framed](message-body.md#non-framed-data)
+- `01` for [nonframed](message-body.md#nonframed-data)
 - `02` for [Framed](message-body.md#framed-data)
 
 The following table is a non-normative representation of the supported content types.
 
 | Value (hex) | Content Type                                  |
 | ----------- | --------------------------------------------- |
-| 01          | [Non-Framed](message-body.md#non-framed-data) |
+| 01          | [nonframed](message-body.md#nonframed-data) |
 | 02          | [Framed](message-body.md#framed-data)         |
 
 ### Algorithm Suite Data
@@ -316,7 +316,7 @@ This value MUST be equal to the [IV length](../framework/algorithm-suites.md#iv-
 The length of the [encrypted content](message-body.md#regular-frame-encrypted-content) within each [regular frame](message-body.md#regular-frame) of framed content.
 The length of the serialized frame length field MUST be 4 bytes.
 The frame length MUST be interpreted as a UInt32.
-When the [content type](#content-type) is non-framed, the value of this field MUST be 0.
+When the [content type](#content-type) is nonframed, the value of this field MUST be 0.
 
 ### Header Authentication
 
@@ -517,10 +517,10 @@ FDD01BD9 B0979082 099FDBFC F7B13548
 3CC686D7 F3CF7C7A CCC52639 122A1495
 71F18A46 80E2C43F A34C0E58 11D05114
 2A363C2A E11397
-01                                         Content Type (1, non-framed data)
+01                                         Content Type (1, nonframed data)
 00000000                                   Reserved
 0C                                         IV Length (12)
-00000000                                   Frame Length (0, non-framed data)
+00000000                                   Frame Length (0, nonframed data)
 734C1BBE 032F7025 84CDA9D0                 IV
 2C82BB23 4CBF4AAB 8F5C6002 622E886C        Authentication Tag
 ```

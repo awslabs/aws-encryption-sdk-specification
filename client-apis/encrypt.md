@@ -461,9 +461,9 @@ to the message footer calculated in this step.
 
 ## Appendix
 
-### Un-Framed Message Body Encryption
+### nonframed Message Body Encryption
 
-Implementations of the AWS Encryption SDK MUST NOT encrypt using the Non-Framed content type.
+Implementations of the AWS Encryption SDK MUST NOT encrypt using the nonframed content type.
 
 ### Encryption Context not stored in the message
 

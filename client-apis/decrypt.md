@@ -17,7 +17,7 @@ authentication tag is successfully checked
 as defined by the algorithm suite indicated in the message header.
 The authentication tag may be from a [regular frame](../data-format/message-body.md#regular-frame-authentication-tag),
 [final frame](../data-format/message-body.md#final-frame-authentication-tag),
-or [non-framed data](../data-format/message-body.md#non-framed-data-authentication-tag).
+or [nonframed data](../data-format/message-body.md#nonframed-data-authentication-tag).
 
 This operation MUST NOT release any unauthenticated plaintext or unauthenticated associated data.
 
@@ -328,7 +328,7 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 
 Regular frame deserialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
 Final frame deserialization MUST conform to the [Final Frame](../data-format/message-body.md#final-frame) specification.
-Non-framed data deserialization MUST conform to the [Non-Framed Data](../data-format/message-body.md#non-framed-data) specification.
+nonframed data deserialization MUST conform to the [nonframed Data](../data-format/message-body.md#nonframed-data) specification.
 
 Once the message header is successfully parsed, the next sequential bytes
 MUST be deserialized according to the [message body spec](../data-format/message-body.md).
@@ -341,7 +341,7 @@ or deserialize and/or decrypt the consumable bytes.
 The Decrypt operation MUST use the [content type](../data-format/message-header.md#content-type) field parsed from the
 message header to determine whether the operation will deserialize the message bytes as
 [framed data](../data-format/message-body.md#framed-data) or
-[non-framed data](../data-format/message-body.md#non-framed-data).
+[nonframed data](../data-format/message-body.md#nonframed-data).
 
 If deserializing [framed data](../data-format/message-body.md#framed-data),
 the Decrypt operation MUST use the first 4 bytes of a frame to determine
@@ -374,7 +374,7 @@ For a final frame, each field MUST be deserialized according to its specificatio
 - The Decrypt operation MUST deserialize the [Encrypted Content](../data-format/message-body.md#final-frame-encrypted-content).
 - The Decrypt operation MUST deserialize the [Authentication Tag](../data-format/message-body.md#final-frame-authentication-tag).
 
-Once at least a single frame is deserialized (or the entire body in the un-framed case),
+Once at least a single frame is deserialized (or the entire body in the nonframed case),
 the Decrypt operation MUST decrypt and authenticate the frame (or body) using the
 [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
 specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
@@ -385,10 +385,10 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
     [message ID](../data-format/message-header.md#message-id) deserialized from the header of this message.
   - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST be constructed
     according to [Message Body AAD](../data-format/message-body-aad.md) depending on
-    whether the bytes being decrypted are a regular frame, final frame, or un-framed data.
+    whether the bytes being decrypted are a regular frame, final frame, or nonframed data.
   - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be the sequence
     number deserialized from the frame being decrypted.
-    If this is un-framed data, this value MUST be 1.
+    If this is nonframed data, this value MUST be 1.
     If this is framed data and the first frame sequentially, this value MUST be 1.
     Otherwise, this value MUST be 1 greater than the value of the sequence number
     of the previous frame.
@@ -397,7 +397,7 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
     If this is a regular frame, this SHOULD be determined by using the [frame length](../data-format/message-header.md#frame-length)
     deserialized from the message header.
     If this is a final frame, this SHOULD be determined by using the [final frame encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
-    If this is non-framed data, this SHOULD be determined by using the [non-framed data encrypted content length](../data-format/message-body.md#non-framed-data-encrypted-content-length).
+    If this is nonframed data, this SHOULD be determined by using the [nonframed data encrypted content length](../data-format/message-body.md#nonframed-data-encrypted-content-length).
 - The IV MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
@@ -405,11 +405,11 @@ specified by the [algorithm suite](../framework/algorithm-suites.md), with the f
 - The ciphertext MUST be the encrypted content deserialized from the frame or body.
   For a regular frame this is the [Regular Frame Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content).
   For a final frame this is the [Final Frame Encrypted Content](../data-format/message-body.md#final-frame-encrypted-content).
-  For non-framed data this is the [Non-Framed Data Encrypted Content](../data-format/message-body.md#non-framed-data-encrypted-content).
+  For nonframed data this is the [nonframed Data Encrypted Content](../data-format/message-body.md#nonframed-data-encrypted-content).
 - The tag MUST be the authentication tag deserialized from the frame or body.
   For a regular frame this is the [Regular Frame Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag).
   For a final frame this is the [Final Frame Authentication Tag](../data-format/message-body.md#final-frame-authentication-tag).
-  For non-framed data this is the [Non-Framed Data Authentication Tag](../data-format/message-body.md#non-framed-data-authentication-tag).
+  For nonframed data this is the [nonframed Data Authentication Tag](../data-format/message-body.md#nonframed-data-authentication-tag).
 
 If this decryption fails, this operation MUST immediately halt and fail.
 This operation MUST NOT release any unauthenticated plaintext.
@@ -422,7 +422,7 @@ If the input encrypted message is being [streamed](streaming.md) to this operati
 - If the streamed Decrypt operation is using an algorithm suite with a signature algorithm,
   all plaintext decrypted from regular frames SHOULD be released as soon as the above calculation,
   including tag verification, succeeds.
-  Any plaintext decrypted from [unframed data](../data-format/message-body.md#non-framed-data) or
+  Any plaintext decrypted from [unframed data](../data-format/message-body.md#nonframed-data) or
   a final frame in a streamed Decrypt operation MUST NOT be released until [signature verification](#verify-the-signature)
   successfully completes.
 - The streamed Decrypt operation SHOULD input the serialized frame to the signature algorithm as soon as it is deserialized,
@@ -472,22 +472,22 @@ and MUST rollback any processing done due to the released plaintext or encryptio
 
 ## Appendix
 
-### Un-Framed Message Body Decryption
+### nonframed Message Body Decryption
 
-If a message has the [non-framed](../data-format/message-body.md#non-framed-data) content type,
+If a message has the [nonframed](../data-format/message-body.md#nonframed-data) content type,
 the Decrypt operation MUST deserialize the message body according to the
-[non-framed data specification](../data-format/message-body.md#non-framed-data)
+[nonframed data specification](../data-format/message-body.md#nonframed-data)
 and decrypt it using the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
 specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
 
-- The IV MUST be the [IV](../data-format/message-body.md#non-framed-data-iv) deserialized from the message body.
-- The ciphertext MUST be the [Encrypted Content](../data-format/message-body.md#non-framed-data-encrypted-content) deserialized from the message body.
+- The IV MUST be the [IV](../data-format/message-body.md#nonframed-data-iv) deserialized from the message body.
+- The ciphertext MUST be the [Encrypted Content](../data-format/message-body.md#nonframed-data-encrypted-content) deserialized from the message body.
 - The cipherkey MUST be the derived data key.
-- The tag MUST be the [Authentication Tag](../data-format/message-body.md#non-framed-data-authentication-tag) deserialized from the message body.
+- The tag MUST be the [Authentication Tag](../data-format/message-body.md#nonframed-data-authentication-tag) deserialized from the message body.
 - The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
   constructed with:
   - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST use the value for
-    [non-framed data](../data-format/message-body-aad.md#body-aad-content).
+    [nonframed data](../data-format/message-body-aad.md#body-aad-content).
   - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be `1`.
   - The [content length](../data-format/message-body-aad.md#content-length) MUST equal the length of the encrypted content.
 

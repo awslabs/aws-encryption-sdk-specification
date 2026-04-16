@@ -46,7 +46,7 @@ The body AAD content value MUST be encoded as UTF-8 bytes.
 ### Sequence Number
 
 The sequence number of the data this message body AAD belongs to.
-For [framed data](message-body.md#framed-data), the value of this field MUST be the frame sequence number.
+For [framed data](message-body.md#framed-data), the value of this field MUST be the [frame sequence number](message-body.md#regular-frame-sequence-number).
 For a regular frame this is the [Regular Frame Sequence Number](message-body.md#regular-frame-sequence-number).
 For a final frame this is the [Final Frame Sequence Number](message-body.md#final-frame-sequence-number).
 For [non-framed data](message-body.md#non-framed-data), the value of this field MUST be `1`.
