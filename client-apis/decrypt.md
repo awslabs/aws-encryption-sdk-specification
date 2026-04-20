@@ -343,11 +343,11 @@ whether the operation will deserialize the frame as a [final frame](../data-form
 or [regular frame](../data-format/message-body.md#regular-frame).
 
 The Decrypt operation MUST inspect the first 4 bytes of each frame.
-  If the first 4 bytes have a value of 0xFFFFFFFF,
-  the Decrypt operation MUST treat them as the [Sequence Number End](../data-format/message-body.md#sequence-number-end)
-  and deserialize the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
-  Otherwise, the Decrypt operation MUST treat them as the [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number)
-  and deserialize the following bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
+If the first 4 bytes have a value of 0xFFFFFFFF,
+the Decrypt operation MUST treat them as the [Sequence Number End](../data-format/message-body.md#sequence-number-end)
+and deserialize the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
+Otherwise, the Decrypt operation MUST treat them as the [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number)
+and deserialize the following bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
 
 Regular frame deserialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
 For a regular frame, each field MUST be deserialized according to its specification:

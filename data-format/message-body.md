@@ -30,8 +30,8 @@ and body [authentication tag](#nonframed-data-authentication-tag).
 The following table is a non-normative representation of the normative requirements in this section.
 The bytes are appended in the order shown.
 
-| Field                                                                 | Length (bytes)                           | Interpreted as |
-| --------------------------------------------------------------------- | ---------------------------------------- | -------------- |
+| Field                                                                | Length (bytes)                           | Interpreted as |
+| -------------------------------------------------------------------- | ---------------------------------------- | -------------- |
 | [IV](#nonframed-data-iv)                                             | [IV Length](message-header.md#iv-length) | Bytes          |
 | [Encrypted Content Length](#nonframed-data-encrypted-content-length) | 8                                        | UInt64         |
 | [Encrypted Content](#nonframed-data-encrypted-content)               | Variable                                 | Bytes          |
@@ -163,14 +163,14 @@ For example, in the case that the length of the Plaintext is equal to the Frame 
 
 The following table is a non-normative representation of the normative requirements in this section.
 
-| Field                                                   | Length (bytes)                                                                                               | Interpreted as |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
-| [Sequence Number End](#sequence-number-end)             | 4                                                                                                            | Bytes          |
-| [Sequence Number](#final-frame-sequence-number)         | 4                                                                                                            | UInt32         |
-| [IV](#final-frame-iv)                                   | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
+| Field                                                             | Length (bytes)                                                                                               | Interpreted as |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
+| [Sequence Number End](#sequence-number-end)                       | 4                                                                                                            | Bytes          |
+| [Sequence Number](#final-frame-sequence-number)                   | 4                                                                                                            | UInt32         |
+| [IV](#final-frame-iv)                                             | [IV Length](message-header.md#iv-length)                                                                     | Bytes          |
 | [Encrypted Content Length](#final-frame-encrypted-content-length) | 4                                                                                                            | UInt32         |
-| [Encrypted Content](#final-frame-encrypted-content)     | Variable                                                                                                     | Bytes          |
-| [Authentication Tag](#final-frame-authentication-tag)   | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
+| [Encrypted Content](#final-frame-encrypted-content)               | Variable                                                                                                     | Bytes          |
+| [Authentication Tag](#final-frame-authentication-tag)             | Algorithm suite ID's [Authentication Tag Length](../framework/algorithm-suites.md#authentication-tag-length) | Bytes          |
 
 A final frame MUST consist of, in order,
 Sequence Number End,

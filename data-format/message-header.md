@@ -284,10 +284,10 @@ The supported content types MUST be:
 
 The following table is a non-normative representation of the supported content types.
 
-| Value (hex) | Content Type                                  |
-| ----------- | --------------------------------------------- |
+| Value (hex) | Content Type                                |
+| ----------- | ------------------------------------------- |
 | 01          | [Nonframed](message-body.md#nonframed-data) |
-| 02          | [Framed](message-body.md#framed-data)         |
+| 02          | [Framed](message-body.md#framed-data)       |
 
 ### Algorithm Suite Data
 
