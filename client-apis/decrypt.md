@@ -174,14 +174,12 @@ The header deserialization order MUST follow the [Header Body Version 1.0](../da
 or [Header Body Version 2.0](../data-format/message-header.md#header-body-version-20) specification,
 depending on the [Version](../data-format/message-header.md#version) field.
 
-Each header field MUST be deserialized according to its specification in the [message header](../data-format/message-header.md).
-
 The [Version](../data-format/message-header.md#version) field MUST be deserialized first.
 The value MUST be a [supported version](../data-format/message-header.md#supported-versions).
 
 #### V1 Header Deserialization
 
-If the version is [1.0](../data-format/message-header.md#supported-versions),
+If the value of the deserialized version field is [1.0](../data-format/message-header.md#supported-versions),
 the remaining header fields MUST be deserialized according to the
 [Header Body Version 1.0](../data-format/message-header.md#header-body-version-10) specification:
 
@@ -205,7 +203,7 @@ The Decrypt operation MUST then deserialize the
 
 #### V2 Header Deserialization
 
-If the version is [2.0](../data-format/message-header.md#supported-versions),
+If the value of the deserialized version field is [2.0](../data-format/message-header.md#supported-versions),
 the remaining header fields MUST be deserialized according to the
 [Header Body Version 2.0](../data-format/message-header.md#header-body-version-20) specification:
 
@@ -471,6 +469,8 @@ and MUST rollback any processing done due to the released plaintext or encryptio
 ## Appendix
 
 ### Nonframed Message Body Decryption
+
+Implementations of the ESDK cannot encrypt messages with nonframed message bodies but still support decrypting messages with nonframed message bodies.
 
 Nonframed data deserialization MUST conform to the [Nonframed Data](../data-format/message-body.md#nonframed-data) specification.
 

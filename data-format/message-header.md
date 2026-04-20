@@ -113,7 +113,6 @@ The following table is a non-normative representation of the supported versions.
 
 The type of the message format.
 The length of the serialized type field MUST be 1 byte.
-The type (hex) of this field MUST be a value that exists in the following table:
 
 ##### Supported Types
 
