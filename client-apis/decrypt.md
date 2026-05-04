@@ -172,7 +172,7 @@ successfully deserialized a valid [message header](../data-format/message-header
 
 The header deserialization order MUST follow the [Header Body Version 1.0](../data-format/message-header.md#header-body-version-10)
 or [Header Body Version 2.0](../data-format/message-header.md#header-body-version-20) specification,
-depending on the [Version](../data-format/message-header.md#version) field.
+depending on the [Version](../data-format/message-header.md#version) field in the message header.
 
 The [Version](../data-format/message-header.md#version) field MUST be deserialized first.
 The value MUST be a [supported version](../data-format/message-header.md#supported-versions).
