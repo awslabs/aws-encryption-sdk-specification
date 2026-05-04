@@ -32,14 +32,14 @@ of the algorithm suite indicated in the message header.
 Required arguments:
 
 - Decrypt operation input MUST accept a required [Encrypted Message](#encrypted-message) argument.
-- Decrypt operation input MUST accept an optional [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) argument.
-- Decrypt operation input MUST accept an optional [Keyring](../framework/keyring-interface.md) argument.
-  The Decrypt operation MUST validate that exactly one of a keyring or CMM was provided by the caller.
-  If the caller does not provide exactly one of a keyring or CMM, the Decrypt operation MUST fail.
 
 Optional arguments:
 
 - Decrypt operation input MUST accept an optional [Encryption Context](#encryption-context) argument.
+- Decrypt operation input MUST accept an optional [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) argument.
+- Decrypt operation input MUST accept an optional [Keyring](../framework/keyring-interface.md) argument.
+  The Decrypt operation MUST validate that exactly one of a keyring or CMM was provided by the caller.
+  If the caller does not provide exactly one of a keyring or CMM, the Decrypt operation MUST fail.
 
 ### Encrypted Message
 
