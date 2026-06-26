@@ -82,6 +82,31 @@ Keys can also reference an AWS KMS CMK. They should contain the following attrib
   - Must be `aws-kms`
 - `key-id`: KMS CMK ID
 
+#### ML-KEM Public Key
+
+A standalone ML-KEM public key used by the
+[AWS KMS ML-KEM Keyring](../aws-kms/aws-kms-ml-kem-keyring.md)
+when its encapsulation source is `local`.
+The private half is not represented here; decapsulation is performed by AWS KMS
+against the corresponding `aws-kms` entry.
+
+- `key-id` : The key ID that should be used to identify this key material.
+- `encrypt` : Boolean that defines whether or not this key should be used to encrypt.
+- `decrypt` : MUST be `false`. ML-KEM public keys cannot decapsulate.
+- `algorithm` : MUST be `ml-kem`.
+- `type` : MUST be `public`.
+- `parameter-set` : ML-KEM parameter set.
+  - Allowed Values
+    - `ml-kem-512`
+    - `ml-kem-768`
+    - `ml-kem-1024`
+- `encoding` : Encoding used to store the public key.
+  - Allowed Values
+    - `base64` : Public key bytes are base64-encoded.
+    - `der` : Public key bytes are a DER-encoded `SubjectPublicKeyInfo`,
+      then base64-encoded for embedding in the JSON manifest.
+- `material` : String containing the encoded public key material.
+
 #### Static Material
 
 A key that defines the encryption materials or decryption materials to return.
