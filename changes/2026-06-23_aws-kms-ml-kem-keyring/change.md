@@ -5,28 +5,28 @@
 
 ## Affected Features
 
-| Feature                                                                       |
-| ----------------------------------------------------------------------------- |
-| [Keyring Interface](../../framework/keyring-interface.md)                     |
-| [AWS KMS ML-KEM Keyring](../../framework/aws-kms/aws-kms-ml-kem-keyring.md)   |
+| Feature                                                                     |
+| --------------------------------------------------------------------------- |
+| [Keyring Interface](../../framework/keyring-interface.md)                   |
+| [AWS KMS ML-KEM Keyring](../../framework/aws-kms/aws-kms-ml-kem-keyring.md) |
 
 ## Affected Specifications
 
-| Specification                                                                                            |
-| -------------------------------------------------------------------------------------------------------- |
-| [AWS KMS ML-KEM Keyring](../../framework/aws-kms/aws-kms-ml-kem-keyring.md) (new)                        |
-| [ML-KEM Key Derivation](../../framework/ml-kem-key-derivation.md) (new)                                  |
-| [Keyring Interface — Supported Keyrings](../../framework/keyring-interface.md#supported-keyrings)        |
-| [Test Vectors — Key Description](../../framework/test-vectors/key-description.md)                        |
-| [Test Vectors — Keys Manifest](../../framework/test-vectors/keys-manifest.md)                            |
-| [Test Vectors — MPL Enumeration](../../framework/test-vectors/mpl-test-vector-enumeration.md)            |
-| [Test Vectors — AWS KMS ML-KEM Keyring](../../framework/test-vectors/complete-vectors/ml-kem.md) (new)   |
+| Specification                                                                                          |
+| ------------------------------------------------------------------------------------------------------ |
+| [AWS KMS ML-KEM Keyring](../../framework/aws-kms/aws-kms-ml-kem-keyring.md) (new)                      |
+| [ML-KEM Key Derivation](../../framework/ml-kem-key-derivation.md) (new)                                |
+| [Keyring Interface — Supported Keyrings](../../framework/keyring-interface.md#supported-keyrings)      |
+| [Test Vectors — Key Description](../../framework/test-vectors/key-description.md)                      |
+| [Test Vectors — Keys Manifest](../../framework/test-vectors/keys-manifest.md)                          |
+| [Test Vectors — MPL Enumeration](../../framework/test-vectors/mpl-test-vector-enumeration.md)          |
+| [Test Vectors — AWS KMS ML-KEM Keyring](../../framework/test-vectors/complete-vectors/ml-kem.md) (new) |
 
 ## Affected Implementations
 
-| Language | Version Introduced | Version Removed | Implementation |
-| -------- | ------------------ | --------------- | -------------- |
-| Java     | TBD                | n/a             | TBD            |
+| Language | Version Introduced | Version Removed | Implementation                   |
+| -------- | ------------------ | --------------- | -------------------------------- |
+| Java     | TBD                | n/a             | TBD                              |
 | Dafny    | n/a                | n/a             | Not planned for initial release. |
 | .NET     | n/a                | n/a             | Not planned for initial release. |
 

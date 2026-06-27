@@ -172,12 +172,12 @@ the [ciphertext](../structures.md#ciphertext) field in
 The following table describes the fields that form the ciphertext.
 The bytes are appended in the order shown.
 
-| Field              | Length (bytes)                                                                | Interpreted as |
-| ------------------ | ----------------------------------------------------------------------------- | -------------- |
-| KEM Ciphertext     | Fixed by the [parameter set](#supported-parameter-sets) (768 / 1088 / 1568)   | Bytes          |
-| Salt               | 32                                                                            | Bytes          |
+| Field              | Length (bytes)                                                                      | Interpreted as |
+| ------------------ | ----------------------------------------------------------------------------------- | -------------- |
+| KEM Ciphertext     | Fixed by the [parameter set](#supported-parameter-sets) (768 / 1088 / 1568)         | Bytes          |
+| Salt               | 32                                                                                  | Bytes          |
 | Encrypted Key      | Length of AES-GCM ciphertext output (i.e. the data key length, per algorithm suite) | Bytes          |
-| Authentication Tag | 16                                                                            | Bytes          |
+| Authentication Tag | 16                                                                                  | Bytes          |
 
 The AES-GCM IV is fixed and is NOT carried in the ciphertext;
 see [Data Key Wrapping](#data-key-wrapping).
