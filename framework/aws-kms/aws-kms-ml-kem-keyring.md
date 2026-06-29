@@ -20,21 +20,12 @@
 
 ## Overview
 
-A keyring which uses an AWS KMS ML-KEM key
-to establish a per-message shared secret
-from which a wrapping key is derived,
-and which then performs envelope encryption on a data key
-using AES-GCM with that wrapping key.
-
-The keyring's encapsulation source is configurable.
-On encrypt, encapsulation MAY be performed by AWS KMS (`Encapsulate`)
-or locally against the ML-KEM public key.
-On decrypt, decapsulation is always performed by AWS KMS (`Decapsulate`);
-the ML-KEM private key never leaves AWS KMS.
-
-This keyring provides quantum-resistant protection of data keys
-without requiring a change to the AWS Encryption SDK message format
-or to the algorithm suites that govern body encryption.
+A keyring that uses an AWS KMS ML-KEM key
+to establish a per-message shared secret,
+derives a wrapping key from it,
+and AES-GCM-wraps the data key.
+Encapsulation source is configurable (KMS or local);
+decapsulation is always performed by AWS KMS.
 
 ## Definitions
 
@@ -48,42 +39,30 @@ in this document are to be interpreted as described in
 
 ### ML-KEM
 
-ML-KEM (Module-Lattice-Based Key Encapsulation Mechanism) is a
-[NIST-standardized Key Encapsulation Mechanism](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf)
-believed to resist attack by both classical and quantum adversaries.
-
-A Key Encapsulation Mechanism is a public-key primitive defined by three operations:
-
-- `KeyGen` produces an encapsulation key (public) and a decapsulation key (private).
-- `Encapsulate(public key)` produces `(ciphertext, sharedSecret)`,
-  where the shared secret is a fresh random 32-byte value and the ciphertext encapsulates it.
-- `Decapsulate(private key, ciphertext)` recovers the same shared secret.
-
-The shared secret is never transmitted as plaintext;
-only the ciphertext travels with the message.
-ML-KEM uses implicit rejection: decapsulating an invalid ciphertext
-returns a pseudo-random secret rather than an error.
+[ML-KEM](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf)
+is the NIST-standardized Module-Lattice-Based Key Encapsulation Mechanism (FIPS 203).
+`Encapsulate(public key)` produces `(ciphertext, sharedSecret)`;
+`Decapsulate(private key, ciphertext)` recovers the same shared secret.
+ML-KEM uses implicit rejection:
+decapsulating an invalid ciphertext returns a pseudo-random secret rather than an error.
 
 ### ML-KEM Public Key
 
 For local encapsulation, an ML-KEM public key
-MUST be a DER-encoded ASN.1 `SubjectPublicKeyInfo`
-as defined for ML-KEM in
+MUST be a DER-encoded ASN.1 `SubjectPublicKeyInfo` as defined for ML-KEM in
 [NIST FIPS 203](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf).
 
 ### Shared Secret
 
-A 32-byte value produced by ML-KEM `Encapsulate` and recovered by `Decapsulate`.
-The shared secret is used as the input keying material to the
-[key derivation step](#key-derivation) and is never used directly to wrap a data key.
+The 32-byte value produced by ML-KEM `Encapsulate` and recovered by `Decapsulate`.
+Used as input keying material to [key derivation](#key-derivation);
+never used directly to wrap a data key.
 
 ### KEM Ciphertext
 
 The byte string produced by ML-KEM `Encapsulate`
-(returned by AWS KMS as `SharedSecretCiphertextBlob`)
-that encapsulates the shared secret.
-Its length is fixed by the ML-KEM parameter set
-(see [Supported Parameter Sets](#supported-parameter-sets)).
+(returned by AWS KMS as `SharedSecretCiphertextBlob`).
+Its length is fixed by the [parameter set](#supported-parameter-sets).
 
 ## Interface
 
@@ -123,24 +102,17 @@ This keyring MUST NOT use a parameter set outside of the defined above.
 
 ### Encapsulation Source
 
-The keyring's encapsulation source determines where ML-KEM `Encapsulate` runs on encrypt.
+Exactly one of the following encapsulation sources MUST be configured.
 Decapsulation is always performed by AWS KMS, regardless of the encapsulation source.
-
-Exactly one of the following encapsulation sources MUST be configured:
+Both sources produce a byte-identical [encrypted data key](#structure).
 
 - **`KmsEncapsulation`** —
   `OnEncrypt` MUST call AWS KMS `Encapsulate` against the configured key identifier.
-  This source carries no additional fields.
 - **`LocalEncapsulation`** —
-  `OnEncrypt` MUST perform ML-KEM `Encapsulate` locally against the configured public key.
-  This source carries:
-  - The [ML-KEM Public Key](#ml-kem-public-key).
-    If the public key is not supplied at configuration time,
-    the keyring MUST obtain it once via AWS KMS `GetPublicKey` and cache it.
-
-Both encapsulation sources produce a byte-identical
-[encrypted data key](#structure),
-so a message encrypted with either source is decrypted by the same KMS-backed decrypt path.
+  `OnEncrypt` MUST perform ML-KEM `Encapsulate` locally against the configured
+  [ML-KEM public key](#ml-kem-public-key).
+  If the public key is not supplied at configuration time,
+  the keyring MUST obtain it once via AWS KMS `GetPublicKey` and cache it.
 
 ## Structure
 
@@ -184,21 +156,50 @@ see [Data Key Wrapping](#data-key-wrapping).
 
 ## Key Derivation
 
-The keyring MUST derive the AES-GCM wrapping key from the shared secret
-according to [ML-KEM Key Derivation](../ml-kem-key-derivation.md),
-binding into the KDF's `FixedInfo`:
+The keyring derives the AES-GCM wrapping key from the shared secret
+using
+[NIST SP 800-108 Counter Mode](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-108r1-upd1.pdf#page=14)
+with HMAC-SHA384 as the PRF.
 
-- The keyring's configured parameter set
-  (from [Supported Parameter Sets](#supported-parameter-sets)).
-- The fully qualified ARN of the configured AWS KMS key,
-  matching the `Key ARN` in the
-  [Key Provider Information](#key-provider-information).
-- The keyring version byte `0x01`,
+The Key Derivation Function Configuration is defined as:
+
+- Key Derivation Function:
+  [Counter-Mode](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-108r1-upd1.pdf#page=14).
+- Pseudo Random Function: HMAC-SHA384.
+- Output length: 32 bytes (the AES-GCM-256 wrapping key).
+
+The KDF inputs MUST be:
+
+- Key (input keying material): the 32-byte ML-KEM shared secret.
+- Salt: the 32-byte random value carried in the
+  [Ciphertext structure](#ciphertext).
+  On encrypt the keyring MUST generate this salt using a cryptographically secure
+  random source.
+- `FixedInfo`: the byte string constructed below.
+
+The `FixedInfo` field MUST be serialized in the following order,
+with single `0x00` separator bytes between fields:
+
+```
+UTF8("AWS-KMS-ML-KEM-KEY-DERIVATION") || 0x00 ||
+UTF8(parameter_set)                    || 0x00 ||
+UTF8("HMAC_SHA384")                    || 0x00 ||
+UTF8(kms_key_arn)                      || 0x00 ||
+keyring_version_byte                   || 0x00 ||
+canonicalized(encryption_context)
+```
+
+Where:
+
+- `parameter_set` is one of `"ML-KEM-512"`, `"ML-KEM-768"`, `"ML-KEM-1024"`,
+  matching the configured [parameter set](#supported-parameter-sets).
+- `kms_key_arn` is the fully qualified ARN of the ML-KEM KMS key
+  (matching the `Key ARN` in the [Key Provider Information](#key-provider-information)).
+- `keyring_version_byte` is `0x01`,
   matching the `Version` byte in the [Key Provider Information](#key-provider-information).
-- The canonicalized encryption context from the materials.
-
-The salt input to the KDF MUST be the 32-byte salt carried in the
-[Ciphertext structure](#ciphertext).
+- `canonicalized(encryption_context)` is the result of applying the
+  [encryption context serialization specification](../structures.md#serialization)
+  to the materials' encryption context.
 
 This keyring does NOT use a key commitment construction.
 See [Security Considerations](#security-considerations) for the rationale.
@@ -377,47 +378,38 @@ If AES-GCM authentication fails, data key unwrapping MUST fail.
 
 **No key commitment.**
 The keyring does not derive or carry a key commitment value.
-Tampering with the encrypted data key, the salt, or the encryption context
-is detected by the AES-GCM authentication tag of the data key wrap:
-any such modification changes the
-`FixedInfo` used as AAD or as KDF input, which causes AEAD authentication to fail.
-ML-KEM additionally provides implicit rejection — decapsulation of an invalid
-KEM ciphertext returns a pseudo-random shared secret rather than an error —
-so a corrupted KEM ciphertext deterministically produces an unrelated wrapping key
-that cannot decrypt the data key wrap.
+Any modification to the encrypted data key, the salt, or the encryption context
+changes the `FixedInfo` used as KDF input and as AES-GCM AAD,
+which causes AEAD authentication to fail.
+ML-KEM's implicit rejection ensures that decapsulating an invalid KEM ciphertext
+yields a pseudo-random shared secret rather than an error,
+which deterministically derives a wrong wrapping key.
 
 **Encryption context binding.**
-The serialized encryption context is bound into the wrapping key
-via the `FixedInfo` field of the KDF and into the data key wrap
-via the AES-GCM Additional Authenticated Data.
-Both bindings must agree on decrypt for the unwrap to succeed.
+The canonicalized encryption context is bound into the wrapping key via the KDF's
+`FixedInfo` and into the data key wrap via the AES-GCM AAD;
+both bindings MUST agree on decrypt.
 
 **Encapsulation source equivalence.**
-KMS encapsulation and local encapsulation use the same ML-KEM key pair
-and produce a byte-identical encrypted data key,
-so the choice of encapsulation source has no effect on decryptors.
-Local encapsulation does not transmit the shared secret to AWS KMS on encrypt,
-which removes the per-message KMS call and the `kms:Encapsulate` permission
-requirement from the encrypt path
+Both encapsulation sources use the same ML-KEM key pair and produce a byte-identical
+encrypted data key.
+Local encapsulation removes the per-message KMS call and the `kms:Encapsulate`
+permission requirement on encrypt,
 at the cost of trusting the local ML-KEM provider for `Encapsulate` correctness.
 
-**Algorithm suite compatibility.**
-The keyring is compatible with all
-[ESDK algorithm suites](../algorithm-suites.md),
-including signing suites.
-The shared-secret-derived wrapping key is unique per message,
-so reusing a zeroed-out AES-GCM IV (see [Data Key Wrapping](#data-key-wrapping))
+**AES-GCM IV.**
+The wrapping key is unique per message (fresh shared secret + fresh salt),
+so the fixed zeroed 12-byte IV used by
+[Data Key Wrapping](#data-key-wrapping)
 does not violate AES-GCM nonce uniqueness across messages.
 
 ## Multi-Keyring Compatibility
 
-This keyring MAY be used as a member of a
-[multi-keyring](../multi-keyring.md).
+This keyring MAY be used inside a [multi-keyring](../multi-keyring.md).
 
 This keyring MUST NOT be used inside an
-[AWS KMS multi-keyring](./aws-kms-multi-keyrings.md).
-An AWS KMS multi-keyring requires its generator and children to be
-[AWS KMS keyrings](./aws-kms-keyring.md),
-whose construction differs from this keyring (symmetric `GenerateDataKey` / `Encrypt` /
-`Decrypt` vs. ML-KEM `Encapsulate` / `Decapsulate`),
-so its inclusion in an AWS KMS multi-keyring is not defined.
+[AWS KMS multi-keyring](./aws-kms-multi-keyrings.md),
+which requires generator and children to be
+[AWS KMS keyrings](./aws-kms-keyring.md) whose symmetric
+`GenerateDataKey` / `Encrypt` / `Decrypt` construction differs from this keyring's
+`Encapsulate` / `Decapsulate`.

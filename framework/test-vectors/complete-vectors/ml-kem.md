@@ -41,7 +41,7 @@ because both encapsulation sources produce a byte-identical encrypted data key.
 A test MUST verify that the deterministic portion of the keyring's wrapping
 produces byte-exact output for fixed inputs.
 The deterministic portion is the
-[ML-KEM key derivation](../../ml-kem-key-derivation.md)
+[key derivation](../../aws-kms/aws-kms-ml-kem-keyring.md#key-derivation)
 and the
 [data key wrap](../../aws-kms/aws-kms-ml-kem-keyring.md#data-key-wrapping);
 the encapsulation step itself is non-deterministic and MUST be excluded from
@@ -59,7 +59,7 @@ And MUST assert byte equality against:
 
 - The derived wrapping key.
 - The serialized
-  [`FixedInfo`](../../ml-kem-key-derivation.md#fixedinfo).
+  [`FixedInfo`](../../aws-kms/aws-kms-ml-kem-keyring.md#key-derivation).
 - The serialized
   [Key Provider Information](../../aws-kms/aws-kms-ml-kem-keyring.md#key-provider-information).
 - The serialized [Ciphertext](../../aws-kms/aws-kms-ml-kem-keyring.md#ciphertext)
