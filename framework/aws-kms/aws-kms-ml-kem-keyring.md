@@ -186,7 +186,6 @@ in the order listed below, of the following fields,
 where each field is immediately preceded by a 2-byte big-endian unsigned integer
 (`UInt16`) equal to the byte length of that field:
 
-
 UInt16(length of field) || field, for each field in order:
 
 UTF8("AWS-KMS-ML-KEM-KEY-DERIVATION")
@@ -196,11 +195,11 @@ UTF8(kms_key_arn)
 keyring_version_byte
 canonicalized(encryption_context)
 
-
 The 2-byte length prefix preceding each `FixedInfo` field
 MUST equal the byte length of that field.
 
 Where:
+
 - `parameter_set` is the UTF-8 encoding of the configured
   [parameter set](#supported-parameter-sets)
   (`"ML-KEM-512"`, `"ML-KEM-768"`, or `"ML-KEM-1024"`).
@@ -211,7 +210,6 @@ Where:
 - `canonicalized(encryption_context)` is the result of applying the
   [encryption context serialization specification](../structures.md#serialization)
   to the materials' encryption context.
-
 
 This keyring does NOT use a key commitment construction.
 See [Security Considerations](#security-considerations) for the rationale.
