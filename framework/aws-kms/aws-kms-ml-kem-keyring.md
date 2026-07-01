@@ -3,16 +3,6 @@
 
 # AWS KMS ML-KEM Keyring
 
-## Version
-
-0.1.0-preview
-
-### Changelog
-
-- 0.1.0-preview
-
-  - Initial record.
-
 ## Implementations
 
 | Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
@@ -51,12 +41,15 @@ decapsulating an invalid ciphertext returns a pseudo-random secret rather than a
 For local encapsulation, an ML-KEM public key
 MUST be a DER-encoded ASN.1 `SubjectPublicKeyInfo` as defined for ML-KEM in
 [NIST FIPS 203](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf).
+If the public key is not a valid DER-encoded `SubjectPublicKeyInfo`,
+the keyring MUST fail.
 
 ### Shared Secret
 
-The 32-byte value produced by ML-KEM `Encapsulate` and recovered by `Decapsulate`.
-Used as input keying material to [key derivation](#key-derivation);
-never used directly to wrap a data key.
+The shared secret is the 32-byte value that ML-KEM `Encapsulate` produces
+and that `Decapsulate` recovers.
+The keyring uses it as the input keying material to [key derivation](#key-derivation),
+and it is never used directly to wrap or encrypt a data key.
 
 ### KEM Ciphertext
 
@@ -120,8 +113,7 @@ Both sources produce a byte-identical [encrypted data key](#structure).
 - **`LocalEncapsulation`** —
   `OnEncrypt` MUST perform ML-KEM `Encapsulate` locally against the configured
   [ML-KEM public key](#ml-kem-public-key).
-  If the public key is not supplied at configuration time,
-  the keyring MUST obtain it once via AWS KMS `GetPublicKey` and cache it.
+  If the public key is not supplied at configuration time, keyring construction MUST fail.
 
 ## Structure
 
@@ -140,9 +132,12 @@ The bytes are appended in the order shown.
 | Key ARN Length | 2              | UInt16         |
 | Key ARN        | Variable       | UTF-8 Bytes    |
 
-The `Key ARN` field MUST be the fully qualified AWS KMS key ARN
-identifying the ML-KEM KMS key
-that produced the [KEM Ciphertext](#kem-ciphertext).
+The key provider information MUST be serialized in big-endian format.
+The fields MUST be serialized in the order shown in the following table.
+The value of the Version field MUST be `0x01`.
+The length of the serialized Key ARN Length field MUST be 2 bytes.
+The Key ARN field MUST be the UTF-8 encoded, fully qualified AWS KMS key ARN
+identifying the ML-KEM KMS key that produced the [KEM Ciphertext](#kem-ciphertext).
 
 ### Ciphertext
 
@@ -186,29 +181,37 @@ The KDF inputs MUST be:
   random source.
 - `FixedInfo`: the byte string constructed below.
 
-The `FixedInfo` field MUST be serialized in the following order,
-with single `0x00` separator bytes between fields:
+The `FixedInfo` input to the key derivation function MUST be the concatenation,
+in the order listed below, of the following fields,
+where each field is immediately preceded by a 2-byte big-endian unsigned integer
+(`UInt16`) equal to the byte length of that field:
 
-```
-UTF8("AWS-KMS-ML-KEM-KEY-DERIVATION") || 0x00 ||
-UTF8(parameter_set)                    || 0x00 ||
-UTF8("HMAC_SHA384")                    || 0x00 ||
-UTF8(kms_key_arn)                      || 0x00 ||
-keyring_version_byte                   || 0x00 ||
+
+UInt16(length of field) || field, for each field in order:
+
+UTF8("AWS-KMS-ML-KEM-KEY-DERIVATION")
+UTF8(parameter_set)
+UTF8("HMAC_SHA384")
+UTF8(kms_key_arn)
+keyring_version_byte
 canonicalized(encryption_context)
-```
+
+
+The 2-byte length prefix preceding each `FixedInfo` field
+MUST equal the byte length of that field.
 
 Where:
-
-- `parameter_set` is one of `"ML-KEM-512"`, `"ML-KEM-768"`, `"ML-KEM-1024"`,
-  matching the configured [parameter set](#supported-parameter-sets).
-- `kms_key_arn` is the fully qualified ARN of the ML-KEM KMS key
+- `parameter_set` is the UTF-8 encoding of the configured
+  [parameter set](#supported-parameter-sets)
+  (`"ML-KEM-512"`, `"ML-KEM-768"`, or `"ML-KEM-1024"`).
+- `kms_key_arn` is the UTF-8 encoding of the fully qualified ARN of the ML-KEM KMS key
   (matching the `Key ARN` in the [Key Provider Information](#key-provider-information)).
-- `keyring_version_byte` is `0x01`,
-  matching the `Version` byte in the [Key Provider Information](#key-provider-information).
+- `keyring_version_byte` is `0x01`
+  (matching the `Version` byte in the [Key Provider Information](#key-provider-information)).
 - `canonicalized(encryption_context)` is the result of applying the
   [encryption context serialization specification](../structures.md#serialization)
   to the materials' encryption context.
+
 
 This keyring does NOT use a key commitment construction.
 See [Security Considerations](#security-considerations) for the rationale.
@@ -358,7 +361,7 @@ The keyring MUST encrypt the plaintext data key using `AES-GCM-256` with the fol
 - The keyring MUST use the derived wrapping key as the AES-GCM cipher key.
 - The keyring MUST use the plaintext data key as the AES-GCM message.
 - The keyring MUST use a zeroed-out 12-byte IV.
-- The keyring MUST use an authentication tag of length 16 bytes.
+- The keyring MUST encrypt the plaintext data using an authentication tag of length 16 bytes.
 - The keyring MUST use as the AES-GCM Additional Authenticated Data
   the same `FixedInfo` byte string defined in [Key Derivation](#key-derivation).
 
@@ -383,6 +386,17 @@ The keyring MUST decrypt the Encrypted Key using `AES-GCM-256` with the followin
 
 If AES-GCM authentication fails, data key unwrapping MUST fail.
 
+## Multi-Keyring Compatibility
+
+This keyring MAY be used inside a [multi-keyring](../multi-keyring.md).
+
+This keyring MUST NOT be used inside an
+[AWS KMS multi-keyring](./aws-kms-multi-keyrings.md),
+which requires generator and children to be
+[AWS KMS keyrings](./aws-kms-keyring.md) whose symmetric
+`GenerateDataKey` / `Encrypt` / `Decrypt` construction differs from this keyring's
+`Encapsulate` / `Decapsulate`.
+
 ## Security Considerations
 
 **No key commitment.**
@@ -396,29 +410,16 @@ which deterministically derives a wrong wrapping key.
 
 **Encryption context binding.**
 The canonicalized encryption context is bound into the wrapping key via the KDF's
-`FixedInfo` and into the data key wrap via the AES-GCM AAD;
-both bindings MUST agree on decrypt.
+`FixedInfo` and into the data key wrap via the AES-GCM AAD.
 
 **Encapsulation source equivalence.**
 Both encapsulation sources use the same ML-KEM key pair and produce a byte-identical
 encrypted data key.
 Local encapsulation removes the per-message KMS call and the `kms:Encapsulate`
-permission requirement on encrypt,
-at the cost of trusting the local ML-KEM provider for `Encapsulate` correctness.
+permission requirement on encrypt.
 
 **AES-GCM IV.**
 The wrapping key is unique per message (fresh shared secret + fresh salt),
 so the fixed zeroed 12-byte IV used by
 [Data Key Wrapping](#data-key-wrapping)
 does not violate AES-GCM nonce uniqueness across messages.
-
-## Multi-Keyring Compatibility
-
-This keyring MAY be used inside a [multi-keyring](../multi-keyring.md).
-
-This keyring MUST NOT be used inside an
-[AWS KMS multi-keyring](./aws-kms-multi-keyrings.md),
-which requires generator and children to be
-[AWS KMS keyrings](./aws-kms-keyring.md) whose symmetric
-`GenerateDataKey` / `Encrypt` / `Decrypt` construction differs from this keyring's
-`Encapsulate` / `Decapsulate`.

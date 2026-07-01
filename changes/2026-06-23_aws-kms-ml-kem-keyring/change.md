@@ -41,14 +41,13 @@ in this document are to be interpreted as described in
 Add an AWS KMS ML-KEM Keyring that protects data keys with a NIST-standardized
 post-quantum Key Encapsulation Mechanism (ML-KEM, FIPS 203).
 The keyring uses an ML-KEM KMS key to establish a per-message shared secret,
-derives a wrapping key from it, and AES-GCM-wraps the data key.
+derives a wrapping key from it, and AES-GCM-256 wraps (encrypts) the data key.
 Encapsulation source is configurable (KMS or local);
 decapsulation is always performed by AWS KMS.
 
 ## Out of Scope
 
 - A Raw ML-KEM Keyring that performs decapsulation locally.
-- Cached shared-secret reuse across messages.
 - Cross-language implementations beyond Java.
 - Changes to the ESDK message format or algorithm-suite registry.
 
@@ -60,8 +59,8 @@ but the asymmetric primitives currently used to wrap symmetric data keys
 ML-KEM is the NIST-standardized post-quantum KEM and is now exposed by AWS KMS
 via `Encapsulate` / `Decapsulate`.
 This keyring lets customers migrate envelope encryption to a quantum-resistant
-primitive without changing the message format, the algorithm suites, or any
-other keyring.
+primitive without changing the message format, the algorithm suites,
+other keyrings, or needing to create their own custom keyring.
 
 ## Security Implications
 

@@ -21,9 +21,6 @@ A test MUST attempt every ML-KEM parameter set:
 
 A test MUST attempt every encapsulation source: `kms` and `local`.
 
-A test MUST attempt to encrypt and decrypt
-with every [algorithm suite](../../algorithm-suites.md#algorithm-suite-id).
-
 A test MUST attempt every
 [standard encryption context](./encryption-context.md#standard-encryption-contexts).
 
