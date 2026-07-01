@@ -66,22 +66,21 @@ Its length is fixed by the [parameter set](#supported-parameter-sets).
 
 ## Interface
 
-MUST implement the [AWS Encryption SDK Keyring interface](../keyring-interface.md#interface).
+The ML-KEM keyring MUST implement the [AWS Encryption SDK Keyring interface](../keyring-interface.md#interface).
 
 ## Initialization
 
-On keyring initialization, the caller:
+The keyring constructor accepts the following required arguments:
 
-- MUST provide an AWS KMS key identifier.
-- MUST provide an AWS KMS SDK client.
-- MUST provide an [ML-KEM Parameter Set](#supported-parameter-sets).
-- MUST provide an [Encapsulation Source](#encapsulation-source).
+- MUST accept an AWS KMS key identifier.
+- MUST accept an AWS KMS SDK client.
+- MUST accept an [ML-KEM Parameter Set](#supported-parameter-sets).
+- MUST accept an [Encapsulation Source](#encapsulation-source).
 
-On keyring initialization, the caller:
+The keyring constructor accepts the following optional arguments:
 
-- MAY provide a list of Grant Tokens.
+- MUST accept an optional list of Grant Tokens.
 
-The AWS KMS key identifier MUST NOT be null or empty.
 The AWS KMS key identifier MUST be
 [a valid AWS KMS identifier](./aws-kms-key-arn.md#a-valid-aws-kms-identifier).
 The AWS KMS key identifier MUST NOT be an AWS KMS alias.
@@ -92,13 +91,23 @@ The following ML-KEM parameter sets are currently defined.
 All byte lengths are taken from
 [NIST FIPS 203 §8 (Parameter Sets)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf).
 
+The supported parameter sets are listed in the table below. The following table is a non-normative representation of the normative requirements in this section.
+
 | Parameter Set | KEM Ciphertext Length (bytes) | Public Key Length (bytes, encapsulation key) |
 | ------------- | ----------------------------- | -------------------------------------------- |
 | ML-KEM-512    | 768                           | 800                                          |
 | ML-KEM-768    | 1088                          | 1184                                         |
 | ML-KEM-1024   | 1568                          | 1568                                         |
 
+The supported parameter sets MUST be ML-KEM-512, ML-KEM-768, and ML-KEM-1024.
 This keyring MUST NOT use a parameter set outside of the defined above.
+
+ML-KEM-512 MUST use a KEM ciphertext length of 768 bytes.
+ML-KEM-512 MUST use a Public Key Length of 800 bytes.
+ML-KEM-768 MUST use a KEM ciphertext length of 1088 bytes.
+ML-KEM-768 MUST use a Public Key Length of 1184 bytes.
+ML-KEM-1024 MUST use a KEM ciphertext length of 1568 bytes.
+ML-KEM-1024 MUST use a Public Key Length of 1568 bytes.
 
 ### Encapsulation Source
 
@@ -107,7 +116,7 @@ Decapsulation is always performed by AWS KMS, regardless of the encapsulation so
 Both sources produce a byte-identical [encrypted data key](#structure).
 
 - **`KmsEncapsulation`** —
-  `OnEncrypt` MUST call AWS KMS `Encapsulate` against the configured key identifier.
+  `OnEncrypt` MUST call AWS KMS `Encapsulate` against the configured key identifier and the provided ML-KEM public key.
 - **`LocalEncapsulation`** —
   `OnEncrypt` MUST perform ML-KEM `Encapsulate` locally against the configured
   [ML-KEM public key](#ml-kem-public-key).
