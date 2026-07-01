@@ -49,6 +49,18 @@ const REPOSITORIES = [
         ]
     },
     {
+        id: 'amazon-s3-encryption-client-python',
+        owner: 'aws',
+        name: 'amazon-s3-encryption-client-python',
+        displayName: 'Amazon S3 Encryption Client for Python',
+        workflows: [
+            'Daily CI'
+        ],
+        badgeWorkflows: [
+            'daily_ci'
+        ]
+    },
+    {
         id: 'aws-encryption-sdk',
         owner: 'aws',
         name: 'aws-encryption-sdk',
