@@ -84,7 +84,7 @@ The following ML-KEM parameter sets are currently defined.
 All byte lengths are taken from
 [NIST FIPS 203 §8 (Parameter Sets)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf).
 
-The supported parameter sets are listed in the table below. The following table is a non-normative representation of the normative requirements in this section.
+The supported parameter sets are listed in the table below. 
 
 | Parameter Set | KEM Ciphertext Length (bytes) | Public Key Length (bytes, encapsulation key) |
 | ------------- | ----------------------------- | -------------------------------------------- |
@@ -93,7 +93,6 @@ The supported parameter sets are listed in the table below. The following table 
 | ML-KEM-1024   | 1568                          | 1568                                         |
 
 The supported parameter sets MUST be ML-KEM-512, ML-KEM-768, and ML-KEM-1024.
-This keyring MUST NOT use a parameter set outside of the defined above.
 
 ML-KEM-512 MUST use a KEM ciphertext length of 768 bytes.
 ML-KEM-512 MUST use a Public Key Length of 800 bytes.
@@ -133,7 +132,7 @@ The bytes are appended in the order shown.
 | Key ARN        | Variable       | UTF-8 Bytes    |
 
 The key provider information MUST be serialized in big-endian format.
-The fields MUST be serialized in the order shown in the following table.
+The fields are serialized in the order shown in the table.
 The value of the Version field MUST be `0x01`.
 The length of the serialized Key ARN Length field MUST be 2 bytes.
 The Key ARN field MUST be the UTF-8 encoded, fully qualified AWS KMS key ARN
@@ -181,19 +180,19 @@ The KDF inputs MUST be:
   random source.
 - `FixedInfo`: the byte string constructed below.
 
-The `FixedInfo` input to the key derivation function MUST be the concatenation,
+The `FixedInfo` input to the key derivation function is the concatenation,
 in the order listed below, of the following fields,
 where each field is immediately preceded by a 2-byte big-endian unsigned integer
 (`UInt16`) equal to the byte length of that field:
 
-UInt16(length of field) || field, for each field in order:
+UInt16(length of field) || field, for each field in order.
 
-UTF8("AWS-KMS-ML-KEM-KEY-DERIVATION")
-UTF8(parameter_set)
-UTF8("HMAC_SHA384")
-UTF8(kms_key_arn)
-keyring_version_byte
-canonicalized(encryption_context)
+The first `FixedInfo` field MUST be `UTF8("AWS-KMS-ML-KEM-KEY-DERIVATION")`.
+The second `FixedInfo` field MUST be `UTF8(parameter_set)`.
+The third `FixedInfo` field MUST be `UTF8("HMAC_SHA384")`.
+The fourth `FixedInfo` field MUST be `UTF8(kms_key_arn)`.
+The fifth `FixedInfo` field MUST be `keyring_version_byte`.
+The sixth `FixedInfo` field MUST be `canonicalized(encryption_context)`.
 
 The 2-byte length prefix preceding each `FixedInfo` field
 MUST equal the byte length of that field.
