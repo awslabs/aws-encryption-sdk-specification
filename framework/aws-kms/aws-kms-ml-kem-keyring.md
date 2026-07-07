@@ -84,7 +84,7 @@ The following ML-KEM parameter sets are currently defined.
 All byte lengths are taken from
 [NIST FIPS 203 §8 (Parameter Sets)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf).
 
-The supported parameter sets are listed in the table below. 
+The supported parameter sets are listed in the table below.
 
 | Parameter Set | KEM Ciphertext Length (bytes) | Public Key Length (bytes, encapsulation key) |
 | ------------- | ----------------------------- | -------------------------------------------- |
