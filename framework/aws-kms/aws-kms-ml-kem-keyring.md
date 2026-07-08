@@ -131,10 +131,10 @@ The bytes are appended in the order shown.
 | Key ARN Length | 2              | UInt16         |
 | Key ARN        | Variable       | UTF-8 Bytes    |
 
-The key provider information MUST be serialized in big-endian format.
-The fields are serialized in the order shown in the table.
+The key provider information MUST be in big-endian format.
+The fields MUST be in the following order: Version, Key ARN Length, Key ARN.
 The value of the Version field MUST be `0x01`.
-The length of the serialized Key ARN Length field MUST be 2 bytes.
+The length of the Key ARN Length field MUST be 2 bytes.
 The Key ARN field MUST be the UTF-8 encoded, fully qualified AWS KMS key ARN
 identifying the ML-KEM KMS key that produced the [KEM Ciphertext](#kem-ciphertext).
 
@@ -154,11 +154,11 @@ The bytes are appended in the order shown.
 | Encrypted Key      | Length of AES-GCM ciphertext output (i.e. the data key length, per algorithm suite) | Bytes          |
 | Authentication Tag | 16                                                                                  | Bytes          |
 
-The ciphertext MUST be serialized in big-endian format.
-The fields MUST be serialized in the following order: KEM Ciphertext, Salt, Encrypted Key, Authentication Tag.
-The length of the serialized KEM Ciphertext field MUST equal the length fixed by the configured [parameter set](#supported-parameter-sets).
-The length of the serialized Salt field MUST be 32 bytes.
-The length of the serialized Authentication Tag field MUST be 16 bytes.
+The ciphertext MUST be in big-endian format.
+The fields MUST be in the following order: KEM Ciphertext, Salt, Encrypted Key, Authentication Tag.
+The length of the KEM Ciphertext field MUST equal the length fixed by the configured [parameter set](#supported-parameter-sets).
+The length of the Salt field MUST be 32 bytes.
+The length of the Authentication Tag field MUST be 16 bytes.
 
 The AES-GCM IV is fixed and is NOT carried in the ciphertext;
 see [Data Key Wrapping](#data-key-wrapping).
@@ -177,14 +177,10 @@ The Key Derivation Function Configuration is defined as:
 - Pseudo Random Function: HMAC-SHA384.
 - Output length: 32 bytes (the AES-GCM-256 wrapping key).
 
-The KDF inputs MUST be:
-
-- Key (input keying material): the 32-byte ML-KEM shared secret.
-- Salt: the 32-byte random value carried in the
-  [Ciphertext structure](#ciphertext).
-  On encrypt the keyring MUST generate this salt using a cryptographically secure
-  random source.
-- `FixedInfo`: the byte string constructed below.
+The Key (input keying material) input to the KDF MUST be the 32-byte ML-KEM shared secret.
+The Salt input to the KDF MUST be the 32-byte random value carried in the [Ciphertext structure](#ciphertext).
+The `FixedInfo` input to the KDF MUST be the byte string constructed below.
+On encrypt the keyring MUST generate the salt using a cryptographically secure random source.
 
 The `FixedInfo` input to the key derivation function is the concatenation,
 in the order listed below, of the following fields,
@@ -226,9 +222,8 @@ See [Security Considerations](#security-considerations) for the rationale.
 OnEncrypt MUST take [encryption materials](../structures.md#encryption-materials) as input.
 
 If the encryption materials do not contain a plaintext data key,
-OnEncrypt MUST generate a fresh random plaintext data key
-of the length defined by the materials'
-[algorithm suite](../algorithm-suites.md).
+OnEncrypt MUST generate a new plaintext data key.
+The generated plaintext data key MUST be a fresh random value from a cryptographically secure random source, of the length defined by the materials' [algorithm suite](../algorithm-suites.md).
 
 The keyring MUST attempt to serialize the
 [encryption materials'](../structures.md#encryption-materials)
@@ -304,8 +299,6 @@ For an encrypted data key to match:
 - The deserialized `Version` value MUST match `0x01`.
 - The deserialized `Key ARN` MUST match the keyring's configured AWS KMS key identifier
   (compared after [AWS KMS key identifier normalization](./aws-kms-key-arn.md)).
-- The `Key ARN Length` field MUST be read as a 2-byte big-endian `UInt16`,
-  and the length of the encoded `Key ARN` MUST equal that value.
 - The deserialized KEM Ciphertext length MUST match the configured parameter set.
 
 For each encrypted data key in the filtered set, one at a time,
@@ -319,10 +312,6 @@ OnDecrypt MUST attempt to deserialize the [Ciphertext](#ciphertext) to obtain:
 - The Salt.
 - The Encrypted Key.
 - The Authentication Tag.
-
-The fields MUST be read from the serialized ciphertext in the following order: KEM Ciphertext, Salt, Encrypted Key, Authentication Tag.
-Deserialization MUST fail if the serialized ciphertext is shorter than the sum of the fixed-length fields (KEM Ciphertext + Salt + Authentication Tag) for the configured parameter set.
-The Encrypted Key MUST be the bytes between the Salt and the Authentication Tag.
 
 If the keyring is unable to deserialize this information,
 then an error MUST be collected
