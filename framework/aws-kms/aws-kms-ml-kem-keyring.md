@@ -154,6 +154,12 @@ The bytes are appended in the order shown.
 | Encrypted Key      | Length of AES-GCM ciphertext output (i.e. the data key length, per algorithm suite) | Bytes          |
 | Authentication Tag | 16                                                                                  | Bytes          |
 
+The ciphertext MUST be serialized in big-endian format.
+The fields MUST be serialized in the following order: KEM Ciphertext, Salt, Encrypted Key, Authentication Tag.
+The length of the serialized KEM Ciphertext field MUST equal the length fixed by the configured [parameter set](#supported-parameter-sets).
+The length of the serialized Salt field MUST be 32 bytes.
+The length of the serialized Authentication Tag field MUST be 16 bytes.
+
 The AES-GCM IV is fixed and is NOT carried in the ciphertext;
 see [Data Key Wrapping](#data-key-wrapping).
 
@@ -298,6 +304,8 @@ For an encrypted data key to match:
 - The deserialized `Version` value MUST match `0x01`.
 - The deserialized `Key ARN` MUST match the keyring's configured AWS KMS key identifier
   (compared after [AWS KMS key identifier normalization](./aws-kms-key-arn.md)).
+- The `Key ARN Length` field MUST be read as a 2-byte big-endian `UInt16`,
+  and the length of the encoded `Key ARN` MUST equal that value.
 - The deserialized KEM Ciphertext length MUST match the configured parameter set.
 
 For each encrypted data key in the filtered set, one at a time,
@@ -311,6 +319,10 @@ OnDecrypt MUST attempt to deserialize the [Ciphertext](#ciphertext) to obtain:
 - The Salt.
 - The Encrypted Key.
 - The Authentication Tag.
+
+The fields MUST be read from the serialized ciphertext in the following order: KEM Ciphertext, Salt, Encrypted Key, Authentication Tag.
+Deserialization MUST fail if the serialized ciphertext is shorter than the sum of the fixed-length fields (KEM Ciphertext + Salt + Authentication Tag) for the configured parameter set.
+The Encrypted Key MUST be the bytes between the Salt and the Authentication Tag.
 
 If the keyring is unable to deserialize this information,
 then an error MUST be collected
