@@ -135,6 +135,7 @@ The key provider information MUST be in big-endian format.
 The fields MUST be in the following order: Version, Key ARN Length, Key ARN.
 The value of the Version field MUST be `0x01`.
 The length of the Key ARN Length field MUST be 2 bytes.
+The value of the Key ARN Length field MUST be the length in bytes of the Key ARN field.
 The Key ARN field MUST be the UTF-8 encoded, fully qualified AWS KMS key ARN
 identifying the ML-KEM KMS key that produced the [KEM Ciphertext](#kem-ciphertext).
 
@@ -158,6 +159,7 @@ The ciphertext MUST be in big-endian format.
 The fields MUST be in the following order: KEM Ciphertext, Salt, Encrypted Key, Authentication Tag.
 The length of the KEM Ciphertext field MUST equal the length fixed by the configured [parameter set](#supported-parameter-sets).
 The length of the Salt field MUST be 32 bytes.
+The Encrypted Key field MUST be the AES-GCM ciphertext of the plaintext data key produced by [Data Key Wrapping](#data-key-wrapping).
 The length of the Authentication Tag field MUST be 16 bytes.
 
 The AES-GCM IV is fixed and is NOT carried in the ciphertext;
@@ -265,11 +267,14 @@ to the encrypted data key list in the encryption materials, constructed as follo
 
 - The [key provider id](../structures.md#key-provider-id)
   MUST be the UTF-8 encoded string `"aws-kms-ml-kem"`.
-- The [key provider information](../structures.md#key-provider-information)
-  is serialized as the
-  [Key Provider Information](#key-provider-information) defined above.
-- The [ciphertext](../structures.md#ciphertext)
-  is serialized as the [Ciphertext](#ciphertext) defined above.
+
+The Version field MUST be serialized as described in [Key Provider Information](#key-provider-information).
+The Key ARN Length field MUST be serialized as described in [Key Provider Information](#key-provider-information).
+The Key ARN field MUST be serialized as described in [Key Provider Information](#key-provider-information).
+The KEM Ciphertext field MUST be serialized as described in [Ciphertext](#ciphertext).
+The Salt field MUST be serialized as described in [Ciphertext](#ciphertext).
+The Encrypted Key field MUST be serialized as described in [Ciphertext](#ciphertext).
+The Authentication Tag field MUST be serialized as described in [Ciphertext](#ciphertext).
 
 OnEncrypt MUST set the plaintext data key on the returned encryption materials
 and MUST output the modified encryption materials.
@@ -312,6 +317,14 @@ OnDecrypt MUST attempt to deserialize the [Ciphertext](#ciphertext) to obtain:
 - The Salt.
 - The Encrypted Key.
 - The Authentication Tag.
+
+The Version field MUST be deserialized as described in [Key Provider Information](#key-provider-information).
+The Key ARN Length field MUST be deserialized as described in [Key Provider Information](#key-provider-information).
+The Key ARN field MUST be deserialized as described in [Key Provider Information](#key-provider-information).
+The KEM Ciphertext field MUST be deserialized as described in [Ciphertext](#ciphertext).
+The Salt field MUST be deserialized as described in [Ciphertext](#ciphertext).
+The Encrypted Key field MUST be deserialized as described in [Ciphertext](#ciphertext).
+The Authentication Tag field MUST be deserialized as described in [Ciphertext](#ciphertext).
 
 If the keyring is unable to deserialize this information,
 then an error MUST be collected
