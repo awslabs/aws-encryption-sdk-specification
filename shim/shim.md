@@ -118,7 +118,7 @@ resource handle created by one shim cannot be passed to another shim — even if
 both wrap the same core library. (ex. An ESDK shim's hierarchical keyring
 cannot be passed to a DBESDK shim's hierarchical keyring.)
 This restriction exists because the generated bindings and internal representations
-are private to each shim, making cross-shim handle reuse unsafe. 
+are private to each shim, making cross-shim handle reuse unsafe.
 (A standalone MPL shim cannot solve this either, because each shim's generated
 bindings produce incompatible opaque handle types — an MPL shim's keyring handle
 would still be a distinct type that the ESDK or DBESDK shim cannot accept without
