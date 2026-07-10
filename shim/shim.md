@@ -151,7 +151,7 @@ the shim library SHOULD support it as well.
 
 ### Streaming
 
-If a core library resource or operation supports [streamed](../client-apis/streaming.md) input/outputs,
+If a core library resource or operation supports [streamed](../client-apis/streaming.md) inputs/outputs,
 the shim library SHOULD support it as well.
 
 ## Operation contracts
