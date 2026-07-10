@@ -27,7 +27,7 @@ its own specification, and is not restated here.
 ## Conventions
 
 The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
-interpreted as described in RFC 2119.
+interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
 Terms defined by the [Shim Specification](./shim.md#conventions) — shim, target,
 generator, generated bindings, owned interface — are used here as defined there,
