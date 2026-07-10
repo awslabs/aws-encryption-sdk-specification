@@ -51,7 +51,7 @@ and that `Decapsulate` recovers.
 The keyring uses it as the input keying material to [key derivation](#key-derivation),
 and it is never used directly to wrap or encrypt a data key.
 
-### KEM Ciphertext
+### Shared Secret Ciphertext
 
 The byte string produced by ML-KEM `Encapsulate`
 (returned by AWS KMS as `SharedSecretCiphertextBlob`).
@@ -86,7 +86,7 @@ All byte lengths are taken from
 
 The supported parameter sets are listed in the table below.
 
-| Parameter Set | KEM Ciphertext Length (bytes) | Public Key Length (bytes, encapsulation key) |
+| Parameter Set | Shared Secret Ciphertext Length (bytes) | Public Key Length (bytes, encapsulation key) |
 | ------------- | ----------------------------- | -------------------------------------------- |
 | ML-KEM-512    | 768                           | 800                                          |
 | ML-KEM-768    | 1088                          | 1184                                         |
@@ -94,11 +94,11 @@ The supported parameter sets are listed in the table below.
 
 The supported parameter sets MUST be ML-KEM-512, ML-KEM-768, and ML-KEM-1024.
 
-ML-KEM-512 MUST use a KEM ciphertext length of 768 bytes.
+ML-KEM-512 MUST use a shared secret ciphertext length of 768 bytes.
 ML-KEM-512 MUST use a Public Key Length of 800 bytes.
-ML-KEM-768 MUST use a KEM ciphertext length of 1088 bytes.
+ML-KEM-768 MUST use a shared secret ciphertext length of 1088 bytes.
 ML-KEM-768 MUST use a Public Key Length of 1184 bytes.
-ML-KEM-1024 MUST use a KEM ciphertext length of 1568 bytes.
+ML-KEM-1024 MUST use a shared secret ciphertext length of 1568 bytes.
 ML-KEM-1024 MUST use a Public Key Length of 1568 bytes.
 
 ### Encapsulation Source
@@ -137,7 +137,7 @@ The value of the Version field MUST be `0x01`.
 The length of the Key ARN Length field MUST be 2 bytes.
 The value of the Key ARN Length field MUST be the length in bytes of the Key ARN field.
 The Key ARN field MUST be the UTF-8 encoded, fully qualified AWS KMS key ARN
-identifying the ML-KEM KMS key that produced the [KEM Ciphertext](#kem-ciphertext).
+identifying the ML-KEM KMS key that produced the [Shared Secret Ciphertext](#shared-secret-ciphertext).
 
 ### Ciphertext
 
@@ -150,14 +150,14 @@ The bytes are appended in the order shown.
 
 | Field              | Length (bytes)                                                                      | Interpreted as |
 | ------------------ | ----------------------------------------------------------------------------------- | -------------- |
-| KEM Ciphertext     | Fixed by the [parameter set](#supported-parameter-sets) (768 / 1088 / 1568)         | Bytes          |
+| Shared Secret Ciphertext     | Fixed by the [parameter set](#supported-parameter-sets) (768 / 1088 / 1568)         | Bytes          |
 | Salt               | 32                                                                                  | Bytes          |
 | Encrypted Key      | Length of AES-GCM ciphertext output (i.e. the data key length, per algorithm suite) | Bytes          |
 | Authentication Tag | 16                                                                                  | Bytes          |
 
 The ciphertext MUST be in big-endian format.
-The fields MUST be in the following order: KEM Ciphertext, Salt, Encrypted Key, Authentication Tag.
-The length of the KEM Ciphertext field MUST equal the length fixed by the configured [parameter set](#supported-parameter-sets).
+The fields MUST be in the following order: Shared Secret Ciphertext, Salt, Encrypted Key, Authentication Tag.
+The length of the Shared Secret Ciphertext field MUST equal the length fixed by the configured [parameter set](#supported-parameter-sets).
 The length of the Salt field MUST be 32 bytes.
 The Encrypted Key field MUST be the AES-GCM ciphertext of the plaintext data key produced by [Data Key Wrapping](#data-key-wrapping).
 The length of the Authentication Tag field MUST be 16 bytes.
@@ -234,7 +234,7 @@ according to the
 [encryption context serialization specification](../structures.md#serialization).
 If the keyring cannot serialize the encryption context, OnEncrypt MUST fail.
 
-The keyring MUST obtain `(sharedSecret, kemCiphertext)`
+The keyring MUST obtain `(sharedSecret, sharedSecretCiphertext)`
 from the configured [Encapsulation Source](#encapsulation-source):
 
 - For `KmsEncapsulation`, the keyring MUST call AWS KMS `Encapsulate`
@@ -271,7 +271,7 @@ to the encrypted data key list in the encryption materials, constructed as follo
 The Version field MUST be serialized as described in [Key Provider Information](#key-provider-information).
 The Key ARN Length field MUST be serialized as described in [Key Provider Information](#key-provider-information).
 The Key ARN field MUST be serialized as described in [Key Provider Information](#key-provider-information).
-The KEM Ciphertext field MUST be serialized as described in [Ciphertext](#ciphertext).
+The Shared Secret Ciphertext field MUST be serialized as described in [Ciphertext](#ciphertext).
 The Salt field MUST be serialized as described in [Ciphertext](#ciphertext).
 The Encrypted Key field MUST be serialized as described in [Ciphertext](#ciphertext).
 The Authentication Tag field MUST be serialized as described in [Ciphertext](#ciphertext).
@@ -304,7 +304,7 @@ For an encrypted data key to match:
 - The deserialized `Version` value MUST match `0x01`.
 - The deserialized `Key ARN` MUST match the keyring's configured AWS KMS key identifier
   (compared after [AWS KMS key identifier normalization](./aws-kms-key-arn.md)).
-- The deserialized KEM Ciphertext length MUST match the configured parameter set.
+- The deserialized Shared Secret Ciphertext length MUST match the configured parameter set.
 
 For each encrypted data key in the filtered set, one at a time,
 OnDecrypt MUST attempt to decrypt the data key.
@@ -313,7 +313,7 @@ If this attempt results in an error, then these errors MUST be collected.
 To attempt to decrypt a particular encrypted data key,
 OnDecrypt MUST attempt to deserialize the [Ciphertext](#ciphertext) to obtain:
 
-- The KEM Ciphertext.
+- The Shared Secret Ciphertext.
 - The Salt.
 - The Encrypted Key.
 - The Authentication Tag.
@@ -321,7 +321,7 @@ OnDecrypt MUST attempt to deserialize the [Ciphertext](#ciphertext) to obtain:
 The Version field MUST be deserialized as described in [Key Provider Information](#key-provider-information).
 The Key ARN Length field MUST be deserialized as described in [Key Provider Information](#key-provider-information).
 The Key ARN field MUST be deserialized as described in [Key Provider Information](#key-provider-information).
-The KEM Ciphertext field MUST be deserialized as described in [Ciphertext](#ciphertext).
+The Shared Secret Ciphertext field MUST be deserialized as described in [Ciphertext](#ciphertext).
 The Salt field MUST be deserialized as described in [Ciphertext](#ciphertext).
 The Encrypted Key field MUST be deserialized as described in [Ciphertext](#ciphertext).
 The Authentication Tag field MUST be deserialized as described in [Ciphertext](#ciphertext).
@@ -335,7 +335,7 @@ by calling AWS KMS `Decapsulate` with a request constructed as follows:
 
 - `KeyId` MUST be the configured AWS KMS key identifier.
 - `EncapsulationAlgorithm` MUST be `ML_KEM`.
-- `CiphertextBlob` MUST be the deserialized KEM Ciphertext.
+- `CiphertextBlob` MUST be the deserialized Shared Secret Ciphertext.
 - `GrantTokens` MUST be this keyring's grant tokens.
 
 If the call to AWS KMS `Decapsulate` fails,
@@ -415,7 +415,7 @@ The keyring does not derive or carry a key commitment value.
 Any modification to the encrypted data key, the salt, or the encryption context
 changes the `FixedInfo` used as KDF input and as AES-GCM AAD,
 which causes AEAD authentication to fail.
-ML-KEM's implicit rejection ensures that decapsulating an invalid KEM ciphertext
+ML-KEM's implicit rejection ensures that decapsulating an invalid shared secret ciphertext
 yields a pseudo-random shared secret rather than an error,
 which deterministically derives a wrong wrapping key.
 
