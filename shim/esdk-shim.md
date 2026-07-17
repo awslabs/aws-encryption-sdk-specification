@@ -119,6 +119,11 @@ ESDK and referenced by the target through an owned-interface handle.
 The dependency edges are therefore: a key store depends on its service clients,
 and a materials source may depend on a key store.
 
+A materials source handle may reference any core-ESDK keyring or CMM, including
+a custom one. A custom keyring, CMM, or branch key ID supplier has its entry
+point in the core ESDK's language, per
+[Shim Specification: Custom implementations of core-library interfaces](./shim.md#custom-implementations-of-core-library-interfaces).
+
 ### Service client configuration
 
 The shim configures each AWS service client it creates from a client

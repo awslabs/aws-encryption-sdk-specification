@@ -144,6 +144,23 @@ The requirements below apply to every resource kind.
   that resource for its own lifetime, so that a handle passed across the boundary
   cannot outlive the resource it refers to.
 
+### Custom implementations of core-library interfaces
+
+A core library may define interfaces that its consumer implements and that the
+core library invokes during an operation (e.g. a custom keyring, a custom
+cryptographic materials manager, or a branch key ID supplier for the ESDK).
+
+The shim accepts an implementation of such an interface the same way it accepts
+any resource: as an owned-interface handle to an object that lives in the core
+library. The owned interface does not define a type the target can implement or
+extend to receive invocations from the core library.
+
+A custom implementation therefore has its entry point in the core library's
+language; once it exists there, it can cross the boundary as a resource like
+any other. Such an implementation may delegate however its author chooses —
+including calling back into target code — but that bridging is the
+implementation's own concern; the shim does not provide it.
+
 ### Concurrency
 
 If a core library resource or operation supports concurrent use from multiple threads,
