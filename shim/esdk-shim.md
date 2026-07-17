@@ -26,9 +26,6 @@ its own specification, and is not restated here.
 
 ## Conventions
 
-The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
-interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
-
 Terms defined by the [Shim Specification](./shim.md#conventions) — shim, target,
 generator, generated bindings, owned interface — are used here as defined there,
 with **core ESDK** as the core library.
@@ -126,8 +123,8 @@ and a materials source may depend on a key store.
 
 The shim configures each AWS service client it creates from a client
 configuration supplied by the target. Any value the target supplies is passed
-through to the service client; where the target omits a value, the shim may
-apply a default.
+through to the service client; where the target omits a value, the shim defers
+to the core ESDK's default configuration resolution.
 
 - The shim MUST set a user-agent on each service client of the form
   `AwsEncryptionSdk-Shim-<target-language>-<core-language>-<version>`, where
@@ -137,8 +134,8 @@ apply a default.
   configuration, appending its own rather than replacing it.
 - If the target supplies a retry configuration, the shim MUST apply it to each
   service client.
-- If the target does not supply a retry configuration, the shim MAY apply a
-  default retry configuration.
+- If the target does not supply a retry configuration, the shim MUST defer to
+  the core ESDK's default retry configuration and MUST NOT substitute its own.
 - If the target supplies a region, the shim MUST apply it to each service client.
 - The shim SHOULD allow one client configuration to be applied to multiple
   service clients.
@@ -160,44 +157,52 @@ per [Delegation](./shim.md#delegation).
 
 ### Encrypt inputs
 
-- `encrypt` MUST pass the target-supplied plaintext to the core ESDK unmodified.
-- `encrypt` MUST provide the target-supplied encryption context to the core ESDK,
+`encrypt`:
+
+- MUST pass the target-supplied plaintext to the core ESDK unmodified.
+- MUST provide the target-supplied encryption context to the core ESDK,
   converted as defined in [Encryption context](#encryption-context).
-- `encrypt` MUST provide the target-supplied algorithm suite to the core ESDK,
+- MUST provide the target-supplied algorithm suite to the core ESDK,
   converted as defined in [Algorithm suite identifier](#algorithm-suite-identifier).
-- `encrypt` MUST provide the target-supplied commitment policy to the core ESDK,
+- MUST provide the target-supplied commitment policy to the core ESDK,
   converted as defined in [Commitment policy](#commitment-policy).
-- `encrypt` MUST provide the target-supplied frame length to the core ESDK,
+- MUST provide the target-supplied frame length to the core ESDK,
   converted as defined in [Frame length](#frame-length).
-- `encrypt` MUST provide the target-supplied maximum-encrypted-data-keys value to
+- MUST provide the target-supplied maximum-encrypted-data-keys value to
   the core ESDK, converted as defined in
   [Maximum encrypted data keys](#maximum-encrypted-data-keys).
 
 ### Encrypt outputs
 
-- `encrypt` MUST return the core ESDK's ciphertext unmodified.
-- `encrypt` MUST return the used algorithm suite, converted as defined in
+`encrypt`:
+
+- MUST return the core ESDK's ciphertext unmodified.
+- MUST return the used algorithm suite, converted as defined in
   [Algorithm suite identifier](#algorithm-suite-identifier).
-- `encrypt` MUST return the result encryption context, converted as defined in
+- MUST return the result encryption context, converted as defined in
   [Encryption context](#encryption-context).
 
 ### Decrypt inputs
 
-- `decrypt` MUST pass the target-supplied ciphertext to the core ESDK unmodified.
-- `decrypt` MUST provide the target-supplied encryption context to the core ESDK,
+`decrypt`:
+
+- MUST pass the target-supplied ciphertext to the core ESDK unmodified.
+- MUST provide the target-supplied encryption context to the core ESDK,
   converted as defined in [Encryption context](#encryption-context).
-- `decrypt` MUST provide the target-supplied commitment policy to the core ESDK,
+- MUST provide the target-supplied commitment policy to the core ESDK,
   converted as defined in [Commitment policy](#commitment-policy).
-- `decrypt` MUST provide the target-supplied maximum-encrypted-data-keys value to
+- MUST provide the target-supplied maximum-encrypted-data-keys value to
   the core ESDK, converted as defined in
   [Maximum encrypted data keys](#maximum-encrypted-data-keys).
 
 ### Decrypt outputs
 
-- `decrypt` MUST return the core ESDK's plaintext unmodified.
-- `decrypt` MUST return the used algorithm suite, converted as defined in
+`decrypt`:
+
+- MUST return the core ESDK's plaintext unmodified.
+- MUST return the used algorithm suite, converted as defined in
   [Algorithm suite identifier](#algorithm-suite-identifier).
-- `decrypt` MUST return the result encryption context, converted as defined in
+- MUST return the result encryption context, converted as defined in
   [Encryption context](#encryption-context).
 
 ### Create KMS client
