@@ -146,35 +146,12 @@ The requirements below apply to every resource kind.
 
 ### Custom implementations of core-library interfaces
 
-A core library may define interfaces that its consumer implements and that the
-core library invokes during an operation (e.g. a custom keyring, a custom
-cryptographic materials manager, or a branch key ID supplier for the ESDK).
+A core library can define interfaces that its consumer implements and that the
+core library invokes during an operation — for example, a custom keyring or a
+custom cryptographic materials manager.
 
-The shim accepts an implementation of such an interface the same way it accepts
-any resource: as an owned-interface handle to an object that lives in the core
-library. The owned interface does not define a type the target can implement or
-extend to receive invocations from the core library.
-
-A custom implementation therefore has its entry point in the core library's
-language; once it exists there, it can cross the boundary as a resource like
-any other. Such an implementation may delegate however its author chooses —
-including calling back into target code — but that bridging is the
-implementation's own concern; the shim does not provide it.
-
-The following requirements keep a shim compatible with implementations it does
-not yet expose, so that exposing one later is not a breaking change:
-
-- For each core-library interface the shim exposes, the shim MUST represent
-  every implementation of that interface as the same owned-interface handle
-  type.
-- Each operation or resource-creation input that consumes an implementation of
-  a core-library interface MUST accept that interface's handle type and MUST
-  NOT be limited to a specific implementation.
-- The shim MAY expose creation operations for only a subset of the
-  implementations the core library defines.
-- If the shim exposes a means of creating additional implementations, a handle
-  to such an implementation MUST be usable wherever that interface's handle
-  type is accepted.
+How a shim exposes such custom implementations is not yet specified; a future
+revision of this specification will define it.
 
 ### Concurrency
 
