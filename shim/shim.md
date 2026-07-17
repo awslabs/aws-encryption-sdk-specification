@@ -195,6 +195,17 @@ the shim library SHOULD support it as well.
   translated per [Type translation](#type-translation).
 - Each operation MUST invoke the core library per [Delegation](#delegation).
 
+For optional inputs — inputs the core library defines a default for:
+
+- The shim SHOULD expose each optional input of the operations and resource
+  creations it exposes.
+- The shim SHOULD accept optional inputs through a mechanism idiomatic to the
+  target language (e.g. an options or builder type in C++).
+- When the target does not supply an optional input, the shim MUST defer to
+  the core library's default and MUST NOT substitute its own.
+- The shim SHOULD define its operation and resource-creation inputs such that
+  an optional input can be added without breaking existing target code.
+
 ## Conformance and testing
 
 - A shim MUST conform to this specification in addition to its core-library-specific
