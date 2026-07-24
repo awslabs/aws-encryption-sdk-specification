@@ -5,10 +5,12 @@
 
 ## Version
 
-0.9.0
+0.10.0
 
 ### Changelog
 
+- 0.10.0
+  - [Define Branch Key Store read consistency semantics](../changes/2025-07-24_define-branch-key-store-read-consistency-semantics/background.md)
 - 0.9.0
   - Re-add [Mitigate Version Race Condition in the Branch Key Store](../changes/2025-01-16_key-store-mitigate-update-race/background.md) with DynamoDB as the only branch key storage option
 - 0.8.0
@@ -76,6 +78,7 @@ The following inputs MAY be specified to create a KeyStore:
 - [ID](#keystore-id)
 - [AWS KMS Grant Tokens](#aws-kms-grant-tokens)
 - [DynamoDb Client](#dynamodb-client)
+- [Require Consistent Reads](#require-consistent-reads)
 - [KMS Client](#kms-client)
 
 The following inputs MUST be specified to create a KeyStore:
@@ -111,6 +114,20 @@ If the AWS KMS Configuration is MRDiscovery,
 and no DynamoDb Client is provided,
 a new DynamoDb Client MUST be created
 with the region configured in the MRDiscovery.
+
+### Require Consistent Reads
+
+Whether read operations are required to perform consistent reads,
+ensuring that recent write operations are reflected in their response.
+
+If set to `true`,
+read operations MUST return results
+which reflect the result of
+the most recently executed write operations.
+
+If unset or set to `false`,
+read operations MAY return stale results
+which are caused by eventual consistency.
 
 ### KMS Client
 
@@ -247,6 +264,7 @@ This MUST include:
 - [logical Keystore name](#logical-keystore-name)
 - [AWS KMS Grant Tokens](#aws-kms-grant-tokens)
 - [AWS KMS Configuration](#aws-kms-configuration)
+- [Require Consistent Reads](#require-consistent-reads)
 
 ### CreateKeyStore
 
@@ -436,6 +454,10 @@ VersionKey MUST first get the active version for the branch key from the keystor
 by calling AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
 
+The [Require Consistent Reads](#require-consistent-reads) configuration MUST be honored
+by setting `ConsistentRead` to `true`
+when consistent reads are required.
+
 The `kms-arn` field of DDB response item MUST be [compatible with](#aws-key-arn-compatibility)
 the configured `KMS ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 
@@ -527,6 +549,10 @@ To get the active version for the branch key id from the keystore
 this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
 
+The [Require Consistent Reads](#require-consistent-reads) configuration MUST be honored
+by setting `ConsistentRead` to `true`
+when consistent reads are required.
+
 The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
 
@@ -549,6 +575,10 @@ On invocation, the caller:
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "branch:version:" + `branchKeyVersion` value as the Sort Key.
 
+The [Require Consistent Reads](#require-consistent-reads) configuration MUST be honored
+by setting `ConsistentRead` to `true`
+when consistent reads are required.
+
 The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
 
@@ -569,6 +599,10 @@ On invocation, the caller:
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "beacon:ACTIVE" value as the Sort Key.
+
+The [Require Consistent Reads](#require-consistent-reads) configuration MUST be honored
+by setting `ConsistentRead` to `true`
+when consistent reads are required.
 
 The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
