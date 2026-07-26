@@ -5,10 +5,12 @@
 
 ## Version
 
-0.9.0
+0.10.0
 
 ### Changelog
 
+- 0.10.0
+  - Add [hierarchy version 2](../changes/2025-06-30_branch_keys_version_2/background.md)
 - 0.9.0
   - Re-add [Mitigate Version Race Condition in the Branch Key Store](../changes/2025-01-16_key-store-mitigate-update-race/background.md) with DynamoDB as the only branch key storage option
 - 0.8.0
@@ -43,26 +45,41 @@
 A Keystore persists hierarchical data that allows customers to call AWS KMS less often.
 The Keystore persists branch keys in DynamoDb that wrap multiple data keys.
 This creates a hierarchy where a branch key wraps multiple data keys and facilitates caching.
-These branch keys are only generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
+These branch keys are generated using the [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html) in Hierarchy Version `v1` and [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html) in Hierarchy Version `v2`.
 
-By creating and persisting a data key to an accesbile medium,
+By creating and persisting a data key to an accessible medium,
 such as a DynamoDb table,
 distributed cryptographic agents can use a common, coordinated, cryptographic materials.
 
 This prevents distributed cryptographic agents from independently
 generating unique data keys that COULD BE coordinated,
 which leads to poor caching performance at decryption,
-as each unqiue encrypting agent had a unqiue data key.
+as each unique encrypting agent had a unique data key.
 
 This Keystore interface defines operations that any implementation of its specification must support and implement.
 
-## Definitions
+### Definitions
 
 - [Branch Key(s)](../structures.md#branch-key): Data keys that are reused to wrap unique data keys for envelope encryption.
   For security considerations on when to rotate the branch key, refer to [Appendix B](aws-kms/aws-kms-hierarchical-keyring.md#appendix-b-security-considerations-for-branch-key-rotation).
 - [Beacon Key(s)](https://github.com/awslabs/aws-database-encryption-sdk-dynamodb-java/blob/main/specification/searchable-encryption/beacons.md#beacons):
   A root key used to then derive different beacon keys per beacon.
 - [UUID](https://www.ietf.org/rfc/rfc4122.txt): a universally unique identifier that can be represented as a byte sequence or a string.
+
+#### kms-arn
+
+`kms-arn` is the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+
+#### Hierarchy Version
+
+Schema Version of the Branch Key.
+All items of the same Branch Key Identifier SHOULD have the same hierarchy-version.
+The hierarchy-version determines how the Branch Key Store protects and validates the branch key with KMS.
+
+There are two hierarchy versions:
+
+- v1
+- v2
 
 ### Conventions used in this document
 
@@ -287,6 +304,7 @@ The CreateKey caller MUST provide:
 
 - An optional branch key id
 - An optional encryption context
+- An optional hierarchy-version
 
 If an optional branch key id is provided
 and no encryption context is provided this operation MUST fail.
@@ -298,11 +316,20 @@ If no branch key id is provided,
 then this operation MUST create a [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
 to be used as the branch key id.
 
+If no Hierarchy-Version is provided,
+then this operation MUST use `v1`.
+
+This operation needs to generate the following:
+
+- `version`: a new guid. This guid MUST be [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
+- `timestamp`: a timestamp for the current time.
+  This timestamp MUST be in ISO 8601 format in UTC, to microsecond precision (e.g. “YYYY-MM-DDTHH:mm:ss.ssssssZ“)
+
 This operation MUST create a [branch key](structures.md#branch-key) and a [beacon key](structures.md#beacon-key) according to
 the [Branch Key and Beacon Key Creation](#branch-key-and-beacon-key-creation) section.
 
 If creation of the keys are successful,
-the operation MUST call Amazon DynamoDB TransactWriteItems according to the [write key material](#writing-branch-key-and-beacon-key-to-keystore) section.
+the operation MUST call Amazon DynamoDB TransactWriteItems according to the [write key material](#writing-branch-key-and-beacon-key-to-branch-key-store-table) section.
 
 If writing to the keystore succeeds,
 the operation MUST return the branch-key-id that maps to both
@@ -315,15 +342,20 @@ Otherwise, this operation MUST yield an error.
 To create a branch key, this operation MUST take the following:
 
 - `branchKeyId`: The identifier
-- `encryptionContext`: Additional encryption context to bind to the created keys
+- `encryption-context`: Additional encryption context to bind to the created keys
+- `hierarchy-version`: The hierarchy-version determined by the input
 
-This operation needs to generate the following:
+If the `hierarchy-version` is `v1`,
+the wrapped beacon key MUST be created according to [Wrapped Beacon Key Creation `v1`](#wrapped-beacon-key-creation-v1) and
+the wrapped branch keys MUST be created according to
+[Wrapped Branch Key Creation `v1`](#wrapped-branch-key-creation-v1);
 
-- `version`: a new guid. This guid MUST be [version 4 UUID](https://www.ietf.org/rfc/rfc4122.txt)
-- `timestamp`: a timestamp for the current time.
-  This timestamp MUST be in ISO 8601 format in UTC, to microsecond precision (e.g. “YYYY-MM-DDTHH:mm:ss.ssssssZ“)
+If the `hierarchy-version` is be `v2`,
+the wrapped beacon Key MUST be created according to [Wrapped Beacon Key Creation `v2`](#wrapped-beacon-key-creation-v2) and
+the wrapped branch keys MUST be created according to
+[Wrapped Branch Key Creation `v2`](#wrapped-branch-key-creation-v2).
 
-The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
+##### Wrapped Beacon Key Creation `v1`
 
 To create a beacon key, this operation will continue to use the `branchKeyId` and `timestamp` as the [Branch Key](structures.md#branch-key).
 
@@ -333,15 +365,59 @@ The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request c
 
 - `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
-- `EncryptionContext` MUST be the [encryption context for beacon keys](#beacon-key-encryption-context).
+- `EncryptionContext` MUST be the [branch key context for beacon keys](#beacon-branch-key-context).
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If the call to AWS KMS GenerateDataKeyWithoutPlaintext succeeds,
 the operation MUST use the `CiphertextBlob` as the wrapped Beacon Key.
 
-#### Wrapped Branch Key Creation
+##### Wrapped Beacon Key Creation `v2`
 
-Given a `branchKeyId`, `version` and `timestamp`
+The operation MUST create a map of strings,
+the [branch key context for beacon keys](#beacon-branch-key-context).
+
+The operation MUST calculate the **SHA-384 Digest for the beacon key**
+by [serializing](../structures.md#serialization) the [branch key context for beacon keys](#beacon-branch-key-context),
+according to the [encryption context serialization specification](../structures.md#serialization).
+
+The operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
+The call to AWS KMS GenerateDataKey MUST use the configured AWS KMS client to make the call.
+The operation MUST call AWS KMS GenerateDataKey with a request constructed as follows:
+
+- `KeyId` MUST be the `kms-arn`
+- `NumberOfBytes` MUST be 32.
+- `EncryptionContext` MUST be the `encryption-context`
+- `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
+
+If the call to AWS KMS GenerateDataKey succeeds,
+the operation MUST use the `Plaintext` from GenerateDataKey result
+as the plain-text Beacon Key.
+
+The operation MUST concatenate the **SHA-384 Digest for the beacon key**
+with the plain-text Beacon Key,
+creating the **beacon plain-text tuple**.
+
+The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html)
+with a request constructed as follows:
+
+- `Plaintext` MUST be the **beacon plain-text tuple**.
+- `KeyId` MUST be the `kms-arn`.
+- `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
+- `EncryptionContext` MUST be the `encryption-context`.
+
+If the call to AWS KMS Encrypt succeeds,
+the operation MUST use the Encrypt result `CiphertextBlob`
+as the wrapped Beacon Key.
+
+#### Wrapped Branch Key Creation `v1`
+
+The operation MUST generate a map of strings,
+the [DECRYPT_ONLY branch context for branch keys](#decrypt_only-branch-key-context),
+using the `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
+
+The operation MUST generate a map of strings,
+the [ACTIVE branch context for branch keys](#active-branch-key-context)
+using the `branchKeyId`, `version`, `timestamp`, `kms-arn`, `encryption-context`, and `hierarchy-version`.
 
 The operation MUST call [AWS KMS API GenerateDataKeyWithoutPlaintext](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html).
 The call to AWS KMS GenerateDataKeyWithoutPlaintext MUST use the configured AWS KMS client to make the call.
@@ -349,8 +425,8 @@ The operation MUST call AWS KMS GenerateDataKeyWithoutPlaintext with a request c
 
 - `KeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `NumberOfBytes` MUST be 32.
-- `EncryptionContext` MUST be the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context).
-- GenerateDataKeyWithoutPlaintext `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
+- `EncryptionContext` MUST be the [DECRYPT_ONLY branch context for branch keys](#decrypt_only-branch-key-context).
+- `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 
 If the call to AWS KMS GenerateDataKeyWithoutPlaintext succeeds,
 the operation MUST use the GenerateDataKeyWithoutPlaintext result `CiphertextBlob`
@@ -359,21 +435,83 @@ as the wrapped DECRYPT_ONLY Branch Key.
 The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
 with a request constructed as follows:
 
-- `SourceEncryptionContext` MUST be the [DECRYPT_ONLY encryption context for branch keys](#decrypt_only-encryption-context).
-- `SourceKeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
+- `SourceEncryptionContext` MUST be the [DECRYPT_ONLY branch key context for branch keys](#decrypt_only-branch-key-context).
+- `SourceKeyId` MUST be the `kms-arn`.
 - `CiphertextBlob` MUST be the wrapped DECRYPT_ONLY Branch Key.
-- ReEncrypt `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
-- `DestinationKeyId` MUST be the configured `AWS KMS Key ARN` in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
-- `DestinationEncryptionContext` MUST be the [ACTIVE encryption context for branch keys](#active-encryption-context).
+- `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
+- `DestinationKeyId` MUST be the `kms-arn`.
+- `DestinationEncryptionContext` MUST be the [ACTIVE branch key context for branch keys](#active-branch-key-context).
 
 If the call to AWS KMS ReEncrypt succeeds,
 the operation MUST use the ReEncrypt result `CiphertextBlob`
 as the wrapped ACTIVE Branch Key.
 
-#### Writing Branch Key and Beacon Key to Keystore
+#### Wrapped Branch Key Creation `v2`
+
+The operation MUST generate a map of strings,
+the [`DECRYPT_ONLY` branch key context for branch keys](#decrypt_only-branch-key-context).
+
+The operation MUST calculate the **SHA-384 Digest for the `DECRYPT_ONLY`**
+by [serializing](../structures.md#serialization) the [`DECRYPT_ONLY` branch key context for branch keys](#decrypt_only-branch-key-context);
+the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
+
+The operation MUST generate a map of strings,
+the [ACTIVE branch key context for branch keys](#active-branch-key-context).
+
+The operation MUST calculate the **SHA-384 Digest for the `ACTIVE`**
+by [serializing](../structures.md#serialization) the [`ACTIVE` branch key context for branch keys](#active-branch-key-context);
+the serialization MUST be done according to the [encryption context serialization specification](../structures.md#serialization).
+
+The operation MUST call [AWS KMS API GenerateDataKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html).
+The call to AWS KMS GenerateDataKey MUST use the configured AWS KMS client to make the call.
+The operation MUST call AWS KMS GenerateDataKey with a request constructed as follows:
+
+- `KeyId` MUST be the `kms-arn`
+- `NumberOfBytes` MUST be 32.
+- `EncryptionContext` MUST be the `encryption-context`
+- `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
+
+If the call to AWS KMS GenerateDataKey succeeds,
+the operation MUST use the `Plaintext` from GenerateDataKey result
+as the plain-text Branch Key.
+
+The operation MUST concatenate the **SHA-384 Digest for the `DECRYPT_ONLY`**
+with the plain-text Branch Key,
+creating the **`DECRYPT_ONLY` plain-text tuple**.
+
+The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html)
+with a request constructed as follows:
+
+- `Plaintext` MUST be **the `DECRYPT_ONLY` plain-text tuple**.
+- `KeyId` MUST be the `kms-arn`.
+- `GrantTokens` MUST be the [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token) of this keystore.
+- `EncryptionContext` MUST be the `encryption-context`.
+
+If the call to AWS KMS Encrypt succeeds,
+the operation MUST use the Encrypt result `CiphertextBlob`
+as the wrapped `DECRYPT_ONLY` Branch Key.
+
+The operation MUST concatenate the **SHA-384 Digest for the `ACTIVE`**
+with the plain-text Branch Key,
+creating the **the `ACTIVE` plain-text tuple**.
+
+The operation MUST call [AWS KMS API Encrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html)
+with a request constructed as follows:
+
+- `Plaintext` MUST be **the `ACTIVE` plain-text tuple**.
+- `KeyId` MUST be the `kms-arn`.
+- `GrantTokens` MUST be the [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token) of this keystore.
+- `EncryptionContext` MUST be the `encryption-context`.
+
+If the call to AWS KMS Encrypt succeeds,
+the operation MUST use the Encrypt result `CiphertextBlob`
+as the wrapped `ACTIVE` Branch Key.
+
+#### Writing Branch Key and Beacon Key to Branch Key Store table
 
 To add the branch keys and a beacon key to the keystore the
 operation MUST call [Amazon DynamoDB API TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
+
 The call to Amazon DynamoDB TransactWriteItems MUST use the configured Amazon DynamoDB Client to make the call.
 The operation MUST call Amazon DynamoDB TransactWriteItems with a request constructed as follows:
 
@@ -386,8 +524,8 @@ List of TransactWriteItem:
     - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
-    - “hierarchy-version” (N): 1
-    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+    - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
+    - Every key-value pair in the input `encryption-context`
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
@@ -398,8 +536,8 @@ List of TransactWriteItem:
     - “enc” (B): wrapped ACTIVE Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
-    - “hierarchy-version” (N): 1
-    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+    - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
+    - Every key-value pair in the input `encryption-context`
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
@@ -410,8 +548,8 @@ List of TransactWriteItem:
     - “enc” (B): the wrapped Beacon Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
-    - “hierarchy-version” (N): 1
-    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+    - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
+    - Every key-value pair in the input `encryption-context`
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName is the configured Table Name
@@ -443,11 +581,20 @@ The `kms-arn` stored in the DDB table MUST NOT change as a result of this operat
 even if the KeyStore is configured with a `KMS MRKey ARN` that does not exactly match the stored ARN.
 If such were allowed, clients using non-MRK KeyStores might suddenly stop working.
 
-The values on the AWS DDB response item
-MUST be authenticated according to [authenticating a keystore item](#authenticating-a-keystore-item).
+If the `hierarchy-version` is `v1`, the values on the AWS DDB response item MUST be authenticated according to
+[authenticating a keystore item for item with hierarchy version v1](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v1).
+
+If the `hierarchy-version` is `v2`, the values on the AWS DDB response item MUST be authenticated according to
+[authenticating a keystore item for item with hierarchy version v2](#authenticating-a-branch-keystore-item-for-item-with-hierarchy-version-v2).
+
 If the item fails to authenticate this operation MUST fail.
 
-The wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Branch Key Creation](#wrapped-branch-key-creation).
+If the `hierarchy-version` is `v1`,
+the wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to [Wrapped Beacon Key Creation `v1`](#wrapped-beacon-key-creation-v1).
+
+If the `hierarchy-version` is `v2`,
+the wrapped Branch Keys, DECRYPT_ONLY and ACTIVE, MUST be created according to
+[Wrapped Branch Key Creation `v2`](#wrapped-branch-key-creation-v2).
 
 To add the new branch key to the keystore,
 the operation MUST call [Amazon DynamoDB API TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
@@ -463,9 +610,8 @@ List of TransactWriteItem:
     - “enc” (B): the wrapped DECRYPT_ONLY Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
-    - “hierarchy-version” (N): 1
-    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
-      MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
+    - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
+    - Every other key-value pair in the [branch key context](./structures.md#branch-key-context).
   - ConditionExpression: `attribute_not_exists(branch-key-id)`
   - TableName: the configured Table Name
 - PUT:
@@ -475,10 +621,10 @@ List of TransactWriteItem:
     - “enc” (B): wrapped ACTIVE Branch Key `CiphertextBlob` from the KMS operation
     - “create-time” (S): `timestamp`
     - "kms-arn" (S): configured KMS Key
-    - “hierarchy-version” (N): 1
-    - Every key-value pair of the custom [encryption context](./structures.md#encryption-context-3) that is associated with the branch key
+    - “hierarchy-version” (N): either `1` or `2`, depending on the `hierarchy-version`
+    - Every key-value pair in the [encryption context](./structures.md#encryption-context) provided by users and is associated with the branch key
       MUST be added with an Attribute Name of `aws-crypto-ec:` + the Key and Attribute Value (S) of the value.
-  - ConditionExpression: `attribute_exists(branch-key-id) AND enc = :encOld`
+  - ConditionExpression: `enc = :encOld`
   - ExpressionAttributeValues: `{":encOld" := DDB.AttributeValue.B(oldCiphertextBlob)}`
   - TableName: the configured Table Name
 
@@ -493,29 +639,35 @@ The condition expression for the Active Input ensures
 the Active Item in DynamoDB has not changed since it was read.
 This prevents overwrites due to a race in updating the Active Item.
 
-#### Authenticating a Keystore item
+#### Authenticating a Branch Keystore item for item with `hierarchy-version` v1
 
 The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
 
-Every attribute on the AWS DDB response item will be authenticated.
-
-Every key in the constructed [encryption context](#encryption-context)
-except `tableName`
-MUST exist as a string attribute in the AWS DDB response item.
-Every value in the constructed [encryption context](#encryption-context)
-except the logical table name
-MUST equal the value with the same key in the AWS DDB response item.
-The key `enc` MUST NOT exist in the constructed [encryption context](#encryption-context).
+This operation MUST call AWS DDB `GetItem`.
+Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs
+which is the [branch key context](#branch-key-context).
 
 The operation MUST call [AWS KMS API ReEncrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html)
 with a request constructed as follows:
 
-- `SourceEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
+- `SourceEncryptionContext` MUST be the [branch key context](#branch-key-context) constructed above
 - `SourceKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
 - `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
 - `GrantTokens` MUST be the configured [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
 - `DestinationKeyId` MUST be [compatible with](#aws-key-arn-compatibility) the configured KMS Key in the [AWS KMS Configuration](#aws-kms-configuration) for this keystore.
-- `DestinationEncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
+- `DestinationEncryptionContext` MUST be the [branch key context](#branch-key-context) constructed above
+
+#### Authenticating a Branch Keystore item for item with `hierarchy-version` v2
+
+The operation MUST use the configured `KMS SDK Client` to authenticate the value of the keystore item.
+
+This operation MUST call AWS DDB `GetItem`.
+Every attribute except `enc` on the AWS DDB response item MUST be converted to a set of key value pairs (a Map)
+which is the [branch key context](#branch-key-context).
+Every key in the constructed branch key context except tableName MUST exist as a string attribute in the AWS DDB response item.
+The [AWS KMS Encryption Context](#aws-kms-encryption-context) MUST be the [encryption context](./structures.md##encryption-context), which is built from the branch key context by extracting the keys with prefix `aws-crypto-ec:` and then dropping the prefix. See [Encryption Context From Authenticated Branch Key Context](#encryption-context-from-authenticated-branch-key-context).
+
+The operation MUST follow [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) to decrypt and authentication the branch key context.
 
 ### GetActiveBranchKey
 
@@ -530,21 +682,32 @@ using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as th
 The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
 If the record does not contain the defined fields, this operation MUST fail.
 
+To get the active version for the branch key id from the keystore
+this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and `"branch:ACTIVE"` value as the Sort Key.
+
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
+
 The operation MUST decrypt the branch key according to the [AWS KMS Branch Key Decryption](#aws-kms-branch-key-decryption) section.
 
 If the branch key fails to decrypt, GetActiveBranchKey MUST fail.
 
 This GetActiveBranchKey MUST construct [branch key materials](./structures.md#branch-key-materials)
-according to [Branch Key Materials From Authenticated Encryption Context](#branch-key-materials-from-authenticated-encryption-context).
+according to [Branch Key Materials From Authenticated Branch Key Context](#branch-key-materials-from-authenticated-branch-key-context).
 
 This operation MUST return the constructed [branch key materials](./structures.md#branch-key-materials).
 
 ### GetBranchKeyVersion
 
-On invocation, the caller:
-
 - MUST supply a `branch-key-id`
 - MUST supply a `branchKeyVersion`
+
+To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and "branch:version:" + `branchKeyVersion` value as the Sort Key.
+
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "branch:version:" + `branchKeyVersion` value as the Sort Key.
@@ -557,7 +720,7 @@ The operation MUST decrypt the branch key according to the [AWS KMS Branch Key D
 If the branch key fails to decrypt, this operation MUST fail.
 
 This GetBranchKeyVersion MUST construct [branch key materials](./structures.md#branch-key-materials)
-according to [Branch Key Materials From Authenticated Encryption Context](#branch-key-materials-from-authenticated-encryption-context).
+according to [Branch Key Materials From Authenticated Branch Key Context](#branch-key-materials-from-authenticated-branch-key-context).
 
 This operation MUST return the constructed [branch key materials](./structures.md#branch-key-materials).
 
@@ -566,6 +729,12 @@ This operation MUST return the constructed [branch key materials](./structures.m
 On invocation, the caller:
 
 - MUST supply a `branch-key-id`
+
+To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
+using the `branch-key-id` as the Partition Key and "beacon:ACTIVE" value as the Sort Key.
+
+The AWS DDB response MUST contain the fields defined in the [branch keystore record format](#record-format).
+If the record does not contain the defined fields, this operation MUST fail.
 
 To get a branch key from the keystore this operation MUST call AWS DDB `GetItem`
 using the `branch-key-id` as the Partition Key and "beacon:ACTIVE" value as the Sort Key.
@@ -582,73 +751,72 @@ and the `branchKeyId` from the returned `branch-key-id` field.
 
 This operation MUST return the constructed [beacon key materials](./structures.md#beacon-key-materials).
 
-## Encryption Context
+## Branch Key Context
 
-This section describes how the AWS KMS encryption context is built
-from the DynamoDB items that store the branch keys.
+Branch Key Context is a set of key value pairs (a Map) that contain contextual information about the Branch Key Item.
 
-The following encryption context keys are shared:
+The Branch Key Context:
 
-- MUST have a `branch-key-id` attribute
-- The `branch-key-id` field MUST not be an empty string
-- MUST have a `type` attribute
-- The `type` field MUST not be an empty string
-- MUST have a `create-time` attribute
-- MUST have a `tablename` attribute to store the logicalKeyStoreName
-- MUST have a `kms-arn` attribute
-- MUST have a `hierarchy-version`
-- MUST NOT have a `enc` attribute
+- MUST have a `branch-key-id` key who's value MUST not be an empty string
+- MUST have a `type` key who's value MUST not be an empty string
+- MUST have a `create-time` key with a value in ISO 8601 format in UTC
+- MUST have a `tablename` key who's value is the logicalKeyStoreName
+- MUST have a `kms-arn` key who's value is valid KMS ARN
+- MUST have a `hierarchy-version` key who's value is either "1" or "2"
+- MUST NOT have an `enc` key
+- MAY have one or more keys prefixed with `aws-crypto-ec:` which is the encryption context send by the customer.
+  The `aws-crypto-ec:` prefix is prepended by the library
+- MUST NOT have any other keys apart from the ones mentioned above if `hierarchy-version` is "2"
 
-Any additionally attributes on the DynamoDB item
-MUST be added to the encryption context.
+### ACTIVE Branch Key Context
 
-### ACTIVE Encryption Context
-
-The ACTIVE branch key is a copy of the DECRYPT_ONLY with the same `version`.
+The ACTIVE branch key is a copy of a DECRYPT_ONLY with the same `version`.
 It is structured slightly differently so that the active version can be accessed quickly.
 
-In addition to the [encryption context](#encryption-context):
+In addition to the [branch key context](#branch-key-context):
 
-The ACTIVE encryption context value of the `type` attribute MUST equal to `"branch:ACTIVE"`.
-The ACTIVE encryption context MUST have a `version` attribute.
-The `version` attribute MUST store the branch key version formatted like `"branch:version:"` + `version`.
+The ACTIVE branch key context value of the key `type` MUST equal to `"branch:ACTIVE"`.
+The ACTIVE branch key context MUST have a `version` key.
+The `version` key MUST store the branch key version formatted like `"branch:version:"` + `<version UUID>`.
 
-### DECRYPT_ONLY Encryption Context
+### DECRYPT_ONLY Branch Key Context
 
-In addition to the [encryption context](#encryption-context):
+In addition to the [branch key context](#branch-key-context):
 
-The DECRYPT_ONLY encryption context MUST NOT have a `version` attribute.
-The `type` attribute MUST stores the branch key version formatted like `"branch:version:"` + `version`.
+The DECRYPT_ONLY branch key context MUST NOT have a `version` key.
+The `type` value MUST store the branch key version formatted like `"branch:version:"` + `<version UUID>`.
 
-### Beacon Key Encryption Context
+### Beacon Branch Key Context
 
-In addition to the [encryption context](#encryption-context):
+In addition to the [branch key context](#branch-key-context):
 
-The Beacon key encryption context value of the `type` attribute MUST equal to `"beacon:ACTIVE"`.
-The Beacon key encryption context MUST NOT have a `version` attribute.
+The Beacon key branch key context MUST include a key `type` and the value MUST be `"beacon:ACTIVE"`.
+The Beacon key branch key context MUST NOT have a `version` key.
 
-### Custom Encryption Context
+## AWS KMS Encryption Context
 
-If custom [encryption context](./structures.md#encryption-context-3)
-is associated with the branch key these values MUST be added to the AWS KMS encryption context.
-To avoid name collisions each added attribute from the custom [encryption context](./structures.md#encryption-context-3)
-MUST be prefixed with `aws-crypto-ec:`.
-Across all versions of a Branch Key, the custom encryption context MUST be equal.
+If the `hierarchy-version` is v1, AWS KMS encryption context MUST be same as [branch key context](#branch-key-context).
+If the `hierarchy-version` is v2, AWS KMS encryption context MUST be the [encryption context from authenticated branch key context](#encryption-context-from-authenticated-branch-key-context) without any transformation. This requirement applies regardless of the Branch Key Item's `type`.
 
 ## AWS KMS Branch Key Decryption
 
 The operation MUST use the configured `KMS SDK Client` to decrypt the value of the branch key field.
 
+To get attributes in branch key item from the keystore
+this operation MUST call AWS DDB `GetItem`.
 Every attribute except for `enc` on the AWS DDB response item
 MUST be authenticated in the decryption of `enc`
 
-Every key in the constructed [encryption context](#encryption-context)
+Every key in the constructed [branch key context](#branch-key-context)
 except `tableName`
-MUST exist as a string attribute in the AWS DDB response item.
-Every value in the constructed [encryption context](#encryption-context)
+MUST exist as a attribute in the AWS DDB response item.
+All attributes in the AWS DynamoDB response item MUST be of type string,
+with the exception of hierarchy-version, which MUST be of type number,
+and `enc`, which MUST be of type binary.
+Every value in the constructed [branch key context](#branch-key-context)
 except the logical table name
 MUST equal the value with the same key in the AWS DDB response item.
-The key `enc` MUST NOT exist in the constructed [encryption context](#encryption-context).
+The key `enc` MUST NOT exist in the constructed [branch key context](#branch-key-context).
 
 If the Keystore's [AWS KMS Configuration](#aws-kms-configuration) is `KMS Key ARN` or `KMS MRKey ARN`,
 the `kms-arn` field of the DDB response item MUST be
@@ -669,8 +837,11 @@ the keystore operation MUST call with a request constructed as follows:
   If the KMS Configuration is MRDiscovery, `KeyId` MUST be the `kms-arn` attribute value of the AWS DDB response item, with the region replaced by the configured region.
   Otherwise, it MUST BE the Keystore's configured KMS Key.
 - `CiphertextBlob` MUST be the `enc` attribute value on the AWS DDB response item
-- `EncryptionContext` MUST be the [encryption context](#encryption-context) constructed above
+- `EncryptionContext` MUST be the [encryption context from authenticated branch key context](#encryption-context-from-authenticated-branch-key-context)
 - `GrantTokens` MUST be this keystore's [grant tokens](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token).
+
+For authentication of attributes except for `enc` on AWS DDB response item in Hierarchy Version `v2`,
+the operation MUST match the first 48 bytes of `Plaintext` returned by AWS KMS Decrypt operation with SHA-384 Digest for the branch key of serialization of the [branch key context](#branch-key-context).
 
 ## Record Format
 
@@ -692,19 +863,19 @@ A branch key record MUST include the following key-value pairs:
 1. `hierarchy-version`: Version of the hierarchical keyring;
    represented as [AWS DDB Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes)
 
-A branch key record MAY include [custom encryption context](#custom-encryption-context) key-value pairs.
-These attributes should be prefixed with `aws-crypto-ec:` the same way they are for [AWS KMS encryption context](#encryption-context).
+A branch key record MAY include [encryption context](./structures.md#encryption-context) key-value pairs.
+These attributes MUST be prefixed with `aws-crypto-ec:` regardless of the item's `hierarchy-version`.
 
-### Branch Key Materials From Authenticated Encryption Context
+### Branch Key Materials From Authenticated Branch key Context
 
 The `type` attribute MUST either be equal to `"branch:ACTIVE"` or start with `"branch:version:"`.
 
 If the `type` attribute is equal to `"branch:ACTIVE"`
-then the authenticated encryption context MUST have a `version` attribute
+then the authenticated branch key context MUST have a `version` attribute
 and the version string is this value.
 If the `type` attribute start with `"branch:version:"` then the version string MUST be equal to this value.
 
-To construct [branch key materials](./structures.md#branch-key-materials) from authenticated encryption context as follows:
+To construct [branch key materials](./structures.md#branch-key-materials) from authenticated branch key context as follows:
 
 - [Branch Key](./structures.md#branch-key) MUST be the [decrypted branch key material](#aws-kms-branch-key-decryption)
 - [Branch Key Id](./structures.md#branch-key-id) MUST be the `branch-key-id`
@@ -712,18 +883,18 @@ To construct [branch key materials](./structures.md#branch-key-materials) from a
   The version string MUST start with `branch:version:`.
   The remaining string encoded as UTF8 bytes MUST be the Branch Key version.
 - [Encryption Context](./structures.md#encryption-context-3) MUST be constructed by
-  [Custom Encryption Context From Authenticated Encryption Context](#custom-encryption-context-from-authenticated-encryption-context)
+  [Encryption Context From Authenticated Branch Key Context](#encryption-context-from-authenticated-branch-key-context)
 
-### Custom Encryption Context From Authenticated Encryption Context
+### Encryption Context From Authenticated Branch Key Context
 
-The custom encryption context is stored as map of UTF8 Encoded bytes.
+The [encryption context](./structures.md#encryption-context) is stored as map of UTF8 Encoded bytes.
 
-For every key in the [encryption context](./structures.md#encryption-context-3)
+For every key in the [encryption context](./structures.md#encryption-context)
 the string `aws-crypto-ec:` + the UTF8 decode of this key
-MUST exist as a key in the authenticated encryption context.
-Also, the value in the [encryption context](./structures.md#encryption-context-3) for this key
-MUST equal the value in the authenticated encryption context
-for the constructed key.
+MUST exist as a key in the authenticated branch key context.
+Also, the value in the [encryption context](./structures.md#encryption-context) for this key
+MUST equal the value in the authenticated branch key context
+for the prefixed key.
 
 ### Example
 
