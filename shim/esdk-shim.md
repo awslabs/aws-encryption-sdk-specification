@@ -150,6 +150,17 @@ where an input or output is passed through unmodified, each is translated per
 [Type translation](#type-translation), and each operation invokes the core ESDK
 per [Delegation](./shim.md#delegation).
 
+### Client configuration
+
+The ESDK shim MAY expose a client-level configuration carrying a commitment
+policy and a maximum number of encrypted data keys, applied to every operation
+of that client.
+
+- A value the target supplies on a per-operation input MUST override the
+  client-level value for the same field for that operation.
+- A field the target sets on neither the client nor the operation MUST defer
+  to the core ESDK's default.
+
 ### Materials source
 
 - Each of `encrypt` and `decrypt` MUST be supplied with exactly one materials
@@ -206,6 +217,20 @@ per [Delegation](./shim.md#delegation).
   [Algorithm suite identifier](#algorithm-suite-identifier).
 - MUST return the result encryption context, converted as defined in
   [Encryption context](#encryption-context).
+
+### Encrypt stream and decrypt stream
+
+- The ESDK shim SHOULD provide streaming encrypt and decrypt operations,
+  accepting the same inputs as [encrypt](#encrypt-inputs) and
+  [decrypt](#decrypt-inputs) except the plaintext or ciphertext, which the
+  target supplies incrementally.
+- On successful completion, a streaming operation MUST return the same
+  non-payload outputs as [encrypt outputs](#encrypt-outputs) or
+  [decrypt outputs](#decrypt-outputs).
+- Streamed decrypt MUST NOT release plaintext the core ESDK would not release,
+  and the shim MUST surface, and MUST NOT work around, the core ESDK's refusal
+  to stream a message whose verification cannot complete until the end of the
+  message.
 
 ### Create KMS client
 

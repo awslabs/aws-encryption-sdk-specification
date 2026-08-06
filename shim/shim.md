@@ -85,6 +85,21 @@ each value it exposes. Every such translation MUST obey the following rules.
 - When the core library produces a value the shim does not define, the
   translation MUST return an error.
 
+### Bulk data
+
+Payload-sized byte inputs and outputs (for example a plaintext or ciphertext)
+can dominate an operation's cost if each boundary crossing copies them.
+
+- The shim SHOULD accept bulk byte input by reference to the target's buffer,
+  without copying it; the buffer need only remain valid for the duration of
+  the call.
+- The shim SHOULD expose bulk byte output to the target as a read-only view of
+  the core library's buffer, without copying it.
+- A view of a core-library buffer MUST keep that buffer alive until the target
+  releases the view.
+- The shim MUST provide a way to copy a view's bytes into a target-owned
+  buffer.
+
 ## Delegation
 
 The shim implements none of the core library's behavior of its own; it forwards
@@ -103,6 +118,18 @@ enforce validity. These requirements pin down that forwarding.
 Checking a target-supplied handle for presence before dereferencing it (see
 [Handles and lifetimes](#handles-and-lifetimes)) is a memory-safety measure, not
 input validation, and is not subject to the rule above.
+
+### Error classification
+
+- The shim SHOULD classify the errors it returns so that the target can
+  distinguish, at minimum: a failed cryptographic verification (retrying the
+  same input cannot succeed), a failed call to a dependency service (retrying
+  may succeed), and invalid target-supplied input.
+- A classified error MUST also be identifiable as the shim's own error type, so
+  a target that handles only the shim's error type is unaffected when a
+  classification is added.
+- An error the shim does not classify MUST be reported as the shim's own error
+  type.
 
 ## Resources
 
@@ -150,8 +177,18 @@ A core library can define interfaces that its consumer implements and that the
 core library invokes during an operation — for example, a custom keyring or a
 custom cryptographic materials manager.
 
-How a shim exposes such custom implementations is not yet specified; a future
-revision of this specification will define it.
+A consumer defines such an implementation in the core library's language, as
+any value the core library accepts for that interface; the shim adopts the
+result and hands the target a handle.
+
+- The shim MAY provide a means for the target to adopt a consumer-defined
+  implementation of a core-library interface.
+- The adoption mechanism MUST accept any implementation the core library
+  accepts for that interface, without depending on which library defines it.
+- Adoption MUST transfer ownership of the adopted implementation; the shim
+  MUST accept each adoptable handle at most once.
+- A handle to an adopted implementation MUST be usable wherever that
+  interface's handle type is accepted.
 
 ### Concurrency
 
@@ -162,6 +199,18 @@ the shim library SHOULD support it as well.
 
 If a core library resource or operation supports [streamed](../client-apis/streaming.md) inputs/outputs,
 the shim library SHOULD support it as well.
+
+When the shim exposes a streamed operation:
+
+- The shim MUST provide a mechanism for the target to supply input
+  incrementally, a mechanism for the target to consume output as it is
+  released, and an explicit completion step that ends the input and reports
+  the operation's result.
+- The shim SHOULD release output to the target as the core library produces
+  it, without waiting for the input to complete.
+- Output released before completion MUST NOT be treated as complete or
+  verified until the completion step succeeds, and the shim MUST NOT weaken
+  the core library's own rules for releasing unverified output.
 
 ## Operation contracts
 
