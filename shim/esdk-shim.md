@@ -156,8 +156,10 @@ The ESDK shim MAY expose a client-level configuration carrying a commitment
 policy and a maximum number of encrypted data keys, applied to every operation
 of that client.
 
-- A value the target supplies on a per-operation input MUST override the
-  client-level value for the same field for that operation.
+- Matching the core ESDK's client, a field the target sets on both the client
+  and a per-operation input MUST be rejected as invalid input: rejecting today
+  is forward-compatible with defining override semantics later, while picking
+  a precedence rule today is not.
 - A field the target sets on neither the client nor the operation MUST defer
   to the core ESDK's default.
 
@@ -224,9 +226,8 @@ of that client.
   accepting the same inputs as [encrypt](#encrypt-inputs) and
   [decrypt](#decrypt-inputs) except the plaintext or ciphertext, which the
   target supplies incrementally.
-- On successful completion, a streaming operation MUST return the same
-  non-payload outputs as [encrypt outputs](#encrypt-outputs) or
-  [decrypt outputs](#decrypt-outputs).
+- A successful finish step MUST return the same non-payload outputs as
+  [encrypt outputs](#encrypt-outputs) or [decrypt outputs](#decrypt-outputs).
 - Streamed decrypt MUST NOT release plaintext the core ESDK would not release,
   and the shim MUST surface, and MUST NOT work around, the core ESDK's refusal
   to stream a message whose verification cannot complete until the end of the
