@@ -229,9 +229,8 @@ picking a precedence rule is not.
 - A successful finish step MUST return the same non-payload outputs as
   [encrypt outputs](#encrypt-outputs) or [decrypt outputs](#decrypt-outputs).
 - Streamed decrypt MUST NOT release plaintext the core ESDK would not release,
-  and the shim MUST surface, and MUST NOT work around, the core ESDK's refusal
-  to stream a message whose verification cannot complete until the end of the
-  message.
+  and the shim MUST surface the core ESDK's refusal to stream a message whose
+  verification cannot complete until the end of the message.
 
 ### Create KMS client
 

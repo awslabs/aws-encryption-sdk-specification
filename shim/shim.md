@@ -183,8 +183,8 @@ A core library can define interfaces that its consumer implements and that the
 core library invokes during an operation — for example, a custom keyring or a
 custom cryptographic materials manager.
 
-The shim does not define these implementations, and does not need to
-understand them. A consumer writes one in the core library's language; the
+The shim does not define these implementations. A consumer writes one in the
+core library's language; the
 shim's job is only to turn it into an ordinary handle in the target language.
 This is called **adoption**.
 
@@ -227,10 +227,8 @@ When the shim exposes a streamed operation:
   it, rather than holding all output until the finish step.
 - The shim MUST NOT weaken the core library's own rules for releasing
   unverified output.
-
-Output returned before the finish step succeeds is not yet complete or
-verified; the shim documents this for the target where the output is
-returned.
+- The shim MUST document to users that output returned before the finish step
+  succeeds is not yet complete or verified.
 
 ## Operation contracts
 
