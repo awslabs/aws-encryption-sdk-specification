@@ -191,16 +191,12 @@ This is called **adoption**.
 - The shim MAY let the target adopt a consumer-written implementation of a
   core-library interface.
 - Anything the core library accepts for that interface MUST be adoptable.
-- The shim MUST NOT depend on which library defined an adopted implementation.
-- An adopted handle MUST work everywhere a handle of that interface's type
-  works.
-- Adoption MUST take ownership: each adoptable value is adopted at most once,
-  and afterwards the handle is the only way to reach it.
 
-Adoption converts; it does not construct or validate. A value presented for
-adoption already conforms to its interface, and any failure to construct one
-is reported in the core library's language before adoption is reached —
-neither is the shim's to check or report.
+Adoption does not construct or validate. A value presented for adoption is
+assumed to already conform to its interface: conformance is the consumer's to
+ensure when writing the implementation, and any failure to construct the value
+is reported in the core library's language before adoption is reached. The
+shim relies on that assumption and does not check it.
 
 - Errors an adopted implementation returns during an operation MUST be
   reported like any core-library error (see [Delegation](#delegation)).
@@ -229,10 +225,12 @@ When the shim exposes a streamed operation:
   write or finish step.
 - The shim SHOULD return output from write steps as the core library produces
   it, rather than holding all output until the finish step.
-- Output returned before the finish step succeeds MUST NOT be treated as
-  complete or verified.
 - The shim MUST NOT weaken the core library's own rules for releasing
   unverified output.
+
+Output returned before the finish step succeeds is not yet complete or
+verified; the shim documents this for the target where the output is
+returned.
 
 ## Operation contracts
 
