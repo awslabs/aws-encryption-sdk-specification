@@ -152,16 +152,15 @@ per [Delegation](./shim.md#delegation).
 
 ### Client configuration
 
-The ESDK shim MAY expose a client-level configuration carrying a commitment
-policy and a maximum number of encrypted data keys, applied to every operation
-of that client.
+The ESDK shim MAY expose a client-level configuration mirroring the core
+ESDK's client configuration, applied to every operation of that client.
 
-- Matching the core ESDK's client, a field the target sets on both the client
-  and a per-operation input MUST be rejected as invalid input: rejecting today
-  is forward-compatible with defining override semantics later, while picking
-  a precedence rule today is not.
-- A field the target sets on neither the client nor the operation MUST defer
-  to the core ESDK's default.
+- Matching the core ESDK's client, a configuration value the target supplies
+  on both the client and a per-operation input MUST be rejected as invalid
+  input: rejecting is forward-compatible with defining override semantics
+  later, while picking a precedence rule is not.
+- A configuration value the target supplies on neither the client nor the
+  operation MUST defer to the core ESDK's default.
 
 ### Materials source
 

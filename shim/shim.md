@@ -185,18 +185,27 @@ custom cryptographic materials manager.
 
 The shim does not define these implementations, and does not need to
 understand them. A consumer writes one in the core library's language; the
-shim's job is only to turn it into an ordinary handle. This is called
-**adoption**.
+shim's job is only to turn it into an ordinary handle in the target language.
+This is called **adoption**.
 
 - The shim MAY let the target adopt a consumer-written implementation of a
   core-library interface.
-- Anything the core library accepts for that interface MUST be adoptable. The
-  shim MUST NOT depend on where the implementation came from or which library
-  defined it.
+- Anything the core library accepts for that interface MUST be adoptable.
+- The shim MUST NOT depend on which library defined an adopted implementation.
 - An adopted handle MUST work everywhere a handle of that interface's type
   works.
 - Adoption MUST take ownership: each adoptable value is adopted at most once,
   and afterwards the handle is the only way to reach it.
+
+Adoption converts; it does not construct or validate. A value presented for
+adoption already conforms to its interface, and any failure to construct one
+is reported in the core library's language before adoption is reached —
+neither is the shim's to check or report.
+
+- Errors an adopted implementation returns during an operation MUST be
+  reported like any core-library error (see [Delegation](#delegation)).
+- The target MUST adopt only values produced by the shim's conversion, and
+  MUST adopt each at most once; the shim does not detect violations.
 
 ### Concurrency
 
@@ -208,22 +217,22 @@ the shim library SHOULD support it as well.
 If a core library resource or operation supports [streamed](../client-apis/streaming.md) inputs/outputs,
 the shim library SHOULD support it as well.
 
-A streamed operation has three parts, and the shim MUST provide all three:
+When the shim exposes a streamed operation:
 
-- a **write** step the target calls repeatedly, each call supplying the next
-  chunk of input and returning whatever output the operation has produced so
-  far (possibly none);
-- a **finish** step that ends the input, completes the operation, and returns
-  the operation's result together with any output not yet returned by a write;
-- an error from any step when the operation has failed.
-
-Additionally:
-
+- The shim MUST provide a write step that the target calls repeatedly, each
+  call supplying the next chunk of input and returning whatever output the
+  operation has produced so far (possibly none).
+- The shim MUST provide a finish step that ends the input, completes the
+  operation, and returns the operation's result together with any output not
+  yet returned by a write step.
+- When the operation has failed, the shim MUST return an error from the next
+  write or finish step.
 - The shim SHOULD return output from write steps as the core library produces
   it, rather than holding all output until the finish step.
 - Output returned before the finish step succeeds MUST NOT be treated as
-  complete or verified, and the shim MUST NOT weaken the core library's own
-  rules for releasing unverified output.
+  complete or verified.
+- The shim MUST NOT weaken the core library's own rules for releasing
+  unverified output.
 
 ## Operation contracts
 
