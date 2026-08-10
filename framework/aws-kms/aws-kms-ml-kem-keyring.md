@@ -59,7 +59,7 @@ Its length is fixed by the [parameter set](#supported-parameter-sets).
 
 ## Interface
 
-The ML-KEM keyring MUST implement the [AWS Encryption SDK Keyring interface](../keyring-interface.md#interface).
+The ML-KEM keyring implements the [AWS Encryption SDK Keyring interface](../keyring-interface.md#interface).
 
 ## Initialization
 
@@ -87,10 +87,10 @@ All byte lengths are taken from
 The supported parameter sets are listed in the table below.
 
 | Parameter Set | Shared Secret Ciphertext Length (bytes) | Public Key Length (bytes, encapsulation key) |
-| ------------- | ----------------------------- | -------------------------------------------- |
-| ML-KEM-512    | 768                           | 800                                          |
-| ML-KEM-768    | 1088                          | 1184                                         |
-| ML-KEM-1024   | 1568                          | 1568                                         |
+| ------------- | --------------------------------------- | -------------------------------------------- |
+| ML-KEM-512    | 768                                     | 800                                          |
+| ML-KEM-768    | 1088                                    | 1184                                         |
+| ML-KEM-1024   | 1568                                    | 1568                                         |
 
 The supported parameter sets MUST be ML-KEM-512, ML-KEM-768, and ML-KEM-1024.
 
@@ -103,16 +103,18 @@ ML-KEM-1024 MUST use a Public Key Length of 1568 bytes.
 
 ### Encapsulation Source
 
-Exactly one of the following encapsulation sources MUST be configured.
+Exactly one of the following encapsulation sources is configured.
 Decapsulation is always performed by AWS KMS, regardless of the encapsulation source.
-Both sources produce a byte-identical [encrypted data key](#structure).
+Both sources use the same ML-KEM key pair and produce an
+[encrypted data key](#structure) in the same wire format,
+so an encrypted data key produced by either source can be decrypted by this keyring.
 
-- **`KmsEncapsulation`** —
-  `OnEncrypt` MUST call AWS KMS `Encapsulate` against the configured key identifier and the provided ML-KEM public key.
-- **`LocalEncapsulation`** —
-  `OnEncrypt` MUST perform ML-KEM `Encapsulate` locally against the configured
-  [ML-KEM public key](#ml-kem-public-key).
+- **`KmsEncapsulation`** — the shared secret is established by AWS KMS `Encapsulate`.
+- **`LocalEncapsulation`** — the shared secret is established locally against the
+  configured [ML-KEM public key](#ml-kem-public-key), without contacting AWS KMS.
   If the public key is not supplied at configuration time, keyring construction MUST fail.
+
+See [OnEncrypt](#onencrypt) for the normative behavior of each source.
 
 ## Structure
 
@@ -148,12 +150,12 @@ the [ciphertext](../structures.md#ciphertext) field in
 The following table describes the fields that form the ciphertext.
 The bytes are appended in the order shown.
 
-| Field              | Length (bytes)                                                                      | Interpreted as |
-| ------------------ | ----------------------------------------------------------------------------------- | -------------- |
-| Shared Secret Ciphertext     | Fixed by the [parameter set](#supported-parameter-sets) (768 / 1088 / 1568)         | Bytes          |
-| Salt               | 32                                                                                  | Bytes          |
-| Encrypted Key      | Length of AES-GCM ciphertext output (i.e. the data key length, per algorithm suite) | Bytes          |
-| Authentication Tag | 16                                                                                  | Bytes          |
+| Field                    | Length (bytes)                                                                      | Interpreted as |
+| ------------------------ | ----------------------------------------------------------------------------------- | -------------- |
+| Shared Secret Ciphertext | Fixed by the [parameter set](#supported-parameter-sets) (768 / 1088 / 1568)         | Bytes          |
+| Salt                     | 32                                                                                  | Bytes          |
+| Encrypted Key            | Length of AES-GCM ciphertext output (i.e. the data key length, per algorithm suite) | Bytes          |
+| Authentication Tag       | 16                                                                                  | Bytes          |
 
 The ciphertext MUST be in big-endian format.
 The fields MUST be in the following order: Shared Secret Ciphertext, Salt, Encrypted Key, Authentication Tag.
@@ -182,7 +184,7 @@ The Key Derivation Function Configuration is defined as:
 The Key (input keying material) input to the KDF MUST be the 32-byte ML-KEM shared secret.
 The Salt input to the KDF MUST be the 32-byte random value carried in the [Ciphertext structure](#ciphertext).
 The `FixedInfo` input to the KDF MUST be the byte string constructed below.
-On encrypt the keyring MUST generate the salt using a cryptographically secure random source.
+On encrypt the keyring generates the salt using a cryptographically secure random source.
 
 The `FixedInfo` input to the key derivation function is the concatenation,
 in the order listed below, of the following fields,
@@ -225,14 +227,13 @@ OnEncrypt MUST take [encryption materials](../structures.md#encryption-materials
 
 If the encryption materials do not contain a plaintext data key,
 OnEncrypt MUST generate a new plaintext data key.
-The generated plaintext data key MUST be a fresh random value from a cryptographically secure random source, of the length defined by the materials' [algorithm suite](../algorithm-suites.md).
+The generated plaintext data key MUST be a fresh random value, of the length defined by the materials' [algorithm suite](../algorithm-suites.md).
 
 The keyring MUST attempt to serialize the
 [encryption materials'](../structures.md#encryption-materials)
 [encryption context](../structures.md#encryption-context-1)
 according to the
 [encryption context serialization specification](../structures.md#serialization).
-If the keyring cannot serialize the encryption context, OnEncrypt MUST fail.
 
 The keyring MUST obtain `(sharedSecret, sharedSecretCiphertext)`
 from the configured [Encapsulation Source](#encapsulation-source):
@@ -246,19 +247,17 @@ from the configured [Encapsulation Source](#encapsulation-source):
   locally against the configured ML-KEM public key,
   using a cryptographically secure random source.
 
-If the encapsulation step fails, OnEncrypt MUST fail
-and MUST NOT modify the encryption materials.
-
-The keyring MUST generate a 32-byte random salt
+The keyring generates a 32-byte random salt
 using a cryptographically secure random source.
 
 The keyring MUST derive the wrapping key from the shared secret
 according to [Key Derivation](#key-derivation), using the generated salt.
-If the key derivation step fails, OnEncrypt MUST fail.
 
 The keyring MUST perform data key wrapping
 according to [Data Key Wrapping](#data-key-wrapping).
-If the keyring is unable to wrap the plaintext data key,
+
+If any of these steps fails —
+encryption context serialization, obtaining `(sharedSecret, sharedSecretCiphertext)` from the encapsulation source, key derivation, or data key wrapping —
 OnEncrypt MUST fail and MUST NOT modify the encryption materials.
 
 Otherwise, OnEncrypt MUST append a new
@@ -288,13 +287,6 @@ If the decryption materials already contain a plaintext data key,
 OnDecrypt MUST fail
 and MUST NOT modify the decryption materials.
 
-The keyring MUST attempt to serialize the
-[decryption materials'](../structures.md#decryption-materials)
-[encryption context](../structures.md#encryption-context-1)
-according to the
-[encryption context serialization specification](../structures.md#serialization).
-If the keyring cannot serialize the encryption context, OnDecrypt MUST fail.
-
 The set of encrypted data keys MUST first be filtered to match this keyring's configuration.
 For an encrypted data key to match:
 
@@ -308,10 +300,11 @@ For an encrypted data key to match:
 
 For each encrypted data key in the filtered set, one at a time,
 OnDecrypt MUST attempt to decrypt the data key.
-If this attempt results in an error, then these errors MUST be collected.
+If an attempt results in an error, that error is collected
+(see the per-step error handling below) and the next encrypted data key is attempted.
 
 To attempt to decrypt a particular encrypted data key,
-OnDecrypt MUST attempt to deserialize the [Ciphertext](#ciphertext) to obtain:
+OnDecrypt deserializes the [Ciphertext](#ciphertext) to obtain:
 
 - The Shared Secret Ciphertext.
 - The Salt.
@@ -338,29 +331,28 @@ by calling AWS KMS `Decapsulate` with a request constructed as follows:
 - `CiphertextBlob` MUST be the deserialized Shared Secret Ciphertext.
 - `GrantTokens` MUST be this keyring's grant tokens.
 
-If the call to AWS KMS `Decapsulate` fails,
-an error MUST be collected
-and the next encrypted data key in the filtered set MUST be attempted.
+The keyring MUST reconstruct the `FixedInfo` input to the key derivation function
+as described in [Key Derivation](#key-derivation),
+which serializes the [decryption materials'](../structures.md#decryption-materials)
+[encryption context](../structures.md#encryption-context-1)
+according to the
+[encryption context serialization specification](../structures.md#serialization).
 
 The keyring MUST derive the wrapping key from the recovered shared secret
 according to [Key Derivation](#key-derivation),
 using the deserialized salt.
 
-If the key derivation step fails,
-an error MUST be collected
-and the next encrypted data key in the filtered set MUST be attempted.
-
 The keyring MUST perform data key unwrapping
 according to [Data Key Unwrapping](#data-key-unwrapping).
-If the keyring fails to unwrap the data key,
+
+If any of these steps fails —
+the AWS KMS `Decapsulate` call, the `FixedInfo` reconstruction, key derivation, or data key unwrapping —
 an error MUST be collected
 and the next encrypted data key in the filtered set MUST be attempted.
 
-If unwrapping succeeds, OnDecrypt:
-
-- MUST set the plaintext data key on the
-  [decryption materials](../structures.md#decryption-materials).
-- MUST immediately return the modified decryption materials.
+If unwrapping succeeds, OnDecrypt MUST set the plaintext data key on the
+[decryption materials](../structures.md#decryption-materials)
+and MUST immediately return the modified decryption materials.
 
 If OnDecrypt fails to successfully decrypt any encrypted data key,
 then it MUST yield an error that includes all the collected errors.
@@ -397,17 +389,6 @@ The keyring MUST decrypt the Encrypted Key using `AES-GCM-256` with the followin
 
 If AES-GCM authentication fails, data key unwrapping MUST fail.
 
-## Multi-Keyring Compatibility
-
-This keyring MAY be used inside a [multi-keyring](../multi-keyring.md).
-
-This keyring MUST NOT be used inside an
-[AWS KMS multi-keyring](./aws-kms-multi-keyrings.md),
-which requires generator and children to be
-[AWS KMS keyrings](./aws-kms-keyring.md) whose symmetric
-`GenerateDataKey` / `Encrypt` / `Decrypt` construction differs from this keyring's
-`Encapsulate` / `Decapsulate`.
-
 ## Security Considerations
 
 **No key commitment.**
@@ -424,8 +405,11 @@ The canonicalized encryption context is bound into the wrapping key via the KDF'
 `FixedInfo` and into the data key wrap via the AES-GCM AAD.
 
 **Encapsulation source equivalence.**
-Both encapsulation sources use the same ML-KEM key pair and produce a byte-identical
-encrypted data key.
+Both encapsulation sources use the same ML-KEM key pair and produce an
+encrypted data key in the same wire format, so either source's output is
+decryptable by this keyring. (The encapsulation step is non-deterministic, so the
+bytes differ between messages and between sources; equivalence is of format and
+decryptability, not of exact bytes.)
 Local encapsulation removes the per-message KMS call and the `kms:Encapsulate`
 permission requirement on encrypt.
 
