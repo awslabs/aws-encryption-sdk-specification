@@ -100,6 +100,7 @@ and SHOULD be equal to a UTF-8 encoding of the key name.
 - [AWS KMS Keyrings](./aws-kms/)
   - [AWS KMS Keyring](./aws-kms/aws-kms-keyring.md)
   - [AWS KMS RSA Keyring](./aws-kms/aws-kms-rsa-keyring.md)
+  - [AWS KMS ML-KEM Keyring](./aws-kms/aws-kms-ml-kem-keyring.md)
   - [AWS KMS Multi Keyrings](./aws-kms/aws-kms-multi-keyrings.md)
   - [AWS KMS Discovery Keyring](./aws-kms/aws-kms-discovery-keyring.md)
   - [AWS KMS MRK Discovery Keyring](./aws-kms/aws-kms-mrk-discovery-keyring.md)

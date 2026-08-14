@@ -22,3 +22,8 @@ for MPL test vectors:
 - reproduced encryption context: Range is every [representative reproduced encryption context](#representative-reproduced-encryption-context)
 - encrypt key description: Range of all [key descriptions](./key-description.md) used to request encrypt materials
 - decrypt key description: Range of all [key descriptions](./key-description.md) used to decrypt
+- ML-KEM parameter set: Range over `ml-kem-512`, `ml-kem-768`, and `ml-kem-1024`
+  for key descriptions of `type` `aws-kms-ml-kem`
+  (see [AWS KMS ML-KEM Keyring vectors](./complete-vectors/ml-kem.md))
+- ML-KEM encapsulation source: Range over `kms` and `local`
+  for key descriptions of `type` `aws-kms-ml-kem`
