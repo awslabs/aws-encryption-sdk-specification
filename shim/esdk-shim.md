@@ -263,19 +263,21 @@ picking a precedence rule is not.
 - Creating a key store MUST provide the target-supplied key store id and grant
   tokens to the core ESDK when present; an unset value is omitted.
 
-### Create cache
+### Create cryptographic materials cache
 
 The core ESDK defines the cache kinds. The shim expresses a cache selection by
 creating a cache of that kind, so a kind the core ESDK does not define cannot be
 requested.
 
-- The shim MUST provide an operation that creates a cache that performs no
-  caching, backed by the core ESDK.
-- The shim MUST provide an operation that creates a multi-threaded cache backed
-  by the core ESDK.
-- Creating a multi-threaded cache MUST provide the target-supplied entry
-  capacity and entry pruning tail size to the core ESDK when present; an unset
-  value is omitted, deferring to the core ESDK's default.
+- The shim MUST provide an operation that creates a cryptographic materials
+  cache of a target-selected kind, backed by the core ESDK.
+- The shim MUST return an error when the target cache kind is not a supported
+  value.
+- The shim MUST support creating a cache that performs no caching.
+- The shim MUST support creating a multi-threaded cache.
+- Creating a cryptographic materials cache MUST provide the target-supplied
+  entry capacity and entry pruning tail size to the core ESDK when present; an
+  unset value is omitted, deferring to the core ESDK's default.
 
 ### Create hierarchical keyring
 
@@ -287,12 +289,14 @@ requested.
   and MUST provide it to the core ESDK.
 - Creating a hierarchical keyring MUST provide the target-supplied branch key id
   and time-to-live to the core ESDK.
-- Creating a hierarchical keyring MAY be supplied with a cache handle (see
-  [Resources](#resources)).
-- When a cache handle is supplied, creating a hierarchical keyring MUST provide
-  the referenced cache to the core ESDK.
-- When no cache handle is supplied, creating a hierarchical keyring MUST defer
-  to the core ESDK's default cache.
+- Creating a hierarchical keyring MAY be supplied with a
+  [cryptographic materials cache](#create-cryptographic-materials-cache),
+  checked as defined in
+  [Shim Specification: Handles and lifetimes](./shim.md#handles-and-lifetimes).
+- When no cache is supplied, creating a hierarchical keyring MUST defer to the
+  core ESDK's default cache.
+- When a cache is supplied, creating a hierarchical keyring MUST reference that
+  exact cache, so several keyrings given the same cache share it.
 - Creating a hierarchical keyring MUST provide the target-supplied partition id to
   the core ESDK when present; an unset value is omitted.
 
