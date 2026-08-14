@@ -26,9 +26,6 @@ its own specification, and is not restated here.
 
 ## Conventions
 
-The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
-interpreted as described in RFC 2119.
-
 Terms defined by the [Shim Specification](./shim.md#conventions) — shim, target,
 generator, generated bindings, owned interface — are used here as defined there,
 with **core ESDK** as the core library.
@@ -100,12 +97,12 @@ Converting from the core ESDK:
 - The shim MUST return an error when the target KMS configuration type is not a
   supported value.
 
-### Cache configuration
+### AES wrapping algorithm
 
-- The shim MUST translate a no-cache selection.
-- The shim MUST translate a multi-threaded cache selection.
-- The shim MUST return an error when the target cache type is not a supported
-  value.
+- The shim MUST translate the target AES wrapping algorithm to the core ESDK
+  wrapping algorithm of the same meaning.
+- The shim MUST return an error when the target wrapping algorithm is not a
+  supported value.
 
 ## Resources
 
@@ -116,18 +113,22 @@ ESDK and referenced by the target through an owned-interface handle.
 - **service client** — a client for an AWS service that a key store requires
   (for example, a KMS client or a DynamoDB client).
 - **key store** — a key store, which depends on one or more service clients.
+- **cache** — a cryptographic materials cache that a materials source may use to
+  reuse cryptographic materials it has already obtained.
 - **materials source** — a keyring or Cryptographic Materials Manager (CMM) that
   supplies cryptographic materials; a materials source may depend on a key store.
 
 The dependency edges are therefore: a key store depends on its service clients,
-and a materials source may depend on a key store.
+and a materials source may depend on a key store and on a cache.
+
+A materials source handle references a core-ESDK keyring or CMM.
 
 ### Service client configuration
 
 The shim configures each AWS service client it creates from a client
 configuration supplied by the target. Any value the target supplies is passed
-through to the service client; where the target omits a value, the shim may
-apply a default.
+through to the service client; where the target omits a value, the shim defers
+to the core ESDK's default configuration resolution.
 
 - The shim MUST set a user-agent on each service client of the form
   `AwsEncryptionSdk-Shim-<target-language>-<core-language>-<version>`, where
@@ -137,8 +138,8 @@ apply a default.
   configuration, appending its own rather than replacing it.
 - If the target supplies a retry configuration, the shim MUST apply it to each
   service client.
-- If the target does not supply a retry configuration, the shim MAY apply a
-  default retry configuration.
+- If the target does not supply a retry configuration, the shim MUST defer to
+  the core ESDK's default retry configuration and MUST NOT substitute its own.
 - If the target supplies a region, the shim MUST apply it to each service client.
 - The shim SHOULD allow one client configuration to be applied to multiple
   service clients.
@@ -151,6 +152,19 @@ where an input or output is passed through unmodified, each is translated per
 [Type translation](#type-translation), and each operation invokes the core ESDK
 per [Delegation](./shim.md#delegation).
 
+### Client configuration
+
+The ESDK shim MAY expose a client-level configuration mirroring the core
+ESDK's client configuration, applied to every operation of that client.
+
+- A configuration value the target supplies on both the client and a
+  per-operation input MUST be rejected as invalid input.
+- A configuration value the target supplies on neither the client nor the
+  operation MUST defer to the core ESDK's default.
+
+Rejecting is forward-compatible with defining override semantics later;
+picking a precedence rule is not.
+
 ### Materials source
 
 - Each of `encrypt` and `decrypt` MUST be supplied with exactly one materials
@@ -160,45 +174,65 @@ per [Delegation](./shim.md#delegation).
 
 ### Encrypt inputs
 
-- `encrypt` MUST pass the target-supplied plaintext to the core ESDK unmodified.
-- `encrypt` MUST provide the target-supplied encryption context to the core ESDK,
+`encrypt`:
+
+- MUST pass the target-supplied plaintext to the core ESDK unmodified.
+- MUST provide the target-supplied encryption context to the core ESDK,
   converted as defined in [Encryption context](#encryption-context).
-- `encrypt` MUST provide the target-supplied algorithm suite to the core ESDK,
+- MUST provide the target-supplied algorithm suite to the core ESDK,
   converted as defined in [Algorithm suite identifier](#algorithm-suite-identifier).
-- `encrypt` MUST provide the target-supplied commitment policy to the core ESDK,
+- MUST provide the target-supplied commitment policy to the core ESDK,
   converted as defined in [Commitment policy](#commitment-policy).
-- `encrypt` MUST provide the target-supplied frame length to the core ESDK,
+- MUST provide the target-supplied frame length to the core ESDK,
   converted as defined in [Frame length](#frame-length).
-- `encrypt` MUST provide the target-supplied maximum-encrypted-data-keys value to
+- MUST provide the target-supplied maximum-encrypted-data-keys value to
   the core ESDK, converted as defined in
   [Maximum encrypted data keys](#maximum-encrypted-data-keys).
 
 ### Encrypt outputs
 
-- `encrypt` MUST return the core ESDK's ciphertext unmodified.
-- `encrypt` MUST return the used algorithm suite, converted as defined in
+`encrypt`:
+
+- MUST return the core ESDK's ciphertext unmodified.
+- MUST return the used algorithm suite, converted as defined in
   [Algorithm suite identifier](#algorithm-suite-identifier).
-- `encrypt` MUST return the result encryption context, converted as defined in
+- MUST return the result encryption context, converted as defined in
   [Encryption context](#encryption-context).
 
 ### Decrypt inputs
 
-- `decrypt` MUST pass the target-supplied ciphertext to the core ESDK unmodified.
-- `decrypt` MUST provide the target-supplied encryption context to the core ESDK,
+`decrypt`:
+
+- MUST pass the target-supplied ciphertext to the core ESDK unmodified.
+- MUST provide the target-supplied encryption context to the core ESDK,
   converted as defined in [Encryption context](#encryption-context).
-- `decrypt` MUST provide the target-supplied commitment policy to the core ESDK,
+- MUST provide the target-supplied commitment policy to the core ESDK,
   converted as defined in [Commitment policy](#commitment-policy).
-- `decrypt` MUST provide the target-supplied maximum-encrypted-data-keys value to
+- MUST provide the target-supplied maximum-encrypted-data-keys value to
   the core ESDK, converted as defined in
   [Maximum encrypted data keys](#maximum-encrypted-data-keys).
 
 ### Decrypt outputs
 
-- `decrypt` MUST return the core ESDK's plaintext unmodified.
-- `decrypt` MUST return the used algorithm suite, converted as defined in
+`decrypt`:
+
+- MUST return the core ESDK's plaintext unmodified.
+- MUST return the used algorithm suite, converted as defined in
   [Algorithm suite identifier](#algorithm-suite-identifier).
-- `decrypt` MUST return the result encryption context, converted as defined in
+- MUST return the result encryption context, converted as defined in
   [Encryption context](#encryption-context).
+
+### Encrypt stream and decrypt stream
+
+- The ESDK shim SHOULD provide streaming encrypt and decrypt operations,
+  accepting the same inputs as [encrypt](#encrypt-inputs) and
+  [decrypt](#decrypt-inputs) except the plaintext or ciphertext, which the
+  target supplies incrementally.
+- A successful finish step MUST return the same non-payload outputs as
+  [encrypt outputs](#encrypt-outputs) or [decrypt outputs](#decrypt-outputs).
+- Streamed decrypt MUST NOT release plaintext the core ESDK would not release,
+  and the shim MUST surface the core ESDK's refusal to stream a message whose
+  verification cannot complete until the end of the message.
 
 ### Create KMS client
 
@@ -229,6 +263,20 @@ per [Delegation](./shim.md#delegation).
 - Creating a key store MUST provide the target-supplied key store id and grant
   tokens to the core ESDK when present; an unset value is omitted.
 
+### Create cache
+
+The core ESDK defines the cache kinds. The shim expresses a cache selection by
+creating a cache of that kind, so a kind the core ESDK does not define cannot be
+requested.
+
+- The shim MUST provide an operation that creates a cache that performs no
+  caching, backed by the core ESDK.
+- The shim MUST provide an operation that creates a multi-threaded cache backed
+  by the core ESDK.
+- Creating a multi-threaded cache MUST provide the target-supplied entry
+  capacity and entry pruning tail size to the core ESDK when present; an unset
+  value is omitted, deferring to the core ESDK's default.
+
 ### Create hierarchical keyring
 
 - The shim MUST provide an operation that creates a hierarchical keyring backed
@@ -239,11 +287,26 @@ per [Delegation](./shim.md#delegation).
   and MUST provide it to the core ESDK.
 - Creating a hierarchical keyring MUST provide the target-supplied branch key id
   and time-to-live to the core ESDK.
-- Creating a hierarchical keyring MUST provide the target-supplied cache
-  configuration to the core ESDK, converted as defined in
-  [Cache configuration](#cache-configuration).
+- Creating a hierarchical keyring MAY be supplied with a cache handle (see
+  [Resources](#resources)).
+- When a cache handle is supplied, creating a hierarchical keyring MUST provide
+  the referenced cache to the core ESDK.
+- When no cache handle is supplied, creating a hierarchical keyring MUST defer
+  to the core ESDK's default cache.
 - Creating a hierarchical keyring MUST provide the target-supplied partition id to
   the core ESDK when present; an unset value is omitted.
+
+### Create raw AES keyring
+
+- The shim MUST provide an operation that creates a raw AES keyring backed by
+  the core ESDK.
+- Creating a raw AES keyring MUST provide the target-supplied key namespace and
+  key name to the core ESDK.
+- Creating a raw AES keyring MUST pass the target-supplied wrapping key to the
+  core ESDK unmodified.
+- Creating a raw AES keyring MUST provide the target-supplied wrapping algorithm
+  to the core ESDK, converted as defined in
+  [AES wrapping algorithm](#aes-wrapping-algorithm).
 
 ## Conformance and testing
 
