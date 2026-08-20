@@ -274,7 +274,8 @@ requested.
 - The shim MUST return an error when the target cache kind is not a supported
   value.
 - The shim MUST support creating a cache that performs no caching.
-- The shim MUST support creating a multi-threaded cache.
+- The shim MUST support creating a default cache.
+- The shim MUST support creating a storm tracking cache.
 - Creating a cryptographic materials cache MUST provide the target-supplied
   entry capacity and entry pruning tail size to the core ESDK when present; an
   unset value is omitted, deferring to the core ESDK's default.
