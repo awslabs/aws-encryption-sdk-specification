@@ -277,8 +277,7 @@ requested.
 - The shim MUST support creating a default cache.
 - The shim MUST support creating a storm tracking cache.
 - Creating a cryptographic materials cache MUST provide the target-supplied
-  entry capacity and entry pruning tail size to the core ESDK when present; an
-  unset value is omitted, deferring to the core ESDK's default.
+  cache type, with its values, to the core ESDK.
 
 ### Create hierarchical keyring
 
