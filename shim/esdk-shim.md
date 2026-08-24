@@ -252,10 +252,11 @@ picking a precedence rule is not.
 
 - The shim MUST provide an operation that creates a key store backed by the core
   ESDK.
-- Creating a key store MUST require a KMS client handle and a DynamoDB client
-  handle, checked as defined in
-  [Shim Specification: Handles and lifetimes](./shim.md#handles-and-lifetimes),
-  and MUST provide both to the core ESDK.
+- Creating a key store MAY be supplied with a KMS client and a DynamoDB client,
+  each checked as defined in
+  [Shim Specification: Handles and lifetimes](./shim.md#handles-and-lifetimes); a
+  supplied client MUST be provided to the core ESDK, and an absent one MUST be
+  left for the core ESDK to default.
 - Creating a key store MUST provide the target-supplied table name and logical key
   store name to the core ESDK.
 - Creating a key store MUST provide the target-supplied KMS configuration to the
