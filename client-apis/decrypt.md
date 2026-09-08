@@ -3,63 +3,21 @@
 
 # Decrypt
 
-## Version
-
-0.5.0
-
-### Changelog
-
-- 0.5.0
-
-  - [Encryption context values that are authenticated but not stored with the encrypted message](../changes/2022-11-14_encryption_context_on_decrypt/proposal.md)
-  - Add requirements to specify that Algorithm Suite be ESDK supported
-
-- 0.4.0
-
-  - Add unsigned streaming decryption option
-
-- 0.3.0
-
-  - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
-
-- 0.2.0
-
-  - [Detect Base64-encoded Messages](../changes/2020-07-13_detect-base64-encoded-messages/change.md)
-
-- 0.1.0-preview
-
-  - Initial record
-
-## Implementations
-
-| Language   | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation                                                                                                                                                 |
-| ---------- | -------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C          | 0.2.0                                  | 0.1.0                     | [session_decrypt.c](https://github.com/aws/aws-encryption-sdk-c/blob/master/source/session_decrypt.c)                                                          |
-| NodeJS     | 0.2.0                                  | 0.1.0                     | [decrypt.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-node/src/decrypt.ts)                                         |
-| Browser JS | 0.2.0                                  | 0.1.0                     | [decrypt.ts](https://github.com/awslabs/aws-encryption-sdk-javascript/blob/master/modules/encrypt-browser/src/decrypt.ts)                                      |
-| Python     | 0.2.0                                  | 1.2.0                     | [streaming_client.py](https://github.com/aws/aws-encryption-sdk-python/blob/master/src/aws_encryption_sdk/streaming_client.py)                                 |
-| Java       | 0.2.0                                  | 0.0.1                     | [DecryptionHandler.java](https://github.com/aws/aws-encryption-sdk-java/blob/master/src/main/java/com/amazonaws/encryptionsdk/internal/DecryptionHandler.java) |
-
 ## Overview
 
 This document describes the AWS Encryption SDK's (ESDK's) decrypt operation,
 used for decrypting a message that was previously encrypted by the ESDK.
 
-Any client provided by the AWS Encryption SDK that performs decryption of encrypted messages MUST follow
-this specification for decryption.
-
 ## Definitions
-
-### Conventions used in this document
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
-in this document are to be interpreted as described in [RFC2119](https://tools.ietf.org/html/rfc2119).
 
 ### Authenticated Data
 
 Plaintext or associated data is considered authenticated if the associated
-[authentication tag](../data-format/message-body.md#authentication-tag) is successfully checked
+authentication tag is successfully checked
 as defined by the algorithm suite indicated in the message header.
+The authentication tag may be from a [regular frame](../data-format/message-body.md#regular-frame-authentication-tag),
+[final frame](../data-format/message-body.md#final-frame-authentication-tag),
+or [nonframed data](../data-format/message-body.md#nonframed-data-authentication-tag).
 
 This operation MUST NOT release any unauthenticated plaintext or unauthenticated associated data.
 
@@ -71,18 +29,17 @@ of the algorithm suite indicated in the message header.
 
 ## Input
 
-The client MUST require the following as inputs to this operation:
+Required arguments:
 
-- [Encrypted Message](#encrypted-message)
+- Decrypt operation input MUST accept a required [Encrypted Message](#encrypted-message) argument.
 
-The client MUST require exactly one of the following types of inputs:
+Optional arguments:
 
-- [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md)
-- [Keyring](../framework/keyring-interface.md)
-
-The following inputs to this behavior MUST be OPTIONAL:
-
-- [Encryption Context](#encryption-context)
+- Decrypt operation input MUST accept an optional [Encryption Context](#encryption-context) argument.
+- Decrypt operation input MUST accept an optional [Cryptographic Materials Manager (CMM)](../framework/cmm-interface.md) argument.
+- Decrypt operation input MUST accept an optional [Keyring](../framework/keyring-interface.md) argument.
+  The Decrypt operation MUST validate that exactly one of a keyring or CMM was provided by the caller.
+  If the caller does not provide exactly one of a keyring or CMM, the Decrypt operation MUST fail.
 
 ### Encrypted Message
 
@@ -91,7 +48,7 @@ The input encrypted message MUST be a sequence of bytes in the
 [message format](../data-format/message.md) specified by the AWS Encryption SDK.
 The encrypted message contains the list of [encrypted data keys](../data-format/message-header.md#encrypted-data-keys),
 [encryption context](../data-format/message-header.md#aad), if provided during encryption,
-[encrypted content](../data-format/message-body.md#encrypted-content) and
+[encrypted content](../data-format/message-body.md) and
 [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id) among other metadata.
 Each key in the encrypted data key list is an encrypted version of the single plaintext data key that was used to encrypt the plaintext.
 The encryption context is the additional authenticated data that was used during encryption.
@@ -109,7 +66,7 @@ Because the first two bytes of the message format have a very limited set of pos
 (currently they are in fact fixed),
 the first two bytes of the Base64 encoding of a valid message are also simple to recognize.
 
-To make diagnosing this mistake easier, implementations SHOULD detect the first two bytes of the Base64 encoding of any supported message [versions](../data-format/message-header.md#version-1)
+To make diagnosing this mistake easier, implementations SHOULD detect the first two bytes of the Base64 encoding of any supported message [versions](../data-format/message-header.md#version)
 and [types](../data-format/message-header.md#type)
 and fail with a more specific error message.
 In particular, the hex values to detect for the current set of versions and types are:
@@ -134,24 +91,19 @@ A Keyring that implements the [keyring interface](../framework/keyring-interface
 
 If the Keyring is provided as the input, the client MUST construct a [default CMM](../framework/default-cmm.md) that uses this keyring,
 to obtain the [decryption materials](../framework/structures.md#decryption-materials) that is required for decryption.
-
-This default CMM MUST obtain the decryption materials required for decryption.
+This default CMM constructed from the keyring MUST obtain the decryption materials required for decryption.
 
 ## Output
 
-The client MUST return as output to this operation:
-
-- [Plaintext](#plaintext)
-- [Encryption Context](#encryption-context)
-- [Algorithm Suite](#algorithm-suite)
-
-The client SHOULD return as an output:
-
-- [Parsed Header](#parsed-header)
+- Decrypt operation output MUST include a [Plaintext](#plaintext) value.
+- Decrypt operation output MUST include an [encryption context](#encryption-context) value.
+- Decrypt operation output MUST include an [algorithm suite](#algorithm-suite) value.
+- Decrypt operation output SHOULD include a [Parsed Header](#parsed-header) value.
 
 ### Plaintext
 
 The decrypted data.
+This MUST be a sequence of bytes.
 
 This operation MAY [stream](streaming.md) the plaintext as output.
 
@@ -182,18 +134,16 @@ A collection of deserialized fields of the [encrypted message's](#encrypted-mess
 
 The Decrypt operation is divided into several distinct steps:
 
-- [Parse the header](#parse-the-header)
-- [Get the decryption materials](#get-the-decryption-materials)
-- [Verify the header](#verify-the-header)
-- [Decrypt the message body](#decrypt-the-message-body)
-- [Verify the signature](#verify-the-signature)
+- Decrypt operation Step 1 MUST be [Parse the header](#parse-the-header)
+- Decrypt operation Step 2 MUST be [Get the decryption materials](#get-the-decryption-materials)
+- Decrypt operation Step 3 MUST be [Verify the header](#verify-the-header)
+- Decrypt operation Step 4 MUST be [Decrypt the message body](#decrypt-the-message-body)
+- Decrypt operation Step 5 MUST be [Verify the signature](#verify-the-signature)
   - If the message header contains an algorithm suite including a
     [signature algorithm](../framework/algorithm-suites.md#signature-algorithm),
-    this operation MUST perform this step.
-    Otherwise this operation MUST NOT perform this step.
-
-This operation MUST perform all the above steps unless otherwise specified,
-and it MUST perform them in the above order.
+    the Decrypt operation MUST perform this step.
+  - If the message header does not contain an algorithm suite including a signature algorithm,
+    the Decrypt operation MUST NOT perform this step.
 
 If the input encrypted message is not being [streamed](streaming.md) to this operation,
 all output MUST NOT be released until after these steps complete successfully.
@@ -219,6 +169,57 @@ deserializing those bytes according to the [message format](../data-format/messa
 
 This operation MUST attempt to deserialize all consumable encrypted message bytes until it has
 successfully deserialized a valid [message header](../data-format/message-header.md).
+
+The header deserialization order MUST follow the [Header Body Version 1.0](../data-format/message-header.md#header-body-version-10)
+or [Header Body Version 2.0](../data-format/message-header.md#header-body-version-20) specification,
+depending on the [Version](../data-format/message-header.md#version) field in the message header.
+
+The [Version](../data-format/message-header.md#version) field MUST be deserialized first.
+The value MUST be a [supported version](../data-format/message-header.md#supported-versions).
+
+#### V1 Header Deserialization
+
+If the value of the deserialized version field is [1.0](../data-format/message-header.md#supported-versions),
+the remaining header fields MUST be deserialized according to the
+[Header Body Version 1.0](../data-format/message-header.md#header-body-version-10) specification:
+
+- MUST deserialize the [Type](../data-format/message-header.md#type).
+  The value MUST be a [supported type](../data-format/message-header.md#supported-types).
+- MUST deserialize the [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id).
+- MUST deserialize the [Message ID](../data-format/message-header.md#message-id).
+- MUST deserialize the [AAD](../data-format/message-header.md#aad).
+- MUST deserialize the [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys).
+- MUST deserialize the [Content Type](../data-format/message-header.md#content-type).
+  The value MUST be a [supported content type](../data-format/message-header.md#supported-content-types).
+- MUST deserialize the [Reserved](../data-format/message-header.md#reserved).
+- MUST deserialize the [IV Length](../data-format/message-header.md#iv-length).
+- MUST deserialize the [Frame Length](../data-format/message-header.md#frame-length).
+
+The Decrypt operation MUST then deserialize the
+[Header Authentication Version 1.0](../data-format/message-header.md#header-authentication-version-10):
+
+- MUST deserialize the [IV](../data-format/message-header.md#iv).
+- MUST deserialize the [Authentication Tag](../data-format/message-header.md#authentication-tag).
+
+#### V2 Header Deserialization
+
+If the value of the deserialized version field is [2.0](../data-format/message-header.md#supported-versions),
+the remaining header fields MUST be deserialized according to the
+[Header Body Version 2.0](../data-format/message-header.md#header-body-version-20) specification:
+
+- MUST deserialize the [Algorithm Suite ID](../data-format/message-header.md#algorithm-suite-id).
+- MUST deserialize the [Message ID](../data-format/message-header.md#message-id).
+- MUST deserialize the [AAD](../data-format/message-header.md#aad).
+- MUST deserialize the [Encrypted Data Keys](../data-format/message-header.md#encrypted-data-keys).
+- MUST deserialize the [Content Type](../data-format/message-header.md#content-type).
+  The value MUST be a [supported content type](../data-format/message-header.md#supported-content-types).
+- MUST deserialize the [Frame Length](../data-format/message-header.md#frame-length).
+- MUST deserialize the [Algorithm Suite Data](../data-format/message-header.md#algorithm-suite-data).
+
+The Decrypt operation MUST then deserialize the
+[Header Authentication Version 2.0](../data-format/message-header.md#header-authentication-version-20):
+
+- MUST deserialize the [Authentication Tag](../data-format/message-header.md#authentication-tag).
 
 If the number of [encrypted data keys](../framework/structures.md#encrypted-data-keys)
 deserialized from the [message header](../data-format/message-header.md)
@@ -252,21 +253,22 @@ from the input [keyring](../framework/keyring-interface.md).
 The call to the CMM's [Decrypt Materials](../framework/cmm-interface.md#decrypt-materials) operation
 MUST be constructed as follows:
 
-- Encryption Context: This is the parsed [encryption context](../data-format/message-header.md#aad)
+- Encryption Context: This MUST be the parsed [encryption context](../data-format/message-header.md#aad)
   from the message header.
-- Algorithm Suite ID: This is the parsed
+- Algorithm Suite ID: This MUST be the parsed
   [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id)
   from the message header.
-- Encrypted Data Keys: This is the parsed [encrypted data keys](../data-format/message-header#encrypted-data-keys)
+- Encrypted Data Keys: This MUST be the parsed [encrypted data keys](../data-format/message-header.md#encrypted-data-keys)
   from the message header.
-- Reproduced Encryption Context: This is the [input](#input) encryption context.
+- Reproduced Encryption Context: This MUST be the [input](#input) encryption context.
+- Commitment Policy: This MUST be the commitment policy configured on the client.
 
-The data key used as input for all decryption described below is a data key derived from the plaintext data key
+The data key used as input for all decryption described below MUST be a data key derived from the plaintext data key
 included in the [decryption materials](../framework/structures.md#decryption-materials).
-The algorithm suite used as input for all decryption described below is a algorithm suite
+The algorithm suite used as input for all decryption described below MUST be the algorithm suite
 included in the [decryption materials](../framework/structures.md#decryption-materials).
 If this algorithm suite is not [supported for the ESDK](../framework/algorithm-suites.md#supported-algorithm-suites-enum)
-encrypt MUST yield an error.
+decrypt MUST yield an error.
 If the algorithm suite is not supported by the [commitment policy](client.md#commitment-policy)
 configured in the [client](client.md) decrypt MUST yield an error.
 If the [algorithm suite](../framework/algorithm-suites.md#algorithm-suites-encryption-key-derivation-settings) supports [key commitment](../framework/algorithm-suites.md#key-commitment)
@@ -278,8 +280,8 @@ the [key derivation algorithm](../framework/algorithm-suites.md#key-derivation-a
 [algorithm suite](../framework/algorithm-suites.md) associated with
 the returned decryption materials.
 This document refers to the output of the key derivation algorithm as the derived data key.
-Note that if the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
-then the derived data key is the same as the plaintext data key.
+If the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
+then the derived data key MUST be the same as the plaintext data key.
 
 ### Verify the header
 
@@ -297,133 +299,158 @@ to decrypt with the following inputs:
   [required encryption context keys](../framework/structures.md#required-encryption-context-keys-1)
   serialized according to the [encryption context serialization specification](../framework/structures.md#serialization).
 - For message format version [1.0](../data-format/message-header.md#supported-versions)
-  the IV MUST be the value serialized in the message header's [IV field](../data-format/message-header#iv).
+  the IV MUST be the value serialized in the message header's [IV field](../data-format/message-header.md#iv).
   For message format version [2.0](../data-format/message-header.md#supported-versions)
   the IV MUST be 0.
-- the cipherkey is the derived data key
-- the ciphertext is an empty byte array
-- the tag is the value serialized in the message header's
+- the cipherkey MUST be the derived data key
+- the ciphertext MUST be an empty byte array
+- the tag MUST be the value serialized in the message header's
   [authentication tag field](../data-format/message-header.md#authentication-tag)
 
 If this tag verification fails, this operation MUST immediately halt and fail.
 
 If the input encrypted message is being [streamed](streaming.md) to this operation:
 
-- This operation SHOULD release the parsed [encryption context](#encryption-context),
+- A streamed Decrypt operation SHOULD release the parsed [encryption context](#encryption-context),
   [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id),
   and [other header information](#parsed-header)
   as soon as tag verification succeeds.
-  However, if this operation is using an algorithm suite with a signature algorithm
+  However, if the streamed Decrypt operation is using an algorithm suite with a signature algorithm
   all released output MUST NOT be considered signed data until
   this operation successfully completes.
   See [security considerations](#security-considerations) below.
-- This operation SHOULD input the serialized header to the signature algorithm as soon as it is deserialized,
-  such that the serialized frame isn't required to remain in memory to [verify the signature](#verify-the-signature).
+- The streamed Decrypt operation SHOULD input the serialized header to the signature algorithm as soon as it is deserialized,
+  such that the serialized header isn't required to remain in memory to [verify the signature](#verify-the-signature).
 
 ### Decrypt the message body
 
 Once the message header is successfully parsed, the next sequential bytes
 MUST be deserialized according to the [message body spec](../data-format/message-body.md).
 
-While there MAY still be message body left to deserialize and decrypt,
+If there could still be message body left to deserialize and decrypt,
 this operation MUST either wait for more of the encrypted message bytes to become consumable,
 wait for the end to the encrypted message to be indicated,
-or to deserialize and/or decrypt the consumable bytes.
+or deserialize and/or decrypt the consumable bytes.
 
-The [content type](../data-format/message-header.md#content-type) field parsed from the
-message header above determines whether these bytes MUST be deserialized as
+The Decrypt operation MUST use the [content type](../data-format/message-header.md#content-type) field parsed from the
+message header to determine whether the operation will deserialize the message bytes as
 [framed data](../data-format/message-body.md#framed-data) or
-[un-framed data](../data-format/message-body.md#un-framed-data).
+[nonframed data](../data-format/message-body.md#nonframed-data).
 
 If deserializing [framed data](../data-format/message-body.md#framed-data),
-this operation MUST use the first 4 bytes of a frame to determine if the frame
-MUST be deserialized as a [final frame](../data-format/message-body.md#final-frame)
-or [regular frame](../fata-format/message-body/md#regular-frame).
-If the first 4 bytes have a value of 0xFFFF,
-then this MUST be deserialized as the [sequence number end](../data-format/message-header.md#sequence-number-end)
-and the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
-Otherwise, this MUST be deserialized as the [sequence number](../data-format/message-header.md#sequence-number)
-and the following bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
+the Decrypt operation MUST use the first 4 bytes of a frame to determine
+whether the operation will deserialize the frame as a [final frame](../data-format/message-body.md#final-frame)
+or [regular frame](../data-format/message-body.md#regular-frame).
 
-If deserializing a [final frame](../data-format/message-body.md#final-frame),
-this operation MUST ensure that the length of the encrypted content field is
-less than or equal to the frame length deserialized in the message header.
+The Decrypt operation MUST inspect the first 4 bytes of each frame.
+If the first 4 bytes have a value of 0xFFFFFFFF,
+the Decrypt operation MUST treat them as the [Sequence Number End](../data-format/message-body.md#sequence-number-end)
+and deserialize the following bytes according to the [final frame spec](../data-format/message-body.md#final-frame).
+Otherwise, the Decrypt operation MUST treat them as the [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number)
+and deserialize the following bytes according to the [regular frame spec](../data-format/message-body.md#regular-frame).
 
-Once at least a single frame is deserialized (or the entire body in the un-framed case),
-this operation MUST decrypt and authenticate the frame (or body) using the
+Regular frame deserialization MUST conform to the [Regular Frame](../data-format/message-body.md#regular-frame) specification.
+For a regular frame, each field MUST be deserialized according to its specification:
+
+- MUST deserialize the [Sequence Number](../data-format/message-body.md#regular-frame-sequence-number).
+- MUST deserialize the [IV](../data-format/message-body.md#regular-frame-iv).
+- MUST deserialize the [Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content).
+- MUST deserialize the [Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag).
+
+Final frame deserialization MUST conform to the [Final Frame](../data-format/message-body.md#final-frame) specification.
+For a final frame, each field MUST be deserialized according to its specification:
+
+- MUST deserialize the [Sequence Number End](../data-format/message-body.md#sequence-number-end).
+  The value MUST be `0xFFFFFFFF`.
+- MUST deserialize the [Sequence Number](../data-format/message-body.md#final-frame-sequence-number).
+- MUST deserialize the [IV](../data-format/message-body.md#final-frame-iv).
+- MUST deserialize the [Encrypted Content Length](../data-format/message-body.md#final-frame-encrypted-content-length).
+  MUST ensure that the length of the encrypted content field is
+  less than or equal to the frame length deserialized in the message header.
+- MUST deserialize the [Encrypted Content](../data-format/message-body.md#final-frame-encrypted-content).
+- MUST deserialize the [Authentication Tag](../data-format/message-body.md#final-frame-authentication-tag).
+
+Once at least a single frame is deserialized (or the entire body in the nonframed case),
+the Decrypt operation MUST decrypt and authenticate the frame (or body) using the
 [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
 specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
 
-- The AAD is the serialized [message body AAD](../data-format/message-body-aad.md),
-  constructed as follows:
-  - The [message ID](../data-format/message-body-aad.md#message-id) is the same as the
-    [message ID](../data-frame/message-header.md#message-id) deserialized from the header of this message.
-  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) depends on
-    whether the thing being decrypted is a regular frame, final frame, or un-framed data.
-    Refer to [Message Body AAD](../data-format/message-body-aad.md) specification for more information.
-  - The [sequence number](../data-format/message-body-aad.md#sequence-number) is the sequence
+- The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
+  constructed according to the [Message Body AAD](../data-format/message-body-aad.md) specification, as follows:
+  - The [message ID](../data-format/message-body-aad.md#message-id) MUST be the same as the
+    [message ID](../data-format/message-header.md#message-id) deserialized from the header of this message.
+  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST be constructed
+    according to [Message Body AAD](../data-format/message-body-aad.md) depending on
+    whether the bytes being decrypted are a regular frame, final frame, or nonframed data.
+  - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be the sequence
     number deserialized from the frame being decrypted.
-    If this is un-framed data, this value MUST be 1.
+    If this is nonframed data, this value MUST be 1.
     If this is framed data and the first frame sequentially, this value MUST be 1.
     Otherwise, this value MUST be 1 greater than the value of the sequence number
     of the previous frame.
   - The [content length](../data-format/message-body-aad.md#content-length) MUST have a value
     equal to the length of the plaintext that was encrypted.
-    This can be determined by using the [frame length](../data-format/message-header.md#frame-length)
-    deserialized from the message header if this is a regular frame,
-    or the [encrypted content length](../data-format/message-body.md#encrypted-content-length)
-    otherwise.
-- The IV is the [sequence number](../data-format/message-body-aad.md#sequence-number)
+    If this is a regular frame, this MUST be determined by using the [frame length](../data-format/message-header.md#frame-length)
+    deserialized from the message header.
+    If this is a final frame, this MUST be determined by using the [final frame encrypted content length](../data-format/message-body.md#final-frame-encrypted-content-length).
+    If this is nonframed data, this MUST be determined by using the [nonframed data encrypted content length](../data-format/message-body.md#nonframed-data-encrypted-content-length).
+- The IV MUST be the [sequence number](../data-format/message-body-aad.md#sequence-number)
   used in the message body AAD above,
   padded to the [IV length](../data-format/message-header.md#iv-length) with 0.
-- The cipherkey is the derived data key
-- The ciphertext is the [encrypted content](../data-format/message-body.md#encrypted-content).
-- the tag is the value serialized in the
-  [authentication tag field](../data-format/message-body.md#authentication-tag)
-  in the message body or frame.
+- The cipherkey MUST be the derived data key
+- The ciphertext MUST be the encrypted content deserialized from the frame or body.
+  For a regular frame this is the [Regular Frame Encrypted Content](../data-format/message-body.md#regular-frame-encrypted-content).
+  For a final frame this is the [Final Frame Encrypted Content](../data-format/message-body.md#final-frame-encrypted-content).
+  For nonframed data this is the [Nonframed Data Encrypted Content](../data-format/message-body.md#nonframed-data-encrypted-content).
+- The tag MUST be the authentication tag deserialized from the frame or body.
+  For a regular frame this is the [Regular Frame Authentication Tag](../data-format/message-body.md#regular-frame-authentication-tag).
+  For a final frame this is the [Final Frame Authentication Tag](../data-format/message-body.md#final-frame-authentication-tag).
+  For nonframed data this is the [Nonframed Data Authentication Tag](../data-format/message-body.md#nonframed-data-authentication-tag).
 
 If this decryption fails, this operation MUST immediately halt and fail.
 This operation MUST NOT release any unauthenticated plaintext.
 
 If the input encrypted message is being [streamed](streaming.md) to this operation:
 
-- If this operation is using an algorithm suite without a signature algorithm,
+- If the streamed Decrypt operation is using an algorithm suite without a signature algorithm,
   plaintext SHOULD be released as soon as the above calculation, including tag verification,
   succeeds.
-- If this operation is using an algorithm suite with a signature algorithm,
+- If the streamed Decrypt operation is using an algorithm suite with a signature algorithm,
   all plaintext decrypted from regular frames SHOULD be released as soon as the above calculation,
   including tag verification, succeeds.
-  Any plaintext decrypted from [unframed data](../data-format/message-body.md#un-framed-data) or
-  a final frame MUST NOT be released until [signature verification](#verify-the-signature)
+  Any plaintext decrypted from [nonframed data](../data-format/message-body.md#nonframed-data) or
+  a final frame in a streamed Decrypt operation MUST NOT be released until [signature verification](#verify-the-signature)
   successfully completes.
-- This operation SHOULD input the serialized frame to the signature algorithm as soon as it is deserialized,
+- The streamed Decrypt operation SHOULD input the serialized frame to the signature algorithm as soon as it is deserialized,
   such that the serialized frame isn't required to remain in memory to complete
   the [signature verification](#verify-the-signature).
 
 ### Verify the signature
 
 If the algorithm suite has a signature algorithm,
-this operation MUST verify the message footer using the specified signature algorithm.
+the Decrypt operation MUST verify the message footer using the specified signature algorithm.
 
-After deserializing the body, this operation MUST deserialize the next encrypted message bytes
+After deserializing the body, the Decrypt operation MUST deserialize the next encrypted message bytes
 as the [message footer](../data-format/message-footer.md).
+
+The order for message footer deserialization MUST conform to the [Message Footer](../data-format/message-footer.md) specification.
 
 If there are not enough consumable bytes to deserialize the message footer and
 the caller has not yet indicated an end to the encrypted message,
-this operation MUST wait for enough bytes to become consumable or for the caller
+the Decrypt operation MUST wait for enough bytes to become consumable or for the caller
 to indicate an end to the encrypted message.
 
-Once the message footer is deserialized, this operation MUST use the
+Once the message footer is deserialized, the Decrypt operation MUST use the
 [signature algorithm](../framework/algorithm-suites.md#signature-algorithm)
 from the [algorithm suite](../framework/algorithm-suites.md) in the decryption materials to
 verify the encrypted message, with the following inputs:
 
-- The verification key is the [verification key](../framework/structures.md#verification-key)
+- The verification key MUST be the [verification key](../framework/structures.md#verification-key)
   in the decryption materials.
-- The input to verify is the concatenation of the serialization of the
+- The input to verify MUST be the concatenation of the serialization of the
   [message header](../data-format/message-header.md) and [message body](../data-format/message-body.md).
 
-Note that the message header and message body MAY have already been input during previous steps.
+Note that the message header and message body could have already been input during previous steps.
 
 If this verification is not successful, this operation MUST immediately halt and fail.
 
@@ -438,3 +465,30 @@ This means that callers that process such released plaintext MUST NOT consider a
 until this operation completes successfully.
 Additionally, if this operation fails, callers MUST discard the released plaintext and encryption context
 and MUST rollback any processing done due to the released plaintext or encryption context.
+
+## Appendix
+
+### Nonframed Message Body Decryption
+
+Implementations of the ESDK cannot encrypt messages with nonframed message bodies but still support decrypting messages with nonframed message bodies.
+
+Nonframed data deserialization MUST conform to the [Nonframed Data](../data-format/message-body.md#nonframed-data) specification.
+
+If a message has the [nonframed](../data-format/message-body.md#nonframed-data) content type,
+the Decrypt operation MUST deserialize the message body according to the
+[nonframed data specification](../data-format/message-body.md#nonframed-data)
+and decrypt it using the [authenticated encryption algorithm](../framework/algorithm-suites.md#encryption-algorithm)
+specified by the [algorithm suite](../framework/algorithm-suites.md), with the following inputs:
+
+- The IV MUST be the [IV](../data-format/message-body.md#nonframed-data-iv) deserialized from the message body.
+- The ciphertext MUST be the [Encrypted Content](../data-format/message-body.md#nonframed-data-encrypted-content) deserialized from the message body.
+- The cipherkey MUST be the derived data key.
+- The tag MUST be the [Authentication Tag](../data-format/message-body.md#nonframed-data-authentication-tag) deserialized from the message body.
+- The AAD MUST be the serialized [message body AAD](../data-format/message-body-aad.md),
+  constructed with:
+  - The [Body AAD Content](../data-format/message-body-aad.md#body-aad-content) MUST use the value for
+    [nonframed data](../data-format/message-body-aad.md#body-aad-content).
+  - The [sequence number](../data-format/message-body-aad.md#sequence-number) MUST be `1`.
+  - The [content length](../data-format/message-body-aad.md#content-length) MUST equal the length of the plaintext.
+
+If this decryption fails, this operation MUST immediately halt and fail.

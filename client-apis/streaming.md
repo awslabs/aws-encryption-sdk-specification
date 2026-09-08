@@ -3,16 +3,6 @@
 
 # Streaming
 
-## Version
-
-0.1.0
-
-### Changelog
-
-- 0.1.0
-
-  - [Clarify Streaming Encrypt and Decrypt](../changes/2020-07-06_clarify-streaming-encrypt-decrypt/change.md)
-
 ## Overview
 
 The AWS Encryption SDK MAY provide APIs that enable streamed [encryption](encrypt.md)
@@ -74,8 +64,7 @@ bytes are considered released once those bytes are available to be read by the c
 
 If bytes are processed by an operation, that does not imply that the operation is allowed to
 release any result of that processing.
-The decrypt and encrypt operations specify when output bytes MUST NOT be released
-and when they SHOULD be released.
+The decrypt and encrypt operations specify when to release output bytes and when not to release output bytes.
 
 ## Inputs
 
@@ -115,4 +104,4 @@ for bytes to be made consumable to the operation
 and for bytes to be released by the operation.
 
 The behavior of the operation specifies how the operation processes consumable bytes,
-and specifies when processed bytes MUST NOT and SHOULD be released.
+and specifies when processed bytes are to be released.
