@@ -81,6 +81,8 @@ When decrypting using Kms+Context mode, the KmsKeyring MUST validate the provide
 The stored encryption context with the two reserved keys removed MUST match the provided encryption context.
 If the stored encryption context with the two reserved keys removed does not match the provided encryption context, the KmsKeyring MUST throw an exception.
 
+When decrypting using Kms+Context mode, the KmsKeyring MUST validate that the content encryption algorithm in the KMS-authenticated encryption context matches the algorithm suite selected for decryption.
+
 When calling [AWS KMS Decrypt](https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html), the keyring must call with a request constructed as follows:
 
 - `KeyId` MUST be the configured AWS KMS key identifier.
