@@ -97,12 +97,12 @@ Converting from the core ESDK:
 - The shim MUST return an error when the target KMS configuration type is not a
   supported value.
 
-### Cache configuration
+### AES wrapping algorithm
 
-- The shim MUST translate a no-cache selection.
-- The shim MUST translate a multi-threaded cache selection.
-- The shim MUST return an error when the target cache type is not a supported
-  value.
+- The shim MUST translate the target AES wrapping algorithm to the core ESDK
+  wrapping algorithm of the same meaning.
+- The shim MUST return an error when the target wrapping algorithm is not a
+  supported value.
 
 ## Resources
 
@@ -113,11 +113,13 @@ ESDK and referenced by the target through an owned-interface handle.
 - **service client** — a client for an AWS service that a key store requires
   (for example, a KMS client or a DynamoDB client).
 - **key store** — a key store, which depends on one or more service clients.
+- **cache** — a cryptographic materials cache that a materials source may use to
+  reuse cryptographic materials it has already obtained.
 - **materials source** — a keyring or Cryptographic Materials Manager (CMM) that
   supplies cryptographic materials; a materials source may depend on a key store.
 
 The dependency edges are therefore: a key store depends on its service clients,
-and a materials source may depend on a key store.
+and a materials source may depend on a key store and on a cache.
 
 A materials source handle references a core-ESDK keyring or CMM.
 
@@ -149,6 +151,19 @@ Each operation below defines its required inputs and its output handling per
 where an input or output is passed through unmodified, each is translated per
 [Type translation](#type-translation), and each operation invokes the core ESDK
 per [Delegation](./shim.md#delegation).
+
+### Client configuration
+
+The ESDK shim MAY expose a client-level configuration mirroring the core
+ESDK's client configuration, applied to every operation of that client.
+
+- A configuration value the target supplies on both the client and a
+  per-operation input MUST be rejected as invalid input.
+- A configuration value the target supplies on neither the client nor the
+  operation MUST defer to the core ESDK's default.
+
+Rejecting is forward-compatible with defining override semantics later;
+picking a precedence rule is not.
 
 ### Materials source
 
@@ -207,6 +222,18 @@ per [Delegation](./shim.md#delegation).
 - MUST return the result encryption context, converted as defined in
   [Encryption context](#encryption-context).
 
+### Encrypt stream and decrypt stream
+
+- The ESDK shim SHOULD provide streaming encrypt and decrypt operations,
+  accepting the same inputs as [encrypt](#encrypt-inputs) and
+  [decrypt](#decrypt-inputs) except the plaintext or ciphertext, which the
+  target supplies incrementally.
+- A successful finish step MUST return the same non-payload outputs as
+  [encrypt outputs](#encrypt-outputs) or [decrypt outputs](#decrypt-outputs).
+- Streamed decrypt MUST NOT release plaintext the core ESDK would not release,
+  and the shim MUST surface the core ESDK's refusal to stream a message whose
+  verification cannot complete until the end of the message.
+
 ### Create KMS client
 
 - The shim MUST provide an operation that creates a KMS service client backed by
@@ -225,16 +252,33 @@ per [Delegation](./shim.md#delegation).
 
 - The shim MUST provide an operation that creates a key store backed by the core
   ESDK.
-- Creating a key store MUST require a KMS client handle and a DynamoDB client
-  handle, checked as defined in
-  [Shim Specification: Handles and lifetimes](./shim.md#handles-and-lifetimes),
-  and MUST provide both to the core ESDK.
+- Creating a key store MAY be supplied with a KMS client and a DynamoDB client,
+  each checked as defined in
+  [Shim Specification: Handles and lifetimes](./shim.md#handles-and-lifetimes); a
+  supplied client MUST be provided to the core ESDK, and an absent one MUST be
+  left for the core ESDK to default.
 - Creating a key store MUST provide the target-supplied table name and logical key
   store name to the core ESDK.
 - Creating a key store MUST provide the target-supplied KMS configuration to the
   core ESDK, converted as defined in [KMS configuration](#kms-configuration).
 - Creating a key store MUST provide the target-supplied key store id and grant
   tokens to the core ESDK when present; an unset value is omitted.
+
+### Create cryptographic materials cache
+
+The core ESDK defines the cache kinds. The shim expresses a cache selection by
+creating a cache of that kind, so a kind the core ESDK does not define cannot be
+requested.
+
+- The shim MUST provide an operation that creates a cryptographic materials
+  cache of a target-selected kind, backed by the core ESDK.
+- The shim MUST return an error when the target cache kind is not a supported
+  value.
+- The shim MUST support creating a cache that performs no caching.
+- The shim MUST support creating a default cache.
+- The shim MUST support creating a storm tracking cache.
+- Creating a cryptographic materials cache MUST provide the target-supplied
+  cache type, with its values, to the core ESDK.
 
 ### Create hierarchical keyring
 
@@ -246,11 +290,28 @@ per [Delegation](./shim.md#delegation).
   and MUST provide it to the core ESDK.
 - Creating a hierarchical keyring MUST provide the target-supplied branch key id
   and time-to-live to the core ESDK.
-- Creating a hierarchical keyring MUST provide the target-supplied cache
-  configuration to the core ESDK, converted as defined in
-  [Cache configuration](#cache-configuration).
+- Creating a hierarchical keyring MAY be supplied with a
+  [cryptographic materials cache](#create-cryptographic-materials-cache),
+  checked as defined in
+  [Shim Specification: Handles and lifetimes](./shim.md#handles-and-lifetimes).
+- When no cache is supplied, creating a hierarchical keyring MUST defer to the
+  core ESDK's default cache.
+- When a cache is supplied, creating a hierarchical keyring MUST reference that
+  exact cache, so several keyrings given the same cache share it.
 - Creating a hierarchical keyring MUST provide the target-supplied partition id to
   the core ESDK when present; an unset value is omitted.
+
+### Create raw AES keyring
+
+- The shim MUST provide an operation that creates a raw AES keyring backed by
+  the core ESDK.
+- Creating a raw AES keyring MUST provide the target-supplied key namespace and
+  key name to the core ESDK.
+- Creating a raw AES keyring MUST pass the target-supplied wrapping key to the
+  core ESDK unmodified.
+- Creating a raw AES keyring MUST provide the target-supplied wrapping algorithm
+  to the core ESDK, converted as defined in
+  [AES wrapping algorithm](#aes-wrapping-algorithm).
 
 ## Conformance and testing
 
