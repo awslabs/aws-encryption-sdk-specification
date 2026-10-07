@@ -85,6 +85,24 @@ each value it exposes. Every such translation MUST obey the following rules.
 - When the core library produces a value the shim does not define, the
   translation MUST return an error.
 
+### Bulk data
+
+A payload (a plaintext or a ciphertext) can be very large. If the shim copies
+the payload on the way in, and copies the result on the way out, every
+operation pays for two payload-sized copies and briefly holds two copies of
+the payload in memory. For a shim, whose purpose is a thin boundary, that cost
+is avoidable: the core library can read the caller's bytes where they already
+are, and the caller can read the result where the core library wrote it.
+
+- The shim SHOULD let the caller pass a payload without first copying it into
+  a shim-defined container: the operation reads the caller's bytes in place,
+  and the caller's bytes need to stay valid only for the duration of the call.
+- The shim SHOULD let the caller read a payload result in place, where the
+  core library wrote it, instead of copying it into a new container first.
+- A result exposed this way MUST remain valid until the caller releases it.
+- The shim MUST also let the caller copy a result into memory the caller
+  owns.
+
 ## Delegation
 
 The shim implements none of the core library's behavior of its own; it forwards
@@ -103,6 +121,21 @@ enforce validity. These requirements pin down that forwarding.
 Checking a target-supplied handle for presence before dereferencing it (see
 [Handles and lifetimes](#handles-and-lifetimes)) is a memory-safety measure, not
 input validation, and is not subject to the rule above.
+
+### Error classification
+
+The core library's errors are the errors; the shim only carries them across
+the boundary.
+
+- When the core library distinguishes kinds of errors, the shim SHOULD expose
+  the same kinds under the core library's own names, expressed in the target
+  language's error mechanism.
+- The shim MUST NOT invent error kinds the core library does not define.
+- Every exposed error kind MUST also be identifiable as the shim's own base
+  error type, so a target that handles only the base type is unaffected when a
+  kind is added.
+- An error whose kind the shim does not expose MUST be reported as the shim's
+  own base error type.
 
 ## Resources
 
@@ -150,8 +183,25 @@ A core library can define interfaces that its consumer implements and that the
 core library invokes during an operation — for example, a custom keyring or a
 custom cryptographic materials manager.
 
-How a shim exposes such custom implementations is not yet specified; a future
-revision of this specification will define it.
+The shim does not define these implementations. A consumer writes one in the
+core library's language; the
+shim's job is only to turn it into an ordinary handle in the target language.
+This is called **adoption**.
+
+- The shim MAY let the target adopt a consumer-written implementation of a
+  core-library interface.
+- Anything the core library accepts for that interface MUST be adoptable.
+
+Adoption does not construct or validate. A value presented for adoption is
+assumed to already conform to its interface: conformance is the consumer's to
+ensure when writing the implementation, and any failure to construct the value
+is reported in the core library's language before adoption is reached. The
+shim relies on that assumption and does not check it.
+
+- Errors an adopted implementation returns during an operation MUST be
+  reported like any core-library error (see [Delegation](#delegation)).
+- The target MUST adopt only values produced by the shim's conversion, and
+  MUST adopt each at most once; the shim does not detect violations.
 
 ### Concurrency
 
@@ -162,6 +212,23 @@ the shim library SHOULD support it as well.
 
 If a core library resource or operation supports [streamed](../client-apis/streaming.md) inputs/outputs,
 the shim library SHOULD support it as well.
+
+When the shim exposes a streamed operation:
+
+- The shim MUST provide a write step that the target calls repeatedly, each
+  call supplying the next chunk of input and returning whatever output the
+  operation has produced so far (possibly none).
+- The shim MUST provide a finish step that ends the input, completes the
+  operation, and returns the operation's result together with any output not
+  yet returned by a write step.
+- When the operation has failed, the shim MUST return an error from the next
+  write or finish step.
+- The shim SHOULD return output from write steps as the core library produces
+  it, rather than holding all output until the finish step.
+- The shim MUST NOT weaken the core library's own rules for releasing
+  unverified output.
+- The shim MUST document to users that output returned before the finish step
+  succeeds is not yet complete or verified.
 
 ## Operation contracts
 
