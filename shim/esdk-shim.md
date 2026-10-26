@@ -157,14 +157,6 @@ per [Delegation](./shim.md#delegation).
 The ESDK shim MAY expose a client-level configuration mirroring the core
 ESDK's client configuration, applied to every operation of that client.
 
-- A configuration value the target supplies on both the client and a
-  per-operation input MUST be rejected as invalid input.
-- A configuration value the target supplies on neither the client nor the
-  operation MUST defer to the core ESDK's default.
-
-Rejecting is forward-compatible with defining override semantics later;
-picking a precedence rule is not.
-
 ### Materials source
 
 - Each of `encrypt` and `decrypt` MUST be supplied with exactly one materials
