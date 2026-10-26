@@ -31,7 +31,7 @@ The settings referenced below are defined in [algorithm suites](../framework/alg
   - The length of the input keying material MUST equal the key derivation input length
     specified by the algorithm suite's encryption key derivation settings.
   - If the algorithm suite's encryption key derivation settings specify a salt length of 0,
-    the salt MUST be a sequence of zero bytes as long as the hash function's output.
+    the salt MUST be all 0x00 bytes, with a length equal to the hash function's output length in bytes.
   - If the algorithm suite's encryption key derivation settings specify a nonzero salt length,
     the salt MUST be the [message ID](../data-format/message-header.md#message-id), with a length equal to that salt length.
 - For the expand step:
