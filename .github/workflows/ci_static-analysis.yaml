@@ -8,13 +8,13 @@ permissions:
 
 jobs:
   not-grep:
-    runs-on: codebuild-CryptoToolsCI-linux-aws-encryption-sdk-specification-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: &codebuild-linux codebuild-CryptoToolsCI-linux-aws-encryption-sdk-specification-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v2
       - name: not-grep
         uses: mattsb42-meta/not-grep@1.0.1
   prettier:
-    runs-on: codebuild-CryptoToolsCI-linux-aws-encryption-sdk-specification-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: *codebuild-linux
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
