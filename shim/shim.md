@@ -188,12 +188,13 @@ core library's language; the
 shim's job is only to turn it into an ordinary handle in the target language.
 This is called **adoption**.
 
-For example, a consumer writes a custom keyring in Rust by implementing the
-Rust ESDK's keyring interface. The C++ shim converts that Rust value, and the
-C++ program adopts it as a C++ keyring handle. The C++ program then passes that
-handle anywhere the C++ shim accepts a keyring, the same as a keyring the C++
-shim created. A custom cryptographic materials manager written in Rust is
-adopted the same way.
+For example: a consumer wants to use a custom keyring with the C++ shim for
+Rust. The consumer writes a custom keyring in Rust by implementing the Rust
+ESDK's keyring interface. The C++ shim converts that Rust value into a C++
+keyring handle. At this point, the keyring behaves exactly the same as a
+keyring the C++ shim created. The C++ program can pass that handle anywhere the
+C++ shim accepts a keyring. A custom cryptographic materials manager written in
+Rust is adopted the same way.
 
 - The shim MAY let the target adopt a consumer-written implementation of a
   core-library interface.
