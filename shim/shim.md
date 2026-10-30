@@ -127,14 +127,14 @@ input validation, and is not subject to the rule above.
 The core library's errors are the errors; the shim only carries them across
 the boundary.
 
-- When the core library distinguishes kinds of errors, the shim SHOULD expose
+- When the core library distinguishes kinds of errors, the shim MUST expose
   the same kinds under the core library's own names, expressed in the target
   language's error mechanism.
 - The shim MUST NOT invent error kinds the core library does not define.
 - Every exposed error kind MUST also be identifiable as the shim's own base
   error type, so a target that handles only the base type is unaffected when a
   kind is added.
-- An error whose kind the shim does not expose MUST be reported as the shim's
+- An error type the shim does not expose MUST be reported as the shim's
   own base error type.
 
 ## Resources
