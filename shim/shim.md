@@ -189,7 +189,7 @@ shim's job is only to turn it into an ordinary handle in the target language.
 This is called **adoption**.
 
 For example, suppose a C++ program uses the C++ shim for the Rust ESDK and
-needs a custom keyring. The consumer writes the keyring in Rust, by
+needs a custom keyring. The consumer writes the keyring in Rust by
 implementing the Rust ESDK's keyring interface. The consumer also writes a
 small exported Rust function that passes the keyring to the C++ shim's
 conversion. The C++ program calls that function and adopts the result as a C++
