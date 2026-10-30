@@ -99,10 +99,10 @@ Converting from the core ESDK:
 
 ### AES wrapping algorithm
 
-- The shim MUST translate the target AES wrapping algorithm to the core ESDK
-  wrapping algorithm of the same meaning.
-- The shim MUST return an error when the target wrapping algorithm is not a
-  supported value.
+- The shim MUST translate the target AES wrapping algorithm configuration to
+  the core ESDK wrapping algorithm configuration.
+- The shim MUST return an error when the target wrapping algorithm configuration is not
+  supported.
 
 ## Resources
 
@@ -214,7 +214,7 @@ ESDK's client configuration, applied to every operation of that client.
 - MUST return the result encryption context, converted as defined in
   [Encryption context](#encryption-context).
 
-### Encrypt stream and decrypt stream
+### Encrypt/Decrypt Streams
 
 - The ESDK shim SHOULD provide streaming encrypt and decrypt operations,
   accepting the same inputs as [encrypt](#encrypt-inputs) and
