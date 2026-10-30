@@ -177,7 +177,7 @@ The requirements below apply to every resource kind.
   that resource for its own lifetime, so that a handle passed across the boundary
   cannot outlive the resource it refers to.
 
-### Custom implementations of core-library interfaces
+### Adopting custom implementations
 
 A core library can define interfaces that its consumer implements and that the
 core library invokes during an operation — for example, a custom keyring or a
@@ -187,6 +187,13 @@ The shim does not define these implementations. A consumer writes one in the
 core library's language; the
 shim's job is only to turn it into an ordinary handle in the target language.
 This is called **adoption**.
+
+For example, a consumer writes a custom keyring in Rust by implementing the
+Rust ESDK's keyring interface. The C++ shim converts that Rust value, and the
+C++ program adopts it as a C++ keyring handle. The C++ program then passes that
+handle anywhere the C++ shim accepts a keyring, the same as a keyring the C++
+shim created. A custom cryptographic materials manager written in Rust is
+adopted the same way.
 
 - The shim MAY let the target adopt a consumer-written implementation of a
   core-library interface.
