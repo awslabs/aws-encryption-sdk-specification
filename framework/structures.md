@@ -5,9 +5,13 @@
 
 ## Version
 
-0.6.0
+0.7.0
 
 ### Changelog
+
+- 0.7.0
+
+  - Update Branch Key Structures to include KMS ARN, Create Time, and Hierarchy Version
 
 - 0.6.0
 
@@ -145,12 +149,12 @@ take the following form:
 | [Key Value Pair Count](#key-value-pair-count)     | 2                                                                    | UInt16                                            |
 | [Key Value Pair Entries](#key-value-pair-entries) | Variable. Determined by the count and length of each key-value pair. | [Key Value Pair Entries](#key-value-pair-entries) |
 
-###### Key Value Pair Count
+##### Key Value Pair Count
 
 The number of key-value pairs within the [Key Value Pair Entries](#key-value-pair-entries) field.
 The value of this field MUST be greater than 0.
 
-###### Key Value Pair Entries
+##### Key Value Pair Entries
 
 A sequence of one or more key-value pair entries.
 
@@ -386,6 +390,9 @@ This structure MUST include all of the following fields:
 - [Branch Key Id](#branch-key-id)
 - [Branch Key Version](#branch-key-version)
 - [Encryption Context](#encryption-context-3)
+- [KMS ARN](#kms-arn)
+- [Create Time](#create-time)
+- [Hierarchy Version](#hierarchy-version)
 
 ##### Branch Key
 
@@ -407,16 +414,28 @@ This value MUST be a version 4 [UUID](https://www.ietf.org/rfc/rfc4122.txt).
 
 ##### Encryption Context
 
-The [custom encryption context](#encryption-context) associated with this branch key.
+The [encryption context](./structures.md#encryption-context) associated with all the items of this Branch Key.
+
+##### KMS ARN
+
+The AWS KMS Key ARN used to protect these materials.
+
+##### Create Time
+
+Timestamp in ISO 8601 format in UTC, to microsecond precision, of when the material was generated.
+
+##### Hierarchy Version
+
+[Schema Version of the Branch Key](branch-key-store.md#hierarchy-version).
 
 ## Beacon Key Materials
 
-#### Implementations
+### Implementations
 
 | Language | Confirmed Compatible with Spec Version | Minimum Version Confirmed | Implementation |
 | -------- | -------------------------------------- | ------------------------- | -------------- |
 
-#### Structure
+### Structure
 
 Beacon Key materials are a structure containing materials
 that are used in structured encryption.
@@ -427,13 +446,16 @@ This structure MUST include the following fields:
 
 - [Beacon Key Id](#beacon-key-id)
 - [Encryption Context](#encryption-context-4)
+- [KMS ARN](#kms-arn)
+- [Create Time](#create-time)
+- [Hierarchy Version](#hierarchy-version)
 
 This structure MAY include the following fields:
 
 - [Beacon Key](#beacon-key)
 - [HMAC Keys](#hmac-keys)
 
-##### Beacon Key
+#### Beacon Key
 
 The Beacon Key that is stored
 in the [Keystore](branch-key-store.md).
@@ -443,16 +465,28 @@ because the beacon key is used to derive [HMAC Keys](#hmac-keys).
 Once this has been complete,
 the beacon key can be discarded.
 
-##### Encryption Context
+#### Encryption Context
 
-The [custom encryption context](#encryption-context) associated with this beacon key.
+The [encryption context](./structures.md#encryption-context) is a key-value pair provided by users and is associated with the beacon key.
 
-##### Beacon Key Id
+#### KMS ARN
+
+The AWS KMS Key ARN used to protect these materials.
+
+#### Create Time
+
+Timestamp in ISO 8601 format in UTC, to microsecond precision, that the Material was generated.
+
+#### Hierarchy Version
+
+[Schema Version of the Branch Key](branch-key-store.md#hierarchy-version).
+
+#### Beacon Key Id
 
 The Beacon key id that was used to obtain
 the beacon key from a [Keystore](branch-key-store.md)
 
-##### HMAC Keys
+#### HMAC Keys
 
 A key-value mapping of arbitrary strings
 to bytes.
