@@ -186,7 +186,7 @@ Note:
 - If the key derivation algorithm is the [identity KDF](../framework/algorithm-suites.md#identity-kdf),
   then the derived data key MUST be the same as the plaintext data key.
 - If the key derivation algorithm is [HKDF](../framework/algorithm-suites.md#hkdf),
-  the derivation process used MUST be the process described in [HKDF Encryption Key](../transitive-requirements.md#hkdf-encryption-key).
+  the derivation process used MUST be the process described in [HKDF Encryption Key](../framework/transitive-requirements.md#hkdf-encryption-key).
 
 The frame length used in the procedures described below MUST be the input [frame length](#frame-length),
 if supplied.
