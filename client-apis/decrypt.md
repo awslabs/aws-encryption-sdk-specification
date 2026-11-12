@@ -63,17 +63,22 @@ that implementation SHOULD NOT provide an API that allows the caller to stream t
 
 The message format is a binary format, but it is a common mistake for users to attempt decryption on the Base64 encoding of this data instead.
 Because the first two bytes of the message format have a very limited set of possible values
-(currently they are in fact fixed),
+(currently they are in fact fixed for version 1.0 messages and limited to two values for version 2.0 messages),
 the first two bytes of the Base64 encoding of a valid message are also simple to recognize.
 
 To make diagnosing this mistake easier, implementations SHOULD detect the first two bytes of the Base64 encoding of any supported message [versions](../data-format/message-header.md#version)
 and [types](../data-format/message-header.md#type)
 and fail with a more specific error message.
-In particular, the hex values to detect for the current set of versions and types are:
+For version 1.0 messages, the first two bytes are the version and the [type](../data-format/message-header.md#type).
+Version 2.0 messages do not have a type field,
+so the first two bytes are the version and the first byte of the [algorithm suite ID](../data-format/message-header.md#algorithm-suite-id).
+In particular, the hex values to detect for the current set of versions are:
 
-| Version and type (hex) | Base64 encoding (ascii) | Base64 encoding (hex) |
-| ---------------------- | ----------------------- | --------------------- |
-| 01 80                  | A Y ...                 | 41 59 ...             |
+| Version | First two bytes (hex) | Base64 encoding (ascii) | Base64 encoding (hex) |
+| ------- | --------------------- | ----------------------- | --------------------- |
+| 1.0     | 01 80                 | A Y ...                 | 41 59 ...             |
+| 2.0     | 02 04                 | A g ...                 | 41 67 ...             |
+| 2.0     | 02 05                 | A g ...                 | 41 67 ...             |
 
 Note that the bytes that follow the initial two in the Base64 encoding
 partially depend on subsequent bytes in the binary message format
