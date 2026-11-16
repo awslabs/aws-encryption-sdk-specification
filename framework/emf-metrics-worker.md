@@ -266,7 +266,27 @@ or encryption context values to a Metrics Worker.
 One Encrypt call with `Library` and `Operation` as dimension keys:
 
 ```json
-{"_aws":{"Timestamp":1762977600000,"CloudWatchMetrics":[{"Namespace":"MyApp/CryptoTools","Dimensions":[["Library","Operation"]],"Metrics":[{"Name":"KmsCallCount","Unit":"Count"},{"Name":"OperationLatency","Unit":"Milliseconds"}]}]},"Library":"ESDK-Java","Operation":"Encrypt","KmsCallCount":1,"OperationLatency":12,"AlgorithmSuite":"0x0578","TransactionId":"7f3c2a"}
+{
+  "_aws": {
+    "Timestamp": 1762977600000,
+    "CloudWatchMetrics": [
+      {
+        "Namespace": "MyApp/CryptoTools",
+        "Dimensions": [["Library", "Operation"]],
+        "Metrics": [
+          { "Name": "KmsCallCount", "Unit": "Count" },
+          { "Name": "OperationLatency", "Unit": "Milliseconds" }
+        ]
+      }
+    ]
+  },
+  "Library": "ESDK-Java",
+  "Operation": "Encrypt",
+  "KmsCallCount": 1,
+  "OperationLatency": 12,
+  "AlgorithmSuite": "0x0578",
+  "TransactionId": "7f3c2a"
+}
 ```
 
 ### Example CloudWatch agent configuration for the file sink

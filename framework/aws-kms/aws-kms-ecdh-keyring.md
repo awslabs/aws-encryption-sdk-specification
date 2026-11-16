@@ -167,7 +167,7 @@ The keyring MUST attempt to serialize the [encryption materials'](structures.md#
 If the keyring cannot serialize the encryption context, OnEncrypt MUST fail.
 
 To attempt to generate a shared secret,
-OnEncrypt MUST call [AWS KMS DeriveSharedSecret]()
+OnEncrypt MUST call [AWS KMS DeriveSharedSecret](<>)
 the keyring MUST call with a request constructed as follows:
 
 - `KeyId` MUST be the configured AWS KMS key identifier in the schema
@@ -243,7 +243,7 @@ If the keyring is unable to deserialize this information then an error MUST be c
 and the next encrypted data key in the filtered set MUST be attempted.
 
 The keyring MUST derive the shared secret
-by calling [AWS KMS DeriveSharedSecret]()
+by calling [AWS KMS DeriveSharedSecret](<>)
 with a request constructed as follows:
 
 - `KeyId` MUST be the configured AWS KMS key identifier in the schema
