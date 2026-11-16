@@ -18,8 +18,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
-        with:
-          node-version: 20
       - name: install
         run: npm install --global prettier@3.5.3
       - name: prettify
