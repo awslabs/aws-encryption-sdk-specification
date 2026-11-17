@@ -64,6 +64,7 @@ A key description structure is defined as a JSON object with the following membe
     - `raw`
     - `aws-kms-hierarchy`
     - `aws-kms-rsa`
+    - `aws-kms-ml-kem`
     - `caching-cmm`
     - `required-encryption-context-cmm`
 - `key` : Name of key from a `keys` manifest.
@@ -98,6 +99,21 @@ For a `aws-kms-mrk-aware-discovery` type the following members exist:
 - `aws-kms-discovery-filter` that has the following:
   - `partition` A partition string
   - `account-ids` An array of AWS account ID string
+
+For a `aws-kms-ml-kem` type the following members exist:
+
+- `key` : Name of an ML-KEM `aws-kms` key from a `keys` manifest.
+- `parameter-set` : ML-KEM parameter set.
+  - Allowed Values
+    - `ml-kem-512`
+    - `ml-kem-768`
+    - `ml-kem-1024`
+- `encapsulation` : Encapsulation source.
+  - Allowed Values
+    - `kms`
+    - `local`
+- `public-key` : Name of an ML-KEM public key from a `keys` manifest.
+  Required when `encapsulation` is `local`; otherwise optional.
 
 For a CMM types like `caching-cmm` or `required-encryption-context-cmm` type
 an `underlying` member exists that is the keyring or cmm that this element would wrap.
