@@ -3,38 +3,32 @@
 
 # EMF Metrics Worker
 
-_NOTE: Draft. Not yet reviewed._
-
 ## Version
 
-0.1.0
+1.0.0
 
 ### Changelog
 
-- 0.1.0
+- 1.0.0
   - Initial record
-
-## Implementations
-
-| Library | Version Introduced | Implementation |
-| ------- | ------------------ | -------------- |
-| MPL     | T.B.D              | T.B.D          |
 
 ## Overview
 
-The EMF Metrics Worker is the [Metrics Worker](metrics-worker.md) implementation
-that Crypto Tools ships.
-It writes the measurements it receives as
+A [Metrics Worker](metrics-worker.md) implementation
+that writes the measurements it receives as
 [CloudWatch Embedded Metric Format (EMF)](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format_Specification.html)
-log lines to a local file or to standard output.
+log lines.
+In languages where AWS publishes an [EMF library](#emf-library),
+the worker is a wrapper around that EMF library.
+In other languages, the worker writes to standard output or to a CloudWatch agent itself.
 
 The EMF Metrics Worker does not call any AWS service.
 A customer who wants the measurements in Amazon CloudWatch ships the output
 with their own log pipeline, for example:
 
-- the CloudWatch agent configured to collect the file,
-- AWS Lambda, which sends standard output to CloudWatch Logs,
-- the Amazon ECS `awslogs` log driver, which sends standard output to CloudWatch Logs.
+- The CloudWatch agent, which receives documents from the [agent sink](#agent-sink).
+- AWS Lambda, which sends standard output to CloudWatch Logs.
+- Amazon ECS `awslogs` log driver, which sends standard output to CloudWatch Logs.
 
 CloudWatch Logs extracts metrics from log events that follow the EMF specification.
 
@@ -63,26 +57,104 @@ An open transaction is the set of records the worker holds for one
 [transactionId](metrics-worker.md#transactionid)
 that has not yet been [flushed](#flush).
 
+### EMF library
+
+An EMF library is an external package, published by AWS,
+that builds and serializes EMF documents,
+for example `aws-embedded-metrics-java`.
+The EMF libraries this worker uses are listed in [Implementation](#implementation).
+
+An EMF library is a dependency of the EMF Metrics Worker.
+It is never the Crypto Tools library (for example the ESDK, MPL, or DB-ESDK)
+that a customer passes the Metrics Worker to.
+
 ### Sink
 
 A sink is the destination EMF documents are written to.
-The supported sinks are [File](#file-sink) and [Stdout](#stdout-sink).
+A worker without an EMF library supports the [Stdout](#stdout-sink) and [Agent](#agent-sink) sinks.
+A worker with an EMF library writes to whatever destination the EMF library uses.
+
+### EMF library client
+
+An EMF library client is the object an EMF library uses to write documents
+and that holds its configuration,
+for example a `DefaultEnvironment` in `aws-embedded-metrics-java`.
+Each EMF library defines its own client and configuration types.
+
+## Implementation
+
+### Languages with an EMF library
+
+In languages where AWS publishes an [EMF library](#emf-library),
+the worker MUST be a wrapper around that EMF library:
+
+| Language | EMF library                                                                           |
+| -------- | ------------------------------------------------------------------------------------- |
+| Java     | [aws-embedded-metrics-java](https://github.com/awslabs/aws-embedded-metrics-java)     |
+| Python   | [aws-embedded-metrics-python](https://github.com/awslabs/aws-embedded-metrics-python) |
+| Node.js  | [aws-embedded-metrics-node](https://github.com/awslabs/aws-embedded-metrics-node)     |
+| .NET     | [aws-embedded-metrics-dotnet](https://github.com/awslabs/aws-embedded-metrics-dotnet) |
+| Rust     | [metrique](https://github.com/awslabs/metrique) (`metrique-writer-format-emf`)        |
+
+The Java, Python, Node.js, and .NET EMF libraries are the
+[EMF client libraries](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format_Libraries.html)
+listed in the CloudWatch documentation.
+
+The worker MUST build, serialize, and write documents through the EMF library.
+
+How documents are written is the EMF library's behavior, not the worker's.
+This includes where documents are written, queuing, retries, which documents are dropped,
+the dimensions the EMF library adds by default, environment metadata,
+and configuration the EMF library reads from the environment.
+
+The worker MUST keep the dimensions the EMF library writes
+and MUST add the dimensions selected as described in
+[Mapping records to members](#mapping-records-to-members) to that dimension set.
+
+The dimension set, including the EMF library's dimensions,
+MUST NOT contain more than 30 dimension keys.
+
+The requirements in [Stdout sink](#stdout-sink), [Agent sink](#agent-sink),
+[Metadata](#metadata), [Serialization](#serialization),
+and [Queue and failure handling](#queue-and-failure-handling)
+do not apply to a worker with an EMF library.
+
+### Languages without an EMF library
+
+In every other language, the worker MUST build, serialize, and write documents itself,
+without an EMF library,
+and MUST meet every requirement in this document.
 
 ## Initialization
-
-On initialization the caller MUST provide:
-
-- A namespace
-- A [sink](#sink)
 
 On initialization the caller MAY provide:
 
 - A list of dimension keys
+
+For a worker with an EMF library, the caller MAY also provide one of:
+
+- An EMF library configuration
+- An [EMF library client](#emf-library-client)
+
+If an EMF library client is provided, the worker MUST write documents through it.
+If an EMF library configuration is provided, the worker MUST create an EMF library client from it.
+If neither is provided, the worker MUST create an EMF library client
+with the EMF library's default configuration.
+
+For a worker without an EMF library, the caller MUST provide:
+
+- A namespace
+- A [sink](#sink)
+
+and MAY provide:
+
 - A maximum queue size
 
-The namespace MUST be used as the `Namespace` of every metric directive the worker writes.
+For a worker without an EMF library,
+the namespace MUST be used as the `Namespace` of every metric directive the worker writes.
 
-If the list of dimension keys is not provided, the worker MUST NOT write any dimensions.
+If the list of dimension keys is not provided, the worker MUST NOT add any dimensions
+beyond those an EMF library writes.
 
 The list of dimension keys MUST NOT contain more than 30 keys.
 
@@ -92,35 +164,40 @@ and MUST NOT start with a colon (`:`).
 
 Initialization MUST fail if any of the above conditions are not met.
 
-If the maximum queue size is not provided, the worker MUST use an implementation-defined bounded value.
-
-### File sink
-
-On initialization of a file sink the caller MUST provide:
-
-- A file path
-- A maximum file size in bytes
-- A maximum number of files
-
-The worker MUST append to the file at the file path.
-
-If the file does not exist, the worker MUST create it with permissions
-that allow only the owning user to read and write it.
-
-When writing a document would make the file larger than the maximum file size,
-the worker MUST rotate the file before writing.
-
-The worker MUST NOT keep more files than the maximum number of files,
-counting the active file.
-
-The worker MAY delegate writing, rotation, and retention to the language's
-logging framework, as long as every requirement in this section holds.
+For a worker without an EMF library, if the maximum queue size is not provided,
+the worker MUST use an implementation-defined bounded value.
 
 ### Stdout sink
 
 The stdout sink has no configuration.
 
 The worker MUST write each document to the process's standard output.
+
+### Agent sink
+
+The agent sink sends documents to a
+[CloudWatch agent listening for EMF](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format_Generation_CloudWatch_Agent.html).
+
+On initialization of an agent sink the caller MUST provide:
+
+- A log group name
+
+On initialization of an agent sink the caller MAY provide:
+
+- An endpoint, as a TCP or UDP host and port
+
+If the endpoint is not provided, the worker MUST use TCP to `127.0.0.1` on port `25888`.
+
+Every document sent to the agent sink MUST contain a `LogGroupName` member
+in its `_aws` metadata, whose value is the configured log group name.
+
+The endpoint SHOULD be on the local host.
+The agent protocol is not encrypted.
+
+For TCP, if the connection is closed or a write fails,
+the worker MUST treat the write as failed and MUST open a new connection for the next write.
+
+For UDP, each datagram MUST contain exactly one document.
 
 ## Behaviors
 
@@ -155,11 +232,14 @@ the worker MUST drop the record.
 
 ### Flush
 
-Flush MUST build the documents for the open transaction,
-enqueue them for the sink,
+Flush MUST build the documents for the open transaction
 and remove the open transaction.
 
-Flush MUST NOT perform I/O on the calling thread.
+A worker with an EMF library MUST pass the documents to the EMF library.
+Whether that performs I/O on the calling thread is the EMF library's behavior.
+
+A worker without an EMF library MUST enqueue the documents for the sink
+and MUST NOT perform I/O on the calling thread.
 
 Flush MUST NOT return an error or throw an exception to the caller.
 
@@ -169,7 +249,13 @@ If there is no open transaction for the transactionId, Flush MUST do nothing.
 
 Shutdown MUST flush every open transaction.
 
-Shutdown MUST attempt to write every queued document to the sink before returning.
+A worker without an EMF library MUST attempt to write every queued document
+to the sink before returning.
+
+A worker with an EMF library MUST shut down the EMF library client
+only if the worker created it.
+If the caller provided the EMF library client, the caller owns its lifecycle,
+and Shutdown MUST NOT shut it down.
 
 After Shutdown returns, every other behavior MUST do nothing.
 
@@ -177,13 +263,19 @@ After Shutdown returns, every other behavior MUST do nothing.
 
 ### Mapping records to members
 
+#### AddCount
+
 For each AddCount label, the worker MUST write a metric member
 whose value is the sum of the counts recorded for that label,
 with a metric definition whose `Unit` is `Count`.
 
+#### AddTime
+
 For each AddTime label, the worker MUST write a metric member
 whose value is an array of the recorded milliseconds values, in the order they were recorded,
 with a metric definition whose `Unit` is `Milliseconds`.
+
+#### AddProperty
 
 For each AddProperty label in the list of dimension keys,
 the worker MUST write a top-level member whose value is the last recorded value
@@ -197,6 +289,8 @@ If an AddProperty value for a dimension key does not contain
 1 to 1024 printable ASCII characters, or contains only whitespace,
 the worker MUST NOT include that label in the dimension set.
 
+#### TransactionId
+
 If the record has a transactionId, the worker MUST write it as a top-level member named `TransactionId`.
 `TransactionId` MUST NOT be included in the dimension set.
 
@@ -208,6 +302,7 @@ Every document MUST contain an `_aws` member with:
 - `CloudWatchMetrics`: one metric directive with the configured namespace,
   one dimension set as described in [Mapping records to members](#mapping-records-to-members),
   and the document's metric definitions.
+- `LogGroupName`: for the [agent sink](#agent-sink) only, the configured log group name.
 
 ### Limits
 
@@ -237,7 +332,8 @@ The worker MUST hold enqueued documents in a queue no larger than the maximum qu
 The worker MUST write queued documents to the sink from a thread or task
 other than the threads that call the behaviors.
 
-If the queue is full, the worker MUST drop the document being enqueued.
+If the queue is full, the worker MUST drop either the document being enqueued
+or the oldest document in the queue.
 
 The worker MUST bound the memory used by open transactions.
 When that bound is reached, the worker MUST drop new records.
@@ -248,9 +344,36 @@ When the dropped count is non-zero, the worker MUST include it in the next docum
 as a metric member named `MetricsWorkerDropped` with `Unit` `Count`,
 then reset the count.
 
-If writing to the sink fails, the worker MUST drop the document and count it as dropped.
+If writing to the sink fails, the worker MAY retry the write
+a bounded number of times, with a delay between attempts.
 
-The worker MUST NOT retry a failed write.
+Retries MUST run on the thread or task that writes to the sink,
+never on the threads that call the behaviors.
+
+If the write still fails after the last attempt, or the worker does not retry,
+the worker MUST drop every document in that write and count each one as dropped.
+
+If a failed write may have written part of a document,
+the worker MUST write a newline character before the next document it writes,
+so that the next document starts on its own line.
+
+### Batching
+
+The worker MAY write several queued documents to the sink in a single write.
+
+A single write MUST contain only complete serialized documents,
+each followed by its newline character.
+
+The worker MUST NOT split one serialized document across more than one write.
+
+The worker MUST NOT wait for more documents to arrive before writing.
+Each write MUST contain the documents that are queued when the write starts,
+up to the batch limits below.
+
+A single write MUST NOT contain more than an implementation-defined number of documents
+or bytes.
+
+For the [agent sink](#agent-sink) over UDP, the worker MUST NOT batch documents.
 
 ## Security considerations
 
@@ -289,24 +412,17 @@ One Encrypt call with `Library` and `Operation` as dimension keys:
 }
 ```
 
-### Example CloudWatch agent configuration for the file sink
+### Example CloudWatch agent configuration for the agent sink
 
-No EMF-specific setting is needed.
-The agent's `emf` field is
-[documented as legacy](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html).
+This configuration, from the
+[CloudWatch documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format_Generation_CloudWatch_Agent.html),
+makes the agent listen on the default endpoint, `tcp:25888`:
 
 ```json
 {
   "logs": {
-    "logs_collected": {
-      "files": {
-        "collect_list": [
-          {
-            "file_path": "/var/log/myapp/crypto-tools-metrics.log",
-            "log_group_name": "myapp-crypto-tools-metrics"
-          }
-        ]
-      }
+    "metrics_collected": {
+      "emf": {}
     }
   }
 }
@@ -325,12 +441,14 @@ operation CreateEmfMetricsWorker {
   output: CreateMetricsWorkerOutput,
 }
 
+// An EMF library configuration or client is language-specific
+// and is not part of this shared model.
+// Each language with an EMF library accepts it through its own native type.
 structure CreateEmfMetricsWorkerInput {
-  @required
-  namespace: String,
-  @required
-  sink: EmfSink,
   dimensionKeys: DimensionKeyList,
+  // Required, and only used, for a worker without an EMF library.
+  namespace: String,
+  sink: EmfSink,
   maxQueueSize: PositiveInteger
 }
 
@@ -340,20 +458,18 @@ list DimensionKeyList {
 }
 
 union EmfSink {
-  file: EmfFileSink,
-  stdout: EmfStdoutSink
-}
-
-structure EmfFileSink {
-  @required
-  path: String,
-  @required
-  maxFileSizeBytes: PositiveLong,
-  @required
-  maxFiles: PositiveInteger
+  stdout: EmfStdoutSink,
+  agent: EmfAgentSink
 }
 
 structure EmfStdoutSink {}
+
+structure EmfAgentSink {
+  @required
+  logGroupName: String,
+  // For example "tcp://127.0.0.1:25888" or "udp://127.0.0.1:25888".
+  endpoint: String
+}
 
 structure CreateMetricsWorkerOutput {
   @required

@@ -76,6 +76,17 @@ ensure the following.
 
 1. MUST NOT block the application's execution thread.
 
+The [EMF Metrics Worker](../../framework/emf-metrics-worker.md) that CT ships
+meets this requirement only in languages without an EMF library.
+In languages with one, the worker is a wrapper around the EMF library
+and is subject to how that EMF library writes documents.
+Some EMF libraries write on the calling thread when a transaction is flushed,
+for example to standard output, or to the CloudWatch agent in Python and Node.js.
+In those languages, the client's call to Flush at the end of an operation
+can block for as long as that write takes.
+A customer who needs a guarantee that metrics never block
+can supply their own Metrics Worker.
+
 ## Points of Integration
 
 To collect metrics across CT's library stack, multiple points of integration
@@ -181,7 +192,28 @@ structure DecryptInput {
 Each call to a customer-facing API is one transaction.
 The customer-facing APIs are the client operations a customer calls directly,
 for example ESDK Encrypt and Decrypt, S3EC PutObject and GetObject,
-and the DB-ESDK item operations.
+and the DynamoDB operations the DB-ESDK intercepts, such as PutItem and GetItem.
+
+The DB-ESDK cannot add a parameter to these operations,
+because the customer calls them on the AWS SDK's DynamoDB client.
+For the DB-ESDK, the Metrics Worker is instead an optional field
+of its table configurations. See [DB-ESDK](#db-esdk).
+The DB-ESDK MUST use the Metrics Worker configured for the table an operation reads or writes.
+
+The DB-ESDK has two kinds of customer-facing API,
+and each creates transactions differently:
+
+- **Intercepted DynamoDB operations.**
+  Each intercepted DynamoDB operation is one transaction.
+  A batch or transactional operation, such as BatchWriteItem or TransactWriteItems,
+  is one transaction for the whole call, even when it covers several items or tables.
+- **DynamoDB Item Encryptor operations.**
+  When a customer calls EncryptItem or DecryptItem directly,
+  that call is one transaction, and the Item Encryptor MUST create it.
+
+When the DB-ESDK calls the Item Encryptor while handling an intercepted operation,
+it MUST pass the scoped Metrics Worker of that operation's transaction.
+The Item Encryptor MUST NOT create a second transaction in that case.
 
 Only the customer-facing API creates a transaction.
 CMMs and keyrings never see a transactionId.
@@ -273,6 +305,13 @@ the appropriate behavior when a client is configured with a metrics worker and
 supplied with a metrics worker at the API call site.
 CT would need to settle on this behavior regardless of making it optional, but it
 allows CT to get metrics into the hands of customers much faster.
+
+The DB-ESDK is the exception.
+Customers call the AWS SDK's DynamoDB operations directly,
+so the DB-ESDK has no call site where a Metrics Worker could be passed.
+The DB-ESDK MUST accept the Metrics Worker as an optional field
+of each of its table configurations.
+See [DB-ESDK](#db-esdk).
 
 ### Issue 1: How are records from different layers tied to one request?
 
@@ -460,6 +499,90 @@ structure OnDecryptOutput {
 }
 ...
 ```
+
+### DB-ESDK
+
+The DB-ESDK intercepts DynamoDB operations through the AWS SDK's DynamoDB client,
+so customers never call a DB-ESDK operation where a Metrics Worker could be passed.
+Instead, the Metrics Worker is an optional field in three configurations.
+Each one is a way a customer configures a table, so each needs the field.
+
+#### DynamoDbTableEncryptionConfig
+
+The table configuration for the DynamoDB client interceptor.
+Customers using the low-level DynamoDB client set it directly,
+and the Enhanced Client configuration is converted into it.
+
+```diff
+structure DynamoDbTableEncryptionConfig {
+  @required
+  logicalTableName: String,
+
+  @required
+  partitionKeyName: KeySchemaAttributeName,
+  sortKeyName: KeySchemaAttributeName,
+  ...
+  keyring: KeyringReference,
+  cmm: CryptographicMaterialsManagerReference,
+
+  legacyOverride: LegacyOverride,
+  plaintextOverride: PlaintextOverride,
+
++ metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
+}
+```
+
+#### DynamoDbItemEncryptorConfig
+
+The configuration of the DynamoDB Item Encryptor.
+Customers can create an Item Encryptor directly and call EncryptItem and DecryptItem.
+The interceptor also creates an Item Encryptor for each table
+by copying fields from the `DynamoDbTableEncryptionConfig`.
+That copy MUST include `metricsWorker`.
+
+```diff
+structure DynamoDbItemEncryptorConfig {
+  @required
+  logicalTableName: String,
+
+  @required
+  partitionKeyName: KeySchemaAttributeName,
+  sortKeyName: KeySchemaAttributeName,
+  ...
+  keyring: KeyringReference,
+  cmm: CryptographicMaterialsManagerReference,
+
+  legacyOverride: LegacyOverride,
+  plaintextOverride: PlaintextOverride,
+
++ metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
+}
+```
+
+#### DynamoDbEnhancedTableEncryptionConfig (Java)
+
+The table configuration for the AWS SDK for Java Enhanced Client.
+It has no Smithy model.
+`DynamoDbEnhancedClientEncryption` converts it into a `DynamoDbTableEncryptionConfig`,
+and that conversion MUST copy the Metrics Worker.
+
+```diff
+public class DynamoDbEnhancedTableEncryptionConfig {
+  private final String logicalTableName;
+  private final List<TableSchema<?>> schemaOnEncrypt;
+  ...
+  private final Keyring keyring;
+  private final CryptographicMaterialsManager cmm;
+  private final LegacyOverride legacyOverride;
+  private final PlaintextOverride plaintextOverride;
+  private final DBEAlgorithmSuiteId algorithmSuiteId;
++ private final IMetricsWorker metricsWorker;
+  ...
+}
+```
+
+For each transaction, the DB-ESDK passes the scoped Metrics Worker to the CMM and keyring,
+as described in [Transactions](#transactions).
 
 ### S3EC
 

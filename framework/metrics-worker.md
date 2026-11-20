@@ -3,8 +3,6 @@
 
 # Metrics Worker Interface
 
-_NOTE: Still in draft but in a state to receive feedback on 9-15-2025_
-
 ## Version
 
 1.0.0
@@ -14,17 +12,9 @@ _NOTE: Still in draft but in a state to receive feedback on 9-15-2025_
 - 1.0.0
   - Initial record
 
-## Implementations
-
-| Library | Version Introduced | Implementation                                                                                                                                                                                                     |
-| ------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ESDK    | T.B.D              | [ESDK.smithy](https://github.com/aws/aws-encryption-sdk/blob/mainline/AwsEncryptionSDK/dafny/AwsEncryptionSdk/Model/esdk.smithy)                                                                                   |
-| MPL     | T.B.D              | [material-provider.smithy](https://github.com/aws/aws-cryptographic-material-providers-library/blob/main/AwsCryptographicMaterialProviders/dafny/AwsCryptographicMaterialProviders/Model/material-provider.smithy) |
-| DB-ESDK | T.B.D              | [DynamoDbEncryption.smithy](https://github.com/aws/aws-database-encryption-sdk-dynamodb/blob/main/DynamoDbEncryption/dafny/DynamoDbEncryption/Model/DynamoDbEncryption.smithy)                                     |
-
 ## Overview
 
-The Metrics Worker defines defines operations that allow messages
+The Metrics Worker Interface defines operations that allow observability data
 to be published to a destination.
 The Metrics Worker interface describes the interface that all
 Metrics Workers MUST implement.

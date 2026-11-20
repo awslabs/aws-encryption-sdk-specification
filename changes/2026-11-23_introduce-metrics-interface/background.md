@@ -107,10 +107,15 @@ not restrict it.
 Keeping in line with the rest of CT features, a well defined interface with out
 of the box implementations should satisfy the feature request.
 
-Out of the box implementations should cover publishing metrics to an
-existing observability service like AWS CloudWatch and to the local file system using
-a hardened framework for that particular language implementation.
-These implementations should offer customers a guide into implementing their own
+CT should ship one out of the box implementation,
+the [EMF Metrics Worker](../../framework/emf-metrics-worker.md).
+It writes metrics in the CloudWatch Embedded Metric Format (EMF)
+to standard output or to a local CloudWatch agent.
+CloudWatch Logs turns those documents into CloudWatch metrics,
+so CT does not call CloudWatch itself.
+Where AWS publishes an EMF client library for a language,
+the worker is built on that library.
+This implementation should offer customers a guide into implementing their own
 if they wish to do so.
 
 ### Issue 4: Should out of the box solutions be custom implementations
