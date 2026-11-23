@@ -212,28 +212,24 @@ and each creates transactions differently:
   that call is one transaction, and the Item Encryptor MUST create it.
 
 When the DB-ESDK calls the Item Encryptor while handling an intercepted operation,
-it MUST pass the scoped Metrics Worker of that operation's transaction.
+it MUST pass the Metrics Worker and the transactionId of that operation's transaction.
 The Item Encryptor MUST NOT create a second transaction in that case.
 
 Only the customer-facing API creates a transaction.
-CMMs and keyrings never see a transactionId.
 
 ```mermaid
 sequenceDiagram
     participant Customer
     participant Client
-    participant Scoped as Scoped Metrics Worker
     participant CMM
     participant Keyring
     participant Worker as Customer's Metrics Worker
     Customer->>Client: Encrypt(..., metricsWorker)
-    Client->>Scoped: wrap metricsWorker with new transactionId
-    Client->>CMM: GetEncryptionMaterials(..., scoped)
-    CMM->>Scoped: AddCount("CacheMiss", 1)
-    Scoped->>Worker: AddCount("CacheMiss", 1, transactionId)
-    CMM->>Keyring: OnEncrypt(..., scoped)
-    Keyring->>Scoped: AddTime("KmsLatency", 11)
-    Scoped->>Worker: AddTime("KmsLatency", 11, transactionId)
+    Client->>Client: generate transactionId
+    Client->>CMM: GetEncryptionMaterials(..., metricsWorker, transactionId)
+    CMM->>Worker: AddCount("CacheMiss", 1, transactionId)
+    CMM->>Keyring: OnEncrypt(..., metricsWorker, transactionId)
+    Keyring->>Worker: AddTime("KmsLatency", 11, transactionId)
     Client->>Worker: Flush(transactionId)
     Client->>Customer: result
 ```
@@ -246,16 +242,14 @@ The transactionId SHOULD be a random version 4 UUID.
 The transactionId MUST NOT be derived from the plaintext, the encryption context,
 or any key material.
 
-The client MUST wrap the supplied Metrics Worker in a scoped Metrics Worker
-and MUST pass only the scoped Metrics Worker to downstream components.
+The client MUST pass the supplied Metrics Worker and the transactionId
+to downstream components.
 
-The client MUST NOT pass the supplied Metrics Worker to downstream components.
+A CMM or keyring that calls AddTime, AddCount, or AddProperty
+MUST set the transactionId it received on that call.
 
-The scoped Metrics Worker MUST forward every AddTime, AddCount, and AddProperty call
-to the supplied Metrics Worker with the transactionId of the call.
-If the forwarded call already has a transactionId, the scoped Metrics Worker MUST replace it.
-
-Flush and Shutdown on the scoped Metrics Worker MUST do nothing.
+A CMM or keyring that calls another CMM or keyring
+MUST pass on the Metrics Worker and the transactionId it received.
 
 CMMs and keyrings MUST NOT call Flush or Shutdown.
 
@@ -321,21 +315,11 @@ such as AWS KMS calls and cache lookups.
 Records from every layer must be tied to the same request,
 and concurrent requests through one Metrics Worker must not mix.
 
-#### Scoped Metrics Worker (recommended)
-
-The client generates the transactionId and passes down a Metrics Worker
-that adds it to every record.
-See [Transactions](#transactions).
-
-No input structure needs a transactionId field.
-A CMM or keyring cannot drop or mismatch the transactionId,
-because it never handles one.
-A custom keyring gets the same behavior by calling the Metrics Worker it receives.
-
-#### Pass a transactionId in every input
+#### Pass a transactionId in every input (recommended)
 
 Every input that gets `metricsWorker` also gets an optional `transactionId`,
 and every layer forwards it on each call to the Metrics Worker.
+See [Transactions](#transactions).
 
 This makes the transactionId visible in the model,
 but adds a second field to every input.
@@ -392,6 +376,7 @@ structure GetEncryptionMaterialsInput {
   requiredEncryptionContextKeys: EncryptionContextKeys,
 
 + metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
++ transactionId: String
 }
 ...
 structure DecryptMaterialsInput {
@@ -426,6 +411,7 @@ structure DecryptMaterialsInput {
   reproducedEncryptionContext: EncryptionContext,
 
 + metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
++ transactionId: String
 }
 ```
 
@@ -467,6 +453,7 @@ structure OnEncryptInput {
   materials: EncryptionMaterials,
 
 + metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
++ transactionId: String
 }
 
 structure OnEncryptOutput {
@@ -491,6 +478,7 @@ structure OnDecryptInput {
   encryptedDataKeys: EncryptedDataKeyList,
 
 + metricsWorker: aws.cryptography.materialProviders#MetricsWorkerReference
++ transactionId: String
 }
 
 structure OnDecryptOutput {
@@ -581,7 +569,7 @@ public class DynamoDbEnhancedTableEncryptionConfig {
 }
 ```
 
-For each transaction, the DB-ESDK passes the scoped Metrics Worker to the CMM and keyring,
+For each transaction, the DB-ESDK passes the Metrics Worker and the transactionId to the CMM and keyring,
 as described in [Transactions](#transactions).
 
 ### S3EC

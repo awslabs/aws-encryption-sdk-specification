@@ -14,10 +14,9 @@
 
 ## Overview
 
-The Metrics Worker Interface defines operations that allow observability data
-to be published to a destination.
-The Metrics Worker interface describes the interface that all
-Metrics Workers MUST implement.
+Metrics Workers are responsible for publishing observability data to a destination.
+
+The Metrics Worker interface specified in this document describes the interface all Metrics Workers MUST implement.
 
 ## Definitions
 
@@ -28,33 +27,44 @@ in this document are to be interpreted as described in [RFC 2119](https://tools.
 
 ### label
 
-A label is a string that is used
-as an attribute name to aggregate
-measurements. A label can be used to
-add a dimension to the Metrics Worker
+An input value to a Metrics Worker
+that is used as an attribute name to aggregate measurements.
+A label can be used to add a dimension to the Metrics Worker.
+
+The label MUST be a string value.
 
 A label MUST contain 1 to 255 printable ASCII characters
 and MUST NOT contain only whitespace.
 
 ### milliseconds
 
-A milliseconds value is a non-negative long
+An input value to a Metrics Worker
 that is a length of time in milliseconds.
+
+The milliseconds value MUST be a non-negative, finite double value.
+It MAY have a fractional part, so that a time shorter than one millisecond is not recorded as 0.
 
 ### count
 
-A count is a long value
+An input value to a Metrics Worker
+that is a number of occurrences of an event.
+
+The count MUST be a long value.
 
 ### value
 
-A value is a string that is used to attach
-context to a particular label.
+An input value to a Metrics Worker
+that attaches context to a particular label.
+
+The value MUST be a string value.
 
 ### transactionId
 
-A transactionId is a string that
-is used to coalasce multiple metric requests
+An input value to a Metrics Worker
+that is used to coalesce multiple metric requests
 for a given client request.
+
+The transactionId MUST be a string value.
 
 ## Supported Metrics Workers
 
@@ -64,65 +74,7 @@ Note: A user MAY create their own custom Metrics Worker.
 
 ## Interface
 
-### Inputs
-
-The inputs to the MetricsWorker are groups of related fields, referred to as:
-
-- [AddTime Input](#addtime-input)
-- [AddCount Input](#addcount-input)
-- [AddProperty Input](#addproperty-input)
-- [Flush Input](#flush-input)
-
-#### AddTime Input
-
-This is the input to the [AddTime](#addtime) behavior.
-
-The add time input MUST include the following:
-
-- A [label](#label)
-- A [milliseconds](#milliseconds) value
-
-The add time input MAY include the following:
-
-- A [transactionId](#transactionid)
-
-#### AddCount Input
-
-This is the input to the [AddCount](#addcount) behavior.
-
-The add count input MUST include the following:
-
-- A [label](#label)
-- A [count](#count)
-
-The add count input MAY include the following:
-
-- A [transactionId](#transactionid)
-
-#### AddProperty Input
-
-This is the input to the [AddProperty](#addproperty) behavior.
-
-The add property input MUST include the following:
-
-- A [label](#label)
-- A [value](#value)
-
-The add property input MAY include the following:
-
-- A [transactionId](#transactionid)
-
-#### Flush Input
-
-This is the input to the [Flush](#flush) behavior.
-
-The flush input MUST include the following:
-
-- A [transactionId](#transactionid)
-
-### Behaviors
-
-The MetricsWorker Interface MUST support the following behaviors:
+The Metrics Worker Interface MUST support the following behaviors:
 
 - [AddTime](#addtime)
 - [AddCount](#addcount)
@@ -130,33 +82,69 @@ The MetricsWorker Interface MUST support the following behaviors:
 - [Flush](#flush)
 - [Shutdown](#shutdown)
 
-#### AddTime
+### AddTime
+
+This interface MUST take a [label](#label) and a [milliseconds](#milliseconds) value as input.
+It MAY take a [transactionId](#transactionid).
 
 Used to record one time value for a metric name.
 Each recorded value MUST be kept as a separate value, not summed,
 so that statistics such as percentiles can be computed over them.
 
-#### AddCount
+### AddCount
+
+This interface MUST take a [label](#label) and a [count](#count) as input.
+It MAY take a [transactionId](#transactionid).
 
 Used to aggregate a sum from multiple count values with the same metric name.
 
-#### AddProperty
+### AddProperty
+
+This interface MUST take a [label](#label) and a [value](#value) as input.
+It MAY take a [transactionId](#transactionid).
 
 Used to add context/metadata in the form of a key-value pair related to a Metrics reference.
 
-#### Flush
+### Flush
+
+This interface MUST take a [transactionId](#transactionid) as input.
 
 Used to signal that no more measurements will be added for a transactionId.
 
-#### Shutdown
+### Shutdown
+
+This interface takes no input.
 
 Used to signal that the worker will receive no more calls,
 so it can write any measurements it still holds.
 
-## Proposed Smithy Model
+## Security Considerations
+
+A Metrics Worker publishes to a destination outside the library's control,
+such as a log file, standard output, or a remote service.
+Any value passed to a Metrics Worker is readable by anyone who can read that destination.
+
+Callers of this interface MUST NOT pass a plaintext, a data key,
+or any other secret as a [label](#label) or a [value](#value).
+
+Callers of this interface MUST NOT pass an [encryption context](structures.md#encryption-context) key or value
+as a [label](#label) or a [value](#value),
+because the encryption context is customer data.
+
+A [label](#label) SHOULD name a measurement the library defines
+rather than a value taken from the request,
+so that the number of distinct labels a destination sees
+does not grow with the number of requests.
+
+## Proposed Smithy model
 
 ```smithy
+namespace aws.cryptography.materialProviders
+
+use aws.polymorph#reference
+use aws.polymorph#positional
 use aws.polymorph#extendable
+use aws.polymorph#javadoc
 
 @extendable
 resource MetricsWorker {
@@ -169,70 +157,125 @@ resource MetricsWorker {
   ]
 }
 
-@range(min: 0)
-long NonNegativeLong
+// Metrics Worker Structures
 
-// Operations for different metric types
+@reference(resource: MetricsWorker)
+structure MetricsWorkerReference {}
+
+// The @pattern trait covers the printable ASCII range a label is limited to.
+// "MUST NOT contain only whitespace" is not expressible as a pattern over that
+// same range, so an implementation enforces that part when it validates input.
+@length(min: 1, max: 255)
+@pattern("^[\\x20-\\x7E]+$")
+string MetricsLabel
+
+// Metrics Worker Operations
+
+//= aws-encryption-sdk-specification/framework/metrics-worker.md#addtime
+//= type=implication
+//# This interface MUST take a [label](#label) and a [milliseconds](#milliseconds) value as input.
 operation AddTime {
   input: AddTimeInput,
-  output: AddOutput,
+  output: AddTimeOutput,
 }
 
-operation AddCount {
-  input: AddCountInput,
-  output: AddOutput,
-}
-
-operation AddProperty {
-  input: AddPropertyInput,
-  output: AddOutput,
-}
-
-// Input structures for each operation with flattened values
+@javadoc("Inputs for recording one time value.")
 structure AddTimeInput {
   @required
-  label: String,
+  @javadoc("The name of the metric this value belongs to.")
+  label: MetricsLabel,
+
   @required
-  milliseconds: NonNegativeLong,
+  @javadoc("The length of time in milliseconds.")
+  milliseconds: NonNegativeDouble,
+
+  @javadoc("The identifier of the client request this value belongs to.")
   transactionId: String
 }
 
+structure AddTimeOutput {}
+
+//= aws-encryption-sdk-specification/framework/metrics-worker.md#addcount
+//= type=implication
+//# This interface MUST take a [label](#label) and a [count](#count) as input.
+operation AddCount {
+  input: AddCountInput,
+  output: AddCountOutput,
+}
+
+@javadoc("Inputs for recording a count to sum.")
 structure AddCountInput {
   @required
-  label: String,
+  @javadoc("The name of the metric this count belongs to.")
+  label: MetricsLabel,
+
   @required
+  @javadoc("The number of occurrences to add to the metric's sum.")
   count: Long,
+
+  @javadoc("The identifier of the client request this count belongs to.")
   transactionId: String
 }
 
+structure AddCountOutput {}
+
+//= aws-encryption-sdk-specification/framework/metrics-worker.md#addproperty
+//= type=implication
+//# This interface MUST take a [label](#label) and a [value](#value) as input.
+operation AddProperty {
+  input: AddPropertyInput,
+  output: AddPropertyOutput,
+}
+
+@javadoc("Inputs for attaching context to a label.")
 structure AddPropertyInput {
   @required
-  label: String,
+  @javadoc("The name this context is attached to.")
+  label: MetricsLabel,
+
   @required
+  @javadoc("The context attached to the label.")
   value: String,
+
+  @javadoc("The identifier of the client request this context belongs to.")
   transactionId: String
 }
 
+structure AddPropertyOutput {}
+
+//= aws-encryption-sdk-specification/framework/metrics-worker.md#flush
+//= type=implication
+//# This interface MUST take a [transactionId](#transactionid) as input.
 operation Flush {
   input: FlushInput,
-  output: AddOutput,
+  output: FlushOutput,
 }
+
+@javadoc("Inputs for signalling that a client request has no more measurements.")
+structure FlushInput {
+  @required
+  @javadoc("The identifier of the client request that has no more measurements.")
+  transactionId: String
+}
+
+structure FlushOutput {}
 
 operation Shutdown {
   input: ShutdownInput,
-  output: AddOutput,
-}
-
-structure FlushInput {
-  @required
-  transactionId: String
+  output: ShutdownOutput,
 }
 
 structure ShutdownInput {}
 
-// Common output structure
-structure AddOutput {}
+structure ShutdownOutput {}
 
-@aws.polymorph#reference(resource: MetricsWorker)
-structure MetricsWorkerReference {}
+// Metrics Worker Constructors
+
+@positional
+@javadoc("Outputs for creating a Metrics Worker.")
+structure CreateMetricsWorkerOutput {
+  @required
+  @javadoc("The created Metrics Worker.")
+  metricsWorker: MetricsWorkerReference
+}
 ```

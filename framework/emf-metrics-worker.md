@@ -406,7 +406,7 @@ One Encrypt call with `Library` and `Operation` as dimension keys:
   "Library": "ESDK-Java",
   "Operation": "Encrypt",
   "KmsCallCount": 1,
-  "OperationLatency": 12,
+  "OperationLatency": [12.25],
   "AlgorithmSuite": "0x0578",
   "TransactionId": "7f3c2a"
 }
@@ -436,6 +436,8 @@ EMF extraction failures are reported as metrics in the `AWS/Logs` namespace.
 ### Proposed Smithy model
 
 ```smithy
+// CreateMetricsWorkerOutput is declared in metrics-worker.md,
+// where every Metrics Worker constructor's output is declared once.
 operation CreateEmfMetricsWorker {
   input: CreateEmfMetricsWorkerInput,
   output: CreateMetricsWorkerOutput,
@@ -469,10 +471,5 @@ structure EmfAgentSink {
   logGroupName: String,
   // For example "tcp://127.0.0.1:25888" or "udp://127.0.0.1:25888".
   endpoint: String
-}
-
-structure CreateMetricsWorkerOutput {
-  @required
-  metricsWorker: MetricsWorkerReference
 }
 ```
